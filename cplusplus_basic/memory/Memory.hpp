@@ -16,6 +16,20 @@ inline void freePoolMemory() { memory::clean(); }
 
 }/*memory*/
 
+#if !defined(MEMORY_CLASS_NEW_DELETE)
+
+#if defined(__cplusplus)
+#define MEMORY_CLASS_NEW_DELETE public: \
+static void operator delete(void *arg) { memory::free(arg); } \
+static void operator delete[](void *arg) { memory::free(arg); } \
+static void * operator new(std::size_t n) { auto ans=memory::malloc(static_cast<int>(n)); if (ans) { return ans; }throw std::bad_alloc{}; } \
+static void * operator new[](std::size_t n) { auto ans=memory::malloc(static_cast<int>(n)); if (ans) { return ans; }throw std::bad_alloc{}; }
+#else
+#define MEMORY_CLASS_NEW_DELETE
+#endif/*MEMORY_CLASS_NEW_DELETE*/
+
+#endif
+
 #endif
 
 

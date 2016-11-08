@@ -3,9 +3,12 @@
 
 /****************************************************************/
 #include <Qt/boost/config.hpp>
+#include <memory>
 #include <cstddef>
 #include <cstdbool>
 #include <cinttypes>
+#include <exception>
+#include <stdexcept>
 #include <type_traits>
 #include <initializer_list>
 /****************************************************************/
