@@ -82,7 +82,7 @@ inline void make(
      #include <initializer_list>
 
      /*boost::pool*/
-     #include "../../cplusplus_base_library/Qt/boost/pool/pool.hpp"
+     #include <Qt/boost/pool/pool.hpp>
 
      namespace  {
      namespace  _p_file{
@@ -93,7 +93,7 @@ inline void make(
           /*boost::pool*/
     class pool_t {
         typedef boost::pool<boost::default_user_allocator_malloc_free> _pool_t;
-        typedef std::recursive_mutex _mutex_t;
+        typedef std::mutex _mutex_t;
         typedef std::unique_lock<_mutex_t> _mlock_t;
         _pool_t _pm_data;
         _mutex_t _pm_mutex;
@@ -308,6 +308,7 @@ inline Memory * get_memory(){
 
 namespace memory {
 
+void clean() { return _p_file::get_memory()->clean(); }
 void * malloc(int arg){ return _p_file::get_memory()->malloc(arg); }
 void free(void * arg){ return _p_file::get_memory()->free(arg); }
 int size(void * arg){ return _p_file::get_memory()->size(arg); }
@@ -323,7 +324,7 @@ int cookie_size() { return sizeof(_p_file::Memory::Item); }
 
 int main(int,char **) {
 
-    std::ofstream ofs(THIS_PROJECT_DIR "/xxx123.cpp");
+    std::ofstream ofs(THIS_PROJECT_DIR "/../../cplusplus_basic/memory/private/memory_basic_malloc_free.cpp");
     std::vector<int_t> s;
     s.reserve(1024*1024);
     for (int i=1; i<=1024; ++i) {
