@@ -9,7 +9,7 @@ TEMPLATE = app
 
 SOURCES += main.cpp
 
-DEFINES+=THIS_PROJECT_DIR=///"$$PWD///"
+DEFINES+=THIS_PROJECT_DIR=\\\"$$PWD\\\"
 
 include($$PWD/../../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
