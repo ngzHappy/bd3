@@ -192,7 +192,8 @@ public:
         }
         _p_quick_exit();
     }
-
+private:
+    MEMORY_CLASS_NEW_DELETE
 };
 
 char _ExceptionHandle::_psm_mutex[sizeof(_ExceptionHandle::_mutex_t)];
