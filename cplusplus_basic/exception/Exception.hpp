@@ -19,7 +19,7 @@ public:
     virtual void print_error(const char*,std::size_t) noexcept(true)=0;
     ExceptionHandle()=default;
 public:
-    inline void print_information(const char *arg,int argl) { 
+    inline void print_information(const char *arg,int argl) {
         print_information(arg,static_cast<std::size_t>(argl));
     }
     inline void print_error(const char *arg,int argl) {
@@ -30,6 +30,28 @@ public:
 typedef std::unique_ptr<ExceptionHandle>(*CreateExceptionHandleFunction)(int/*line*/,const char * /*func*/,const char * /*file*/);
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT CreateExceptionHandleFunction getCreateExceptionHandleFunction();
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT CreateExceptionHandleFunction setCreateExceptionHandleFunction(CreateExceptionHandleFunction);
+
+}/*exception*/
+
+namespace exception {
+
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void exception_handle(
+    bool a_exit=true,
+    int a_line=0,
+    const char * a_functionName=nullptr,
+    const char * a_fileName=nullptr) noexcept(true);
+
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void information_handle(
+    const char * a_info,int a_len,
+    int a_line=0,
+    const char * a_functionName=nullptr,
+    const char * a_fileName=nullptr) noexcept(true);
+
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void error_handle(
+    const char * a_error,int a_len,
+    int a_line=0,
+    const char * a_functionName=nullptr,
+    const char * a_fileName=nullptr) noexcept(true);
 
 }/*exception*/
 

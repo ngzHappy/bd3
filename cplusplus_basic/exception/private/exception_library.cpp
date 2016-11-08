@@ -251,6 +251,50 @@ CreateExceptionHandleFunction setCreateExceptionHandleFunction(
     return get_CreateExceptionHandleFunction()->set(arg);
 }
 
+void exception_handle(
+    bool a_exit,
+    int a_line,
+    const char * a_functionName,
+    const char * a_fileName) noexcept(true) {
+
+    try {
+        auto var=getCreateExceptionHandleFunction()(a_line,a_functionName,a_fileName);
+        var->print_exception(a_exit);
+    }
+    catch (...) {
+        _p_quick_exit();
+    }
+
+}
+
+void information_handle(
+    const char * a_info,int a_len,
+    int a_line,
+    const char * a_functionName,
+    const char * a_fileName) noexcept(true) {
+    try {
+        auto var=getCreateExceptionHandleFunction()(a_line,a_functionName,a_fileName);
+        var->print_information(a_info,a_len);
+    }
+    catch (...) {
+        _p_quick_exit();
+    }
+}
+
+void error_handle(
+    const char * a_error,int a_len,
+    int a_line,
+    const char * a_functionName,
+    const char * a_fileName) noexcept(true) {
+    try {
+        auto var=getCreateExceptionHandleFunction()(a_line,a_functionName,a_fileName);
+        var->print_error(a_error,a_len);
+    }
+    catch (...) {
+        _p_quick_exit();
+    }
+}
+
 }/*exception*/
 
 
