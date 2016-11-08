@@ -133,7 +133,7 @@ inline void make(
              void free(void * arg) override{std::free(arg);}
              void * malloc(int_t arg){
                 auto var=reinterpret_cast<Item *>(std::malloc(arg));
-                if (var) { 
+                if (var) {
                  var->data=this;
                   return ++var;
              }
@@ -219,7 +219,7 @@ Memory&operator=(Memory&&)=delete;
 
     {
         ofs<<u8R"(
-/*+++*/ 
+/*+++*/
 void * malloc(int_t n){
         constexpr static int_t var_size_of_Item=sizeof(Item);
         if(n<1){return nullptr;}
@@ -272,7 +272,7 @@ private:
             ofs<<"\n";
         }
 
-        ofs<<u8R"( 
+        ofs<<u8R"(
 }catch(...){}
     }
 )"_sw;
@@ -323,7 +323,7 @@ int cookie_size() { return sizeof(_p_file::Memory::Item); }
 
 int main(int,char **) {
 
-    std::ofstream ofs("xxx123.cpp");
+    std::ofstream ofs(THIS_PROJECT_DIR "/xxx123.cpp");
     std::vector<int_t> s;
     s.reserve(1024*1024);
     for (int i=1; i<=1024; ++i) {
