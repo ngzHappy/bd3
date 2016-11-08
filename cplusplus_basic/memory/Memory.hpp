@@ -29,6 +29,26 @@ static void * operator new[](std::size_t n) { auto ans=memory::malloc(static_cas
 #endif/*MEMORY_CLASS_NEW_DELETE*/
 
 #endif
+ 
+namespace memory {
+
+class _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT __memory__construct_static {
+    friend void constructStatic();
+protected:
+    static bool __is_construct_static() noexcept(true);
+    static void __set_construct_static() noexcept(true);
+    static bool __run_once(void(*)(void)) noexcept(true);
+};
+
+}/*namespace memory*/
+
+/*****************************************/
+#include "private/Allocator.hpp"
+#include "private/MakeShared.hpp"
+#include "private/MakeFunction.hpp"
+#include "private/MemoryStatic.hpp"
+#include "private/MemoryApplication.hpp"
+/*****************************************/
 
 #endif
 
