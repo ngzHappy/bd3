@@ -1,5 +1,5 @@
-﻿#ifndef _MEMORY_HPP_0x877120
-#define _MEMORY_HPP_0x877120
+﻿#ifndef _MEMORY_HPP_0x877160
+#define _MEMORY_HPP_0x877160
 
 #include "../config/config.hpp"
 
@@ -16,4 +16,5 @@ inline void freePoolMemory() { memory::clean(); }
 }/*memory*/
 
 #endif
+
 
