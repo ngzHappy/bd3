@@ -13,7 +13,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    test/void_test
+    test/void_test \
+    tool/memory_maker
 
 
 
