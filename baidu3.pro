@@ -17,7 +17,8 @@ library_cplusplus_basic.file=$$PWD/cplusplus_basic/cplusplus_basic.pro
 SUBDIRS += \
     test/void_test \
     tool/memory_maker \
-    library_cplusplus_basic
+    library_cplusplus_basic \
+    test/quick_test/quick_test
 
 
 

@@ -12,9 +12,9 @@
 
 /****************************************************************/
 #if defined(CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT)
-#  define CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT BOOST_SYMBOL_EXPORT
+#  define _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT BOOST_SYMBOL_EXPORT
 #else
-#  define CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT BOOST_SYMBOL_IMPORT
+#  define _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT BOOST_SYMBOL_IMPORT
 #endif
 /****************************************************************/
 
