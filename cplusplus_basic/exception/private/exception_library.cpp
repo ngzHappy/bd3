@@ -56,6 +56,9 @@ public:
         catch (const std::bad_alloc&) {
             print_error("bad_alloc",9);
         }
+        catch (const std::exception &) {
+
+        }
         catch (...) {}
     }
 
@@ -123,6 +126,7 @@ public:
         catch (...) {/*?????*/
             _p_quick_exit();
         }
+        return nullptr;
     }
     ) {
     }
