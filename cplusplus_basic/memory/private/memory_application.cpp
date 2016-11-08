@@ -1,4 +1,4 @@
-#include "MemoryApplication.hpp"
+﻿#include "MemoryApplication.hpp"
 #include <atomic>
 
 namespace memory {

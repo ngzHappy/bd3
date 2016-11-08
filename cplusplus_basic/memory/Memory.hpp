@@ -29,7 +29,7 @@ static void * operator new[](std::size_t n) { auto ans=memory::malloc(static_cas
 #endif/*MEMORY_CLASS_NEW_DELETE*/
 
 #endif
- 
+
 namespace memory {
 
 class _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT __memory__construct_static {
