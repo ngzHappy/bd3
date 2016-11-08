@@ -8,10 +8,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         MainWindow.cpp \
-    TestMemory.cpp
+    TestMemory.cpp \
+    TestException.cpp
 
 HEADERS  += MainWindow.hpp \
-    TestMemory.hpp
+    TestMemory.hpp \
+    TestException.hpp
 
 FORMS    += MainWindow.ui
 
