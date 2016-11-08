@@ -1,5 +1,5 @@
-﻿#ifndef __Cplusplus_basic_hpp_0x97721
-#define __Cplusplus_basic_hpp_0x97721
+﻿#ifndef __CPLUSPLUS_BASIC_HPP_0X97721
+#define __CPLUSPLUS_BASIC_HPP_0X97721
 
 #include <utility>
 #include <algorithm>
