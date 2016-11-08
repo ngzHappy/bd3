@@ -14,11 +14,14 @@ TEMPLATE = subdirs
 
 library_cplusplus_basic.file=$$PWD/cplusplus_basic/cplusplus_basic.pro
 
+app_quick_test.file=$$PWD/test/quick_test/quick_test/quick_test.pro
+app_quick_test.depends+=library_cplusplus_basic
+
 SUBDIRS += \
     test/void_test \
     tool/memory_maker \
     library_cplusplus_basic \
-    test/quick_test/quick_test
+    app_quick_test
 
 
 
