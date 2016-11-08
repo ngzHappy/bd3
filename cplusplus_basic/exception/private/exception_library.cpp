@@ -1,5 +1,6 @@
 ﻿#include "../Exception.hpp"
 #include <mutex>
+#include <string>
 #include <sstream>
 #include <cstdlib>
 #include <iostream>
@@ -10,8 +11,14 @@ namespace exception {
 namespace {
 inline namespace _exception_private {
 
+/************************************************************************/
 inline void _p_exit() { return std::exit(-1); }
 inline void _p_quick_exit() { return std::exit(-2); }
+
+using _string_t=std::basic_string<char,std::char_traits<char>,memory::Allocator<char>>;
+inline _string_t operator""_s(const char *arg,std::size_t argl) {
+    return _string_t(arg,argl);
+}
 
 class _ExceptionHandle final :public exception::ExceptionHandle {
     typedef std::recursive_mutex _mutex_t;
@@ -23,6 +30,7 @@ class _ExceptionHandle final :public exception::ExceptionHandle {
         static auto var=::new (_psm_mutex) _mutex_t;
         return *var;
     }
+    bool _pm_exit_=true;
     int _pm_line;
     const char *_pm_functionname;
     const char *_pm_filename;
@@ -38,28 +46,104 @@ class _ExceptionHandle final :public exception::ExceptionHandle {
         _lock_t _{ _p_mutex() };
         std::cout<<arg.rdbuf();
     }
+protected:
+    template<int _N_>
+    void lprint_error(const char(&arg)[_N_]) {
+        print_error(arg,(_N_-1));
+    }
+    template<int _N_>
+    void lprint_information(const char(&arg)[_N_]) {
+        print_information(arg,(_N_-1));
+    }
 public:
 
     _ExceptionHandle(
-        int argLine,
-        const char *argFunc,
-        const char *argFile
-    ):_pm_line(argLine),
-        _pm_functionname(argFunc),
-        _pm_filename(argFile) {
+                int argLine,
+                const char *argFunc,
+                const char *argFile
+    ):_pm_line(argLine),_pm_functionname(argFunc),_pm_filename(argFile) {
+    }
+
+    void bad_exception_handle() noexcept(true) {
+        try {
+            lprint_error("bad_exception_handle");
+        }
+        catch (...) {}
+        _p_quick_exit();
+    }
+
+    void std_exception_handle(const std::exception &e) noexcept(true) {
+
+        try {
+            _string_t var="std::exception "_s+e.what();
+            print_information(var.data(),var.size());
+        }
+        catch (...) {
+            bad_exception_handle();
+        }
+
+        try {
+            std::rethrow_if_nested(e);
+        }
+        catch (...) {
+            print_exception(_pm_exit_);
+        }
+
+    }
+
+    void std_logic_error_handle(const std::logic_error &e) noexcept(true) {
+
+        try {
+            _string_t var="std::logic_error "_s+e.what();
+            if (_pm_exit_) {
+                print_error(var.data(),var.size());
+            }
+            else {
+                print_information(var.data(),var.size());
+            }
+        }
+        catch (...) {
+            bad_exception_handle();
+        }
+
+        try {
+            std::rethrow_if_nested(e);
+        }
+        catch (...) {
+            print_exception(_pm_exit_);
+        }
+
     }
 
     virtual void print_exception(bool argExit) noexcept(true) override {
+        _pm_exit_=argExit;
         try {
             std::rethrow_exception(std::current_exception());
         }
         catch (const std::bad_alloc&) {
             print_error("bad_alloc",9);
         }
-        catch (const std::exception &) {
+        catch (const std::logic_error&e) {
+            std_logic_error_handle(e);
+        }
+        catch (const std::exception &e) {
+            std_exception_handle(e);
+        }
+        catch (...) {
+
+            try {
+                if (argExit) {
+                    lprint_error("unknow exception ");
+                }
+                else {
+                    lprint_information("unknow exception ");
+                }
+            }
+            catch (...) {
+                bad_exception_handle();
+            }
 
         }
-        catch (...) {}
     }
 
     virtual void print_information(const char* arg,std::size_t argl) noexcept(true) override {
@@ -70,13 +154,14 @@ public:
                 if (_pm_filename&&_pm_functionname) {
                     _p_write(varStream,"@line : ");
                     _p_write(varStream,_pm_line);
-                    _p_write(varStream,"@function_name : ");
+                    _p_write(varStream," @function_name : ");
                     _p_write(varStream,_pm_functionname);
-                    _p_write(varStream,"@file_name : ");
+                    _p_write(varStream," @file_name : ");
                     _p_write(varStream,_pm_filename);
                 }
                 _p_write(varStream,"\n");
                 varStream.write(arg,argl);
+                _p_write(varStream,"\n");
                 __p_write(varStream);
             }
             catch (...) {/*?????*/
@@ -93,22 +178,25 @@ public:
                 if (_pm_filename&&_pm_functionname) {
                     _p_write(varStream,"@line : ");
                     _p_write(varStream,_pm_line);
-                    _p_write(varStream,"@function_name : ");
+                    _p_write(varStream," @function_name : ");
                     _p_write(varStream,_pm_functionname);
-                    _p_write(varStream,"@file_name : ");
+                    _p_write(varStream," @file_name : ");
                     _p_write(varStream,_pm_filename);
                 }
                 _p_write(varStream,"\n");
                 varStream.write(arg,argl);
+                _p_write(varStream,"\n");
                 __p_write(varStream);
             }
             catch (...) {}
         }
         _p_quick_exit();
     }
+
 };
 
 char _ExceptionHandle::_psm_mutex[sizeof(_ExceptionHandle::_mutex_t)];
+/************************************************************************/
 
 class __CreateExceptionHandleFunction {
     typedef std::shared_timed_mutex _mutex_t;
@@ -118,7 +206,7 @@ class __CreateExceptionHandleFunction {
     _mutex_t _pm_mutex;
 public:
     __CreateExceptionHandleFunction():_pm_function(
-        [](int a1,const char *a2,const char *a3)->std::unique_ptr<ExceptionHandle> {
+                                          [](int a1,const char *a2,const char *a3)->std::unique_ptr<ExceptionHandle> {
         try {
             ExceptionHandle *var=new _ExceptionHandle{ a1,a2,a3 };
             return std::unique_ptr<ExceptionHandle>{var};
@@ -158,7 +246,7 @@ CreateExceptionHandleFunction getCreateExceptionHandleFunction() {
 }
 
 CreateExceptionHandleFunction setCreateExceptionHandleFunction(
-    CreateExceptionHandleFunction arg) {
+        CreateExceptionHandleFunction arg) {
     if (arg==nullptr) { return getCreateExceptionHandleFunction(); }
     return get_CreateExceptionHandleFunction()->set(arg);
 }
