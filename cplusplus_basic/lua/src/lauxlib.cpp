@@ -998,13 +998,57 @@ LUALIB_API const char *luaL_gsub(lua_State *L,const char *s,const char *p,
 
 
 static void *l_alloc(void *ud,void *ptr,size_t osize,size_t nsize) {
-    (void)ud; (void)osize;  /* not used */
-    if (nsize==0) {
-        free(ptr);
+    try {
+        /*When nsize is zero, the allocator must behave like free and return nullptr.*/
+        if (nsize==0) {
+            memory::free(ptr);
+            return nullptr;
+        }
+        else {
+
+            if (ptr&&osize) {
+                /*
+                When nsize is not zero,
+                the allocator must behave like realloc.
+                The allocator returns nullptr if and only if it cannot fulfill the
+                request. Lua assumes that the allocator never fails when
+                osize >= nsize.
+                */
+                if (osize>=nsize) { return ptr; }
+                
+                try {
+                    auto newdata=reinterpret_cast<char*>(memory::malloc(nsize));
+                    if (newdata) {
+                        std::memcpy(newdata,ptr,osize);
+                    }
+                    memory::free(ptr);
+                    return newdata;
+                }
+                catch (...) {
+                    memory::free(ptr);
+                    return nullptr;
+                }
+
+            }
+            else {
+                /*
+                When ptr is nullptr,
+                osize encodes the kind of object that Lua is allocating.
+                osize is any of LUA_TSTRING, LUA_TTABLE, LUA_TFUNCTION, LUA_TUSERDATA, or LUA_TTHREAD
+                when (and only when) Lua is creating a new object of that type.
+                When osize is some other value, Lua is allocating memory
+                for something else.
+                */
+                memory::free(ptr);
+                return memory::malloc(nsize);
+            }
+
+        }
+    }
+    catch (...) {
         return nullptr;
     }
-    else
-        return realloc(ptr,nsize);
+    (void)ud;
 }
 
 

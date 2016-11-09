@@ -9,11 +9,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         MainWindow.cpp \
     TestMemory.cpp \
-    TestException.cpp
+    TestException.cpp \
+    TestLua.cpp
 
 HEADERS  += MainWindow.hpp \
     TestMemory.hpp \
-    TestException.hpp
+    TestException.hpp \
+    TestLua.hpp
 
 FORMS    += MainWindow.ui
 
