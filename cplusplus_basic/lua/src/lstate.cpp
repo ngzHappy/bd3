@@ -147,7 +147,9 @@ void luaE_shrinkCI(lua_State *L) {
     }
 }
 
-
+namespace luaL {
+int default_error_function(lua_State * L);
+}
 static void stack_init(lua_State *L1,lua_State *L) {
     int i; CallInfo *ci;
 
@@ -164,7 +166,8 @@ static void stack_init(lua_State *L1,lua_State *L) {
     }
 
     for (i=0; i<lua_State::stack_basic_size();++i) {
-        /*set default error function*/
+        setfvalue((i+L1->stack_basic),
+            (&luaL::default_error_function))/*set default error function*/;
     }
 
     L1->top=L1->stack;

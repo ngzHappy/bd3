@@ -1,4 +1,4 @@
-#ifndef __LUA_EXCEPTION_0x887763
+﻿#ifndef __LUA_EXCEPTION_0x887763
 #define __LUA_EXCEPTION_0x887763
 
 class lua_exception{

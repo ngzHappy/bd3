@@ -31,7 +31,8 @@ SOURCES += \
     $$PWD/src/lundump.cpp \
     $$PWD/src/lutf8lib.cpp \
     $$PWD/src/lvm.cpp \
-    $$PWD/src/lzio.cpp
+    $$PWD/src/lzio.cpp \
+    $$PWD/private/lua_default_error_function.cpp
 
 HEADERS += \
     $$PWD/src/lapi.h \
