@@ -150,11 +150,23 @@ void luaE_shrinkCI(lua_State *L) {
 
 static void stack_init(lua_State *L1,lua_State *L) {
     int i; CallInfo *ci;
+
     /* initialize stack array */
-    L1->stack=luaM_newvector(L,BASIC_STACK_SIZE,TValue);
+    L1->stack=luaM_newvector(L,
+        (BASIC_STACK_SIZE+lua_State::stack_basic_size()),
+        TValue);
+    L1->stack_basic=L1->stack;
+    L1->stack+=lua_State::stack_basic_size();
+
     L1->stacksize=BASIC_STACK_SIZE;
-    for (i=0; i<BASIC_STACK_SIZE; i++)
+    for (i=0; i<BASIC_STACK_SIZE; ++i) {
         setnilvalue(L1->stack+i);  /* erase new stack */
+    }
+
+    for (i=0; i<lua_State::stack_basic_size();++i) {
+        /*set default error function*/
+    }
+
     L1->top=L1->stack;
     L1->stack_last=L1->stack+L1->stacksize-EXTRA_STACK;
     /* initialize first ci */
@@ -165,6 +177,9 @@ static void stack_init(lua_State *L1,lua_State *L) {
     setnilvalue(L1->top++);  /* 'function' entry for this 'ci' */
     ci->top=L1->top+LUA_MINSTACK;
     L1->ci=ci;
+
+    /*set default error function*/
+    L1->errfunc=(char *)(L1->stack)-(char *)(L1->stack_basic);
 }
 
 
@@ -174,7 +189,9 @@ static void freestack(lua_State *L) {
     L->ci=&L->base_ci;  /* free the entire 'ci' list */
     luaE_freeCI(L);
     lua_assert(L->nci==0);
-    luaM_freearray(L,L->stack,L->stacksize);  /* free stack array */
+    luaM_freearray(L,
+        (L->stack_basic),
+        (L->stacksize+lua_State::stack_basic_size()));  /* free stack array */
 }
 
 

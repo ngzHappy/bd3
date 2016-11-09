@@ -157,9 +157,19 @@ void luaD_reallocstack(lua_State *L,int newsize) {
     int lim=L->stacksize;
     lua_assert(newsize<=LUAI_MAXSTACK||newsize==ERRORSTACKSIZE);
     lua_assert(L->stack_last-L->stack==L->stacksize-EXTRA_STACK);
-    luaM_reallocvector(L,L->stack,L->stacksize,newsize,TValue);
-    for (; lim<newsize; lim++)
+
+    /*重新分配堆栈大小*/
+    luaM_reallocvector(L,
+        L->stack_basic,
+        (L->stacksize+lua_State::stack_basic_size()),
+        (newsize+lua_State::stack_basic_size()),
+        TValue);
+    L->stack=L->stack_basic+lua_State::stack_basic_size();
+
+    for (; lim<newsize; lim++) {
         setnilvalue(L->stack+lim); /* erase new segment */
+    }
+
     L->stacksize=newsize;
     L->stack_last=L->stack+newsize-EXTRA_STACK;
     correctstack(L,oldstack);

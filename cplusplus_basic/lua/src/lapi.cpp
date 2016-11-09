@@ -955,8 +955,9 @@ LUA_API int lua_pcallk(lua_State *L,int nargs,int nresults,int errfunc,
     api_checknelems(L,nargs+1);
     api_check(L,L->status==LUA_OK,"cannot do calls on non-normal thread");
     checkresults(L,nargs,nresults);
-    if (errfunc==0)
-        func=0;
+    if (errfunc==0) {/*设置默认error function*/
+        func=func=savestack(L,(L->stack_basic));
+    }
     else {
         StkId o=index2addr(L,errfunc);
         api_checkstackindex(L,errfunc,o);
