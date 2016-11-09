@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <cstring>
 
 /*
 ** This file uses only the official API of Lua.

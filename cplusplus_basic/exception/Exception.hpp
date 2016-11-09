@@ -21,13 +21,12 @@ public:
     RuntimeError(const char *a,int al,
         int a_line=-1,
         const char * a_functionName=nullptr,
-        const char * a_fileName=nullptr):
+        const char * a_fileName=nullptr):std::exception(),
         _pm_data(
             memory::make_shared<const string>(
-            create_string(a,al,a_line,a_functionName,a_fileName))),
-        std::exception(nullptr) {}
+            create_string(a,al,a_line,a_functionName,a_fileName))){}
 
-    const char * what() const override { return _pm_data->c_str(); }
+    const char * what() const noexcept(true) override { return _pm_data->c_str(); }
 };
 
 class LogicError :public std::logic_error {
@@ -36,13 +35,12 @@ public:
     LogicError(const char *a,int al,
         int a_line=-1,
         const char * a_functionName=nullptr,
-        const char * a_fileName=nullptr):
+        const char * a_fileName=nullptr):std::logic_error(nullptr),
         _pm_data(
             memory::make_shared<const string>(
-            create_string(a,al,a_line,a_functionName,a_fileName))),
-        std::logic_error(nullptr) {}
+            create_string(a,al,a_line,a_functionName,a_fileName))){}
 
-    const char * what() const override { return _pm_data->c_str(); }
+    const char * what() const noexcept(true) override { return _pm_data->c_str(); }
 };
 
 #define throw_runtime_error(_s_,_sl_)  throw exception::RuntimeError((_s_),(_sl_),__LINE__,__func__,__FILE__)
