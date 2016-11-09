@@ -14,6 +14,7 @@ TestLua::TestLua() {
 
     auto L=luaL::newstate();
     lua::checkstack(L,8);
+    lua::openlibs(L);
 
     class ThisCall {
     public:
@@ -34,6 +35,7 @@ TestLua::TestLua() {
         lua::error(L);
         return 0;
     });
+
     lua::pushlightuserdata(L,&test);
     lua::pcall(L,1,0,0);
 

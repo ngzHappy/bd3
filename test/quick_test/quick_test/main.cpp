@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     QTimer gcTimer;
     gcTimer.connect(&gcTimer,&QTimer::timeout,
                     [](){memory::clean();});
-    gcTimer.start(312);
+    gcTimer.start(512);
 
 
     {/*测试内存*/
