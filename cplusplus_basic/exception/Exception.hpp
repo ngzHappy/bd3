@@ -24,35 +24,35 @@ protected:
     virtual void _do_quick_exit() noexcept(true)=0;
 public:
     template<typename _C_T_>
-    inline void print_information(const _C_T_ * const &arg,isize_t argl) noexcept(true){
+    inline void print_information(const _C_T_ * const &arg,isize_t argl) noexcept(true) {
         _do_print_information(arg,static_cast<size_t>(argl));
     }
     template<typename _C_T_>
-    inline void print_information(const _C_T_ * const &arg,size_t argl) noexcept(true){
+    inline void print_information(const _C_T_ * const &arg,size_t argl) noexcept(true) {
         _do_print_information(arg,argl);
     }
     template<typename _C_T_,int _N_>
     inline void print_information(_C_T_(&arg)[_N_]) {
         _do_print_information(arg,static_cast<size_t>(_N_-1));
-    } 
+    }
 
     template<typename _C_T_>
-    inline void print_error(const _C_T_ * const &arg,isize_t argl) noexcept(true){
+    inline void print_error(const _C_T_ * const &arg,isize_t argl) noexcept(true) {
         _do_print_error(arg,static_cast<size_t>(argl));
     }
     template<typename _C_T_>
-    inline void print_error(const _C_T_ * const &arg,size_t argl) noexcept(true){
+    inline void print_error(const _C_T_ * const &arg,size_t argl) noexcept(true) {
         _do_print_error(arg,argl);
     }
     template<typename _C_T_,int _N_>
     inline void print_error(_C_T_(&arg)[_N_]) {
         _do_print_error(arg,static_cast<size_t>(_N_-1));
-    } 
+    }
 
-    inline void print_exception(bool argExit=true) noexcept(true){
+    inline void print_exception(bool argExit=true) noexcept(true) {
         _do_print_exception(argExit);
     }
-    inline void quick_exit() noexcept(true){ _do_quick_exit(); }
+    inline void quick_exit() noexcept(true) { _do_quick_exit(); }
 };
 
 typedef std::unique_ptr<ExceptionHandle>(*CreateExceptionHandleFunction)(int/*line*/,const char * /*func*/,const char * /*file*/);
