@@ -166,6 +166,8 @@ struct lua_State {
     const Instruction *oldpc;  /* last pc traced */
     StkId stack_last;  /* last free slot in the stack */
     StkId stack;  /* stack base */
+    constexpr static int stack_basic_size() { return 1; }
+    StkId stack_basic;  /* stack_basic+stack_basic_size()=stack */
     UpVal *openupval;  /* list of open upvalues in this stack */
     GCObject *gclist;
     struct lua_State *twups;  /* list of threads with open upvalues */

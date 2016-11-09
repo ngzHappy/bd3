@@ -1,4 +1,5 @@
 ﻿#include "../Exception.hpp"
+#include "../../lua/private/lua_exception.hpp"
 #include <mutex>
 #include <string>
 #include <sstream>
@@ -113,6 +114,10 @@ public:
         }
         catch (const std::bad_alloc&) {
             print_error("bad_alloc");
+        }
+        catch (const lua_exception&) {
+            /*ignore lua exception*/
+            return;
         }
         catch (const std::logic_error&e) {
             std_logic_error_handle(e);
