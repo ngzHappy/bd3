@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: lmem.h,v 1.43 2014/12/19 17:26:14 roberto Exp $
 ** Interface to Memory Manager
 ** See Copyright Notice in lua.h
@@ -45,7 +45,7 @@
 #define luaM_malloc(L,s)	luaM_realloc_(L, NULL, 0, (s))
 #define luaM_new(L,t)		cast(t *, luaM_malloc(L, sizeof(t)))
 #define luaM_newvector(L,n,t) \
-		cast(t *, luaM_reallocv(L, NULL, 0, n, sizeof(t)))
+        cast(t *, luaM_reallocv(L, NULL, 0, n, sizeof(t)))
 
 #define luaM_newobject(L,tag,s)	luaM_realloc_(L, NULL, tag, (s))
 
@@ -56,13 +56,13 @@
 #define luaM_reallocvector(L, v,oldn,n,t) \
    ((v)=cast(t *, luaM_reallocv(L, v, oldn, n, sizeof(t))))
 
-LUAI_FUNC l_noret luaM_toobig (lua_State *L);
+LUAI_FUNC l_noret luaM_toobig(lua_State *L);
 
 /* not to be called directly */
-LUAI_FUNC void *luaM_realloc_ (lua_State *L, void *block, size_t oldsize,
+LUAI_FUNC void *luaM_realloc_(lua_State *L,void *block,size_t oldsize,
                                                           size_t size);
-LUAI_FUNC void *luaM_growaux_ (lua_State *L, void *block, int *size,
-                               size_t size_elem, int limit,
+LUAI_FUNC void *luaM_growaux_(lua_State *L,void *block,int *size,
+                               size_t size_elem,int limit,
                                const char *what);
 
 #endif

@@ -32,3 +32,31 @@ SOURCES += \
     $$PWD/src/lutf8lib.cpp \
     $$PWD/src/lvm.cpp \
     $$PWD/src/lzio.cpp
+
+HEADERS += \
+    $$PWD/src/lapi.h \
+    $$PWD/src/lauxlib.h \
+    $$PWD/src/lcode.h \
+    $$PWD/src/lctype.h \
+    $$PWD/src/ldebug.h \
+    $$PWD/src/ldo.h \
+    $$PWD/src/lfunc.h \
+    $$PWD/src/lgc.h \
+    $$PWD/src/llex.h \
+    $$PWD/src/llimits.h \
+    $$PWD/src/lmem.h \
+    $$PWD/src/lobject.h \
+    $$PWD/src/lopcodes.h \
+    $$PWD/src/lparser.h \
+    $$PWD/src/lprefix.h \
+    $$PWD/src/lstate.h \
+    $$PWD/src/lstring.h \
+    $$PWD/src/ltable.h \
+    $$PWD/src/ltm.h \
+    $$PWD/src/lua.h \
+    $$PWD/src/luaconf.h \
+    $$PWD/src/lualib.h \
+    $$PWD/src/lundump.h \
+    $$PWD/src/lvm.h \
+    $$PWD/src/lzio.h \
+    $$PWD/src/lua.hpp

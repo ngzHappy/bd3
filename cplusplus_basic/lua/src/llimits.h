@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: llimits.h,v 1.141 2015/11/19 19:16:22 roberto Exp $
 ** Limits, basic types, and some other 'installation-dependent' definitions
 ** See Copyright Notice in lua.h
@@ -65,11 +65,11 @@ typedef unsigned char lu_byte;
 typedef LUAI_USER_ALIGNMENT_T L_Umaxalign;
 #else
 typedef union {
-  lua_Number n;
-  double u;
-  void *s;
-  lua_Integer i;
-  long l;
+    lua_Number n;
+    double u;
+    void *s;
+    lua_Integer i;
+    long l;
 } L_Umaxalign;
 #endif
 
@@ -310,14 +310,14 @@ typedef unsigned long Instruction;
 #else
 /* realloc stack keeping its size */
 #define condmovestack(L,pre,pos)  \
-	{ int sz_ = (L)->stacksize; pre; luaD_reallocstack((L), sz_); pos; }
+    { int sz_ = (L)->stacksize; pre; luaD_reallocstack((L), sz_); pos; }
 #endif
 
 #if !defined(HARDMEMTESTS)
 #define condchangemem(L,pre,pos)	((void)0)
 #else
 #define condchangemem(L,pre,pos)  \
-	{ if (G(L)->gcrunning) { pre; luaC_fullgc(L, 0); pos; } }
+    { if (G(L)->gcrunning) { pre; luaC_fullgc(L, 0); pos; } }
 #endif
 
 #endif
