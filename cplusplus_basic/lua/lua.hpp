@@ -305,9 +305,9 @@ inline auto pcallk(State *L,int nargs,int nresults,int errfunc,KContext ctx,KFun
 /**/
 inline auto pcall(State*L,int n,int r,int errorFunction)->ThreadStatus { return pcallk(L,n,r,errorFunction,0,nullptr); }
 /**/
-inline auto load(State *L,Reader reader,void *dt,const char *chunkname,const char *mode) ->ThreadStatus { return static_cast<ThreadStatus>(lua_load(L,reader,dt,chunkname,mode)); }
+inline auto load(State *L,Reader reader,void *dt,const char *chunkname,const char *mode) noexcept(true)->ThreadStatus { return static_cast<ThreadStatus>(lua_load(L,reader,dt,chunkname,mode)); }
 /**/
-inline auto dump(State *L,Writer writer,void *data,int strip)->ThreadStatus { return static_cast<ThreadStatus>(lua_dump(L,writer,data,strip)); }
+inline auto dump(State *L,Writer writer,void *data,int strip)noexcept(true)->ThreadStatus { return static_cast<ThreadStatus>(lua_dump(L,writer,data,strip)); }
 /**/
 //inline auto yieldk(State *L,int nresults,KContext ctx,KFunction k) ->unknow_return_type { return lua_yieldk(L,nresults,ctx,k); }
 /**/
