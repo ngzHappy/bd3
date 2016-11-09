@@ -116,10 +116,18 @@ int luaD_rawrunprotected(lua_State *L,Pfunc f,void *ud) {
     struct lua_longjmp lj;
     lj.status=LUA_OK;
     lj.previous=L->errorJmp;  /* chain new error handler */
-    L->errorJmp=&lj;
-    LUAI_TRY(L,&lj,
-        (*f)(L,ud);
-    );
+
+    {/*protected call*/
+        auto c=&lj;
+        L->errorJmp=c;
+        try {
+            (*f)(L,ud);
+        }
+        catch (...) {
+            if ((c)->status==0) { (c)->status=-1; }
+        }
+    }
+    
     L->errorJmp=lj.previous;  /* restore old error handler */
     L->nCcalls=oldnCcalls;
     return lj.status;
