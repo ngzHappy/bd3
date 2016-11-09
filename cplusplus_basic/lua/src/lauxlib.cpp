@@ -1015,17 +1015,20 @@ static void *l_alloc(void *ud,void *ptr,size_t osize,size_t nsize) {
                 osize >= nsize.
                 */
                 if (osize>=nsize) { return ptr; }
-                
+
                 try {
                     auto newdata=reinterpret_cast<char*>(memory::malloc(nsize));
                     if (newdata) {
                         std::memcpy(newdata,ptr,osize);
+                    }else{
+                        throw std::bad_alloc{};
                     }
                     memory::free(ptr);
                     return newdata;
                 }
                 catch (...) {
                     memory::free(ptr);
+                    exception::exception_handle(true,__LINE__,__func__,__FILE__);
                     return nullptr;
                 }
 
