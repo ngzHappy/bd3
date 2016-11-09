@@ -214,7 +214,7 @@ inline auto rotate(State *L,int idx,int n)noexcept(true)->void { return lua_rota
 /*noexcept(true):[-0, +0, –]将栈区fromidx拷贝到toidx*/
 inline auto copy(State *L,int fromidx,int toidx)noexcept(true) ->void { return lua_copy(L,fromidx,toidx); }
 /*noexcept(true):[-0, +0, –]如果栈区没有n个空余空间则强制分配*/
-inline auto checkstack(State *L,int n)noexcept(true) ->bool { return lua_checkstack(L,n)>0; }
+inline auto checkstack(State *L,int n)noexcept(true)->bool { return lua_checkstack(L,n)>0; }
 /*noexcept(true):[-?, +?, –]将from协程的n个value弹出并压入to协程*/
 inline auto xmove(State *from,State *to,int n)noexcept(true)->void { return lua_xmove(from,to,n); }
 /*noexcept(true):[-0, +0, –]判断是否是number*/
@@ -281,8 +281,8 @@ inline auto pushfstring(State *L,const char *fmt,...)noexcept(false)->const char
 inline auto pushcclosure(State *L,lua_CFunction fn,int n)noexcept(false) ->void { return lua_pushcclosure(L,fn,n); }
 /**/
 inline auto pushboolean(State *L,int b)->void { return lua_pushboolean(L,b); }
-/**/
-inline auto pushlightuserdata(State *L,void *p)->void { return lua_pushlightuserdata(L,p); }
+/*noexcept(true): [-0, +1, –] */
+inline auto pushlightuserdata(State *L,void *p)noexcept(true)->void { return lua_pushlightuserdata(L,p); }
 /* Returns 1 if this thread is the main thread of its state*/
 inline auto pushthread(State *L)->int { return lua_pushthread(L); }
 /*noexcept(false): [-0, +1, e] */
@@ -373,8 +373,8 @@ inline auto tointeger(State*L,int i) ->lua_Integer { return tointegerx(L,(i),nul
 inline auto pop(State*L,int n) ->void { return settop(L,-(n)-1); }
 /*noexcept(false): [-0, +1, m] */
 inline auto newtable(State*L) noexcept(false)->void { return createtable(L,0,0); }
-/**/
-inline auto pushcfunction(State*L,CFunction f) ->void { return pushcclosure(L,f,0); }
+/*noexcept(true):[-0, +1, –] */
+inline auto pushcfunction(State*L,CFunction f)noexcept(true) ->void { return pushcclosure(L,f,0); }
 /*noexcept(false): [-0, +0, e] */
 inline auto register_function(State*L,const char * n,CFunction f)noexcept(false)->void { pushcfunction(L,f); return setglobal(L,n); }
 /**/
@@ -469,7 +469,8 @@ inline auto open_bit32(State *L)->int { return luaopen_bit32(L); }
 inline auto open_math(State *L)->int { return luaopen_math(L); }
 inline auto open_debug(State *L)->int { return luaopen_debug(L); }
 inline auto open_package(State *L)->int { return luaopen_package(L); }
-inline auto openlibs(State *L)->void { return luaL_openlibs(L); }
+/*noexcept(false):[-0, +0, e] */
+inline auto openlibs(State *L)noexcept(false)->void { return luaL_openlibs(L); }
 
 }/*_import_lualib_h*/
 
@@ -490,8 +491,8 @@ enum RefOptions :enum_base_type {
 
 /**/
 inline auto checkversion_(lua::State *L,lua_Number ver,size_t sz)->void { luaL_checkversion_(L,ver,sz); }
-/**/
-inline auto checkversion(lua::State *L) ->void { return checkversion_(L,LUA_VERSION_NUM,LUAL_NUMSIZES); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checkversion(lua::State *L)noexcept(false) ->void { return checkversion_(L,LUA_VERSION_NUM,LUAL_NUMSIZES); }
 /**/
 inline auto getmetafield(lua::State *L,int obj,const char *e)->lua::BaseTypes { return static_cast<lua::BaseTypes>(luaL_getmetafield(L,obj,e)); }
 /*noexcept(false): [-0, +(0|1), e] */
@@ -500,42 +501,42 @@ inline auto callmeta(lua::State *L,int obj,const char *e)noexcept(false)->bool {
 inline auto tolstring(lua::State *L,int idx,size_t *len)->const char * { return luaL_tolstring(L,idx,len); }
 /*noexcept(false): [-0, +0, v] */
 inline auto argerror(lua::State *L,int arg,const char *extramsg)noexcept(false)->unknow_return_type { return luaL_argerror(L,arg,extramsg); }
-/**/
-inline auto checklstring(lua::State *L,int arg,size_t *l)->const char * { return luaL_checklstring(L,arg,l); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checklstring(lua::State *L,int arg,size_t *l)noexcept(false)->const char * { return luaL_checklstring(L,arg,l); }
 /**/
 inline auto optlstring(lua::State *L,int arg,const char *def,size_t *l)->const char * { return luaL_optlstring(L,arg,def,l); }
-/**/
-inline auto checknumber(lua::State *L,int arg)->lua::Number { return luaL_checknumber(L,arg); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checknumber(lua::State *L,int arg)noexcept(false)->lua::Number { return luaL_checknumber(L,arg); }
 /**/
 inline auto optnumber(lua::State *L,int arg,lua::Number def)->lua_Number { return luaL_optnumber(L,arg,def); }
-/**/
-inline auto checkinteger(lua::State *L,int arg)->lua::Integer { return luaL_checkinteger(L,arg); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checkinteger(lua::State *L,int arg)noexcept(false)->lua::Integer { return luaL_checkinteger(L,arg); }
 /**/
 inline auto optinteger(lua::State *L,int arg,lua::Integer def)->lua::Integer { return luaL_optinteger(L,arg,def); }
-/**/
-inline auto checkstack(lua::State *L,int sz,const char *msg)->void { return luaL_checkstack(L,sz,msg); }
-/**/
-inline auto checktype(lua::State *L,int arg,lua::BaseTypes t)->void { return luaL_checktype(L,arg,t); }
-/**/
-inline auto checkany(lua::State *L,int arg)->void { return luaL_checkany(L,arg); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checkstack(lua::State *L,int sz,const char *msg)noexcept(false)->void { return luaL_checkstack(L,sz,msg); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checktype(lua::State *L,int arg,lua::BaseTypes t)noexcept(false)->void { return luaL_checktype(L,arg,t); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checkany(lua::State *L,int arg)noexcept(false)->void { return luaL_checkany(L,arg); }
 /*return true if the table is new created,else return false*/
 inline auto newmetatable(lua::State *L,const char *tname)->bool { return luaL_newmetatable(L,tname)>0; }
 /**/
 inline auto setmetatable(lua::State *L,const char *tname)->void { return luaL_setmetatable(L,tname); }
 /**/
 inline auto testudata(lua::State *L,int ud,const char *tname)->void * { return luaL_testudata(L,ud,tname); }
-/**/
-inline auto checkudata(lua::State *L,int ud,const char *tname)->void * { return luaL_checkudata(L,ud,tname); }
+/*noexcept(false):[-0, +0, v]*/
+inline auto checkudata(lua::State *L,int ud,const char *tname)noexcept(false)->void * { return luaL_checkudata(L,ud,tname); }
 /**/
 inline auto where(lua::State *L,int lvl)->void { return luaL_where(L,lvl); }
-/**/
-inline auto error(lua::State *L,const char *fmt,...)->unknow_return_type { va_list argp; va_start(argp,fmt); luaL_where(L,1); lua_pushvfstring(L,fmt,argp); va_end(argp); lua_concat(L,2); return lua::error(L); }
-/**/
+/*noexcept(false): [-0, +0, v] */
+inline auto error(lua::State *L,const char *fmt,...)noexcept(false)->unknow_return_type { va_list argp; va_start(argp,fmt); luaL_where(L,1); lua_pushvfstring(L,fmt,argp); va_end(argp); lua_concat(L,2); return lua::error(L); }
+/*noexcept(false): [-0, +0, v] */
 inline auto checkoption(lua::State *L,int arg,const char *def,const char *const lst[])->unknow_return_type { return luaL_checkoption(L,arg,def,lst); }
 /**/
 inline auto fileresult(lua::State *L,int stat,const char *fname)->int { return luaL_fileresult(L,stat,fname); }
-/**/
-inline auto execresult(lua::State *L,int stat)->int { return luaL_execresult(L,stat); }
+/*noexcept(false):[-0, +3, m] */
+inline auto execresult(lua::State *L,int stat)noexcept(false)->int { return luaL_execresult(L,stat); }
 /**/
 inline auto ref(lua::State *L,int t)->RefOptions { return static_cast<RefOptions>(luaL_ref(L,t)); }
 /**/
@@ -570,14 +571,14 @@ template<std::size_t _N_>
 inline auto newlib(lua::State *L,const Reg(&l)[_N_])->void { checkversion(L); newlibtable(L,l); return setfuncs(L,l,0); }
 /*noexcept(false): [-0, +0, v] */
 inline auto argcheck(lua::State * L,int cond,int arg,const char *extramsg)noexcept(false)->void { return ((void)((cond)||luaL_argerror(L,(arg),(extramsg)))); }
-/**/
-inline auto checkstring(lua::State *L,int n) ->const char * { return checklstring(L,n,nullptr); }
+/*noexcept(false): [-0, +0, v] */
+inline auto checkstring(lua::State *L,int n)noexcept(false) ->const char * { return checklstring(L,n,nullptr); }
 /**/
 inline auto optstring(lua::State * L,int n,const char *d)->const char * { return optlstring(L,n,d,nullptr); }
 /**/
 inline auto type_name(lua::State *L,int i)->const char * { return lua::type_name(L,lua::type(L,(i))); }
-/*false is no error ,true is has error*/
-inline auto dofile(lua::State *L,const char * fn) ->bool { return (loadfile(L,fn)||lua::pcall(L,0,LUA_MULTRET,0)); }
+/*noexcept(false): [-0, +?, e] false is no error ,true is has error*/
+inline auto dofile(lua::State *L,const char * fn)noexcept(false) ->bool { return (loadfile(L,fn)||lua::pcall(L,0,LUA_MULTRET,0)); }
 /*false is no error ,true is has error*/
 inline auto dostring(lua::State *L,const char *s) ->bool { return (luaL_loadstring(L,s)||lua_pcall(L,0,LUA_MULTRET,0)); }
 /**/
