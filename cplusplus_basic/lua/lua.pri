@@ -60,4 +60,5 @@ HEADERS += \
     $$PWD/src/lundump.h \
     $$PWD/src/lvm.h \
     $$PWD/src/lzio.h \
-    $$PWD/src/lua.hpp
+    $$PWD/src/lua.hpp \
+    $$PWD/lua.hpp

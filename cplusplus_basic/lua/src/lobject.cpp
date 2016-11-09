@@ -362,7 +362,7 @@ int luaO_utf8esc(char *buff,unsigned long x) {
 
 
 /* maximum length of the conversion of a number to a string */
-#define MAXNUMBER2STR	50
+#define MAXNUMBER2STR	64
 
 
 /*
@@ -372,8 +372,9 @@ void luaO_tostring(lua_State *L,StkId obj) {
     char buff[MAXNUMBER2STR];
     size_t len;
     lua_assert(ttisnumber(obj));
-    if (ttisinteger(obj))
+    if (ttisinteger(obj)){
         len=lua_integer2str(buff,sizeof(buff),ivalue(obj));
+    }
     else {
         len=lua_number2str(buff,sizeof(buff),fltvalue(obj));
 #if !defined(LUA_COMPAT_FLOATSTRING)
