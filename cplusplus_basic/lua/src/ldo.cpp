@@ -123,8 +123,13 @@ int luaD_rawrunprotected(lua_State *L,Pfunc f,void *ud) {
         try {
             (*f)(L,ud);
         }
+        catch (const lua_exception &) {
+            if ((c)->status==0) { (c)->status=-1; }
+        }
         catch (...) {
             if ((c)->status==0) { (c)->status=-1; }
+            exception::exception_handle(false,
+                __LINE__,__func__,__FILE__);
         }
     }
     
