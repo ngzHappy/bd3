@@ -41,5 +41,7 @@
 
 #endif			/* } */
 
+#include "../private/config.hpp"
+
 #endif
 
