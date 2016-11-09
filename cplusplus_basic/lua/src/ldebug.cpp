@@ -565,7 +565,8 @@ static const char *varinfo(lua_State *L,const TValue *o) {
 
 l_noret luaG_typeerror(lua_State *L,const TValue *o,const char *op) {
     const char *t=luaT_objtypename(L,o);
-    luaG_runerror(L,"attempt to %s a %s value%s",op,t,varinfo(L,o));
+    auto tmp=varinfo(L,o);
+    luaG_runerror(L,"attempt to %s a %s value%s",op,t,tmp);
 }
 
 

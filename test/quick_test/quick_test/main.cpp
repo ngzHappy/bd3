@@ -2,6 +2,7 @@
 #include <QtWidgets/QApplication>
 #include "TestMemory.hpp"
 #include "TestException.hpp"
+#include "TestLua.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,10 @@ int main(int argc, char *argv[])
 
     {/*测试异常*/
         TestException test;
+    }
+
+    {/*测试lua*/
+        TestLua test;
     }
 
     MainWindow window;

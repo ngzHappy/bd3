@@ -182,7 +182,7 @@ static void stack_init(lua_State *L1,lua_State *L) {
     L1->ci=ci;
 
     /*set default error function*/
-    L1->errfunc=(char *)(L1->stack)-(char *)(L1->stack_basic);
+    L1->errfunc=(const char *)(L1->stack_basic)-(const char *)(L1->stack);
 }
 
 
