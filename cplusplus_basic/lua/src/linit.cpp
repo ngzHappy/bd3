@@ -42,7 +42,9 @@
 static const luaL_Reg loadedlibs[]={
   {"_G", luaopen_base},
   {LUA_LOADLIBNAME, luaopen_package},
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
   {LUA_COLIBNAME, luaopen_coroutine},
+#endif/*ENABLE_LUA_COROUTINE*/
   {LUA_TABLIBNAME, luaopen_table},
   {LUA_IOLIBNAME, luaopen_io},
   {LUA_OSLIBNAME, luaopen_os},

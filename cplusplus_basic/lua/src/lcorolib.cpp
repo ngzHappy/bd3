@@ -9,6 +9,7 @@
 
 #include "lprefix.h"
 
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 
 #include <stdlib.h>
 
@@ -166,3 +167,4 @@ LUAMOD_API int luaopen_coroutine(lua_State *L) {
     return 1;
 }
 
+#endif/*ENABLE_LUA_COROUTINE*/
