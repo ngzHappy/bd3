@@ -189,7 +189,7 @@ public:
         this->quick_exit();
     }
 
-    void _do_quick_exit() noexcept(true) override{
+    void _do_quick_exit() noexcept(true) override {
         _p_quick_exit();
     }
 
@@ -295,6 +295,81 @@ void error_handle(
     catch (...) {
         _p_quick_exit();
     }
+}
+
+namespace {
+namespace __private {
+thread_local char tmp_char_s[256];
+class string_view_t {
+public:
+    const char * data=nullptr;
+    std::size_t length=0;
+};
+inline string_view_t int_string(int arg) {
+    auto endl=&tmp_char_s[200];
+    string_view_t ans;
+
+    if (arg==0) {
+        *endl='0';
+        ans.data=endl;
+        ans.length=1;
+        return ans;
+    }
+
+    bool is_negative=false;
+    if (arg<0) {
+        arg=-arg;
+        is_negative=true;
+    }
+    
+    auto tmp=std::div(arg,10);
+    *endl=char(tmp.rem+'0');
+    ++ans.length;
+
+    while (tmp.quot!=0) {
+        arg=tmp.quot;
+        tmp=std::div(arg,10);
+        --endl;
+        *endl=char(tmp.rem+'0');
+        ++ans.length;
+    }
+
+    if (is_negative) {
+        --endl;
+        *endl='-';
+        ++ans.length;
+    }
+
+    ans.data=endl;
+    return ans;
+}
+
+}/*__private*/
+}/**/
+string create_string(
+    const char * argD,int argl,
+    int a_line,
+    const char * a_functionName,
+    const char * a_fileName) {
+    try {
+        if (argD&&(argl>0)) {
+            string varAns{ argD, static_cast<std::size_t>(argl) };
+            if (a_functionName&&a_fileName) {
+                {
+                    auto str=__private::int_string(a_line);
+                    varAns.append("@from: ",7);
+                    varAns.append(str.data,str.length);
+                    varAns.append("@from: ",7);
+                    varAns.append(a_functionName);
+                    varAns.append("@from: ",7);
+                    varAns.append(a_fileName);
+                }
+            }
+            return std::move(varAns);
+        }
+    }
+    catch (...) {}
+    return{};
 }
 
 }/*exception*/

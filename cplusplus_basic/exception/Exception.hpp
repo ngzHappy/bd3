@@ -2,10 +2,51 @@
 #define _EXCEPTION_HPP_0x325678
 
 #include "../memory/Memory.hpp"
+#include <string>
 #include <exception>
 #include <stdexcept>
 
 namespace exception {
+
+using string=std::basic_string<char,std::char_traits<char>,memory::Allocator<char>>;
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT string create_string(
+const char *,int,
+int a_line=-1,
+const char * a_functionName=nullptr,
+const char * a_fileName=nullptr);
+
+class RuntimeError :public std::exception {
+    std::shared_ptr<const string> _pm_data;
+public:
+    RuntimeError(const char *a,int al,
+        int a_line=-1,
+        const char * a_functionName=nullptr,
+        const char * a_fileName=nullptr):
+        _pm_data(
+            memory::make_shared<const string>(
+            create_string(a,al,a_line,a_functionName,a_fileName))),
+        std::exception(nullptr) {}
+
+    const char * what() const override { return _pm_data->c_str(); }
+};
+
+class LogicError :public std::logic_error {
+    std::shared_ptr<const string> _pm_data;
+public:
+    LogicError(const char *a,int al,
+        int a_line=-1,
+        const char * a_functionName=nullptr,
+        const char * a_fileName=nullptr):
+        _pm_data(
+            memory::make_shared<const string>(
+            create_string(a,al,a_line,a_functionName,a_fileName))),
+        std::logic_error(nullptr) {}
+
+    const char * what() const override { return _pm_data->c_str(); }
+};
+
+#define throw_runtime_error(_s_,_sl_)  throw exception::RuntimeError((_s_),(_sl_),__LINE__,__func__,__FILE__)
+#define throw_logic_error(_s_,_sl_)  throw exception::LogicError((_s_),(_sl_),__LINE__,__func__,__FILE__)
 
 class ExceptionHandle {
     ExceptionHandle&operator=(const ExceptionHandle&)=delete;

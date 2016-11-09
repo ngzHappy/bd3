@@ -3,12 +3,12 @@
 TestException::TestException(){
 
     try {
-        throw std::logic_error("test");
+        throw_runtime_error("test",4);
     }
     catch (...) {
         exception::exception_handle(false);
     }
-
-
+    
+  
 
 }
