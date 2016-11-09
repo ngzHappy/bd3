@@ -56,8 +56,6 @@
 #define LUAI_TRY(L,c,a) \
     try { a } catch(...) { if ((c)->status == 0) (c)->status = -1; }
 #define luai_jmpbuf		int  /* dummy variable */
-	 
-
 
 
 /* chain list of long jump buffers */
@@ -487,7 +485,7 @@ void luaD_callnoyield(lua_State *L,StkId func,int nResults) {
     L->nny--;
 }
 
-
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 /*
 ** Completes the execution of an interrupted C function, calling its
 ** continuation function.
@@ -514,8 +512,8 @@ static void finishCcall(lua_State *L,int status) {
     /* finish 'luaD_precall' */
     luaD_poscall(L,ci,L->top-n,n);
 }
-
-
+#endif
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 /*
 ** Executes "full continuation" (everything in the stack) of a
 ** previously interrupted coroutine until the stack is empty (or another
@@ -536,8 +534,8 @@ static void unroll(lua_State *L,void *ud) {
         }
     }
 }
-
-
+# endif
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 /*
 ** Try to find a suspended protected call (a "recover point") for the
 ** given thread.
@@ -550,8 +548,8 @@ static CallInfo *findpcall(lua_State *L) {
     }
     return NULL;  /* no pending pcall */
 }
-
-
+#endif
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 /*
 ** Recovers from an error in a coroutine. Finds a recover point (if
 ** there is one) and completes the execution of the interrupted
@@ -572,7 +570,7 @@ static int recover(lua_State *L,int status) {
     L->errfunc=ci->u.c.old_errfunc;
     return 1;  /* continue running the coroutine */
 }
-
+#endif
 
 /*
 ** signal an error in the call to 'resume', not in the execution of the
@@ -586,7 +584,7 @@ static l_noret resume_error(lua_State *L,const char *msg,StkId firstArg) {
     luaD_throw(L,-1);  /* jump back to 'lua_resume' */
 }
 
-
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 /*
 ** Do the work for 'lua_resume' in protected mode. Most of the work
 ** depends on the status of the coroutine: initial state, suspended
@@ -629,8 +627,9 @@ static void resume(lua_State *L,void *ud) {
     }
     lua_assert(nCcalls==L->nCcalls);
 }
+#endif
 
-
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 LUA_API int lua_resume(lua_State *L,lua_State *from,int nargs) {
     int status;
     unsigned short oldnny=L->nny;  /* save "number of non-yieldable" calls */
@@ -660,13 +659,13 @@ LUA_API int lua_resume(lua_State *L,lua_State *from,int nargs) {
     lua_unlock(L);
     return status;
 }
-
+#endif/*ENABLE_LUA_COROUTINE*/
 
 LUA_API int lua_isyieldable(lua_State *L) {
     return (L->nny==0);
 }
 
-
+#if ENABLE_LUA_COROUTINE/*ENABLE_LUA_COROUTINE*/
 LUA_API int lua_yieldk(lua_State *L,int nresults,lua_KContext ctx,
                         lua_KFunction k) {
     CallInfo *ci=L->ci;
@@ -694,7 +693,7 @@ LUA_API int lua_yieldk(lua_State *L,int nresults,lua_KContext ctx,
     lua_unlock(L);
     return 0;  /* return to 'luaD_hook' */
 }
-
+#endif
 
 int luaD_pcall(lua_State *L,Pfunc func,void *u,
                 ptrdiff_t old_top,ptrdiff_t ef) {

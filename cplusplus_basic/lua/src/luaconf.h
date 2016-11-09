@@ -219,7 +219,7 @@
 ** Marks for exported symbols in the C code
 ** ===================================================================
 */
-
+#include "../private/config.hpp"
 /*
 @@ LUA_API is a mark for all core API functions.
 @@ LUALIB_API is a mark for all auxiliary library functions.
@@ -229,20 +229,7 @@
 ** the libraries, you may want to use the following definition (define
 ** LUA_BUILD_AS_DLL to get it).
 */
-#if defined(LUA_BUILD_AS_DLL)	/* { */
-
-#if defined(LUA_CORE) || defined(LUA_LIB)	/* { */
-#define LUA_API __declspec(dllexport)
-#else						/* }{ */
-#define LUA_API __declspec(dllimport)
-#endif						/* } */
-
-#else				/* }{ */
-
-#define LUA_API		extern
-
-#endif				/* } */
-
+#define LUA_API	_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT
 
 /* more often than not the libs go together with the core */
 #define LUALIB_API	LUA_API
