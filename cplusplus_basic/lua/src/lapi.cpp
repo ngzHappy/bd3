@@ -1,4 +1,4 @@
-/*
+﻿/*
 ** $Id: lapi.c,v 2.259 2016/02/29 14:27:14 roberto Exp $
 ** Lua API
 ** See Copyright Notice in lua.h
@@ -54,7 +54,7 @@ const char lua_ident[] =
 #define api_checkvalidindex(l,o)  api_check(l, isvalid(o), "invalid index")
 
 #define api_checkstackindex(l, i, o)  \
-	api_check(l, isstackindex(i, o), "index not in the stack")
+    api_check(l, isstackindex(i, o), "index not in the stack")
 
 
 static TValue *index2addr (lua_State *L, int idx) {
@@ -902,7 +902,7 @@ LUA_API void lua_setuservalue (lua_State *L, int idx) {
 
 #define checkresults(L,na,nr) \
      api_check(L, (nr) == LUA_MULTRET || (L->ci->top - L->top >= (nr) - (na)), \
-	"results from function overflow current stack size")
+    "results from function overflow current stack size")
 
 
 LUA_API void lua_callk (lua_State *L, int nargs, int nresults,
