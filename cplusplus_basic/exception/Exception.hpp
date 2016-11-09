@@ -13,18 +13,46 @@ class ExceptionHandle {
     ExceptionHandle(const ExceptionHandle&)=delete;
     ExceptionHandle(ExceptionHandle&&)=delete;
 public:
+    using size_t=std::size_t;
+    using isize_t=std::make_signed_t<size_t>;
     virtual ~ExceptionHandle()=default;
-    virtual void print_exception(bool argExit=true) noexcept(true)=0;
-    virtual void print_information(const char*,std::size_t) noexcept(true)=0;
-    virtual void print_error(const char*,std::size_t) noexcept(true)=0;
     ExceptionHandle()=default;
+protected:
+    virtual void _do_print_exception(bool argExit) noexcept(true)=0;
+    virtual void _do_print_information(const char*,size_t) noexcept(true)=0;
+    virtual void _do_print_error(const char*,size_t) noexcept(true)=0;
+    virtual void _do_quick_exit() noexcept(true)=0;
 public:
-    inline void print_information(const char *arg,int argl) {
-        print_information(arg,static_cast<std::size_t>(argl));
+    template<typename _C_T_>
+    inline void print_information(const _C_T_ * const &arg,isize_t argl) noexcept(true){
+        _do_print_information(arg,static_cast<size_t>(argl));
     }
-    inline void print_error(const char *arg,int argl) {
-        print_error(arg,static_cast<std::size_t>(argl));
+    template<typename _C_T_>
+    inline void print_information(const _C_T_ * const &arg,size_t argl) noexcept(true){
+        _do_print_information(arg,argl);
     }
+    template<typename _C_T_,int _N_>
+    inline void print_information(_C_T_(&arg)[_N_]) {
+        _do_print_information(arg,static_cast<size_t>(_N_-1));
+    } 
+
+    template<typename _C_T_>
+    inline void print_error(const _C_T_ * const &arg,isize_t argl) noexcept(true){
+        _do_print_error(arg,static_cast<size_t>(argl));
+    }
+    template<typename _C_T_>
+    inline void print_error(const _C_T_ * const &arg,size_t argl) noexcept(true){
+        _do_print_error(arg,argl);
+    }
+    template<typename _C_T_,int _N_>
+    inline void print_error(_C_T_(&arg)[_N_]) {
+        _do_print_error(arg,static_cast<size_t>(_N_-1));
+    } 
+
+    inline void print_exception(bool argExit=true) noexcept(true){
+        _do_print_exception(argExit);
+    }
+    inline void quick_exit() noexcept(true){ _do_quick_exit(); }
 };
 
 typedef std::unique_ptr<ExceptionHandle>(*CreateExceptionHandleFunction)(int/*line*/,const char * /*func*/,const char * /*file*/);

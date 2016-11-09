@@ -46,15 +46,6 @@ class _ExceptionHandle final :public exception::ExceptionHandle {
         _lock_t _{ _p_mutex() };
         std::cout<<arg.rdbuf();
     }
-protected:
-    template<int _N_>
-    void lprint_error(const char(&arg)[_N_]) {
-        print_error(arg,(_N_-1));
-    }
-    template<int _N_>
-    void lprint_information(const char(&arg)[_N_]) {
-        print_information(arg,(_N_-1));
-    }
 public:
 
     _ExceptionHandle(
@@ -66,10 +57,10 @@ public:
 
     void bad_exception_handle() noexcept(true) {
         try {
-            lprint_error("bad_exception_handle");
+            print_error("bad_exception_handle");
         }
         catch (...) {}
-        _p_quick_exit();
+        this->quick_exit();
     }
 
     void std_exception_handle(const std::exception &e) noexcept(true) {
@@ -115,13 +106,13 @@ public:
 
     }
 
-    virtual void print_exception(bool argExit) noexcept(true) override {
+    virtual void _do_print_exception(bool argExit) noexcept(true) override {
         _pm_exit_=argExit;
         try {
             std::rethrow_exception(std::current_exception());
         }
         catch (const std::bad_alloc&) {
-            print_error("bad_alloc",9);
+            print_error("bad_alloc");
         }
         catch (const std::logic_error&e) {
             std_logic_error_handle(e);
@@ -133,10 +124,10 @@ public:
 
             try {
                 if (argExit) {
-                    lprint_error("unknow exception ");
+                    print_error("unknow exception ");
                 }
                 else {
-                    lprint_information("unknow exception ");
+                    print_information("unknow exception ");
                 }
             }
             catch (...) {
@@ -146,7 +137,7 @@ public:
         }
     }
 
-    virtual void print_information(const char* arg,std::size_t argl) noexcept(true) override {
+    virtual void _do_print_information(const char* arg,size_t argl) noexcept(true) override {
         if (arg&&(argl>0)) {
             try {
                 _sstream_t varStream;
@@ -165,12 +156,12 @@ public:
                 __p_write(varStream);
             }
             catch (...) {/*?????*/
-                _p_quick_exit();
+                this->quick_exit();
             }
         }
     }
 
-    virtual void print_error(const char* arg,std::size_t argl) noexcept(true) override {
+    virtual void _do_print_error(const char* arg,size_t argl) noexcept(true) override {
         if (arg&&(argl>0)) {
             try {
                 _sstream_t varStream;
@@ -190,8 +181,13 @@ public:
             }
             catch (...) {}
         }
+        this->quick_exit();
+    }
+
+    void _do_quick_exit() noexcept(true) override{
         _p_quick_exit();
     }
+
 private:
     MEMORY_CLASS_NEW_DELETE
 };
