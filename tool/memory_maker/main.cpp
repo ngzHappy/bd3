@@ -312,6 +312,7 @@ namespace memory {
 /*********************************/
 namespace  {
 static int _memory_private_zero=-1;
+static std::atomic_bool _memory_is_malloced;
 [[noreturn]]
 inline void _on_memory_zero_()noexcept(true) {
     try {
@@ -325,6 +326,8 @@ inline void _on_memory_zero_()noexcept(true) {
  /*********************************/
 
 void clean() {
+    if (false==_memory_is_malloced.load()) { return; }
+    _memory_is_malloced.store(false);
     return _p_file::get_memory()->clean();
 }
 
@@ -335,6 +338,7 @@ void * malloc(int arg) {
     /*exceptions?*/
     try {
         ans=_p_file::get_memory()->malloc(arg);
+        _memory_is_malloced.store(true);
     }
     catch (...) {
         _on_memory_zero_();
