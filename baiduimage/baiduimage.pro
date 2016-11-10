@@ -2,6 +2,8 @@
 QT += core
 QT += gui
 QT += widgets
+QT += script
+QT += network
 
 TARGET = baiduimage
 TEMPLATE = app

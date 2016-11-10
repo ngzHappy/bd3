@@ -1,4 +1,4 @@
-#include "MainWindow.hpp"
+﻿#include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -12,3 +12,10 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_doButton_clicked(){
+
+}
+
+
+
