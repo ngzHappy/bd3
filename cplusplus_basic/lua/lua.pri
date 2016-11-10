@@ -32,7 +32,9 @@ SOURCES += \
     $$PWD/src/lutf8lib.cpp \
     $$PWD/src/lvm.cpp \
     $$PWD/src/lzio.cpp \
-    $$PWD/private/lua_default_error_function.cpp
+    $$PWD/private/lua_default_error_function.cpp \
+    $$PWD/private/lua_deep_copy_table.cpp \
+    $$PWD/private/lua_print_table.cpp
 
 HEADERS += \
     $$PWD/src/lapi.h \
@@ -61,4 +63,8 @@ HEADERS += \
     $$PWD/src/lvm.h \
     $$PWD/src/lzio.h \
     $$PWD/src/lua.hpp \
-    $$PWD/lua.hpp
+    $$PWD/lua.hpp \
+    $$PWD/private/lua_deep_copy_table.hpp \
+    $$PWD/private/lua_print_table.hpp
+
+include($$PWD/private/3rd/double-conversion/double-conversion.pri)
