@@ -14,7 +14,7 @@ inline namespace _exception_private {
 
 /************************************************************************/
 inline void _p_exit() { return std::exit(-1); }
-inline void _p_quick_exit() { return std::exit(-2); }
+inline void _p_quick_exit() { return memory::quick_exit(); }
 
 using _string_t=std::basic_string<char,std::char_traits<char>,memory::Allocator<char>>;
 inline _string_t operator""_s(const char *arg,std::size_t argl) {
