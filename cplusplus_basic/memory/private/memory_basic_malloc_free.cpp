@@ -716,11 +716,12 @@ inline Memory * get_memory() {
 }/*_p_file*/
 }/*namespace*/
 
+
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 namespace memory {
 
 /*********************************/
-namespace  {
+namespace {
 static int _memory_private_zero=-1;
 [[noreturn]]
 inline void _on_memory_zero_()noexcept(true) {
@@ -741,7 +742,7 @@ void clean() {
 void * malloc(int arg) {
     if (arg<=0) { return &_memory_private_zero; }
     void * ans=nullptr;
-    
+
     /*exceptions?*/
     try {
         ans=_p_file::get_memory()->malloc(arg);
@@ -769,10 +770,11 @@ int size(void * arg) {
     return _p_file::get_memory()->size(arg);
 }
 
-int cookie_size() { 
+int cookie_size() {
     return sizeof(_p_file::Memory::Item);
 }
 
 }/*memroy*/
  /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
+
 
