@@ -11,6 +11,8 @@ DEFINES*=CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT
 
 include($$PWD/lua/lua.pri)
 
+include($$PWD/gumbo/gumbo.pri)
+
 include($$PWD/../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
 
