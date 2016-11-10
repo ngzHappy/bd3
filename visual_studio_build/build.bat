@@ -1,4 +1,4 @@
-PATH=D:\x\QT_VS2015_57\qt-everywhere-opensource-src-5.7.0-beta\qtbase\bin;%PATH%;
+set PATH=C:\QT\Qt5.8.0\5.8\msvc2015\bin;%PATH%;
 qmake -r -tp vc "../baidu3.pro"
  
 
