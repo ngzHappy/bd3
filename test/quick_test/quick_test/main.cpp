@@ -18,10 +18,10 @@ int main(int argc, char *argv[])try
     QApplication app(argc, argv);
 
     /*每隔一段时间清理内存*/
-    //QTimer gcTimer;
-    //gcTimer.connect(&gcTimer,&QTimer::timeout,
-    //                [](){memory::clean();});
-    //gcTimer.start(512);
+    QTimer gcTimer;
+    gcTimer.connect(&gcTimer,&QTimer::timeout,
+                    [](){memory::clean();});
+    gcTimer.start(512);
 
 
     {/*测试内存*/
