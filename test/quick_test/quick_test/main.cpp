@@ -5,7 +5,7 @@
 #include "TestLua.hpp"
 #include <QtCore/qtimer.h>
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[])try
 {
     memory::Application memory_app;
     QApplication app(argc, argv);
@@ -35,4 +35,8 @@ int main(int argc, char *argv[])
     auto app_ans= app.exec();
     memory_app.quit();
     return app_ans;
+}
+catch (...) {
+    exception::exception_handle(true,
+        __LINE__,__func__,__FILE__);
 }

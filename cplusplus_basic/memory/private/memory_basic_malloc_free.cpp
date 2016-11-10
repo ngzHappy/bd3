@@ -736,13 +736,13 @@ inline void _on_memory_zero_()noexcept(true) {
 }/*namespace*/
  /*********************************/
 
-void clean() {
+void clean() noexcept(true){
     if (false==_memory_is_malloced.load()) { return; }
     _memory_is_malloced.store(false);
     return _p_file::get_memory()->clean();
 }
 
-void * malloc(int arg) {
+void * malloc(int arg) noexcept(true){
     if (arg<=0) { return &_memory_private_zero; }
     void * ans=nullptr;
 
@@ -764,17 +764,17 @@ void * malloc(int arg) {
     return ans;
 }
 
-void free(void * arg) {
+void free(void * arg) noexcept(true){
     if (arg==&_memory_private_zero) { return; }
     return _p_file::get_memory()->free(arg);
 }
 
-int size(void * arg) {
+int size(void * arg) noexcept(true){
     if (arg==&_memory_private_zero) { return 0; }
     return _p_file::get_memory()->size(arg);
 }
 
-int cookie_size() {
+int cookie_size() noexcept(true){
     return sizeof(_p_file::Memory::Item);
 }
 
