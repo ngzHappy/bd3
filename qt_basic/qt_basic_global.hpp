@@ -2,6 +2,8 @@
 #define QT_BASIC_GLOBAL_HPP
 
 #include <QtCore/qglobal.h>
+#include <QtCore/qstring.h>
+#include <QtCore/qbytearray.h>
 #include <cplusplus_basic.hpp>
 
 #if defined(QT_BASIC_LIBRARY)
