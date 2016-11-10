@@ -2,9 +2,8 @@
 #define LUA_LIB
 #endif
 
-#include "../../class/class.hpp"
-#include "print_table.hpp"
-#include "default_error_function.hpp"
+#include "lua_print_table.hpp"
+#include "lua_default_error_function.hpp"
 #include "3rd/double-conversion/include/double-conversion/double-conversion.h"
 #include <cstdlib>
 #include <string>
@@ -15,7 +14,18 @@
 #include <vector>
 #include <sstream>
 
+namespace luaL {
+extern int default_error_function(lua_State * L);
+}/*luaL*/
+
 namespace {
+
+namespace _luaL {
+inline auto get_default_lua_error_function() {
+    return &luaL::default_error_function;
+}
+}/*luaL*/
+
 namespace __private {
 
 using IntType=int;
@@ -364,7 +374,7 @@ public:
             static_cast<int>(_m_String.size()));
     }
 private:
-    CPLUSPLUS_CLASS_META
+    CPLUSPLUS_OBJECT(PrintString)
 };
 
 template<typename _C_>
@@ -412,7 +422,7 @@ public:
     }
 
 private:
-    CPLUSPLUS_CLASS_META
+    CPLUSPLUS_OBJECT(BeginPrintATable)
 };
 
 template<typename _C_>
@@ -446,7 +456,7 @@ public:
         _m_DataPrintTable->tablePath.pop_back();
     }
 private:
-    CPLUSPLUS_CLASS_META
+    CPLUSPLUS_OBJECT(EndPrintATable)
 };
 
 template<typename _C_>
@@ -599,7 +609,7 @@ public:
 #undef function_return
     }
 private:
-    CPLUSPLUS_CLASS_META
+    CPLUSPLUS_OBJECT(PrintATable)
 };
 
 template<typename _T_>
@@ -616,6 +626,9 @@ int print_table(lua::State *L) {
         lua::pushlstring(L,"call back is not right");
         lua::error(L);
     }
+
+    /*确保堆栈够用*/
+    lua::checkstack(L,36);
 
     DataPrintTable<_T_> dataPrintTable{
         reinterpret_cast<_T_*>(lua::touserdata(L,source_callback_index))
@@ -676,12 +689,14 @@ namespace luaL {
 lua::ThreadStatus print_table(lua::State*L,int t,PrintTableCallback*c) {
     if ((L==nullptr)||(c==nullptr)) { return lua::ERRERR; }
 
+    /*确保堆栈够用*/
+    lua::checkstack(L,8);
     t=lua::absindex(L,t);
 
     {
         lua::pushcfunction(L,&__private::print_table<PrintTableCallback>);
         lua::pushvalue(L,t);
-        lua::pushcfunction(L,luaL::get_default_lua_error_function());
+        lua::pushcfunction(L,_luaL::get_default_lua_error_function());
         auto epos=lua::gettop(L);
         lua::pushlightuserdata(L,c);
         return lua::pcall(L,3,lua::MULTRET,epos);
@@ -708,6 +723,9 @@ int function_print_table(lua::State*L) {
         void finished() { std::cout<<about_to_write.rdbuf(); }
         void end() {}
     };
+
+    /*确保堆栈够用*/
+    lua::checkstack(L,3);
 
     _PrintTableCallback _c;
     lua::pushlightuserdata(L,&_c);
@@ -740,6 +758,9 @@ int function_table_tostring(lua::State*L) {
         }
         void end() {}
     };
+
+    /*确保堆栈够用*/
+    lua::checkstack(L,3);
 
     _PrintTableCallback _c{ L };
     lua::pushlightuserdata(L,&_c);

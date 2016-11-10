@@ -7,6 +7,7 @@ namespace luaL {
 
 int default_error_function(lua_State * L) {
     if (L==nullptr) { return 0; }
+    lua::checkstack(L,3);
 
     try {
         if (lua::isstring(L,-1)) {

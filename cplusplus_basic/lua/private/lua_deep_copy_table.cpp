@@ -2,14 +2,24 @@
 #define LUA_LIB
 #endif
 
-#include "../../memory/MemoryLibrary.hpp"
-#include "deep_copy_table.hpp"
-#include "default_error_function.hpp"
+#include "lua_deep_copy_table.hpp"
+#include "lua_default_error_function.hpp"
 #include <list>
 #include <set>
 #include <map>
 
+namespace luaL {
+extern int default_error_function(lua_State * L);
+}/*luaL*/
+
 namespace {
+
+namespace _luaL {
+inline auto get_default_lua_error_function() {
+    return &luaL::default_error_function;
+}
+}/*luaL*/
+
 namespace __private {
 
 typedef int IntType;
@@ -146,6 +156,7 @@ int deep_copy_table(lua::State*L) {
         return 0;
     }
 
+    lua::checkstack(L,36);
     lua::newtable(L);
     const auto source_tmp_table=lua::gettop(L);
 
@@ -188,7 +199,9 @@ int deep_copy_table(lua::State*L) {
 namespace luaL {
 
 lua::ThreadStatus deep_copy_table(lua::State*L,int/*from*/argFrom,int/*to*/argTo) {
-
+    /*确保堆栈够用*/
+    lua::checkstack(L,8);
+    
     if (argFrom==argTo) { return lua::OK; }
 
     argFrom=lua::absindex(L,argFrom);
@@ -198,7 +211,7 @@ lua::ThreadStatus deep_copy_table(lua::State*L,int/*from*/argFrom,int/*to*/argTo
         lua::pushcfunction(L,&__private::deep_copy_table);
         lua::pushvalue(L,argFrom)/*from table*/;
         lua::pushvalue(L,argTo)/*to table*/;
-        lua::pushcfunction(L,luaL::get_default_lua_error_function())/*error function*/;
+        lua::pushcfunction(L,_luaL::get_default_lua_error_function())/*error function*/;
         auto epos=lua::gettop(L);
         return lua::pcall(L,3,lua::MULTRET,epos);
     }
