@@ -4,6 +4,7 @@ TEMPLATE = app
 QT -= core
 QT -= gui
 
+CONFIG += console
 
 include($$PWD/../../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
