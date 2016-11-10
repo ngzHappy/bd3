@@ -8,19 +8,31 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
+namespace baiduimage {
+class DownLoadCallBack :public QObject {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    Q_SIGNAL void finished(QString);
+};
+}/*baiduimage*/
+
+class MainWindow : public QMainWindow {
+    Q_OBJECT
+
+public:
+    explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
 
-private slots:
-    void on_doButton_clicked();
+public:
+    Q_SLOT void setText(QString);
+
+private:
+    Q_SLOT void on_doButton_clicked();
 
 private:
     Ui::MainWindow *ui;
+    bool _pm_IsDownLoad=false;
 private:
     CPLUSPLUS_OBJECT(MainWindow)
 };

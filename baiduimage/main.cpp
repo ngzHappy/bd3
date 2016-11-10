@@ -18,6 +18,7 @@ int main(int argc, char *argv[])try{
     {
         auto ans = app.exec();
         mapp.quit();
+        return ans;
     }
 
 }catch(...){
