@@ -24,13 +24,18 @@ app_quick_test.file=$$PWD/test/quick_test/quick_test/quick_test.pro
 app_quick_test.depends+=library_cplusplus_basic
 app_quick_test.depends+=qt_basic_library
 
+app_baiduimage.file=$$PWD/baiduimage/baiduimage.pro
+app_baiduimage.depends+=library_cplusplus_basic
+app_baiduimage.depends+=qt_basic_library
+
 SUBDIRS += \
     test/void_test \
     tool/memory_maker \
     library_cplusplus_basic \
     app_quick_test \
     lua_test \
-    qt_basic_library
+    qt_basic_library \
+    app_baiduimage
 
 
 
