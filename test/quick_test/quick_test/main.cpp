@@ -39,4 +39,5 @@ int main(int argc, char *argv[])try
 catch (...) {
     exception::exception_handle(true,
         __LINE__,__func__,__FILE__);
+    return -7;
 }
