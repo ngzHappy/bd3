@@ -17,11 +17,15 @@ library_cplusplus_basic.file=$$PWD/cplusplus_basic/cplusplus_basic.pro
 app_quick_test.file=$$PWD/test/quick_test/quick_test/quick_test.pro
 app_quick_test.depends+=library_cplusplus_basic
 
+lua_test.file=$$PWD/test/lua/lua.pro
+lua_test.depends+=library_cplusplus_basic
+
 SUBDIRS += \
     test/void_test \
     tool/memory_maker \
     library_cplusplus_basic \
-    app_quick_test
+    app_quick_test \
+    lua_test
 
 
 
