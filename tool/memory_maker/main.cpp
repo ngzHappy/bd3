@@ -313,7 +313,7 @@ namespace memory {
 namespace  {
 static int _memory_private_zero=-1;
 static std::atomic_bool _memory_is_malloced;
-[[noreturn]]
+//[[noreturn]]
 inline void _on_memory_zero_()noexcept(true) {
     try {
         memory::get_memory_not_enough()();
@@ -334,7 +334,7 @@ void clean() noexcept(true){
 void * malloc(int arg) noexcept(true){
     if (arg<=0) { return &_memory_private_zero; }
     void * ans=nullptr;
-    
+
     /*exceptions?*/
     try {
         ans=_p_file::get_memory()->malloc(arg);
@@ -363,7 +363,7 @@ int size(void * arg) noexcept(true){
     return _p_file::get_memory()->size(arg);
 }
 
-int cookie_size() noexcept(true){ 
+int cookie_size() noexcept(true){
     return sizeof(_p_file::Memory::Item);
 }
 

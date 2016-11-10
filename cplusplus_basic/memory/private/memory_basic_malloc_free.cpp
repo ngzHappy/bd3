@@ -724,7 +724,7 @@ namespace memory {
 namespace {
 static int _memory_private_zero=-1;
 static std::atomic_bool _memory_is_malloced;
-[[noreturn]]
+//[[noreturn]]
 inline void _on_memory_zero_()noexcept(true) {
     try {
         memory::get_memory_not_enough()();
