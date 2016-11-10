@@ -5,11 +5,15 @@
 
 namespace memory {
 
+typedef void(*function_memory_not_enough)();
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT function_memory_not_enough get_memory_not_enough();
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT function_memory_not_enough set_memory_not_enough(function_memory_not_enough);
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void clean();
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void * malloc(int arg);
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void free(void * arg);
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT int size(void * arg);
 _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT int cookie_size();
+_CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT void quick_exit(int =-2);
 inline void free(const void *arg) { memory::free(const_cast<void*>(arg)); }
 inline int size(const void *arg) { return memory::size(const_cast<void*>(arg)); }
 inline void freePoolMemory() { memory::clean(); }

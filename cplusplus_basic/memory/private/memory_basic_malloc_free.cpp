@@ -716,15 +716,63 @@ inline Memory * get_memory() {
 }/*_p_file*/
 }/*namespace*/
 
-
+/*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 namespace memory {
 
-void clean() { return _p_file::get_memory()->clean(); }
-void * malloc(int arg) { return _p_file::get_memory()->malloc(arg); }
-void free(void * arg) { return _p_file::get_memory()->free(arg); }
-int size(void * arg) { return _p_file::get_memory()->size(arg); }
-int cookie_size() { return sizeof(_p_file::Memory::Item); }
+/*********************************/
+namespace  {
+static int _memory_private_zero=-1;
+[[noreturn]]
+inline void _on_memory_zero_()noexcept(true) {
+    try {
+        memory::get_memory_not_enough()();
+    }
+    catch (...) {}
+    memory::quick_exit();
+}/*void _on_memory_zero_()*/
+
+}/*namespace*/
+ /*********************************/
+
+void clean() {
+    return _p_file::get_memory()->clean();
+}
+
+void * malloc(int arg) {
+    if (arg<=0) { return &_memory_private_zero; }
+    void * ans=nullptr;
+    
+    /*exceptions?*/
+    try {
+        ans=_p_file::get_memory()->malloc(arg);
+    }
+    catch (...) {
+        _on_memory_zero_();
+    }
+
+    /*can not find memory space?*/
+    if (ans==nullptr) {
+        _on_memory_zero_();
+    }
+
+    /*ok*/
+    return ans;
+}
+
+void free(void * arg) {
+    if (arg==&_memory_private_zero) { return; }
+    return _p_file::get_memory()->free(arg);
+}
+
+int size(void * arg) {
+    if (arg==&_memory_private_zero) { return 0; }
+    return _p_file::get_memory()->size(arg);
+}
+
+int cookie_size() { 
+    return sizeof(_p_file::Memory::Item);
+}
 
 }/*memroy*/
-
+ /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 
