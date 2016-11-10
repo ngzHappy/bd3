@@ -88,7 +88,7 @@ public:
             return nullptr;
         }/*void * malloc()*/
         Item_N() {
-            if /*c++17 constexpr*/(N<(1024)) { _pm_pool.malloc()/*init without delete*/; }
+            if /*c++17 constexpr*/(N<(1*1024)) { _pm_pool.malloc()/*init without delete*/; }
         }
     }/*class Item_N*/;
 

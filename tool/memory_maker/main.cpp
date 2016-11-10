@@ -158,7 +158,7 @@ inline void make(
             return nullptr;
              }/*void * malloc()*/
         Item_N() {
-            if /*c++17 constexpr*/(N<(1024)) { _pm_pool.malloc()/*init without delete*/; }
+            if /*c++17 constexpr*/(N<(1*1024)) { _pm_pool.malloc()/*init without delete*/; }
         }/*Item_N*/
          }/*class Item_N*/;
 
