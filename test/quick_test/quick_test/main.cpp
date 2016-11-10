@@ -7,6 +7,7 @@
 
 int main(int argc, char *argv[])
 {
+    memory::Application memory_app;
     QApplication app(argc, argv);
 
     /*每隔一段时间清理内存*/
@@ -31,5 +32,7 @@ int main(int argc, char *argv[])
     MainWindow window;
     window.show();
 
-    return app.exec();
+    auto app_ans= app.exec();
+    memory_app.quit();
+    return app_ans;
 }

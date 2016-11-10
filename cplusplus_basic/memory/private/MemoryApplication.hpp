@@ -19,6 +19,7 @@ public:
 
     static bool isMainConstruct();
     static bool isMainQuit();
+    inline void quit() { _p_setMainQuit(); }
 };
 
 }/*namespace memory*/
