@@ -98,7 +98,7 @@ inline void make(
         _pool_t _pm_data;
         _mutex_t _pm_mutex;
         public:
-            pool_t(int_t arg):_pm_data(arg) {}
+            pool_t(int_t arg,int_t argn):_pm_data(arg,argn) {}
             void * malloc() { _mlock_t _{_pm_mutex}; return _pm_data.malloc(); }
             void free(void *arg) {_mlock_t _{_pm_mutex}; return _pm_data.free(arg); }
             void release_memory() {_mlock_t _{_pm_mutex}; _pm_data.release_memory(); }
@@ -143,7 +143,8 @@ inline void make(
 
          template<int_t N>
          class Item_N final:public MFItem{
-             pool_t _pm_pool{N};
+             constexpr static auto _next_size_=(((32*1024)/N)>32)?((32*1024)/N):32;
+             pool_t _pm_pool{ N ,_next_size_};
          public:
              void clean(){_pm_pool.release_memory();}
              int_t size(void *)const override{return N;}

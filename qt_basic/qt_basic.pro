@@ -2,9 +2,14 @@
 TARGET = qt_basic_library
 TEMPLATE = lib
 
+QT += core
+QT += gui
+QT += concurrent
+
 DEFINES += QT_BASIC_LIBRARY
 
-SOURCES += QtBasicLibrary.cpp
+SOURCES += QtBasicLibrary.cpp \
+    QtBasicLibraryStart.cpp
 
 HEADERS += QtBasicLibrary.hpp\
         qt_basic_global.hpp

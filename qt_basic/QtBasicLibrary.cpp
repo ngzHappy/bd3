@@ -1,6 +1,5 @@
 ﻿#include "QtBasicLibrary.hpp"
 
-
 QtBasicLibrary::QtBasicLibrary(){
 
 }

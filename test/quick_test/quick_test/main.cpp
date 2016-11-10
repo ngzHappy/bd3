@@ -4,17 +4,24 @@
 #include "TestException.hpp"
 #include "TestLua.hpp"
 #include <QtCore/qtimer.h>
+#include <text/gzip.hpp>
 
 int main(int argc, char *argv[])try
 {
+
+    {
+        const char * v="123";
+        text::gzip(v,v+3);
+    }
+
     memory::Application memory_app;
     QApplication app(argc, argv);
 
     /*每隔一段时间清理内存*/
-    QTimer gcTimer;
-    gcTimer.connect(&gcTimer,&QTimer::timeout,
-                    [](){memory::clean();});
-    gcTimer.start(512);
+    //QTimer gcTimer;
+    //gcTimer.connect(&gcTimer,&QTimer::timeout,
+    //                [](){memory::clean();});
+    //gcTimer.start(512);
 
 
     {/*测试内存*/
