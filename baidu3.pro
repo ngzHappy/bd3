@@ -28,6 +28,10 @@ app_baiduimage.file=$$PWD/baiduimage/baiduimage.pro
 app_baiduimage.depends+=library_cplusplus_basic
 app_baiduimage.depends+=qt_basic_library
 
+tool_test_maker.file=$$PWD/tool/test_maker/test_maker.pro
+tool_test_maker.depends+=library_cplusplus_basic
+tool_test_maker.depends+=qt_basic_library
+
 SUBDIRS += \
     test/void_test \
     tool/memory_maker \
@@ -35,16 +39,6 @@ SUBDIRS += \
     app_quick_test \
     lua_test \
     qt_basic_library \
-    app_baiduimage
-
-
-
-
-
-
-
-
-
-
-
+    app_baiduimage \
+    tool_test_maker
 
