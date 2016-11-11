@@ -34,11 +34,57 @@ private:
     CPLUSPLUS_OBJECT(Chart)
 };
 
+class ImageChart :
+    public QtCharts::QChart {
+    using Super=QtCharts::QChart;
+private:
+    QImage _pm_Image;
+    QPixmap _pm_ImagePaint;
+    template<typename _T_>void _p_setImage(_T_&&);
+public:
+    void setImage(QImage &&arg) { _p_setImage(std::move(arg)); }
+    void setImage(const QImage &arg) { _p_setImage(arg); }
+public:
+    ImageChart();
+protected:
+    void paint(QPainter *painter,const QStyleOptionGraphicsItem *option,QWidget *widget) override {
+        Super::paint(painter,option,widget);
+        if (painter) {
+            if (_pm_Image.isNull()) { return; }
+            const auto varPlotArea=this->plotArea();
+            const auto varPlotAreaSize=varPlotArea.size().toSize();
+            if (varPlotAreaSize==_pm_ImagePaint.size()) {
+                painter->drawPixmap(varPlotArea.topLeft(),_pm_ImagePaint);
+            }
+            else {
+                _pm_ImagePaint=QPixmap::fromImage(
+                _pm_Image.scaled(varPlotAreaSize
+                    ,Qt::IgnoreAspectRatio
+                    ,Qt::SmoothTransformation));
+                painter->drawPixmap(varPlotArea.topLeft(),_pm_ImagePaint);
+            }
+        }
+    }/*void paint(QPainter *painter,const QStyleOptionGraphicsItem *option,QWidget *widget)*/
+private:
+    CPLUSPLUS_OBJECT(Chart)
+};
+
+template<typename _T_>
+void ImageChart::_p_setImage(_T_&&arg) {
+    _pm_Image=std::forward<_T_>(arg);
+    _pm_ImagePaint={};
+    this->update();
+}
+
+ImageChart::ImageChart() {
+    setBackgroundVisible(false);
+}/*ImageChart::ImageChart*/
+
 }/*MQtCharts*/
 
 std::shared_ptr<void> test_qt_charts() {
 
-    auto * chart=new MQtCharts::Chart;
+    auto * chart=new MQtCharts::ImageChart;
 
     for (double i=0; i<(2*3.141592654); i+=(3.141592654/30)) {
         const QPen pen(QColor(
@@ -68,6 +114,8 @@ std::shared_ptr<void> test_qt_charts() {
     view->resize(512,512);
     view->show();
 
+    chart->setImage(QImage(":/image/0x000000.jpg"));
+
     view->setChart(chart);
     view->setRenderHints(
         QPainter::HighQualityAntialiasing|
@@ -80,4 +128,5 @@ std::shared_ptr<void> test_qt_charts() {
 
     return std::move(view);
 }
+
 
