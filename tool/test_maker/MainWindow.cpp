@@ -46,7 +46,7 @@ void MainWindow::on_doButton_clicked(){
         dir_project=project_path+project_rpath+"test/"+project_name;
         dir.mkpath(dir_project);
     }
-    
+
     {
         QFile file(dir_project+"/main.cpp");
         if (false==file.open(QIODevice::WriteOnly)) {
@@ -107,6 +107,7 @@ int main(int argc, char *argv[])try{
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+#include <cplusplus_basic.hpp>
 #include <QtWidgets/QMainWindow>
 
 namespace Ui {
@@ -123,6 +124,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
+private:
+    CPLUSPLUS_OBJECT(MainWindow)
 };
 
 #endif // MAINWINDOW_HPP
@@ -203,6 +206,7 @@ MainWindow::~MainWindow()
 QT += core
 QT += gui
 QT += widgets
+#QT += charts
 #QT += script
 #QT += network
 
