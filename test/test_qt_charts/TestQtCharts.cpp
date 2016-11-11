@@ -75,6 +75,9 @@ std::shared_ptr<void> test_qt_charts() {
         QPainter::TextAntialiasing
     );
 
+    qDebug()<<chart->mapToPosition(QPointF(0,0));
+    qDebug()<<chart->mapToPosition(QPointF(1,1));
+
     return std::move(view);
 }
 
