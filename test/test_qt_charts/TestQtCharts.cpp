@@ -22,6 +22,9 @@ class LineSeries :public QtCharts::QLineSeries {
     using Super=QtCharts::QLineSeries;
 public:
     using Super::Super;
+    virtual ~LineSeries() {
+        qDebug()<<"~LineSeries";
+    }
 private:
     CPLUSPLUS_OBJECT(LineSeries)
 };
@@ -110,7 +113,9 @@ std::shared_ptr<void> test_qt_charts() {
     /*开启全部动画*/
     chart->setAnimationOptions(QChart::AllAnimations);
 
-    auto view=memory::make_shared<MQtCharts::ChartView>();
+    auto view=new MQtCharts::ChartView ;
+    view->setAttribute(Qt::WA_DeleteOnClose);
+
     view->resize(512,512);
     view->show();
 
@@ -126,7 +131,7 @@ std::shared_ptr<void> test_qt_charts() {
     qDebug()<<chart->mapToPosition(QPointF(0,0));
     qDebug()<<chart->mapToPosition(QPointF(1,1));
 
-    return std::move(view);
+    return{};
 }
 
 
