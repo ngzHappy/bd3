@@ -43,10 +43,11 @@ class ImageChart :
 private:
     QImage _pm_Image;
     QPixmap _pm_ImagePaint;
-    template<typename _T_>void _p_setImage(_T_&&);
+    template<typename _T_>
+    inline void _p_setImage(_T_&&);
 public:
-    void setImage(QImage &&arg) { _p_setImage(std::move(arg)); }
-    void setImage(const QImage &arg) { _p_setImage(arg); }
+    inline void setImage(QImage &&arg) { _p_setImage(std::move(arg)); }
+    inline void setImage(const QImage &arg) { _p_setImage(arg); }
 public:
     ImageChart();
 protected:
@@ -73,7 +74,7 @@ private:
 };
 
 template<typename _T_>
-void ImageChart::_p_setImage(_T_&&arg) {
+inline void ImageChart::_p_setImage(_T_&&arg) {
     _pm_Image=std::forward<_T_>(arg);
     _pm_ImagePaint={};
     this->update();
