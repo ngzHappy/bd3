@@ -11,12 +11,14 @@ DEFINES += OPENCV3_BASIC_LIBRARY
 SOURCES += \
     OpenCVBasic.cpp \
     ToolOpencvException.cpp \
-    ToolOpencvMemory.cpp
+    ToolOpencvMemory.cpp \
+    ImageShowWidget.cpp
 
 HEADERS += \
     OpenCVBasic.hpp \
     ToolOpencvException.hpp \
-    ToolOpencvMemory.hpp
+    ToolOpencvMemory.hpp \
+    ImageShowWidget.hpp
 
 include($$PWD/opencv_basic.pri)
 
