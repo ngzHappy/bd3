@@ -89,7 +89,7 @@ auto autoGetX(const _xT_&arg) {
 
 template<typename _xT_,
     typename _U_=std::enable_if_t<!HasXFunction<const _xT_&>::value>,
-    typename _U1_=void>
+    typename _U1_=void*>
     const auto & autoGetX(const _xT_&arg) {
     return arg.x;
 }
@@ -104,7 +104,7 @@ auto autoGetY(const _xT_&arg) {
 
 template<typename _xT_,
     typename _U_=std::enable_if_t<!HasXFunction<const _xT_&>::value>,
-    typename _U1_=void>
+    typename _U1_=void*>
     const auto & autoGetY(const _xT_&arg) {
     return arg.y;
 }
