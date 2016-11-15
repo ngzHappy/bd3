@@ -8,7 +8,7 @@
 #include "exception/Exception.hpp"
 
 #ifndef CPLUSPLUS_OBJECT
-#define CPLUSPLUS_OBJECT(_objname_) MEMORY_CLASS_NEW_DELETE
+#define CPLUSPLUS_OBJECT(_objname_) inline static constexpr auto __0x21_size() noexcept(true){ return sizeof(_objname_); } MEMORY_CLASS_NEW_DELETE
 #endif
 
 #ifndef CPLUSPLUS_EXCEPTION
