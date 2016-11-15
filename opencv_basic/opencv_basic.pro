@@ -4,14 +4,19 @@ TEMPLATE = lib
 QT += core
 QT += gui
 QT += concurrent
+QT += widgets
 
 DEFINES += OPENCV3_BASIC_LIBRARY
 
 SOURCES += \
-    OpenCVBasic.cpp
+    OpenCVBasic.cpp \
+    ToolOpencvException.cpp \
+    ToolOpencvMemory.cpp
 
 HEADERS += \
-    OpenCVBasic.hpp
+    OpenCVBasic.hpp \
+    ToolOpencvException.hpp \
+    ToolOpencvMemory.hpp
 
 include($$PWD/opencv_basic.pri)
 
