@@ -35,12 +35,11 @@ int main(int argc,char *argv[])try {
     chart->setAlgorithm([](const QImage &arg)->QImage {
         return arg.mirrored(true,true);
     });
-
-
+    
     QPointF test[2];
     test[0]=QPointF(0,0);
     test[1]=QPointF(33,66);
-    makeLineSeries(chart,test);
+    addScatterSeries(chart,test);
    
     widget.show();
 

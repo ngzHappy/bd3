@@ -109,12 +109,12 @@ template<typename _xT_,
     return arg.y;
 }
 
-template<typename _Tb_,typename _Te_>
-inline QtCharts::QLineSeries *makeLineSeries(
+template<typename _L_=QtCharts::QLineSeries,typename _Tb_,typename _Te_>
+inline _L_ *_line_like_addLineSeries(
     ChartBasic *argC,const _Tb_&argB_,const _Te_&argE
 ) {
-    class LineSeries :public QtCharts::QLineSeries {
-        using _Super=QtCharts::QLineSeries;
+    class LineSeries :public _L_ {
+        using _Super=_L_;
     public:
         using _Super::_Super;
     private:
@@ -139,24 +139,60 @@ inline QtCharts::QLineSeries *makeLineSeries(
     return ans;
 }
 
+template<typename _Tb_,typename _Te_>
+inline QtCharts::QLineSeries *addLineSeries(
+    ChartBasic *argC,const _Tb_&argB_,const _Te_&argE
+) {
+    return _line_like_addLineSeries<QtCharts::QLineSeries>(argC,argB_,argE);
+}
+
 template<
     typename _Tb_,
     typename _Te_= std::enable_if_t<HasBeginEnd<_Tb_>::value>
 >
-inline QtCharts::QLineSeries *makeLineSeries(
+inline QtCharts::QLineSeries *addLineSeries(
     ChartBasic *argC,const _Tb_&argB_ 
 ) {
-    return makeLineSeries(argC,argB_.begin(),argB_.end());
+    return addLineSeries(argC,argB_.begin(),argB_.end());
 }
 
 template<
     typename _Tb_,
     int _N_
 >
-inline QtCharts::QLineSeries *makeLineSeries(
+inline QtCharts::QLineSeries *addLineSeries(
     ChartBasic *argC,_Tb_(&argB_) [_N_]
 ) {
-    return makeLineSeries(argC,
+    return addLineSeries(argC,
+        static_cast<const _Tb_*>(argB_),
+        static_cast<const _Tb_*>(argB_)+_N_);
+}
+
+template<typename _Tb_,typename _Te_>
+inline QtCharts::QScatterSeries *addScatterSeries(
+    ChartBasic *argC,const _Tb_&argB_,const _Te_&argE
+) {
+    return _line_like_addLineSeries<QtCharts::QScatterSeries>(argC,argB_,argE);
+}
+
+template<
+    typename _Tb_,
+    typename _Te_= std::enable_if_t<HasBeginEnd<_Tb_>::value>
+>
+inline QtCharts::QScatterSeries *addScatterSeries(
+    ChartBasic *argC,const _Tb_&argB_ 
+) {
+    return addScatterSeries(argC,argB_.begin(),argB_.end());
+}
+
+template<
+    typename _Tb_,
+    int _N_
+>
+inline QtCharts::QScatterSeries *addScatterSeries(
+    ChartBasic *argC,_Tb_(&argB_) [_N_]
+) {
+    return addScatterSeries(argC,
         static_cast<const _Tb_*>(argB_),
         static_cast<const _Tb_*>(argB_)+_N_);
 }
@@ -164,8 +200,8 @@ inline QtCharts::QLineSeries *makeLineSeries(
 }/*__ImageShowUtility*/
 }/*__private*/
 
-
-using __private::__ImageShowUtility::makeLineSeries;
+using __private::__ImageShowUtility::addLineSeries;
+using __private::__ImageShowUtility::addScatterSeries;
 
 #endif // IMAGESHOWUTILITY_HPP
 
