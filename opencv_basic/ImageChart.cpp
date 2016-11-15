@@ -156,6 +156,9 @@ void ImageChart::setImage(const QImage &arg,bool _copy) {
     if (_copy) {
         _mp->oldImage=arg.copy();
     }
+    else {
+        _mp->oldImage=arg;
+    }
     _p_alg_or_img_changed();
     update();
     imageChanged();
