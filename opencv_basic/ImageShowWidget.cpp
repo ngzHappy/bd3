@@ -186,6 +186,7 @@ public:
     __private::BasicImageView * originalWidget=nullptr;
     __private::MenuBar * menuBar=nullptr;
     __private::Menu * basicMenu=nullptr;
+    std::shared_ptr<AbstractImageShift> algorithm;
 private:
     CPLUSPLUS_OBJECT(_PrivateImageShowWidget)
 };
@@ -241,6 +242,27 @@ QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle
     }
 }
 
+const std::shared_ptr<AbstractImageShift>&ImageShowWidget::getAlgorithm()const {
+    return _pm_this_data->algorithm;
+}
+
+void ImageShowWidget::_p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&arg) {
+    if (_pm_this_data->chartCentralWidget) {
+        _pm_this_data->chartCentralWidget->setAlgorithm(arg);
+    }
+    else if (_pm_this_data->centralWidget) {
+        _pm_this_data->centralWidget->setAlgorithm(arg);
+    }
+}
+void ImageShowWidget::_p_setAlgorithm(std::shared_ptr<AbstractImageShift>&&arg) {
+    if (_pm_this_data->chartCentralWidget) {
+        _pm_this_data->chartCentralWidget->setAlgorithm(std::move(arg));
+    }
+    else if (_pm_this_data->centralWidget) {
+        _pm_this_data->centralWidget->setAlgorithm(std::move(arg));
+    }
+}
+
 ImageShowWidget::~ImageShowWidget() {
     delete _pm_this_data;
 }
@@ -253,6 +275,7 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
     _pm_this_data->chartCentralWidget=nullptr;
     _pm_this_data->centralWidget->setImage(
         _pm_this_data->originalWidget->getImage(),false);
+    _pm_this_data->centralWidget->setAlgorithm(_pm_this_data->algorithm);
     setCentralWidget(_pm_this_data->centralWidget);
     return _pm_this_data->centralWidget;
 }
@@ -266,6 +289,7 @@ ImageChart * ImageShowWidget::setChartImage(
     _pm_this_data->chartCentralWidget=new ImageChartView;
     _pm_this_data->chartCentralWidget->setImage(
         _pm_this_data->originalWidget->getImage(),false);
+    _pm_this_data->chartCentralWidget->setAlgorithm(_pm_this_data->algorithm);
     setCentralWidget(_pm_this_data->chartCentralWidget);
     return _pm_this_data->chartCentralWidget->imageChart();
 }
