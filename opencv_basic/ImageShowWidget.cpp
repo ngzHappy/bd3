@@ -224,13 +224,14 @@ ImageShowWidget::~ImageShowWidget() {
     delete _pm_this_data;
 }
 
-PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
+PlainImageView * ImageShowWidget::setImage(const QImage & arg,bool _copy) {
     /*设置原始图片*/
     _pm_this_data->originalWidget->setImage(arg);
     /*设置显示图片*/
     _pm_this_data->centralWidget=new PlainImageView;
     _pm_this_data->chartCentralWidget=nullptr;
-    _pm_this_data->centralWidget->setImage(arg);
+    _pm_this_data->centralWidget->setImage(
+        _pm_this_data->originalWidget->getImage(),false);
     setCentralWidget(_pm_this_data->centralWidget);
     return _pm_this_data->centralWidget;
 }
@@ -242,7 +243,7 @@ ImageChartView * ImageShowWidget::setChartImage(
     /*设置显示图片*/
     _pm_this_data->centralWidget=nullptr;
     _pm_this_data->chartCentralWidget=new ImageChartView;
-    _pm_this_data->chartCentralWidget->setImage(argImage);
+    _pm_this_data->chartCentralWidget->setImage(argImage,false);
     setCentralWidget(_pm_this_data->chartCentralWidget);
     return _pm_this_data->chartCentralWidget;
 }

@@ -116,9 +116,14 @@ void PlainImageView::paintEvent(QPaintEvent *) {
     }
 }
 
-void PlainImageView::setImage(const QImage & arg) {
+void PlainImageView::setImage(const QImage & arg,bool _copy=true) {
     _pm->isAlgUpdated=false;
-    _pm->old_image=arg.copy()/*获得独立copy*/;
+    if (_copy) {
+        _pm->old_image=arg.copy()/*获得独立copy*/;
+    }
+    else {
+        _pm->old_image=arg;
+    }
     _alg_or_img_change();
     update();
     imageChanged();

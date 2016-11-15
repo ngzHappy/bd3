@@ -20,7 +20,7 @@ public:
     ~ImageChartView();
     ImageChart * imageChart()const { return _mp_image_chart; }
 
-    ImageChart * setImage(const QImage &);
+    ImageChart * setImage(const QImage &,bool _copy=true);
     const QImage &getImage()const;
     const QImage &getAlgorithmImage()const;
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;

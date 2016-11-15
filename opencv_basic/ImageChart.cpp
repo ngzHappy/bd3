@@ -152,8 +152,10 @@ void ImageChart::paint(
     _Super::paint(painterx,option,widget);
 }
 
-void ImageChart::setImage(const QImage &arg) {
-    _mp->oldImage=arg.copy();
+void ImageChart::setImage(const QImage &arg,bool _copy) {
+    if (_copy) {
+        _mp->oldImage=arg.copy();
+    }
     _p_alg_or_img_changed();
     update();
     imageChanged();

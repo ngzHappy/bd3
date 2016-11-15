@@ -17,7 +17,7 @@ public:
     PlainImageView();
     virtual ~PlainImageView();
 
-    void setImage(const QImage &);
+    void setImage(const QImage &,bool/*copy*/=true);
     const QImage & getImage()const;
     const QImage & getAlgorithmImage()const;
 

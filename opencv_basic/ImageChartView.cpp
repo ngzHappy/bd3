@@ -13,8 +13,8 @@ ImageChartView::ImageChartView(QWidget *parent):_Super(parent){
 ImageChartView::~ImageChartView() {
 }
 
-ImageChart * ImageChartView::setImage(const QImage &arg) {
-   _mp_image_chart->setImage(arg);
+ImageChart * ImageChartView::setImage(const QImage &arg,bool _copy) {
+   _mp_image_chart->setImage(arg,_copy);
    return _mp_image_chart;
 }
 
