@@ -26,7 +26,7 @@ ChartBasic::ChartBasic(
         Qt::WindowFlags wFlags):_Super(parent,wFlags) {
     _p_x=new __private::ValueAxis;
     _p_y=new __private::ValueAxis;
-    _p_y->setReverse(true);
+    //_p_y->setReverse(true);
     this->addAxis(_p_x,Qt::AlignBottom);
     this->addAxis(_p_y,Qt::AlignLeft);
     this->setAnimationOptions(QChart::SeriesAnimations);
