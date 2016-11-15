@@ -64,8 +64,9 @@ void MainWindow::on_doButton_clicked(){
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])try{
-
-    /*init memory*/
+    /*init new handler*/
+    std::set_new_handler( memory::get_memory_not_enough() );
+    /*init memory application*/
     memory::Application mapp;
     /*init qt basic library*/
     QtBasicLibrary qtBasicLibrary;

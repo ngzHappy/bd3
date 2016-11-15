@@ -9,6 +9,7 @@
 int main(int argc, char *argv[])try
 {
 
+    std::set_new_handler( memory::get_memory_not_enough() );
     {
         const char * v="123";
         text::gzip(v,v+3);
