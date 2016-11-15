@@ -8,8 +8,7 @@ class QImage;
 class PlainImageView;
 class ImageChartView;
 
-class OPENCV3_BASICHARED_EXPORT ImageShowWidget : public QMainWindow
-{
+class OPENCV3_BASICHARED_EXPORT ImageShowWidget : public QMainWindow {
     Q_OBJECT
 
 private:
@@ -17,7 +16,7 @@ private:
     class _PrivateImageShowWidget;
     _PrivateImageShowWidget * _pm_this_data;
 public:
-    ImageShowWidget(QWidget * /*parent*/=nullptr, Qt::WindowFlags /*flags*/=Qt::WindowFlags());
+    ImageShowWidget(QWidget * /*parent*/=nullptr,Qt::WindowFlags /*flags*/=Qt::WindowFlags());
     virtual ~ImageShowWidget();
 public:
     PlainImageView * setImage(const QImage &);

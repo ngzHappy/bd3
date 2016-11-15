@@ -242,6 +242,7 @@ ImageChartView * ImageShowWidget::setChartImage(
     /*设置显示图片*/
     _pm_this_data->centralWidget=nullptr;
     _pm_this_data->chartCentralWidget=new ImageChartView;
+    _pm_this_data->chartCentralWidget->setImage(argImage);
     setCentralWidget(_pm_this_data->chartCentralWidget);
     return _pm_this_data->chartCentralWidget;
 }

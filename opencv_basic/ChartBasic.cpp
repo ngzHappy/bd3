@@ -29,6 +29,7 @@ ChartBasic::ChartBasic(
     y->setReverse(true);
     this->addAxis(x,Qt::AlignBottom);
     this->addAxis(y,Qt::AlignLeft);
+    this->setAnimationOptions(QChart::SeriesAnimations);
 }
 
 

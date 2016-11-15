@@ -3,8 +3,7 @@
 
 #include "OpenCVBasic.hpp"
 
-class ToolOpencvException
-{
+class OPENCV3_BASICHARED_EXPORT ToolOpencvException {
 public:
     ToolOpencvException();
     virtual ~ToolOpencvException();

@@ -10,14 +10,15 @@
 using namespace std::chrono_literals;
 
 namespace {
+
 static void _var() {
 
-    std::this_thread::sleep_for(8ms);
     {/*load image plugin*/
         QImage _image_{ "__________qt__.png" };
     }
 
 };
+
 }
 
 static void _on_qt_start_up_0x99812() {

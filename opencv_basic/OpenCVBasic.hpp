@@ -15,8 +15,7 @@
 #  define OPENCV3_BASICHARED_EXPORT Q_DECL_IMPORT
 #endif
 
-class OPENCV3_BASICHARED_EXPORT OpenCVBasic
-{
+class OPENCV3_BASICHARED_EXPORT OpenCVBasic {
 public:
     OpenCVBasic();
     virtual ~OpenCVBasic();

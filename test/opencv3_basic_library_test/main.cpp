@@ -7,6 +7,8 @@
 #include <QtWidgets/QApplication>
 #include <ImageShowWidget.hpp>
 #include <PlainImageView.hpp>
+#include <ImageChart.hpp>
+#include <ImageChartView.hpp>
 
 int main(int argc, char *argv[])try{
     /*init new handler*/
@@ -28,7 +30,7 @@ int main(int argc, char *argv[])try{
     //window.show();
 
     ImageShowWidget widget;
-    widget.setImage(QImage(":/0x000000.jpg"))
+    widget.setChartImage(QImage(":/0x000000.jpg"))
         ->setAlgorithm([](const QImage &arg)->QImage {
         return arg.mirrored(true,true);
     });
@@ -45,4 +47,5 @@ int main(int argc, char *argv[])try{
     CPLUSPLUS_EXCEPTION(true);
     return -1;
 }
+
 
