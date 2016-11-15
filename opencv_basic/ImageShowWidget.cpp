@@ -236,7 +236,7 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
     return _pm_this_data->centralWidget;
 }
 
-ImageChartView * ImageShowWidget::setChartImage(
+ImageChart * ImageShowWidget::setChartImage(
     const QImage & argImage) {
     /*设置原始图片*/
     _pm_this_data->originalWidget->setImage(argImage);
@@ -246,7 +246,7 @@ ImageChartView * ImageShowWidget::setChartImage(
     _pm_this_data->chartCentralWidget->setImage(
         _pm_this_data->originalWidget->getImage(),false);
     setCentralWidget(_pm_this_data->chartCentralWidget);
-    return _pm_this_data->chartCentralWidget;
+    return _pm_this_data->chartCentralWidget->imageChart();
 }
 
 const QImage &ImageShowWidget::getImage() const {

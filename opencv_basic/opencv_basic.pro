@@ -29,7 +29,8 @@ HEADERS += \
     ChartView.hpp \
     ImageChartView.hpp \
     ChartBasic.hpp \
-    ImageChart.hpp
+    ImageChart.hpp \
+    ImageShowUtility.hpp
 
 include($$PWD/opencv_basic.pri)
 

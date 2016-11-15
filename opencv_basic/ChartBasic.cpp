@@ -24,12 +24,14 @@ ChartBasic::~ChartBasic() {
 ChartBasic::ChartBasic(
         QGraphicsItem *parent,
         Qt::WindowFlags wFlags):_Super(parent,wFlags) {
-    auto x=new __private::ValueAxis;
-    auto y=new __private::ValueAxis;
-    y->setReverse(true);
-    this->addAxis(x,Qt::AlignBottom);
-    this->addAxis(y,Qt::AlignLeft);
+    _p_x=new __private::ValueAxis;
+    _p_y=new __private::ValueAxis;
+    _p_y->setReverse(true);
+    this->addAxis(_p_x,Qt::AlignBottom);
+    this->addAxis(_p_y,Qt::AlignLeft);
     this->setAnimationOptions(QChart::SeriesAnimations);
+    auto varLegend=legend();
+    varLegend->setVisible(false);
 }
 
 

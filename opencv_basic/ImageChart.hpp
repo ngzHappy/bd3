@@ -11,6 +11,7 @@ private:
     using _Super=ChartBasic;
     class _PrivateImageChart;
     _PrivateImageChart *_mp;
+    template<typename ...>using _void_t=void;
 public:
     ImageChart(QGraphicsItem *parent=nullptr,Qt::WindowFlags wFlags=Qt::WindowFlags());
     ~ImageChart();
@@ -20,10 +21,21 @@ public:
     const QImage &getAlgorithmImage()const;
      
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;
-    inline void setAlgorithm(const std::shared_ptr<AbstractImageShift> &arg) {
+    template<typename _A_,typename=_void_t<
+        decltype(std::declval<_A_&&>()(std::declval<const QImage&>()))>/**/>
+        inline void setAlgorithm(_A_&&);
+
+    template<typename _A_,typename=_void_t<
+        decltype(std::declval<_A_&&>()->run(std::declval<const QImage&>()))>,
+        typename=double*>
+        inline void setAlgorithm(_A_&&arg) {
+        _p_setAlgorithm(std::forward<_A_>(arg));
+    }
+private:
+    inline void _p_setAlgorithm(const std::shared_ptr<AbstractImageShift> &arg) {
         _p_set_alg(arg);
     }
-    inline void setAlgorithm(std::shared_ptr<AbstractImageShift> &&arg) {
+    inline void _p_setAlgorithm(std::shared_ptr<AbstractImageShift> &&arg) {
         _p_set_alg(std::move(arg));
     }
 public:
@@ -43,6 +55,21 @@ public:
 private:
     CPLUSPLUS_OBJECT(ImageChart)
 };
+
+template<typename _A_,typename>
+inline void ImageChart::setAlgorithm(_A_&&arg) {
+    using _A0_=std::remove_reference_t<_A_>;
+    class _Alg_A0_ :public AbstractImageShift {
+        _A0_ _pm;
+    public:
+        QImage run(const QImage& arg) const override {
+            return _pm(arg);
+        }
+        _Alg_A0_(_A_&&_arg):_pm(std::forward<_A_>(_arg)) {}
+    };
+    this->_p_setAlgorithm(
+        memory::make_shared<_Alg_A0_>(std::forward<_A_>(arg)));
+}
 
 #endif // IMAGECHART_HPP
 

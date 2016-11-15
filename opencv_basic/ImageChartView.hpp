@@ -2,8 +2,8 @@
 #define IMAGECHARTVIEW_HPP
 
 #include "ChartView.hpp"
+#include "AbstractImageShift.hpp"
 class ImageChart;
-class AbstractImageShift;
 
 class OPENCV3_BASICHARED_EXPORT ImageChartView : public ChartView {
     Q_OBJECT

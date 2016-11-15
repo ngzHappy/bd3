@@ -214,8 +214,8 @@ bool ImageChart::_p_update_axis() {
     if (varIWidth<0.5) { return false; }
     if (varIHeight<0.5) { return false; }
 
-    auto varAxisX=qobject_cast<QtCharts::QValueAxis*>(this->axisX());
-    auto varAxisY=qobject_cast<QtCharts::QValueAxis*>(this->axisY());
+    auto varAxisX=this->imageXAxis();
+    auto varAxisY=this->imageYAxis();
 
     if (varAxisX&&varAxisY) {
     

@@ -5,6 +5,7 @@
 #include <QtWidgets/QMainWindow>
 #include "OpenCVBasic.hpp"
 class QImage;
+class ImageChart;
 class PlainImageView;
 class ImageChartView;
 
@@ -20,7 +21,7 @@ public:
     virtual ~ImageShowWidget();
 public:
     PlainImageView * setImage(const QImage &);
-    ImageChartView * setChartImage(const QImage &);
+    ImageChart * setChartImage(const QImage &);
     const QImage &getImage() const;
 public:
     ImageShowWidget(const ImageShowWidget &)=delete;
