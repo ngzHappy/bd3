@@ -16,7 +16,9 @@ library_opencv_basic.file=$$PWD/opencv_basic/opencv_basic.pro
 
 SUBDIRS += library_opencv_basic
 
-
+opencv3_basic_library_test.file=$$PWD/test/opencv3_basic_library_test/opencv3_basic_library_test.pro
+opencv3_basic_library_test.depends+=library_opencv_basic
+SUBDIRS += opencv3_basic_library_test
 
 
 
