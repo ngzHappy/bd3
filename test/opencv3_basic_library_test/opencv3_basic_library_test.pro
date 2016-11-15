@@ -3,7 +3,6 @@
 QT += core
 QT += gui
 QT += widgets
-#QT += charts
 #QT += script
 #QT += network
 

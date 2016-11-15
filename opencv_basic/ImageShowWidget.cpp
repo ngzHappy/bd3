@@ -1,5 +1,6 @@
 ﻿#include "ImageShowWidget.hpp"
 #include "PlainImageView.hpp"
+#include "ImageChartView.hpp"
 #include <cmath>
 #include <QtWidgets/qdockwidget.h>
 #include <QtWidgets/qmenu.h>
@@ -181,6 +182,7 @@ public:
     inline virtual ~_PrivateImageShowWidget();
 public:
     PlainImageView * centralWidget=nullptr;
+    ImageChartView * chartCentralWidget=nullptr;
     __private::BasicImageView * originalWidget=nullptr;
     __private::MenuBar * menuBar=nullptr;
     __private::Menu * basicMenu=nullptr;
@@ -227,9 +229,21 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
     _pm_this_data->originalWidget->setImage(arg);
     /*设置显示图片*/
     _pm_this_data->centralWidget=new PlainImageView;
+    _pm_this_data->chartCentralWidget=nullptr;
     _pm_this_data->centralWidget->setImage(arg);
     setCentralWidget(_pm_this_data->centralWidget);
     return _pm_this_data->centralWidget;
+}
+
+ImageChartView * ImageShowWidget::setChartImage(
+    const QImage & argImage) {
+    /*设置原始图片*/
+    _pm_this_data->originalWidget->setImage(argImage);
+    /*设置显示图片*/
+    _pm_this_data->centralWidget=nullptr;
+    _pm_this_data->chartCentralWidget=new ImageChartView;
+    setCentralWidget(_pm_this_data->chartCentralWidget);
+    return _pm_this_data->chartCentralWidget;
 }
 
 const QImage &ImageShowWidget::getImage() const {
@@ -244,3 +258,5 @@ inline ImageShowWidget::_PrivateImageShowWidget::_PrivateImageShowWidget() {
 inline ImageShowWidget::_PrivateImageShowWidget::~_PrivateImageShowWidget() {
 
 }
+
+

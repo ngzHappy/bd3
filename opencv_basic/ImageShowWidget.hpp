@@ -6,6 +6,7 @@
 #include "OpenCVBasic.hpp"
 class QImage;
 class PlainImageView;
+class ImageChartView;
 
 class OPENCV3_BASICHARED_EXPORT ImageShowWidget : public QMainWindow
 {
@@ -20,6 +21,7 @@ public:
     virtual ~ImageShowWidget();
 public:
     PlainImageView * setImage(const QImage &);
+    ImageChartView * setChartImage(const QImage &);
     const QImage &getImage() const;
 public:
     ImageShowWidget(const ImageShowWidget &)=delete;
