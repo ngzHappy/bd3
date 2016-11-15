@@ -5,6 +5,8 @@
 #include <QtBasicLibrary.hpp>
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/QApplication>
+#include <ImageShowWidget.hpp>
+#include <PlainImageView.hpp>
 
 int main(int argc, char *argv[])try{
     /*init new handler*/
@@ -22,8 +24,16 @@ int main(int argc, char *argv[])try{
                     [](){memory::clean();});
     gcTimer.start(512);
 
-    MainWindow window;
-    window.show();
+    //MainWindow window;
+    //window.show();
+
+    ImageShowWidget widget;
+    widget.setImage(QImage(":/0x000000.jpg"))
+        ->setAlgorithm([](const QImage &arg)->QImage {
+        return arg.mirrored(true,true);
+    });
+
+    widget.show();
 
     {
         auto ans = app.exec();

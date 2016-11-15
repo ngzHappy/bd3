@@ -1,6 +1,9 @@
 ﻿#include "ImageShowWidget.hpp"
+#include "PlainImageView.hpp"
 #include <cmath>
 #include <QtWidgets/qdockwidget.h>
+#include <QtWidgets/qmenu.h>
+#include <QtWidgets/qmenubar.h>
 #include <QtGui/qimage.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpainter.h>
@@ -75,12 +78,13 @@ class BasicImageView :public QWidget {
 public:
 
     /*构造函数*/
-    BasicImageView(const QImage & arg) {
+    BasicImageView(const QImage & arg) :BasicImageView(){
         setImage(arg);
     }
+
     /*默认构造函数*/
     BasicImageView() {
-
+        setMinimumSize(64,64);
     }
 
     /*析构函数*/
@@ -98,7 +102,7 @@ public:
     }
 
     /*获得图片*/
-    const QImage & getImage() {
+    const QImage & getImage() const {
         /*获得独立拷贝*/
         return _pm_Image;
     }
@@ -114,7 +118,8 @@ protected:
                 QPainter::TextAntialiasing|
                 QPainter::SmoothPixmapTransform
             );
-            painter.drawPixmap(0,
+            painter.drawPixmap(
+                std::max(0,(this->size().width()-varDrawSize.width())/2),
                 std::max(0,(this->size().height()-varDrawSize.height())/2),
                 _pm_DrawImage);
         }
@@ -128,7 +133,8 @@ protected:
                 QPainter::TextAntialiasing|
                 QPainter::SmoothPixmapTransform
             );
-            painter.drawPixmap(0,
+            painter.drawPixmap(
+                std::max(0,(this->size().width()-varDrawSize.width())/2),
                 std::max(0,(this->size().height()-varDrawSize.height())/2),
                 _pm_DrawImage);
         }
@@ -145,17 +151,39 @@ private:
     CPLUSPLUS_OBJECT(DockWidget)
 };
 
-}/**/
+class MenuBar :public QMenuBar{
+    using _Super=QMenuBar;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(QMenuBar)
+};
+
+class Menu :public QMenu{
+    using _Super= QMenu;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(Menu)
+};
+
 }/**/
 
+inline QString operator""_qs(const char * arg,std::size_t n) {
+    return QString::fromUtf8(arg,static_cast<int>(n));
+}
+
+}/**/
 
 class ImageShowWidget::_PrivateImageShowWidget {
 public:
     inline _PrivateImageShowWidget();
     inline virtual ~_PrivateImageShowWidget();
 public:
-    __private::BasicImageView * centralWidget=nullptr;
+    PlainImageView * centralWidget=nullptr;
     __private::BasicImageView * originalWidget=nullptr;
+    __private::MenuBar * menuBar=nullptr;
+    __private::Menu * basicMenu=nullptr;
 private:
     CPLUSPLUS_OBJECT(_PrivateImageShowWidget)
 };
@@ -165,17 +193,28 @@ ImageShowWidget::ImageShowWidget(
         Qt::WindowFlags var_flags):
     Super(var_parent,var_flags) {
     _pm_this_data=new _PrivateImageShowWidget;
-    
+
+    {
+        _pm_this_data->menuBar=new __private::MenuBar(this);
+        this->setMenuBar(_pm_this_data->menuBar);
+        auto varMenu=new __private::Menu;
+        varMenu->setTitle(u8R"(基本操作)"_qs);
+        _pm_this_data->menuBar->addMenu(varMenu);
+        _pm_this_data->basicMenu=varMenu;
+    }
+
     /*设置原始图片*/
     {
         _pm_this_data->originalWidget=new __private::BasicImageView;
         auto varDock=new __private::DockWidget;
+        varDock->setWindowTitle(u8R"(原始图片)"_qs);
         varDock->setWidget(_pm_this_data->originalWidget);
         varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
         this->addDockWidget(Qt::LeftDockWidgetArea,varDock);
+        _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
     }
 
-    _pm_this_data->centralWidget=new __private::BasicImageView;
+    _pm_this_data->centralWidget=new PlainImageView;
     setCentralWidget(_pm_this_data->centralWidget);
 }
 
@@ -183,15 +222,18 @@ ImageShowWidget::~ImageShowWidget() {
     delete _pm_this_data;
 }
 
-void ImageShowWidget::setImage(const QImage & arg) {
+PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
     /*设置原始图片*/
     _pm_this_data->originalWidget->setImage(arg);
     /*设置显示图片*/
-    _pm_this_data->centralWidget=new __private::BasicImageView(arg);
+    _pm_this_data->centralWidget=new PlainImageView;
+    _pm_this_data->centralWidget->setImage(arg);
     setCentralWidget(_pm_this_data->centralWidget);
+    return _pm_this_data->centralWidget;
 }
 
-const QImage &ImageShowWidget::getImage() {
+const QImage &ImageShowWidget::getImage() const {
+    /*获得原始图片*/
     return _pm_this_data->originalWidget->getImage();
 }
 

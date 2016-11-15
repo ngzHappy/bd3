@@ -5,6 +5,7 @@
 #include <QtWidgets/QMainWindow>
 #include "OpenCVBasic.hpp"
 class QImage;
+class PlainImageView;
 
 class OPENCV3_BASICHARED_EXPORT ImageShowWidget : public QMainWindow
 {
@@ -18,8 +19,8 @@ public:
     ImageShowWidget(QWidget * /*parent*/=nullptr, Qt::WindowFlags /*flags*/=Qt::WindowFlags());
     virtual ~ImageShowWidget();
 public:
-    void setImage(const QImage &);
-    const QImage &getImage();
+    PlainImageView * setImage(const QImage &);
+    const QImage &getImage() const;
 public:
     ImageShowWidget(const ImageShowWidget &)=delete;
     ImageShowWidget(ImageShowWidget&&)=delete;

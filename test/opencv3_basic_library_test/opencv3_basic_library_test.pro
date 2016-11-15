@@ -29,3 +29,6 @@ LIBS+=-L$$THIS_PROJECT_DESTDIR -lqt_basic_library
 include($$PWD/../../opencv_basic/opencv_basic.pri)
 LIBS+=-L$$THIS_PROJECT_DESTDIR -lopencv3_basic_library
 
+RESOURCES += \
+    source.qrc
+

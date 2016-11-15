@@ -12,13 +12,16 @@ SOURCES += \
     OpenCVBasic.cpp \
     ToolOpencvException.cpp \
     ToolOpencvMemory.cpp \
-    ImageShowWidget.cpp
+    ImageShowWidget.cpp \
+    PlainImageView.cpp
 
 HEADERS += \
     OpenCVBasic.hpp \
     ToolOpencvException.hpp \
     ToolOpencvMemory.hpp \
-    ImageShowWidget.hpp
+    ImageShowWidget.hpp \
+    AbstractImageShift.hpp \
+    PlainImageView.hpp
 
 include($$PWD/opencv_basic.pri)
 
