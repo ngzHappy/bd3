@@ -15,7 +15,7 @@ public:
     ImageChart(QGraphicsItem *parent=nullptr,Qt::WindowFlags wFlags=Qt::WindowFlags());
     ~ImageChart();
 public:
-    void setImage(const QImage &);
+    void setImage(const QImage &,bool _copy=true);
     const QImage &getImage()const;
     const QImage &getAlgorithmImage()const;
      

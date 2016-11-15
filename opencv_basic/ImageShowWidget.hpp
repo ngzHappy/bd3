@@ -19,7 +19,7 @@ public:
     ImageShowWidget(QWidget * /*parent*/=nullptr,Qt::WindowFlags /*flags*/=Qt::WindowFlags());
     virtual ~ImageShowWidget();
 public:
-    PlainImageView * setImage(const QImage &,bool _copy=true);
+    PlainImageView * setImage(const QImage &);
     ImageChartView * setChartImage(const QImage &);
     const QImage &getImage() const;
 public:
