@@ -41,6 +41,30 @@ int main(int argc,char *argv[])try {
     test[1]=QPointF(33,66);
     addScatterSeries(chart,test);
    
+    {
+        auto view=new ChartView;
+        auto chart=new ChartBasic;
+        view->setChart(chart);
+        addLineSeries(chart,test);
+        widget.addImageWidget(view,"0");
+    }
+
+    {
+        auto view=new ChartView;
+        auto chart=new ChartBasic;
+        view->setChart(chart);
+        addLineSeries(chart,test);
+        widget.addImageWidget(view,"1");
+    }
+
+    {
+        auto view=new ChartView;
+        auto chart=new ChartBasic;
+        view->setChart(chart);
+        addLineSeries(chart,test);
+        widget.addImageWidget(view,"2");
+    }
+
     widget.show();
 
     {

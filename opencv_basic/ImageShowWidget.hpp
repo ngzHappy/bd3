@@ -23,6 +23,7 @@ public:
     PlainImageView * setImage(const QImage &);
     ImageChart * setChartImage(const QImage &);
     const QImage &getImage() const;
+    QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
 public:
     ImageShowWidget(const ImageShowWidget &)=delete;
     ImageShowWidget(ImageShowWidget&&)=delete;

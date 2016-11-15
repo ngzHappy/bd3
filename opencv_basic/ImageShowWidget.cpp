@@ -79,7 +79,7 @@ class BasicImageView :public QWidget {
 public:
 
     /*构造函数*/
-    BasicImageView(const QImage & arg) :BasicImageView(){
+    BasicImageView(const QImage & arg):BasicImageView() {
         setImage(arg);
     }
 
@@ -144,7 +144,7 @@ private:
     CPLUSPLUS_OBJECT(BasicImageView)
 };
 
-class DockWidget :public QDockWidget{
+class DockWidget :public QDockWidget {
     using _Super=QDockWidget;
 public:
     using _Super::_Super;
@@ -152,7 +152,7 @@ private:
     CPLUSPLUS_OBJECT(DockWidget)
 };
 
-class MenuBar :public QMenuBar{
+class MenuBar :public QMenuBar {
     using _Super=QMenuBar;
 public:
     using _Super::_Super;
@@ -160,8 +160,8 @@ private:
     CPLUSPLUS_OBJECT(QMenuBar)
 };
 
-class Menu :public QMenu{
-    using _Super= QMenu;
+class Menu :public QMenu {
+    using _Super=QMenu;
 public:
     using _Super::_Super;
 private:
@@ -208,16 +208,37 @@ ImageShowWidget::ImageShowWidget(
     /*设置原始图片*/
     {
         _pm_this_data->originalWidget=new __private::BasicImageView;
+        _pm_this_data->originalWidget->setParent(this);
         auto varDock=new __private::DockWidget;
+        varDock->setParent(this);
         varDock->setWindowTitle(u8R"(原始图片)"_qs);
         varDock->setWidget(_pm_this_data->originalWidget);
-        varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        varDock->setAllowedAreas(Qt::LeftDockWidgetArea
+            |Qt::RightDockWidgetArea
+            |Qt::BottomDockWidgetArea);
         this->addDockWidget(Qt::LeftDockWidgetArea,varDock);
         _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
     }
 
     _pm_this_data->centralWidget=new PlainImageView;
     setCentralWidget(_pm_this_data->centralWidget);
+}
+
+QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle) {
+    if (arg==nullptr) { return nullptr; }
+    {
+        arg->setParent(this);
+        auto varDock=new __private::DockWidget;
+        varDock->setParent(this);
+        varDock->setWindowTitle(argTitle);
+        varDock->setWidget(arg);
+        varDock->setAllowedAreas(Qt::LeftDockWidgetArea
+            |Qt::RightDockWidgetArea
+            |Qt::BottomDockWidgetArea);
+        this->addDockWidget(Qt::RightDockWidgetArea,varDock);
+        _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
+        return varDock;
+    }
 }
 
 ImageShowWidget::~ImageShowWidget() {
