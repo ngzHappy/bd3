@@ -16,7 +16,8 @@ SOURCES += \
     PlainImageView.cpp \
     ChartView.cpp \
     ImageChartView.cpp \
-    ChartBasic.cpp
+    ChartBasic.cpp \
+    ImageChart.cpp
 
 HEADERS += \
     OpenCVBasic.hpp \
@@ -27,7 +28,8 @@ HEADERS += \
     PlainImageView.hpp \
     ChartView.hpp \
     ImageChartView.hpp \
-    ChartBasic.hpp
+    ChartBasic.hpp \
+    ImageChart.hpp
 
 include($$PWD/opencv_basic.pri)
 
