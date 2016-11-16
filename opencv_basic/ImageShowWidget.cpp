@@ -200,6 +200,28 @@ public:
     __private::MenuBar * menuBar=nullptr;
     __private::Menu * basicMenu=nullptr;
     std::shared_ptr<AbstractImageShift> algorithm;
+#define ONLY_TOP 1
+#if  ((ONLY_TOP)<1)
+    int currentDock=-1;
+    int nextDock() {
+        ++currentDock;
+        if (currentDock>=4) { currentDock=0; }
+        return currentDock;
+    }
+#endif
+    Qt::DockWidgetArea nextArea() {
+#if  ((ONLY_TOP)>=0)
+        return Qt::DockWidgetArea::TopDockWidgetArea;
+#else
+        switch (nextDock()) {
+            case 0:return Qt::DockWidgetArea::LeftDockWidgetArea;
+            case 1:return Qt::DockWidgetArea::BottomDockWidgetArea;
+            case 2:return Qt::DockWidgetArea::RightDockWidgetArea;
+            case 3:return Qt::DockWidgetArea::TopDockWidgetArea;
+        }
+        return Qt::DockWidgetArea::LeftDockWidgetArea;
+#endif
+    }
 private:
     CPLUSPLUS_OBJECT(_PrivateImageShowWidget)
 };
@@ -221,14 +243,14 @@ ImageShowWidget::ImageShowWidget(
 
     /*设置原始图片*/
     {
-        auto varDock=new __private::DockWidget;
-        varDock->setParent(this);
         _pm_this_data->originalWidget=new __private::BasicImageView;
-        _pm_this_data->originalWidget->setParent(this);
+        auto varDock=new __private::DockWidget;
+        _pm_this_data->originalWidget->setParent(varDock);
+        varDock->setParent(this);
         varDock->setWidget(_pm_this_data->originalWidget);
         varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
         this->addDockWidget(
-            Qt::RightDockWidgetArea,
+            _pm_this_data->nextArea(),
             varDock);
         _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
         varDock->setWindowTitle(u8R"(原始图片)"_qs);
@@ -242,14 +264,14 @@ ImageShowWidget::ImageShowWidget(
 QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle) {
     if (arg==nullptr) { return nullptr; }
     {
-        arg->setParent(this);
         auto varDock=new __private::DockWidget;
+        arg->setParent(varDock);
         varDock->setParent(this);
         varDock->setWindowTitle(argTitle);
         varDock->setWidget(arg);
         varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
         this->addDockWidget(
-            Qt::RightDockWidgetArea,
+            _pm_this_data->nextArea(),
             varDock);
         _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
         return varDock;
