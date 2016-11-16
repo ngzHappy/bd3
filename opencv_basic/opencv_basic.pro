@@ -6,6 +6,10 @@ QT += gui
 QT += concurrent
 QT += widgets
 
+###private for qimage
+QT += core_private
+QT += gui_private
+
 DEFINES += OPENCV3_BASIC_LIBRARY
 
 SOURCES += \
@@ -17,7 +21,8 @@ SOURCES += \
     ChartView.cpp \
     ImageChartView.cpp \
     ChartBasic.cpp \
-    ImageChart.cpp
+    ImageChart.cpp \
+    QOpencvImage.cpp
 
 HEADERS += \
     OpenCVBasic.hpp \
@@ -30,7 +35,8 @@ HEADERS += \
     ImageChartView.hpp \
     ChartBasic.hpp \
     ImageChart.hpp \
-    ImageShowUtility.hpp
+    ImageShowUtility.hpp \
+    QOpencvImage.hpp
 
 include($$PWD/opencv_basic.pri)
 

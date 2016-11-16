@@ -65,6 +65,9 @@ int main(int argc,char *argv[])try {
         widget.addImageWidget(view,"2");
     }
 
+    QImage xxx;
+    xxx.data_ptr();
+
     widget.show();
 
     {

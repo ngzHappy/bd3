@@ -79,8 +79,8 @@ class BasicImageView :public QWidget {
 public:
 
     /*构造函数*/
-    BasicImageView(const QImage & arg):BasicImageView() {
-        setImage(arg);
+    BasicImageView(QImage && arg):BasicImageView() {
+        setImage(std::move(arg));
     }
 
     /*默认构造函数*/
@@ -94,9 +94,9 @@ public:
     }
 
     /*设置图片*/
-    void setImage(const QImage & arg) {
+    void setImage(QImage && arg) {
         /*获得独立copy*/
-        _pm_Image=arg.copy();
+        _pm_Image=std::move(arg);
         _pm_DrawImage={};
         /*更新显示*/
         update();
@@ -267,9 +267,15 @@ ImageShowWidget::~ImageShowWidget() {
     delete _pm_this_data;
 }
 
-PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
+PlainImageView * ImageShowWidget::setImage(const QImage & arg,bool _copy) {
     /*设置原始图片*/
-    _pm_this_data->originalWidget->setImage(arg);
+    if (_copy) {
+        _pm_this_data->originalWidget->setImage(arg.copy());
+    }
+    else {
+        QImage tmp(arg);
+        _pm_this_data->originalWidget->setImage(std::move(tmp));
+    }
     /*设置显示图片*/
     _pm_this_data->centralWidget=new PlainImageView;
     _pm_this_data->chartCentralWidget=nullptr;
@@ -281,9 +287,15 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
 }
 
 ImageChart * ImageShowWidget::setChartImage(
-    const QImage & argImage) {
+    const QImage & argImage,bool _copy) {
     /*设置原始图片*/
-    _pm_this_data->originalWidget->setImage(argImage);
+    if (_copy) {
+        _pm_this_data->originalWidget->setImage(argImage.copy());
+    }
+    else {
+        QImage tmp(argImage);
+        _pm_this_data->originalWidget->setImage(std::move(tmp));
+    }
     /*设置显示图片*/
     _pm_this_data->centralWidget=nullptr;
     _pm_this_data->chartCentralWidget=new ImageChartView;

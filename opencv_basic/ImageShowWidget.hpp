@@ -23,8 +23,8 @@ public:
     ImageShowWidget(QWidget * /*parent*/=nullptr,Qt::WindowFlags /*flags*/=Qt::WindowFlags());
     virtual ~ImageShowWidget();
 public:
-    PlainImageView * setImage(const QImage &);
-    ImageChart * setChartImage(const QImage &);
+    PlainImageView * setImage(const QImage &,bool is_copy_=true);
+    ImageChart * setChartImage(const QImage &,bool is_copy_=true);
     const QImage &getImage() const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;
