@@ -35,7 +35,8 @@ int main(int argc,char *argv[])try {
 
     OpencvMainWindow mainWindow;
 
-    for (int xx=0;xx<5;++xx) {
+    for (int xx=0;xx<5;++xx) 
+    {
 
         ImageShowWidget *_widget=new ImageShowWidget;
         auto & widget=*_widget;
@@ -74,6 +75,8 @@ int main(int argc,char *argv[])try {
             view->setChart(chart);
             addLineSeries(chart,test);
             widget.addImageWidget(view,"2");
+            
+            //_widget->show();
         }
         mainWindow.addWidget(_widget);
 
@@ -81,7 +84,6 @@ int main(int argc,char *argv[])try {
     
     mainWindow.show();
 
-   // _widget->show();
 
     {
         auto ans=app.exec();
