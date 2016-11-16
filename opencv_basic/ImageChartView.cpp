@@ -31,6 +31,10 @@ ImageChartView::getAlgorithm()const {
     return _mp_image_chart->getAlgorithm();
 }
 
+QSize ImageChartView::sizeHint() const {
+    return{512+128,512};
+}
+
 void ImageChartView::_p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&arg) {
     _mp_image_chart->setAlgorithm(arg);
 }

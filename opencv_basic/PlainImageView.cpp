@@ -129,6 +129,10 @@ void PlainImageView::setImage(const QImage & arg,bool _copy) {
     imageChanged();
 }
 
+QSize PlainImageView::sizeHint() const {
+    return{512+128,512};
+}
+
 void PlainImageView::_alg_or_img_change() {
     _pm->imageToDraw={};
     try {

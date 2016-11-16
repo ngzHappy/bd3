@@ -35,6 +35,7 @@ public:
         inline void setAlgorithm(_A_&&arg) {
         _p_setAlgorithm(std::forward<_A_>(arg));
     }
+    QSize sizeHint() const override;
 protected:
     void _p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&);
     void _p_setAlgorithm(std::shared_ptr<AbstractImageShift>&&);

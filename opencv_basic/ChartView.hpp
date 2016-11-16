@@ -17,6 +17,8 @@ protected:
 public:
     ChartView(QWidget *parent=nullptr):ChartView(nullptr,parent) {}
     ~ChartView();
+
+    QSize sizeHint() const override;
 private:
     CPLUSPLUS_OBJECT(ChartView)
 };

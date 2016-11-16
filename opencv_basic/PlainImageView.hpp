@@ -44,6 +44,7 @@ public:
     PlainImageView&operator=(PlainImageView &&)=delete;
     PlainImageView(const PlainImageView &)=delete;
     PlainImageView&operator=(const PlainImageView &)=delete;
+    QSize sizeHint() const override;
 private:
     void _alg_or_img_change();
     void _p_setAlgorithm(std::shared_ptr<AbstractImageShift>);

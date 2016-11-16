@@ -8,6 +8,7 @@
 #include <QtGui/qimage.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpainter.h>
+#include <private/qimage_p.h>
 
 /*
  * 简易的gui库,不要用于复杂工程
@@ -107,6 +108,11 @@ public:
         /*获得独立拷贝*/
         return _pm_Image;
     }
+
+    QSize sizeHint() const override {
+        return{ 128,128 };
+    }
+
 protected:
     void paintEvent(QPaintEvent *) override {
         const auto & varImage=_pm_Image;
@@ -267,9 +273,9 @@ ImageShowWidget::~ImageShowWidget() {
     delete _pm_this_data;
 }
 
-PlainImageView * ImageShowWidget::setImage(const QImage & arg,bool _copy) {
+PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
     /*设置原始图片*/
-    if (_copy) {
+    if (const_cast<QImage&>(arg).data_ptr()->own_data==false) {
         _pm_this_data->originalWidget->setImage(arg.copy());
     }
     else {
@@ -287,23 +293,26 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg,bool _copy) {
 }
 
 ImageChart * ImageShowWidget::setChartImage(
-    const QImage & argImage,bool _copy) {
-    /*设置原始图片*/
-    if (_copy) {
-        _pm_this_data->originalWidget->setImage(argImage.copy());
-    }
-    else {
-        QImage tmp(argImage);
-        _pm_this_data->originalWidget->setImage(std::move(tmp));
-    }
-    /*设置显示图片*/
-    _pm_this_data->centralWidget=nullptr;
-    _pm_this_data->chartCentralWidget=new ImageChartView;
-    _pm_this_data->chartCentralWidget->setImage(
-        _pm_this_data->originalWidget->getImage(),false);
-    _pm_this_data->chartCentralWidget->setAlgorithm(_pm_this_data->algorithm);
-    setCentralWidget(_pm_this_data->chartCentralWidget);
-    return _pm_this_data->chartCentralWidget->imageChart();
+    const QImage & argImage) {
+        {
+            /*设置原始图片*/
+            auto vardt=const_cast<QImage&>(argImage).data_ptr();
+            if (vardt->own_data==false) {
+                _pm_this_data->originalWidget->setImage(argImage.copy());
+            }
+            else {
+                QImage tmp(argImage);
+                _pm_this_data->originalWidget->setImage(std::move(tmp));
+            }
+        }
+        /*设置显示图片*/
+        _pm_this_data->centralWidget=nullptr;
+        _pm_this_data->chartCentralWidget=new ImageChartView;
+        _pm_this_data->chartCentralWidget->setImage(
+            _pm_this_data->originalWidget->getImage(),false);
+        _pm_this_data->chartCentralWidget->setAlgorithm(_pm_this_data->algorithm);
+        setCentralWidget(_pm_this_data->chartCentralWidget);
+        return _pm_this_data->chartCentralWidget->imageChart();
 }
 
 const QImage &ImageShowWidget::getImage() const {
