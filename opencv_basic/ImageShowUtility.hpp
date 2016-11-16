@@ -16,6 +16,7 @@ namespace QtCharts {}
 #include "ImageShowWidget.hpp"
 #include "OpencvMainWindow.hpp"
 #include "ToolOpencvException.hpp"
+#include "OpencvApplication.hpp"
 
 namespace __private {
 namespace __ImageShowUtility {

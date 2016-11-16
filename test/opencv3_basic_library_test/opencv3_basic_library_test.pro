@@ -16,6 +16,8 @@ HEADERS  += MainWindow.hpp
 
 FORMS    += MainWindow.ui
 
+DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
+
 include($$PWD/../../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
 

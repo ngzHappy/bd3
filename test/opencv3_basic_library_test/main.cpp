@@ -1,15 +1,15 @@
 ﻿/*main.cpp*/
 namespace QtCharts {}
+
+#include <vector>
+#include <list>
+
 #include "MainWindow.hpp"
 #include <QtCore/qtimer.h>
 #include <QtBasicLibrary.hpp>
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/QApplication>
 #include <ImageShowUtility.hpp>
-
-#include <vector>
-#include <list>
-
 
 int main(int argc,char *argv[])try {
     /*init new handler*/
@@ -19,7 +19,7 @@ int main(int argc,char *argv[])try {
     /*init qt basic library*/
     QtBasicLibrary qtBasicLibrary;
 
-    QApplication app(argc,argv);
+    OpencvApplication app(THIS_PROJECT_BUILD_DIR,THIS_PROJECT_BUILD_DIR,argc,argv);
 
     /*每隔一段时间清理内存*/
     QTimer gcTimer;
@@ -29,13 +29,10 @@ int main(int argc,char *argv[])try {
 
     //MainWindow window;
     //window.show();
-     
-
-
 
     OpencvMainWindow mainWindow;
 
-    for (int xx=0;xx<1;++xx) 
+    for (int xx=0;xx<1;++xx)
     {
 
         ImageShowWidget *_widget=new ImageShowWidget;
@@ -75,13 +72,13 @@ int main(int argc,char *argv[])try {
             view->setChart(chart);
             addLineSeries(chart,test);
             widget.addImageWidget(view,"2");
-            
+
             //_widget->show();
         }
         mainWindow.addWidget(_widget);
 
-    }    
-    
+    }
+
     mainWindow.show();
 
 
