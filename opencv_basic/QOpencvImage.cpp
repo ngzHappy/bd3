@@ -164,12 +164,22 @@ QOpencvImage & QOpencvImage::fromOpencvMat(const cv::Mat &arg) {
     
     do {
         if ((arg.rows<1)||(arg.cols<1)) { break; }
-
+        bool varIsThis=false;
         const auto varChannels=arg.channels();
         if (varChannels==1) {
-
             /*分配内存*/
-            QImage _tmp{ arg.cols,arg.rows,QImage::Format_Grayscale8 };
+            QImage _tmp;
+            if ((this->format()==QImage::Format_Grayscale8)&&
+                (this->height()==arg.rows)&&
+                (this->width()==arg.cols)&&
+                (this->data_ptr()->own_data)) {
+                this->detach();
+                _tmp=*this;
+                varIsThis=true;
+            }
+            else { 
+                _tmp=QImage{ arg.cols,arg.rows,QImage::Format_Grayscale8 };
+            }
             /*设置包装*/
             cv::Mat var(_tmp.height(),_tmp.width(),
                 CV_8UC1,
@@ -177,12 +187,25 @@ QOpencvImage & QOpencvImage::fromOpencvMat(const cv::Mat &arg) {
                 _tmp.bytesPerLine());
             arg.convertTo(var,CV_8UC1);
             
-            QImage::operator=(std::move(_tmp));
+            if (varIsThis==false) {
+                QImage::operator=(std::move(_tmp));
+            }
             return *this;
         }
         else if (varChannels==3) {
             /*分配内存*/
-            QImage _tmp{ arg.cols,arg.rows,QImage::Format_RGB888 };
+            QImage _tmp;
+            if ((this->format()==QImage::Format_RGB888)&&
+                (this->height()==arg.rows)&&
+                (this->width()==arg.cols)&&
+                (this->data_ptr()->own_data)) {
+                this->detach();
+                _tmp=*this;
+                varIsThis=true;
+            }
+            else { 
+                _tmp=QImage{ arg.cols,arg.rows,QImage::Format_RGB888 };
+            }
             /*设置包装*/
             cv::Mat var(_tmp.height(),_tmp.width(),
                 CV_8UC3,
@@ -190,12 +213,25 @@ QOpencvImage & QOpencvImage::fromOpencvMat(const cv::Mat &arg) {
                 _tmp.bytesPerLine());
             arg.convertTo(var,CV_8UC3);
 
-            QImage::operator=(std::move(_tmp));
+            if (varIsThis==false) {
+                QImage::operator=(std::move(_tmp));
+            }
             return *this;
         }
         else if (varChannels==4) {
             /*分配内存*/
-            QImage _tmp{ arg.cols,arg.rows,QImage::Format_RGBA8888 };
+            QImage _tmp;
+            if ((this->format()==QImage::Format_RGBA8888)&&
+                (this->height()==arg.rows)&&
+                (this->width()==arg.cols)&&
+                (this->data_ptr()->own_data)) {
+                this->detach();
+                _tmp=*this;
+                varIsThis=true;
+            }
+            else { 
+                _tmp=QImage{ arg.cols,arg.rows,QImage::Format_RGBA8888 };
+            }
             /*设置包装*/
             cv::Mat var(_tmp.height(),_tmp.width(),
                 CV_8UC4,
@@ -203,7 +239,9 @@ QOpencvImage & QOpencvImage::fromOpencvMat(const cv::Mat &arg) {
                 _tmp.bytesPerLine());
             arg.convertTo(var,CV_8UC4);
 
-            QImage::operator=(std::move(_tmp));
+            if (varIsThis==false) {
+                QImage::operator=(std::move(_tmp));
+            }
             return *this;
         }
     } while (false);
@@ -219,7 +257,12 @@ cv::Mat QOpencvImage::toOpencvMat() const {
 }
 
 cv::Mat QOpencvImage::toOpencvRef() {
-    this->detach()/*获得独立拷贝*/;
+    if (this->data_ptr()->own_data==false) {
+        QImage::operator=(this->copy())/*获得独立拷贝*/;
+    }
+    else {
+        this->detach()/*获得独立拷贝*/;
+    }
     return _p_toOpencvRef();
 }
 

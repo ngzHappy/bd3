@@ -16,6 +16,9 @@ public:
     QOpencvImage(const QImage&);
     QOpencvImage(QImage&&);
 
+    QOpencvImage&operator=(const QOpencvImage&)=default;
+    QOpencvImage&operator=(QOpencvImage&&)=default;
+
     /*
     创建opencv数据,
     进行浅拷贝,

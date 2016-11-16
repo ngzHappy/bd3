@@ -33,7 +33,11 @@ int main(int argc,char *argv[])try {
     ImageShowWidget widget;
     auto chart=widget.setChartImage(QImage(":/0x000000.jpg"));
     chart->setAlgorithm([](const QImage &arg)->QImage {
-        return arg.mirrored(true,true);
+        QOpencvImage var(arg);
+        auto mat=var.toOpencvMat();
+        var.toOpencvRef()/*test*/;
+        cv::flip(mat,mat,-1);
+        return var.fromOpencvMat(mat);
     });
     
     QPointF test[2];
