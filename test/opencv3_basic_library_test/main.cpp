@@ -35,7 +35,7 @@ int main(int argc,char *argv[])try {
 
     OpencvMainWindow mainWindow;
 
-    for (int xx=0;xx<5;++xx) 
+    for (int xx=0;xx<1;++xx) 
     {
 
         ImageShowWidget *_widget=new ImageShowWidget;

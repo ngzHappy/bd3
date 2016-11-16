@@ -2,16 +2,16 @@
 #define OPENCVMAINWINDOW_HPP
 
 #include "OpenCVBasic.hpp"
-#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qmainwindow.h>
 class ImageShowWidget;
 class QMdiSubWindow;
 
-class OPENCV3_BASICHARED_EXPORT OpencvMainWindow : public QWidget
+class OPENCV3_BASICHARED_EXPORT OpencvMainWindow : public QMainWindow
 {
     Q_OBJECT
 
 private:
-    using _Super=QWidget;
+    using _Super=QMainWindow;
     class _PrivateOpencvMainWindow;
     _PrivateOpencvMainWindow * _mp;
 public:
@@ -20,6 +20,8 @@ public:
 
     QMdiSubWindow * addWidget(ImageShowWidget*);
     virtual void addImage(const QImage &);
+private:
+    void _p_open_image();
 private:
     CPLUSPLUS_OBJECT(OpencvMainWindow)
 };
