@@ -34,10 +34,9 @@ int main(int argc,char *argv[])try {
     auto chart=widget.setChartImage(QImage(":/0x000000.jpg"));
     chart->setAlgorithm([](const QImage &arg)->QImage {
         QOpencvImage var(arg);
-        auto mat=var.toOpencvMat();
-        var.toOpencvRef()/*test*/;
+        auto mat=var.toOpencvRef();
         cv::flip(mat,mat,-1);
-        return var.fromOpencvMat(mat);
+        return var;
     });
     
     QPointF test[2];
