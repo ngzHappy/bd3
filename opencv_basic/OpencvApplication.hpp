@@ -18,6 +18,7 @@ public:
             int/*argc*/,char ** /*argv*/);
     ~OpencvApplication();
 
+    const QString & getBuildPath() const;
     const string_t & getLuaFileData() const;
 public:
     OpencvApplication(const OpencvApplication&)=delete;
@@ -26,7 +27,6 @@ public:
     OpencvApplication&operator=(OpencvApplication&&)=delete;
 
     static OpencvApplication * instance();
-
 private:
     class _PrivateOpencvApplication;
     _PrivateOpencvApplication *_mp=nullptr;
