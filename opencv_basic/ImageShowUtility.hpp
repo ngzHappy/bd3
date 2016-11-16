@@ -118,6 +118,8 @@ inline _L_ *_line_like_addLineSeries(
         using _Super=_L_;
     public:
         using _Super::_Super;
+        using _Super::replace;
+        using _Super::attachAxis;
     private:
         CPLUSPLUS_OBJECT(LineSeries)
     };
