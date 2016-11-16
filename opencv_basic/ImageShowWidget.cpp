@@ -77,6 +77,7 @@ inline QSize imageResizeSize(
 class BasicImageView :public QWidget {
     QImage _pm_Image;
     QPixmap _pm_DrawImage;
+    using _Super=QWidget;
 public:
 
     /*构造函数*/
@@ -114,7 +115,12 @@ public:
     }
 
 protected:
-    void paintEvent(QPaintEvent *) override {
+
+    virtual bool event(QEvent *e) override {
+        return _Super::event(e);
+    }
+
+    void paintEvent(QPaintEvent *e) override {
         const auto & varImage=_pm_Image;
         if (varImage.isNull()) { return; }
         auto varDrawSize=imageResizeSize(varImage.size(),this->size());
@@ -145,6 +151,7 @@ protected:
                 std::max(0,(this->size().height()-varDrawSize.height())/2),
                 _pm_DrawImage);
         }
+        return _Super::paintEvent(e);
     }
 private:
     CPLUSPLUS_OBJECT(BasicImageView)
@@ -207,28 +214,29 @@ ImageShowWidget::ImageShowWidget(
         _pm_this_data->menuBar=new __private::MenuBar(this);
         this->setMenuBar(_pm_this_data->menuBar);
         auto varMenu=new __private::Menu;
-        varMenu->setTitle(u8R"(基本操作)"_qs);
+        varMenu->setTitle(u8R"(视图)"_qs);
         _pm_this_data->menuBar->addMenu(varMenu);
         _pm_this_data->basicMenu=varMenu;
     }
 
     /*设置原始图片*/
     {
-        _pm_this_data->originalWidget=new __private::BasicImageView;
-        _pm_this_data->originalWidget->setParent(this);
         auto varDock=new __private::DockWidget;
         varDock->setParent(this);
-        varDock->setWindowTitle(u8R"(原始图片)"_qs);
+        _pm_this_data->originalWidget=new __private::BasicImageView;
+        _pm_this_data->originalWidget->setParent(this);
         varDock->setWidget(_pm_this_data->originalWidget);
-        varDock->setAllowedAreas(Qt::LeftDockWidgetArea
-            |Qt::RightDockWidgetArea
-            |Qt::BottomDockWidgetArea);
-        this->addDockWidget(Qt::LeftDockWidgetArea,varDock);
+        varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        this->addDockWidget(
+            Qt::RightDockWidgetArea,
+            varDock);
         _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
+        varDock->setWindowTitle(u8R"(原始图片)"_qs);
     }
 
     _pm_this_data->centralWidget=new PlainImageView;
     setCentralWidget(_pm_this_data->centralWidget);
+    this->setDockNestingEnabled(true);
 }
 
 QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle) {
@@ -239,10 +247,10 @@ QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle
         varDock->setParent(this);
         varDock->setWindowTitle(argTitle);
         varDock->setWidget(arg);
-        varDock->setAllowedAreas(Qt::LeftDockWidgetArea
-            |Qt::RightDockWidgetArea
-            |Qt::BottomDockWidgetArea);
-        this->addDockWidget(Qt::RightDockWidgetArea,varDock);
+        varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
+        this->addDockWidget(
+            Qt::RightDockWidgetArea,
+            varDock);
         _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
         return varDock;
     }
@@ -260,6 +268,7 @@ void ImageShowWidget::_p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&
         _pm_this_data->centralWidget->setAlgorithm(arg);
     }
 }
+
 void ImageShowWidget::_p_setAlgorithm(std::shared_ptr<AbstractImageShift>&&arg) {
     if (_pm_this_data->chartCentralWidget) {
         _pm_this_data->chartCentralWidget->setAlgorithm(std::move(arg));

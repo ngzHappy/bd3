@@ -3,7 +3,8 @@
 
 ImageChartView::ImageChartView(QWidget *parent):_Super(parent){
     _mp_image_chart=new ImageChart;
-    setChart(_mp_image_chart);
+    _mp_image_chart->setParent(this);
+    this->setChart(_mp_image_chart);
     connect(_mp_image_chart,&ImageChart::imageChanged,
         this,&ImageChartView::imageChanged);
     connect(_mp_image_chart,&ImageChart::algorithmChanged,

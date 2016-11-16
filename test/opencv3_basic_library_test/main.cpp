@@ -29,49 +29,59 @@ int main(int argc,char *argv[])try {
 
     //MainWindow window;
     //window.show();
+     
 
-    ImageShowWidget widget;
-    auto chart=widget.setChartImage(QImage(":/0x000000.jpg"));
-    chart->setAlgorithm([](const QImage &arg)->QImage {
-        QOpencvImage var(arg);
-        auto mat=var.toOpencvRef();
-        cv::flip(mat,mat,-1);
-        return var;
-    });
+
+
+    OpencvMainWindow mainWindow;
+
+    for (int xx=0;xx<5;++xx) {
+
+        ImageShowWidget *_widget=new ImageShowWidget;
+        auto & widget=*_widget;
+        auto chart=widget.setChartImage(QImage(":/0x000000.jpg"));
+        chart->setAlgorithm([](const QImage &arg)->QImage {
+            QOpencvImage var(arg);
+            auto mat=var.toOpencvRef();
+            cv::flip(mat,mat,-1);
+            return var;
+        });
+
+        QPointF test[2];
+        test[0]=QPointF(0,0);
+        test[1]=QPointF(33,66);
+        addScatterSeries(chart,test);
+
+        {
+            auto view=new ChartView;
+            auto chart=new ChartBasic;
+            view->setChart(chart);
+            addLineSeries(chart,test);
+            widget.addImageWidget(view,"0");
+        }
+
+        {
+            auto view=new ChartView;
+            auto chart=new ChartBasic;
+            view->setChart(chart);
+            addLineSeries(chart,test);
+            widget.addImageWidget(view,"1");
+        }
+
+        {
+            auto view=new ChartView;
+            auto chart=new ChartBasic;
+            view->setChart(chart);
+            addLineSeries(chart,test);
+            widget.addImageWidget(view,"2");
+        }
+        mainWindow.addWidget(_widget);
+
+    }    
     
-    QPointF test[2];
-    test[0]=QPointF(0,0);
-    test[1]=QPointF(33,66);
-    addScatterSeries(chart,test);
-   
-    {
-        auto view=new ChartView;
-        auto chart=new ChartBasic;
-        view->setChart(chart);
-        addLineSeries(chart,test);
-        widget.addImageWidget(view,"0");
-    }
+    mainWindow.show();
 
-    {
-        auto view=new ChartView;
-        auto chart=new ChartBasic;
-        view->setChart(chart);
-        addLineSeries(chart,test);
-        widget.addImageWidget(view,"1");
-    }
-
-    {
-        auto view=new ChartView;
-        auto chart=new ChartBasic;
-        view->setChart(chart);
-        addLineSeries(chart,test);
-        widget.addImageWidget(view,"2");
-    }
-
-    QImage xxx;
-    xxx.data_ptr();
-
-    widget.show();
+   // _widget->show();
 
     {
         auto ans=app.exec();

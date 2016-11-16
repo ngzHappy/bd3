@@ -14,6 +14,7 @@ namespace QtCharts {}
 #include "ImageChartView.hpp"
 #include "ToolOpencvMemory.hpp"
 #include "ImageShowWidget.hpp"
+#include "OpencvMainWindow.hpp"
 #include "ToolOpencvException.hpp"
 
 namespace __private {
@@ -154,7 +155,7 @@ template<
     typename _Te_= std::enable_if_t<HasBeginEnd<_Tb_>::value>
 >
 inline QtCharts::QLineSeries *addLineSeries(
-    ChartBasic *argC,const _Tb_&argB_ 
+    ChartBasic *argC,const _Tb_&argB_
 ) {
     return addLineSeries(argC,argB_.begin(),argB_.end());
 }
@@ -183,7 +184,7 @@ template<
     typename _Te_= std::enable_if_t<HasBeginEnd<_Tb_>::value>
 >
 inline QtCharts::QScatterSeries *addScatterSeries(
-    ChartBasic *argC,const _Tb_&argB_ 
+    ChartBasic *argC,const _Tb_&argB_
 ) {
     return addScatterSeries(argC,argB_.begin(),argB_.end());
 }

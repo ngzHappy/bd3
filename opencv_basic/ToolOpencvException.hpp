@@ -12,3 +12,7 @@ private:
 };
 
 #endif // TOOLOPENCVEXCEPTION_HPP
+
+
+
+
