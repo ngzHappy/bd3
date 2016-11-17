@@ -10,6 +10,9 @@ class QImage;
 class ImageChart;
 class PlainImageView;
 class ImageChartView;
+namespace QtCharts {
+class QChartView;
+}
 
 class OPENCV3_BASICHARED_EXPORT ImageShowWidget : public QMainWindow {
     Q_OBJECT
@@ -27,6 +30,8 @@ public:
     PlainImageView * setImage(const QImage &);
     /*set central widget*/
     ImageChart * setChartImage(const QImage &);
+    /*set central widget*/
+    QtCharts::QChartView * setChartView(QtCharts::QChartView *);
     const QImage &getImage() const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;
@@ -40,6 +45,9 @@ public:
         inline void setAlgorithm(_A_&&arg) {
         _p_setAlgorithm(std::forward<_A_>(arg));
     }
+
+    void setOriginalImageWidgetVisible(bool);
+
 public:
     ImageShowWidget(const ImageShowWidget &)=delete;
     ImageShowWidget(ImageShowWidget&&)=delete;

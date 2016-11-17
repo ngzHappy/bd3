@@ -198,6 +198,7 @@ public:
     QPointer<PlainImageView> centralWidget;
     QPointer<ImageChartView> chartCentralWidget;
     __private::BasicImageView * originalWidget=nullptr;
+    QDockWidget * dockOriginalWidget=nullptr;
     __private::MenuBar * menuBar=nullptr;
     __private::Menu * basicMenu=nullptr;
     std::shared_ptr<AbstractImageShift> algorithm;
@@ -255,6 +256,7 @@ ImageShowWidget::ImageShowWidget(
             varDock);
         _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
         varDock->setWindowTitle(u8R"(原始图片)"_qs);
+        _pm_this_data->dockOriginalWidget=varDock;
     }
 
     _pm_this_data->centralWidget=new PlainImageView;
@@ -303,6 +305,14 @@ void ImageShowWidget::_p_setAlgorithm(std::shared_ptr<AbstractImageShift>&&arg) 
 
 ImageShowWidget::~ImageShowWidget() {
     delete _pm_this_data;
+}
+
+QtCharts::QChartView * ImageShowWidget::setChartView(QtCharts::QChartView *arg) {
+    if (arg==nullptr) { return nullptr; }
+    _pm_this_data->originalWidget->setImage(QImage{});
+    setOriginalImageWidgetVisible(false);
+    setCentralWidget(arg);
+    return arg;
 }
 
 PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
@@ -359,5 +369,10 @@ inline ImageShowWidget::_PrivateImageShowWidget::_PrivateImageShowWidget() {
 inline ImageShowWidget::_PrivateImageShowWidget::~_PrivateImageShowWidget() {
 
 }
+
+void ImageShowWidget::setOriginalImageWidgetVisible(bool arg) {
+    _pm_this_data->dockOriginalWidget->setVisible(arg);
+}
+
 
 
