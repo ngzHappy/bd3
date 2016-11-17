@@ -95,108 +95,9 @@ int main(int argc, char *argv[])try{
 }
 
 )_!_"_qu8;
-    }
+    }     
 
-    {
-        QFile file(dir_project+"/MainWindow.hpp");
-        if (false==file.open(QIODevice::WriteOnly)) {
-            return;
-        }
-        QTextStream textStream(&file);
-        textStream.setCodec("UTF-8");
-        textStream<<bom;
-        textStream<<u8R"_!_(/*MainWindow.hpp*/
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
-
-#include <cplusplus_basic.hpp>
-#include <QtWidgets/QMainWindow>
-
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-private:
-    Ui::MainWindow *ui;
-private:
-    CPLUSPLUS_OBJECT(MainWindow)
-};
-
-#endif // MAINWINDOW_HPP
-
-)_!_"_qu8;
-    }
-
-    {
-        QFile file(dir_project+"/MainWindow.ui");
-        if (false==file.open(QIODevice::WriteOnly)) {
-            return;
-        }
-        QTextStream textStream(&file);
-        textStream<<u8R"_!_(<ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow" >
-  <property name="geometry" >
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>300</height>
-   </rect>
-  </property>
-  <property name="windowTitle" >
-   <string>MainWindow</string>
-  </property>
-  <widget class="QMenuBar" name="menuBar" />
-  <widget class="QToolBar" name="mainToolBar" />
-  <widget class="QWidget" name="centralWidget" />
-  <widget class="QStatusBar" name="statusBar" />
- </widget>
- <layoutDefault spacing="6" margin="11" />
- <pixmapfunction></pixmapfunction>
- <resources/>
- <connections/>
-</ui>
-
-)_!_"_qu8;
-    }
-
-    {
-        QFile file(dir_project+"/MainWindow.cpp");
-        if (false==file.open(QIODevice::WriteOnly)) {
-            return;
-        }
-        QTextStream textStream(&file);
-        textStream.setCodec("UTF-8");
-        textStream<<bom;
-        textStream<<u8R"_!_(/*MainWindow.cpp*/
-#include "MainWindow.hpp"
-#include "ui_MainWindow.h"
-
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
-)_!_"_qu8;
-    }
-
-
+/*****************************************/
     {
         QFile file(dir_project+"/"+project_name+".pro");
         if (false==file.open(QIODevice::WriteOnly)) {
@@ -205,22 +106,24 @@ MainWindow::~MainWindow()
         QTextStream textStream(&file);
         auto write_data=u8R"_!_(###$$$.pro
 
+###$$$.pro
+
 QT += core
 QT += gui
 QT += widgets
-#QT += charts
 #QT += script
 #QT += network
 
 TARGET = $$$
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        MainWindow.cpp
+SOURCES += main.cpp
 
-HEADERS  += MainWindow.hpp
+HEADERS  +=  
 
-FORMS    += MainWindow.ui
+FORMS    +=  
+
+DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 
 include($$PWD/../../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
@@ -230,6 +133,16 @@ LIBS+=-L$$THIS_PROJECT_DESTDIR -lcplusplus_basic_library
 
 include($$PWD/../../qt_basic/qt_basic.pri)
 LIBS+=-L$$THIS_PROJECT_DESTDIR -lqt_basic_library
+
+include($$PWD/../../opencv_basic/opencv_basic.pri)
+LIBS+=-L$$THIS_PROJECT_DESTDIR -lopencv3_basic_library
+
+RESOURCES += \
+    source.qrc
+
+DISTFILES += \
+    $$PWD/$$$.lua
+
 
 )_!_"_qu8;;
         textStream<<write_data.replace("$$$"_qu8,project_name);
