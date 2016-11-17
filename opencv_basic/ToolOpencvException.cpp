@@ -7,3 +7,9 @@ ToolOpencvException::ToolOpencvException(){
 ToolOpencvException::~ToolOpencvException(){
 
 }
+
+
+
+
+
+
