@@ -18,8 +18,6 @@ LIBS += -llibtcmalloc_minimal
 
 }
 
-SOURCES += \
-    $$PWD/tcmalloc_fore_load.cpp
 
 
 
