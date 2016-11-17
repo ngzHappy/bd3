@@ -27,6 +27,9 @@ public:
     OpencvApplication&operator=(OpencvApplication&&)=delete;
 
     static OpencvApplication * instance();
+
+    QPair<const QString*,const QString*> getAllImageNames()const;
+
 private:
     class _PrivateOpencvApplication;
     _PrivateOpencvApplication *_mp=nullptr;

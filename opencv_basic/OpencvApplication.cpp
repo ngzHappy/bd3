@@ -1,6 +1,10 @@
 ﻿#include "OpencvApplication.hpp"
 #include <QtCore/qdir.h>
 #include <text/to_plain_text.hpp>
+#include <lua/lua.hpp>
+#include <list>
+#include <vector>
+#include <forward_list>
 
 namespace  {
 
@@ -21,6 +25,18 @@ public:
     QString imageDirPath;
     string_t luaFileData;
     OpencvApplication *thisp;
+    lua::State * L=nullptr;
+    std::vector<QString,memory::Allocator<QString>> imageNames;
+
+    _PrivateOpencvApplication(){
+        L=luaL::newstate();
+        lua::checkstack(L,1024);
+        lua::openlibs(L);
+    }
+
+    virtual ~_PrivateOpencvApplication(){
+        lua::close(L);
+    }
 
     void updateLuaFile() {
         const QString varAppName=thisp->applicationName();
@@ -62,7 +78,7 @@ public:
                     luaFileName=dir.absoluteFilePath(testName);
                     break;
                 }
-            }                            
+            }
 
         } while (false);
 
@@ -84,10 +100,18 @@ public:
                 varPlainText.end());
         }
 
+        /*put the app to top*/
+        luaL::loadstring(L,luaFileData.c_str());
+        lua::pcall(L,0,lua::MULTRET,0);
+
+        if(lua::istable(L,-1)){
+            lua::rawsetp(L,LUA_REGISTRYINDEX,this);
+        }
+
     }
 
     void upateImageSearchDir(){
-        
+
         {
             QDir dir(thisp->applicationDirPath());
             dir=QDir( dir.absoluteFilePath("Images"_qs) );
@@ -149,6 +173,56 @@ public:
         }
 
     }
+
+    class ReadAllImagesState{
+    public:
+        using list_t=std::list<QString,memory::Allocator<QString>>;
+        _PrivateOpencvApplication * pointer;
+        list_t imageNames;
+    };
+    static int lua_readAllImages(lua::State * L){
+        lua::checkstack(L,64);
+        auto state=reinterpret_cast<ReadAllImagesState *>(lua::touserdata(L,-1));
+        lua::rawgetp(L,LUA_REGISTRYINDEX,state->pointer);
+        auto tableIndex=lua::gettop(L);
+        if(false==lua::istable(L,-1)){
+            lua::pushlstring(L,"can not find table");
+            lua::error(L);
+        }
+        
+        lua::pushlstring(L,"input_images");
+        lua::rawget(L,tableIndex);
+
+        auto dataIndex=lua::gettop(L);
+        if (false==lua::istable(L,dataIndex)) {
+            lua::pushlstring(L,"can not find table:input_images");
+            lua::error(L);
+        }
+
+        lua::pushnil(L);
+        std::size_t strl;
+        while (lua::next(L,dataIndex)) {
+            const char * strd=luaL::tolstring(L,-1/*value index*/,&strl);
+            if ((strl>0)&&strd) {
+                state->imageNames.push_back(
+                    QString::fromUtf8(strd,strl).trimmed());
+            }
+            lua::pop(L,2);
+        }
+
+        return 0;
+    }
+
+    ReadAllImagesState::list_t readAllImageNames(){
+        lua::checkstack(L,3);
+        ReadAllImagesState state;
+        state.pointer=this;
+        lua::pushcfunction(L,&lua_readAllImages);
+        lua::pushlightuserdata(L,&state);
+        lua::pcall(L,1,0,0);
+        return std::move(state.imageNames);
+    }
+
 private:
     CPLUSPLUS_OBJECT(_PrivateOpencvApplication)
 };
@@ -174,7 +248,7 @@ OpencvApplication * OpencvApplication::instance(){
     return static_cast<OpencvApplication *>(_Super::instance());
 }
 
-const OpencvApplication::string_t & 
+const OpencvApplication::string_t &
 OpencvApplication::getLuaFileData() const {
     return _mp->luaFileData;
 }
@@ -183,6 +257,21 @@ const QString & OpencvApplication::getBuildPath() const{
     return _mp->buildPath;
 }
 
+QPair<const QString*,const QString*> OpencvApplication::getAllImageNames()const {
+    
+    if (_mp->imageNames.empty()) {
+        auto tmp=_mp->readAllImageNames();
+        _mp->imageNames.reserve(tmp.size());
+        for (auto & i:tmp) {
+            _mp->imageNames.push_back(std::move(i));
+        }
+    }
+
+    QString * _fs=&(*_mp->imageNames.begin());
+    QString * _ls=_fs+_mp->imageNames.size();
+
+    return{_fs,_ls};
+}
 
 
 

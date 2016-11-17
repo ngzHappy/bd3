@@ -23,7 +23,9 @@ public:
     ImageShowWidget(QWidget * /*parent*/=nullptr,Qt::WindowFlags /*flags*/=Qt::WindowFlags());
     virtual ~ImageShowWidget();
 public:
+    /*set central widget*/
     PlainImageView * setImage(const QImage &);
+    /*set central widget*/
     ImageChart * setChartImage(const QImage &);
     const QImage &getImage() const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
@@ -44,6 +46,7 @@ public:
     ImageShowWidget&operator=(const ImageShowWidget &)=delete;
     ImageShowWidget&operator=(ImageShowWidget&&)=delete;
 private:
+    using Super::setCentralWidget;
     void _p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&);
     void _p_setAlgorithm(std::shared_ptr<AbstractImageShift>&&);
 private:

@@ -497,8 +497,8 @@ inline auto checkversion(lua::State *L)noexcept(false) ->void { return checkvers
 inline auto getmetafield(lua::State *L,int obj,const char *e)->lua::BaseTypes { return static_cast<lua::BaseTypes>(luaL_getmetafield(L,obj,e)); }
 /*noexcept(false): [-0, +(0|1), e] */
 inline auto callmeta(lua::State *L,int obj,const char *e)noexcept(false)->bool { return luaL_callmeta(L,obj,e)>0; }
-/**/
-inline auto tolstring(lua::State *L,int idx,size_t *len)->const char * { return luaL_tolstring(L,idx,len); }
+/*noexcept(false): [-0, +1, e] */
+inline auto tolstring(lua::State *L,int idx,size_t *len)noexcept(false)->const char * { return luaL_tolstring(L,idx,len); }
 /*noexcept(false): [-0, +0, v] */
 inline auto argerror(lua::State *L,int arg,const char *extramsg)noexcept(false)->unknow_return_type { return luaL_argerror(L,arg,extramsg); }
 /*noexcept(false): [-0, +0, v] */

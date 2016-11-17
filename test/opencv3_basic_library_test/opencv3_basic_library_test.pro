@@ -33,3 +33,6 @@ LIBS+=-L$$THIS_PROJECT_DESTDIR -lopencv3_basic_library
 RESOURCES += \
     source.qrc
 
+DISTFILES += \
+    opencv3_basic_library_test.lua
+

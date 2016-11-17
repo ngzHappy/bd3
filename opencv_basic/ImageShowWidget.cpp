@@ -8,6 +8,7 @@
 #include <QtGui/qimage.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpainter.h>
+#include <QtCore/qpointer.h>
 #include <private/qimage_p.h>
 
 /*
@@ -194,8 +195,8 @@ public:
     inline _PrivateImageShowWidget();
     inline virtual ~_PrivateImageShowWidget();
 public:
-    PlainImageView * centralWidget=nullptr;
-    ImageChartView * chartCentralWidget=nullptr;
+    QPointer<PlainImageView> centralWidget;
+    QPointer<ImageChartView> chartCentralWidget;
     __private::BasicImageView * originalWidget=nullptr;
     __private::MenuBar * menuBar=nullptr;
     __private::Menu * basicMenu=nullptr;

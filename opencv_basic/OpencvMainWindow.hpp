@@ -19,11 +19,22 @@ public:
     OpencvMainWindow(QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
 
     QMdiSubWindow * addWidget(ImageShowWidget*);
-    virtual void addImage(const QImage &);
+    virtual QWidget* addImage(const QImage &);
+
+    template<typename _Tb,typename _Te>
+    void addImage(_Tb b,const _Te&e);
+    void addImage(const QPair<const QString *,const QString *>&arg);
 private:
     void _p_open_image();
 private:
     CPLUSPLUS_OBJECT(OpencvMainWindow)
 };
+
+template<typename _Tb,typename _Te>
+void  OpencvMainWindow::addImage(_Tb b,const _Te&e) {
+    for (; b!=e;++b) {
+        this->addImage(*b);
+    }
+}
 
 #endif // OPENCVMAINWINDOW_HPP

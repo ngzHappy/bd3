@@ -1,5 +1,6 @@
 ﻿--[[lua--]]
-application={
+
+local application={
         input_images={
                 "images:000001",
                 "images:000002",
@@ -7,3 +8,6 @@ application={
         }
 }
 
+return application
+
+--[[lua--]]

@@ -135,12 +135,18 @@ QMdiSubWindow * OpencvMainWindow::addWidget(ImageShowWidget*arg) {
 
 }
 
-void OpencvMainWindow::addImage(const QImage & arg) {
-    if (arg.isNull()) { return; }
+QWidget* OpencvMainWindow::addImage(const QImage & arg) {
+    if (arg.isNull()) { return nullptr; }
     auto var= new ImageShowWidget(this);
     var->setImage(arg);
-    this->addWidget(var);
+    return this->addWidget(var);
 }
 
+void OpencvMainWindow::addImage(const QPair<const QString *,const QString *>&arg) {
+    for (auto i=arg.first;i!=arg.second;++i) {
+        auto w=addImage(QImage(*i));
+        if (w) { w->setWindowTitle(*i); }
+    }
+}
 
 

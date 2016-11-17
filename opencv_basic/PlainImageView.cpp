@@ -76,6 +76,7 @@ private:
 
 PlainImageView::PlainImageView() {
     _pm=new _PrivatePlainImageView;
+    this->setMinimumSize(64,64);
 }
 
 PlainImageView::~PlainImageView() {
