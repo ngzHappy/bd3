@@ -223,6 +223,44 @@ public:
         return std::move(state.imageNames);
     }
 
+    class ReadPoint2dState {
+    public:
+        _PrivateOpencvApplication * pointer;
+        using list_t=std::list<QPointF,memory::Allocator<QPointF>>;
+        list_t data;
+    };
+    static int lua_readPoint2d(lua::State*L) noexcept(false){
+        lua::checkstack(L,64);
+        auto state=
+            reinterpret_cast<ReadPoint2dState*>(lua::touserdata(L,-1));
+       
+        lua::rawgetp(L,LUA_REGISTRYINDEX,state->pointer);
+        auto tableIndex=lua::gettop(L);
+        if(false==lua::istable(L,-1)){
+            lua::pushlstring(L,"can not find table");
+            lua::error(L);
+        }
+
+        lua::pushlstring(L,"input_images");
+        lua::rawget(L,tableIndex);
+
+        auto dataIndex=lua::gettop(L);
+        if (false==lua::istable(L,dataIndex)) {
+            lua::pushlstring(L,"can not find table:input_images");
+            lua::error(L);
+        }
+
+        return 0;
+    }
+    ReadPoint2dState::list_t readPoint2d() {
+        lua::checkstack(L,3);
+        ReadPoint2dState state;
+        lua::pushcfunction(L,&lua_readPoint2d);
+        lua::pushlightuserdata(L,&state);
+        lua::pcall(L,1,0,0);
+        return std::move(state.data);
+    }
+
 private:
     CPLUSPLUS_OBJECT(_PrivateOpencvApplication)
 };
