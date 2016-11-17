@@ -34,6 +34,7 @@ void MainWindow::on_doButton_clicked(){
         QFile file(proFileName);
         if (file.open(QIODevice::ReadOnly)==false) {
             ui->textShow->setText("can not find:"+proFileName);
+            return;
         }
         QTextStream textStream(&file);
         pro_file_data=textStream.readAll().trimmed();
