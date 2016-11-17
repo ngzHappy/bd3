@@ -26,7 +26,10 @@ public:
     string_t luaFileData;
     OpencvApplication *thisp;
     lua::State * L=nullptr;
+
+    /*lua state data*/
     std::vector<QString,memory::Allocator<QString>> imageNames;
+    std::vector<QPointF,memory::Allocator<QPointF>> point2dData;
 
     _PrivateOpencvApplication(){
         L=luaL::newstate();
@@ -83,30 +86,7 @@ public:
         } while (false);
 
         luaFileName=luaFileName.trimmed();
-        luaFileData.clear();
-
-        if (luaFileName.isEmpty()) {
-            return;
-        }
-
-        QFile file(luaFileName);
-        if (file.open(QIODevice::ReadOnly)) {
-            const QByteArray varData=file.readAll();
-            file.close();
-            if (varData.isEmpty()) { return; }
-            auto varPlainText=
-            text::to_plain_text(varData.begin(),varData.end());
-            luaFileData=string_t(varPlainText.begin(),
-                varPlainText.end());
-        }
-
-        /*put the app to top*/
-        luaL::loadstring(L,luaFileData.c_str());
-        lua::pcall(L,0,lua::MULTRET,0);
-
-        if(lua::istable(L,-1)){
-            lua::rawsetp(L,LUA_REGISTRYINDEX,this);
-        }
+        readLuaFile(luaFileName);
 
     }
 
@@ -229,6 +209,49 @@ public:
         using list_t=std::list<QPointF,memory::Allocator<QPointF>>;
         list_t data;
     };
+    static bool readPoint2dItem(lua::State *L,QPointF & ans) {
+        
+        const auto tableIndex=lua::gettop(L);
+        const auto luaNextPos=tableIndex+1;
+        const auto _key=tableIndex+1;
+        const auto _value=tableIndex+2;
+
+        lua::pushnil(L);
+        int isNum=-1;
+        bool isXSet=false;
+        bool isYSet=false;
+        std::size_t strl=0;
+        while (lua::next(L,tableIndex)) {
+            if (lua::isinteger(L,_key)) {
+                isNum=-1;
+                auto key=lua::tointeger(L,_key);
+                if (key==1) {
+                    isXSet=true;
+                    ans.setX(lua::tonumberx(L,_value,&isNum));
+                }
+                else if(key==2){
+                    isYSet=true;
+                    ans.setY(lua::tonumberx(L,_value,&isNum));
+                }
+                if (isNum<0) { return false; }
+            }
+            else {
+                isNum=-1;
+                auto key=luaL::tolstring(L,_key,&strl);
+                if (key&&(strl>0)) {
+                    switch (*key) {
+                        case 'X':
+                        case 'x':isXSet=true;ans.setX(lua::tonumberx(L,_value,&isNum));break;
+                        case 'Y':
+                        case 'y':isYSet=true;ans.setY(lua::tonumberx(L,_value,&isNum)); break;
+                    }
+                }
+                if (isNum<0) { return false; }
+            }
+            lua::settop(L,luaNextPos);
+        }
+        return (isXSet&&isYSet);
+    }
     static int lua_readPoint2d(lua::State*L) noexcept(false){
         lua::checkstack(L,64);
         auto state=
@@ -241,7 +264,7 @@ public:
             lua::error(L);
         }
 
-        lua::pushlstring(L,"input_images");
+        lua::pushlstring(L,"input_data_2d");
         lua::rawget(L,tableIndex);
 
         auto dataIndex=lua::gettop(L);
@@ -250,15 +273,74 @@ public:
             lua::error(L);
         }
 
+        lua::pushnil(L);
+        constexpr static const auto _key=-2;
+        constexpr static const auto _value=-1;
+        const auto luaNextPos=dataIndex+1;
+        while (lua::next(L,dataIndex)) {
+            if (lua::istable(L,_value)) {
+                QPointF ansi;
+                if (readPoint2dItem(L,ansi)) {
+                    state->data.push_back(ansi);
+                }
+                else {
+                    state->data.clear();
+                    lua::pushlstring(L,"read point 2d error");
+                    lua::error(L);
+                }
+            }
+            lua::settop(L,luaNextPos);
+        }
+        
         return 0;
     }
     ReadPoint2dState::list_t readPoint2d() {
         lua::checkstack(L,3);
         ReadPoint2dState state;
+        state.pointer=this;
         lua::pushcfunction(L,&lua_readPoint2d);
         lua::pushlightuserdata(L,&state);
         lua::pcall(L,1,0,0);
         return std::move(state.data);
+    }
+
+    void readLuaFile(const QString &luaFileName) {
+        /*check state size*/
+        lua::checkstack(L,8);
+        /*reset lua state*/
+        lua::pushnil(L);
+        lua::rawsetp(L,LUA_REGISTRYINDEX,this);
+        /*clear c++ state data*/
+        point2dData.clear();
+        imageNames.clear();
+        luaFileData.clear();
+
+        if (luaFileName.isEmpty()) {
+            return;
+        }
+
+        QFile file(luaFileName);
+        if (file.open(QIODevice::ReadOnly)) {
+            const QByteArray varData=file.readAll();
+            file.close();
+            if (varData.isEmpty()) { return; }
+            auto varPlainText=
+                text::to_plain_text(varData.begin(),varData.end());
+            luaFileData=string_t(varPlainText.begin(),
+                varPlainText.end());
+        }
+        else {
+            return;
+        }
+
+        /*put the app to top*/
+        luaL::loadstring(L,luaFileData.c_str());
+        lua::pcall(L,0,lua::MULTRET,0);
+
+        if(lua::istable(L,-1)){
+            lua::rawsetp(L,LUA_REGISTRYINDEX,this);
+        }
+
     }
 
 private:
@@ -311,9 +393,22 @@ QPair<const QString*,const QString*> OpencvApplication::getAllImageNames()const 
     return{_fs,_ls};
 }
 
+QPair<const QPointF*,const QPointF*> OpencvApplication::getPoint2d()const {
 
+    if (_mp->point2dData.empty()) {
+        auto tmp=_mp->readPoint2d();
+        _mp->point2dData.assign(tmp.begin(),tmp.end());
+    }
 
+    auto * _fs=&(*_mp->point2dData.begin());
+    auto * _ls=_fs+_mp->point2dData.size();
+    
+    return{_fs,_ls};
+}
 
+void OpencvApplication::readLuaFile(const QString &arg) {
+    return _mp->readLuaFile(arg);
+}
 
 
 

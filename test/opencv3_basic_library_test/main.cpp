@@ -21,6 +21,8 @@ int main(int argc,char *argv[])try {
 
     OpencvApplication app(THIS_PROJECT_BUILD_DIR,THIS_PROJECT_BUILD_DIR,argc,argv);
 
+    app.getPoint2d();
+
     /*每隔一段时间清理内存*/
     QTimer gcTimer;
     gcTimer.connect(&gcTimer,&QTimer::timeout,

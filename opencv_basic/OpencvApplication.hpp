@@ -20,6 +20,7 @@ public:
 
     const QString & getBuildPath() const;
     const string_t & getLuaFileData() const;
+    
 public:
     OpencvApplication(const OpencvApplication&)=delete;
     OpencvApplication(OpencvApplication&&)=delete;
@@ -29,7 +30,8 @@ public:
     static OpencvApplication * instance();
 
     QPair<const QString*,const QString*> getAllImageNames()const;
-
+    QPair<const QPointF*,const QPointF*> getPoint2d()const;
+    void readLuaFile(const QString &);
 private:
     class _PrivateOpencvApplication;
     _PrivateOpencvApplication *_mp=nullptr;
