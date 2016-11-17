@@ -34,5 +34,5 @@ RESOURCES += \
     source.qrc
 
 DISTFILES += \
-    opencv3_basic_library_test.lua
+    $$PWD/opencv3_basic_library_test.lua
 

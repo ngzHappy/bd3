@@ -20,7 +20,7 @@ public:
 
     const QString & getBuildPath() const;
     const string_t & getLuaFileData() const;
-    
+
 public:
     OpencvApplication(const OpencvApplication&)=delete;
     OpencvApplication(OpencvApplication&&)=delete;
