@@ -123,6 +123,11 @@ HEADERS  +=
 
 FORMS    +=  
 
+RESOURCES +=  
+
+DISTFILES += \
+    $$PWD/$$$.lua
+
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 
 include($$PWD/../../this_project.pri)
@@ -136,13 +141,6 @@ LIBS+=-L$$THIS_PROJECT_DESTDIR -lqt_basic_library
 
 include($$PWD/../../opencv_basic/opencv_basic.pri)
 LIBS+=-L$$THIS_PROJECT_DESTDIR -lopencv3_basic_library
-
-RESOURCES += \
-    source.qrc
-
-DISTFILES += \
-    $$PWD/$$$.lua
-
 
 )_!_"_qu8;;
         textStream<<write_data.replace("$$$"_qu8,project_name);

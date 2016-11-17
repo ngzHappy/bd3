@@ -169,7 +169,7 @@ public:
             lua::pushlstring(L,"can not find table");
             lua::error(L);
         }
-        
+
         lua::pushlstring(L,"input_images");
         lua::rawget(L,tableIndex);
 
@@ -210,7 +210,7 @@ public:
         list_t data;
     };
     static bool readPoint2dItem(lua::State *L,QPointF & ans) {
-        
+
         const auto tableIndex=lua::gettop(L);
         const auto luaNextPos=tableIndex+1;
         const auto _key=tableIndex+1;
@@ -256,7 +256,7 @@ public:
         lua::checkstack(L,64);
         auto state=
             reinterpret_cast<ReadPoint2dState*>(lua::touserdata(L,-1));
-       
+
         lua::rawgetp(L,LUA_REGISTRYINDEX,state->pointer);
         auto tableIndex=lua::gettop(L);
         if(false==lua::istable(L,-1)){
@@ -274,7 +274,7 @@ public:
         }
 
         lua::pushnil(L);
-        constexpr static const auto _key=-2;
+        //constexpr static const auto _key=-2;
         constexpr static const auto _value=-1;
         const auto luaNextPos=dataIndex+1;
         while (lua::next(L,dataIndex)) {
@@ -291,7 +291,7 @@ public:
             }
             lua::settop(L,luaNextPos);
         }
-        
+
         return 0;
     }
     ReadPoint2dState::list_t readPoint2d() {
@@ -378,7 +378,7 @@ const QString & OpencvApplication::getBuildPath() const{
 }
 
 QPair<const QString*,const QString*> OpencvApplication::getAllImageNames()const {
-    
+
     if (_mp->imageNames.empty()) {
         auto tmp=_mp->readAllImageNames();
         _mp->imageNames.reserve(tmp.size());
@@ -402,7 +402,7 @@ QPair<const QPointF*,const QPointF*> OpencvApplication::getPoint2d()const {
 
     auto * _fs=&(*_mp->point2dData.begin());
     auto * _ls=_fs+_mp->point2dData.size();
-    
+
     return{_fs,_ls};
 }
 
