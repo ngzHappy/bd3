@@ -112,6 +112,13 @@ template<typename _xT_,
     return arg.y;
 }
 
+template<typename __U__>
+inline ChartBasic * attachAxis(ChartBasic * x,__U__ * c) {
+    c->attachAxis(x->imageXAxis());
+    c->attachAxis(x->imageYAxis());
+    return x;
+}
+
 template<typename _L_=QtCharts::QLineSeries,typename _Tb_,typename _Te_>
 inline _L_ *_line_like_addLineSeries(
     ChartBasic *argC,const _Tb_&argB_,const _Te_&argE
@@ -138,9 +145,7 @@ inline _L_ *_line_like_addLineSeries(
 
     /*将曲线加入chart,并设置坐标轴*/
     argC->addSeries(ans);
-    ans->attachAxis(argC->imageXAxis());
-    ans->attachAxis(argC->imageYAxis());
-
+    attachAxis(argC,ans);
     return ans;
 }
 
@@ -207,6 +212,7 @@ inline QtCharts::QScatterSeries *addScatterSeries(
 
 using __private::__ImageShowUtility::addLineSeries;
 using __private::__ImageShowUtility::addScatterSeries;
+using __private::__ImageShowUtility::attachAxis;
 
 #endif // IMAGESHOWUTILITY_HPP
 

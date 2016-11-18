@@ -32,7 +32,9 @@ public:
     ImageChart * setChartImage(const QImage &);
     /*set central widget*/
     QtCharts::QChartView * setChartView(QtCharts::QChartView *);
+
     const QImage &getImage() const;
+    const QImage &getAlgorithmImage()const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;
     template<typename _A_,typename=_void_t<
@@ -47,7 +49,8 @@ public:
     }
 
     void setOriginalImageWidgetVisible(bool);
-
+public:
+    Q_SIGNAL void centralWidgetDataChanged();
 public:
     ImageShowWidget(const ImageShowWidget &)=delete;
     ImageShowWidget(ImageShowWidget&&)=delete;

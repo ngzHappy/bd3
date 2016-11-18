@@ -10,6 +10,7 @@
 #include <QtGui/qpainter.h>
 #include <QtCore/qpointer.h>
 #include <private/qimage_p.h>
+#include <list>
 
 /*
  * 简易的gui库,不要用于复杂工程
@@ -201,7 +202,18 @@ public:
     QDockWidget * dockOriginalWidget=nullptr;
     __private::MenuBar * menuBar=nullptr;
     __private::Menu * basicMenu=nullptr;
+    ImageShowWidget * super;
     std::shared_ptr<AbstractImageShift> algorithm;
+    using list_connections_t=std::list<QMetaObject::Connection,memory::Allocator<QMetaObject::Connection>>;
+    list_connections_t connections;
+
+    void disconnect() {
+        for (const auto & i:connections) {
+            super->disconnect(i);
+        }
+        connections.clear();
+    }
+
 #define ONLY_TOP 1
 #if  ((ONLY_TOP)<1)
     int currentDock=-1;
@@ -233,6 +245,7 @@ ImageShowWidget::ImageShowWidget(
         Qt::WindowFlags var_flags):
     Super(var_parent,var_flags) {
     _pm_this_data=new _PrivateImageShowWidget;
+    _pm_this_data->super=this;
 
     {
         _pm_this_data->menuBar=new __private::MenuBar(this);
@@ -308,14 +321,17 @@ ImageShowWidget::~ImageShowWidget() {
 }
 
 QtCharts::QChartView * ImageShowWidget::setChartView(QtCharts::QChartView *arg) {
+    _pm_this_data->disconnect();
     if (arg==nullptr) { return nullptr; }
     _pm_this_data->originalWidget->setImage(QImage{});
     setOriginalImageWidgetVisible(false);
     setCentralWidget(arg);
+    emit centralWidgetDataChanged();
     return arg;
 }
 
 PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
+    _pm_this_data->disconnect();
     /*设置原始图片*/
     if (const_cast<QImage&>(arg).data_ptr()->own_data==false) {
         _pm_this_data->originalWidget->setImage(arg.copy());
@@ -330,12 +346,20 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
     _pm_this_data->centralWidget->setImage(
         _pm_this_data->originalWidget->getImage(),false);
     _pm_this_data->centralWidget->setAlgorithm(_pm_this_data->algorithm);
+    emit centralWidgetDataChanged();
+    _pm_this_data->connections.push_back(
+    connect(_pm_this_data->centralWidget,&PlainImageView::imageChanged,
+        this,&ImageShowWidget::centralWidgetDataChanged));
+    _pm_this_data->connections.push_back(
+    connect(_pm_this_data->centralWidget,&PlainImageView::algorithmChanged,
+        this,&ImageShowWidget::centralWidgetDataChanged));
     setCentralWidget(_pm_this_data->centralWidget);
     return _pm_this_data->centralWidget;
 }
 
 ImageChart * ImageShowWidget::setChartImage(
     const QImage & argImage) {
+    _pm_this_data->disconnect();
         {
             /*设置原始图片*/
             auto vardt=const_cast<QImage&>(argImage).data_ptr();
@@ -353,6 +377,13 @@ ImageChart * ImageShowWidget::setChartImage(
         _pm_this_data->chartCentralWidget->setImage(
             _pm_this_data->originalWidget->getImage(),false);
         _pm_this_data->chartCentralWidget->setAlgorithm(_pm_this_data->algorithm);
+        emit centralWidgetDataChanged();
+        _pm_this_data->connections.push_back(
+        connect(_pm_this_data->chartCentralWidget,&ImageChartView::imageChanged,
+            this,&ImageShowWidget::centralWidgetDataChanged));
+        _pm_this_data->connections.push_back(
+        connect(_pm_this_data->chartCentralWidget,&ImageChartView::algorithmChanged,
+            this,&ImageShowWidget::centralWidgetDataChanged));
         setCentralWidget(_pm_this_data->chartCentralWidget);
         return _pm_this_data->chartCentralWidget->imageChart();
 }
@@ -360,6 +391,19 @@ ImageChart * ImageShowWidget::setChartImage(
 const QImage &ImageShowWidget::getImage() const {
     /*获得原始图片*/
     return _pm_this_data->originalWidget->getImage();
+}
+
+static memory::StaticData<QImage> _d_null;
+const QImage &ImageShowWidget::getAlgorithmImage()const {
+    if (_pm_this_data->centralWidget) {
+        return _pm_this_data->centralWidget->getAlgorithmImage();
+    }
+    else if(_pm_this_data->chartCentralWidget){
+        return _pm_this_data->chartCentralWidget->getAlgorithmImage();
+    }
+    const static QImage null__;
+    static memory::StaticPoionter<QImage> _null__(_d_null);
+    return *_null__;
 }
 
 inline ImageShowWidget::_PrivateImageShowWidget::_PrivateImageShowWidget() {

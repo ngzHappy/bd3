@@ -79,11 +79,18 @@ int main(int argc,char *argv[])try {
         auto var=new ImageShowWidget;
         var->setImage(QImage(":/0x000000.jpg"));
         var->setAlgorithm([](const QImage & arg)->QImage {
-            QOpencvImage var(arg);
-            cv::Mat refMat=var.toOpencvRef();
-            cv::flip(refMat,refMat,-1);
-            return var;
+            try {
+                QOpencvImage var(arg);
+                cv::Mat refMat=var.toOpencvRef();
+                cv::flip(refMat,refMat,-1);
+                return var;
+            }
+            catch (...) {
+                CPLUSPLUS_EXCEPTION(true);
+            }
+            return arg;
         });
+        
         varMainWindow.addWidget(var)
             ->setWindowTitle("abcd");
     }
