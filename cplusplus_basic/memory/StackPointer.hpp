@@ -19,17 +19,32 @@ public:
     _T_* operator->() { return pointer(); }
     constexpr const _T_* operator->()const { return pointer(); }
     _T_& operator*() { return *pointer(); }
-    constexpr const _T_ &operator*()const { return *pointer(); }
+    constexpr const _T_& operator*()const { return *pointer(); }
     operator _T_* () { return pointer(); }
     constexpr operator const _T_* ()const { return pointer(); }
     constexpr explicit operator bool()const { return pointer()!=nullptr; }
     StackPointer& operator=(_T_* arg) { reset(arg); return *this; }
+    StackPointer(StackPointer&&arg):
+        user_(arg.user_),owner_(arg.owner_) {
+        arg.owner_=nullptr;
+    }
+    StackPointer&operator=(StackPointer&&arg) {
+        if (this==&arg) { return *this; }
+        owner_=arg.owner_;
+        arg.owner_=nullptr;
+        user_=arg.user_;
+        return *this;
+    }
 private:
     StackPointer(const StackPointer&)=delete;
     StackPointer&operator=(const StackPointer&)=delete;
-    StackPointer(StackPointer&&)=delete;
-    StackPointer&operator=(StackPointer&&)=delete;
 };
+
+template<typename _T_,typename ...Args>
+StackPointer<_T_> makeStackPointer(Args&&...args) {
+    /*rewrite in c++17*/
+    return new _T_(std::forward<Args>(args)...);
+}
 
 }/*memory*/
 

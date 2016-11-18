@@ -65,6 +65,7 @@ QList<QPointF> genEllipse(
 }
 
 void MainWindow::openLua() {
+    using namespace memory;
     /*获得数据*/
     auto points2d=qApp()->getPoint2d();
     /*检查数据*/
@@ -74,9 +75,9 @@ void MainWindow::openLua() {
         return;
     }
     /*设置视图*/
-    auto mainView=new ImageShowWidget;
-    auto view=new DataChartView;
-    mainView->setChartView(view);
+    auto mainView=makeStackPointer<ImageShowWidget>();
+    auto view=makeStackPointer<DataChartView>();
+    mainView->setChartView(view.release());
     auto chart=view->dataChart();
     /*调整坐标轴*/
     auto xAxis=std::minmax_element(points2d.first,points2d.second,
@@ -114,7 +115,7 @@ void MainWindow::openLua() {
             yAxis.second->y()+distance);
     }
 
-    addWidget(mainView)->resize(600,600);
+    addWidget(mainView.release())->resize(600,600);
 
     /*opencv 曲线拟合*/
     try {

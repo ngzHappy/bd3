@@ -508,6 +508,7 @@ void OpencvApplication::_p_setStype() {
     static QStyle * var=[]() {
         auto ans=new OpenCVAPPStype(qApp()->style());
         qApp()->setStyle(ans);
+        qApp()->setWindowIcon(ans->getTitleBarIcon());
         return ans;
     }();
     (void)var;
