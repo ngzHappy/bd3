@@ -157,26 +157,26 @@ private:
 
     {/*创建MainWindow.hpp*/
         auto varFileName=dir_project+"/MainWindow.hpp";
-        auto varFileData=u8R"_!_(/*MainWindow.hpp*/
-#ifndef MAINWINDOW_HPP_0x12778
+        auto varFileData=u8R"_!_(#ifndef MAINWINDOW_HPP_0x12778
 #define MAINWINDOW_HPP_0x12778
 
 #include <cplusplus_basic.hpp>
 #include <ImageShowUtility.hpp>
 
-class MainWindow final: public OpencvMainWindow
-{
+class MainWindow final : public OpencvMainWindow {
     Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-
-    QWidget* addImage(const QImage &) override
 private:
     using _Super=OpencvMainWindow;
     class _PrivateMainWindow;
     _PrivateMainWindow * _thisp=nullptr;
+public:
+    explicit MainWindow(QWidget *parent=nullptr);
+    ~MainWindow();
+
+    using _Super::addImage;
+    QWidget* addImage(const QImage &) override;
+
 public:
     MainWindow(const MainWindow&)=delete;
     MainWindow(MainWindow&&)=delete;

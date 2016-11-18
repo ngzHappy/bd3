@@ -137,6 +137,7 @@ QMdiSubWindow * OpencvMainWindow::addWidget(ImageShowWidget*arg) {
 }
 
 QWidget* OpencvMainWindow::addImage(const QImage & arg) {
+    if (addImageIndex()<0) { return nullptr; }
     if (arg.isNull()) { return nullptr; }
     auto var= new ImageShowWidget(this);
     var->setImage(arg);
@@ -161,6 +162,14 @@ void OpencvMainWindow::_p_begin_add_image() {
 }
 
 void OpencvMainWindow::_p_end_add_image() {
+    _mp->addImageIndex=-1;
+    try {
+        this->addImage(QImage{});
+    }
+    catch (...) {
+        _mp->addImageIndex=0;
+        throw;
+    }
     _mp->addImageIndex=0;
 }
 

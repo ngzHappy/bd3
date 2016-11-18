@@ -24,7 +24,12 @@ public:
     template<typename _Tb,typename _Te>
     void addImage(_Tb b,const _Te&e);
     void addImage(const QPair<const QString *,const QString *>&arg);
-
+    /*
+    begin add image it will return 1
+    ++1 on add a image
+    end add image it will return -1
+    just add a image return 0
+    */
     int addImageIndex()const;
 private:
     void _p_open_image();

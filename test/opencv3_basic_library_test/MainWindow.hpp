@@ -8,15 +8,17 @@
 class MainWindow final : public OpencvMainWindow {
     Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent=nullptr);
-    ~MainWindow();
-
-    QWidget* addImage(const QImage &) override;
 private:
     using _Super=OpencvMainWindow;
     class _PrivateMainWindow;
     _PrivateMainWindow * _thisp=nullptr;
+public:
+    explicit MainWindow(QWidget *parent=nullptr);
+    ~MainWindow();
+
+    using _Super::addImage;
+    QWidget* addImage(const QImage &) override;
+
 public:
     MainWindow(const MainWindow&)=delete;
     MainWindow(MainWindow&&)=delete;
