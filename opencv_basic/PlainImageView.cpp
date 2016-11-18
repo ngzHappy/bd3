@@ -93,7 +93,8 @@ void PlainImageView::paintEvent(QPaintEvent *) {
         painter.setRenderHints(
             QPainter::HighQualityAntialiasing|
             QPainter::TextAntialiasing|
-            QPainter::SmoothPixmapTransform
+            QPainter::SmoothPixmapTransform|
+            QPainter::Antialiasing
         );
         painter.drawPixmap(
             std::max(0,(this->size().width()-varDrawSize.width())/2),
@@ -108,7 +109,8 @@ void PlainImageView::paintEvent(QPaintEvent *) {
         painter.setRenderHints(
             QPainter::HighQualityAntialiasing|
             QPainter::TextAntialiasing|
-            QPainter::SmoothPixmapTransform
+            QPainter::SmoothPixmapTransform|
+            QPainter::Antialiasing
         );
         painter.drawPixmap(
             std::max(0,(this->size().width()-varDrawSize.width())/2),

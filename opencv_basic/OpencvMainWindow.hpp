@@ -19,7 +19,11 @@ public:
     OpencvMainWindow(QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::WindowFlags());
 
     QMdiSubWindow * addWidget(ImageShowWidget*);
+
+    /*加载图片回调函数*/
     virtual QWidget* addImage(const QImage &);
+    /*打开lua回调函数*/
+    virtual void openLua();
 
     template<typename _Tb,typename _Te>
     void addImage(_Tb b,const _Te&e);
@@ -33,6 +37,7 @@ public:
     int addImageIndex()const;
 private:
     void _p_open_image();
+    void _p_open_lua();
     void _p_begin_add_image();
     void _p_end_add_image();
     void _p_finished_add_a_image();

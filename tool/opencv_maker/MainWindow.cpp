@@ -176,6 +176,7 @@ public:
 
     using _Super::addImage;
     QWidget* addImage(const QImage &) override;
+    void openLua() override;
 
 public:
     MainWindow(const MainWindow&)=delete;
@@ -217,6 +218,10 @@ MainWindow::~MainWindow(){
 /*write your code here*/
 QWidget* MainWindow::addImage(const QImage &arg) {
     return _Super::addImage(arg);
+}
+
+void MainWindow::openLua(){
+    return _Super::openLua();
 }
 
 /*End of the file.*/
@@ -301,8 +306,8 @@ int main(int argc,char *argv[])try {
         std::make_unique<MainState>(argc,argv);
 
     MainWindow varMainWindow;
-
-    varMainWindow.addImage(varMainState->app()->getAllImageNames());
+    /*注入启动数据*/
+    varMainWindow.openLua();
     varMainWindow.show();
 
     return varMainState->exec();

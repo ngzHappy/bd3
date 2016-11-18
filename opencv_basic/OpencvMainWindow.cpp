@@ -7,6 +7,7 @@
 #include <QtWidgets/qmdiarea.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmdisubwindow.h>
+#include "OpencvApplication.hpp"
 
 namespace {
 namespace __private {
@@ -93,7 +94,28 @@ OpencvMainWindow::OpencvMainWindow(
         connect(openaction,&QAction::triggered,
             this,&OpencvMainWindow::_p_open_image);
     }
+    {
+        auto openaction=new __private::Action(u8R"(打开lua)"_qs,this);
+        _mp->defaultMenu->addAction(openaction);
+        connect(openaction,&QAction::triggered,
+            this,&OpencvMainWindow::_p_open_lua);
+    }
     _mp->menuBar->addMenu(_mp->defaultMenu);
+
+}
+
+void OpencvMainWindow::_p_open_lua(){
+
+    const auto varImages= QFileDialog::getOpenFileName(this,
+        u8R"(打开lua文件)"_qs/*caption*/,
+        {}/*dir*/,
+        u8R"(lua文件(*.lua *.lua.gz *.gz);;所有类型(*.*))"_qs
+        );
+
+    if (varImages.isEmpty()) { return; }
+
+    qApp()->readLuaFile(varImages);
+    openLua();
 
 }
 
@@ -177,7 +199,9 @@ void OpencvMainWindow::_p_finished_add_a_image() {
     ++_mp->addImageIndex;
 }
 
-
+void OpencvMainWindow::openLua(){
+    addImage(qApp()->getAllImageNames());
+}
 
 
 

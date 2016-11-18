@@ -10,7 +10,8 @@ ChartView::ChartView(
     this->setRenderHints(
         QPainter::HighQualityAntialiasing|
         QPainter::SmoothPixmapTransform|
-        QPainter::TextAntialiasing
+        QPainter::TextAntialiasing|
+        QPainter::Antialiasing
     );
 }
 

@@ -277,9 +277,9 @@ public:
         //constexpr static const auto _key=-2;
         constexpr static const auto _value=-1;
         const auto luaNextPos=dataIndex+1;
+        QPointF ansi;
         while (lua::next(L,dataIndex)) {
             if (lua::istable(L,_value)) {
-                QPointF ansi;
                 if (readPoint2dItem(L,ansi)) {
                     state->data.push_back(ansi);
                 }
@@ -397,6 +397,7 @@ QPair<const QPointF*,const QPointF*> OpencvApplication::getPoint2d()const {
 
     if (_mp->point2dData.empty()) {
         auto tmp=_mp->readPoint2d();
+        _mp->point2dData.reserve(tmp.size());
         _mp->point2dData.assign(tmp.begin(),tmp.end());
     }
 

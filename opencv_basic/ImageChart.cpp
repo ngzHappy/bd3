@@ -125,7 +125,8 @@ void ImageChart::paint(
             painter.setRenderHints(
                 QPainter::HighQualityAntialiasing|
                 QPainter::TextAntialiasing|
-                QPainter::SmoothPixmapTransform
+                QPainter::SmoothPixmapTransform|
+                QPainter::Antialiasing
             );
             painter.drawPixmap(
                 std::max(0,(varSize.width()-varDrawSize.width())/2),

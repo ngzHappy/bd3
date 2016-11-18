@@ -22,5 +22,7 @@ opencv3_basic_library_test.file=$$PWD/test/opencv3_basic_library_test/opencv3_ba
 opencv3_basic_library_test.depends+=library_opencv_basic
 SUBDIRS += opencv3_basic_library_test
 
-
+opencv_fitEllipse.file=$$PWD/opencv/opencv_point_algorithm/opencv_fitEllipse/opencv_fitEllipse.pro
+opencv_fitEllipse.depends+=library_opencv_basic
+SUBDIRS += opencv_fitEllipse
 
