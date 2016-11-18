@@ -89,7 +89,8 @@ inline void make(
 
      class Memory{
      public:
-         typedef int int_t;
+          typedef int int_t;static_assert(sizeof(int_t)>=4,"32bits");
+          typedef size_t uint_t;static_assert(sizeof(uint_t)>=4,"32bits");
           /*boost::pool*/
     class pool_t {
         typedef boost::pool<boost::default_user_allocator_malloc_free> _pool_t;
@@ -111,7 +112,7 @@ inline void make(
          public:
              virtual ~MFItem()=default;
              virtual void free(void *)=0;
-             virtual int_t size(void *) const =0;
+             virtual uint_t size(void *) const =0;
          };
 
          class Item{
@@ -121,24 +122,24 @@ inline void make(
 
          class Item_default final:public MFItem{
          public:
-             int_t size(void *arg)const override{
+             uint_t size(void *arg)const override{
 #if defined(WIN32)||defined(_WIN32)
-            return static_cast<int_t>(::_msize(arg));
+            return static_cast<uint_t>(::_msize(arg));
 #else
-            return static_cast<int_t>(::malloc_usable_size(arg));
+            return static_cast<uint_t>(::malloc_usable_size(arg));
 #endif
     return -1;
     (void)arg;
 }
              void free(void * arg) override{std::free(arg);}
-             void * malloc(int_t arg){
+             void * malloc(uint_t arg){
                 auto var=reinterpret_cast<Item *>(std::malloc(arg));
                 if (var) {
                  var->data=this;
                   return ++var;
              }
              return nullptr;
-             }/*malloc(int_t arg)*/
+             }/*malloc(uint_t arg)*/
          }_pm_item_default;
 
          template<int_t N>
@@ -147,7 +148,7 @@ inline void make(
              pool_t _pm_pool{ N ,_next_size_};
          public:
              void clean(){_pm_pool.release_memory();}
-             int_t size(void *)const override{return N;}
+             uint_t size(void *)const override{return N;}
              void free(void * arg) override{_pm_pool.free(arg);}
              void * malloc(){
                  auto var=reinterpret_cast<Item *>(_pm_pool.malloc());
@@ -224,7 +225,7 @@ Memory&operator=(Memory&&)=delete;
     {
         ofs<<u8R"(
 /*+++*/
-void * malloc(int_t n){
+void * malloc(uint_t n){
         constexpr static int_t var_size_of_Item=sizeof(Item);
         if(n<1){return nullptr;}
         if(n>()"_sw;
@@ -247,7 +248,7 @@ void * malloc(int_t n){
         var->data->free(var);
     }
 
-    int_t size(void * arg)const{
+    uint_t size(void * arg)const{
         if(arg==nullptr){return 0;}
         auto var=reinterpret_cast<Item *>(arg);
         --var;
@@ -335,7 +336,7 @@ void clean() noexcept(true){
     return _p_file::get_memory()->clean();
 }
 
-void * malloc(int arg) noexcept(true){
+void * malloc(size_t arg) noexcept(true){
     if (arg<=0) { return &_memory_private_zero; }
     void * ans=nullptr;
 
@@ -362,7 +363,7 @@ void free(void * arg) noexcept(true){
     return _p_file::get_memory()->free(arg);
 }
 
-int size(void * arg) noexcept(true){
+size_t size(void * arg) noexcept(true){
     if (arg==&_memory_private_zero) { return 0; }
     return _p_file::get_memory()->size(arg);
 }
