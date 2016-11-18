@@ -1,5 +1,6 @@
 ﻿#include "ImageChartView.hpp"
 #include "ImageChart.hpp"
+#include <algorithm>
 
 ImageChartView::ImageChartView(QWidget *parent):_Super(parent){
     _mp_image_chart=new ImageChart;
@@ -33,7 +34,16 @@ ImageChartView::getAlgorithm()const {
 }
 
 QSize ImageChartView::sizeHint() const {
-    return{512+128,512};
+    const auto & image_=_mp_image_chart->getImage();
+    if (image_.isNull()==false) {
+        auto w=image_.width();
+        auto h=image_.height();
+        auto mwh=std::max(w,h);
+        if (mwh<513) { return{w,h}; }
+        auto k=512/double(mwh);
+        return QSizeF{k*w,k*h}.toSize();
+    }
+    return{512,512};
 }
 
 void ImageChartView::_p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&arg) {

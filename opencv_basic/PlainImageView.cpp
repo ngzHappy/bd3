@@ -131,7 +131,16 @@ void PlainImageView::setImage(const QImage & arg,bool _copy) {
 }
 
 QSize PlainImageView::sizeHint() const {
-    return{512+128,512};
+    const auto & image_=this->getImage();
+    if (image_.isNull()==false) {
+        auto w=image_.width();
+        auto h=image_.height();
+        auto mwh=std::max(w,h);
+        if (mwh<513) { return{w,h}; }
+        auto k=512/double(mwh);
+        return QSizeF{k*w,k*h}.toSize();
+    }
+    return{512,512};
 }
 
 void PlainImageView::_alg_or_img_change() {

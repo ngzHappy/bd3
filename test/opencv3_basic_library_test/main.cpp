@@ -66,6 +66,8 @@ inline MainState::~MainState() {
 
 }/*namespace*/
 
+#include <vector>
+
 int main(int argc,char *argv[])try {
 
     auto varMainState=
@@ -74,7 +76,7 @@ int main(int argc,char *argv[])try {
     MainWindow varMainWindow;
 
     varMainWindow.addImage(varMainState->app()->getAllImageNames());
-    
+
     {
         auto var=new ImageShowWidget;
         var->setImage(QImage(":/0x000000.jpg"));
@@ -90,10 +92,34 @@ int main(int argc,char *argv[])try {
             }
             return arg;
         });
-        
+
+        {
+            auto cv=new ChartView;
+            auto c=new ChartBasic;
+            cv->setChart(c);
+            addScatterSeries(c,
+                std::vector<QPointF>{QPointF(0,0),
+                    QPointF(100,100),
+            });
+            var->addImageWidget(cv);
+        }
+
+        {
+            auto cv=new ChartView;
+            auto c=new ChartBasic;
+            cv->setChart(c);
+            addLineSeries(c,
+                std::vector<QPointF>{QPointF(0,0),
+                    QPointF(100,100),
+            });
+            var->addImageWidget(cv);
+        }
+
         varMainWindow.addWidget(var)
             ->setWindowTitle("abcd");
     }
+
+
     varMainWindow.show();
 
     return varMainState->exec();

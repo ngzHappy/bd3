@@ -18,8 +18,11 @@ ChartView::~ChartView() {
 }
 
 QSize ChartView::sizeHint() const {
-    return{128,128};
+    return{64,64};
 }
+
+
+
 
 
 
