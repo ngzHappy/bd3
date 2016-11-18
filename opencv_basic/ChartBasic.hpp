@@ -3,7 +3,7 @@
 
 #include "OpenCVBasic.hpp"
 #include <QtCharts/qchart.h>
-namespace QtCharts{
+namespace QtCharts {
 class QValueAxis;
 }
 

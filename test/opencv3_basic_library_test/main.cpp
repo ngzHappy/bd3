@@ -105,9 +105,8 @@ int main(int argc,char *argv[])try {
         }
 
         {
-            auto cv=new ChartView;
-            auto c=new ChartBasic(cv);
-            cv->setChart(c);
+            auto cv=new DataChartView;
+            auto c=cv->dataChart();
             addLineSeries(c,
                 std::vector<QPointF>{QPointF(0,0),
                     QPointF(100,100),
