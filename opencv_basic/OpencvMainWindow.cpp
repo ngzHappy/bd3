@@ -65,6 +65,7 @@ public:
     __private::MdiArea * mdiArea;
     __private::MenuBar * menuBar;
     __private::Menu *defaultMenu;
+    int addImageIndex=0;
 private:
     CPLUSPLUS_OBJECT(_PrivateOpencvMainWindow)
 };
@@ -143,10 +144,36 @@ QWidget* OpencvMainWindow::addImage(const QImage & arg) {
 }
 
 void OpencvMainWindow::addImage(const QPair<const QString *,const QString *>&arg) {
+    _AddImageState _{this};
     for (auto i=arg.first;i!=arg.second;++i) {
         auto w=addImage(QImage(*i));
         if (w) { w->setWindowTitle(*i); }
+        _p_finished_add_a_image();
     }
 }
+
+int OpencvMainWindow::addImageIndex()const {
+    return _mp->addImageIndex;
+}
+
+void OpencvMainWindow::_p_begin_add_image() {
+    _mp->addImageIndex=1;
+}
+
+void OpencvMainWindow::_p_end_add_image() {
+    _mp->addImageIndex=0;
+}
+
+void OpencvMainWindow::_p_finished_add_a_image() {
+    ++_mp->addImageIndex;
+}
+
+
+
+
+
+
+
+
 
 

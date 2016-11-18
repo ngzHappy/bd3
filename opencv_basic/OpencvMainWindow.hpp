@@ -24,16 +24,29 @@ public:
     template<typename _Tb,typename _Te>
     void addImage(_Tb b,const _Te&e);
     void addImage(const QPair<const QString *,const QString *>&arg);
+
+    int addImageIndex()const;
 private:
     void _p_open_image();
+    void _p_begin_add_image();
+    void _p_end_add_image();
+    void _p_finished_add_a_image();
+    class _AddImageState {
+        OpencvMainWindow *const _p_m;
+    public:
+        _AddImageState(OpencvMainWindow *a):_p_m(a) { a->_p_begin_add_image(); }
+        ~_AddImageState() { _p_m->_p_end_add_image(); }
+    };
 private:
     CPLUSPLUS_OBJECT(OpencvMainWindow)
 };
 
 template<typename _Tb,typename _Te>
 void  OpencvMainWindow::addImage(_Tb b,const _Te&e) {
+    _AddImageState _{this};
     for (; b!=e;++b) {
         this->addImage(*b);
+        _p_finished_add_a_image();
     }
 }
 
