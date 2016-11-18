@@ -36,6 +36,7 @@ private:
     class _PrivateOpencvApplication;
     _PrivateOpencvApplication *_mp=nullptr;
     using _Super=QApplication;
+    void _p_setStype();
 private:
     CPLUSPLUS_OBJECT(OpencvApplication)
 };
