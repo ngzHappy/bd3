@@ -483,7 +483,7 @@ public:
         ComplexControl control,
         const QStyleOptionComplex *option,
         QPainter *painter,
-        const QWidget *widget) const {
+        const QWidget *widget) const override {
 
         if (control==ComplexControl::CC_TitleBar) {
             const auto * titileBarStyle_=qstyleoption_cast<const QStyleOptionTitleBar *>(option);
