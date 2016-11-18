@@ -36,6 +36,9 @@ public:
     const QImage &getImage() const;
     const QImage &getAlgorithmImage()const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
+    QDockWidget* addImageWidget(QWidget* aw_a_1,Qt::DockWidgetArea ad_b_2,const QString&as_c_3=QString{}) {
+        return _p_addImageWidget(aw_a_1,ad_b_2,as_c_3);
+    }
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;
     template<typename _A_,typename=_void_t<
         decltype(std::declval<_A_&&>()(std::declval<const QImage&>()))>/**/>
@@ -60,6 +63,7 @@ private:
     using Super::setCentralWidget;
     void _p_setAlgorithm(const std::shared_ptr<AbstractImageShift>&);
     void _p_setAlgorithm(std::shared_ptr<AbstractImageShift>&&);
+    QDockWidget* _p_addImageWidget(QWidget*,Qt::DockWidgetArea,const QString&/*title*/);
 private:
     CPLUSPLUS_OBJECT(ImageShowWidget)
 };

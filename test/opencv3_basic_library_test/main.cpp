@@ -95,7 +95,7 @@ int main(int argc,char *argv[])try {
 
         {
             auto cv=new ChartView;
-            auto c=new ChartBasic;
+            auto c=new ChartBasic(cv);
             cv->setChart(c);
             addScatterSeries(c,
                 std::vector<QPointF>{QPointF(0,0),
@@ -106,13 +106,13 @@ int main(int argc,char *argv[])try {
 
         {
             auto cv=new ChartView;
-            auto c=new ChartBasic;
+            auto c=new ChartBasic(cv);
             cv->setChart(c);
             addLineSeries(c,
                 std::vector<QPointF>{QPointF(0,0),
                     QPointF(100,100),
             });
-            var->addImageWidget(cv);
+            var->addImageWidget(cv,Qt::DockWidgetArea::RightDockWidgetArea);
         }
 
         varMainWindow.addWidget(var)

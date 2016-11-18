@@ -277,7 +277,8 @@ ImageShowWidget::ImageShowWidget(
     this->setDockNestingEnabled(true);
 }
 
-QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle) {
+QDockWidget* ImageShowWidget::_p_addImageWidget(
+    QWidget*arg,Qt::DockWidgetArea darea,const QString &argTitle) {
     if (arg==nullptr) { return nullptr; }
     {
         auto varDock=new __private::DockWidget;
@@ -287,11 +288,18 @@ QDockWidget* ImageShowWidget::addImageWidget(QWidget*arg,const QString &argTitle
         varDock->setWidget(arg);
         varDock->setAllowedAreas(Qt::AllDockWidgetAreas);
         this->addDockWidget(
-            _pm_this_data->nextArea(),
+            darea,
             varDock);
-        _pm_this_data->basicMenu->addAction(varDock->toggleViewAction());
+        _pm_this_data->basicMenu->addAction(
+            varDock->toggleViewAction());
         return varDock;
     }
+}
+
+QDockWidget* ImageShowWidget::addImageWidget(
+    QWidget*arg,const QString &argTitle) {
+    return _p_addImageWidget(arg,
+        _pm_this_data->nextArea(),argTitle);
 }
 
 const std::shared_ptr<AbstractImageShift>&ImageShowWidget::getAlgorithm()const {

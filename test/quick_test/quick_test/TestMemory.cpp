@@ -24,8 +24,8 @@ TestMemory::TestMemory(){
 
         {
             int *data;
-            for (int i=sizeof(int); i<1024*33; ++i) {
-                for (int j=0; j<8; ++j) {
+            for (size_t i=sizeof(int); i<1024*33; ++i) {
+                for (size_t j=0; j<8; ++j) {
                     data=reinterpret_cast<int *>(memory::malloc(i));
                     *data=332;
                     auto size=memory::size(data);
