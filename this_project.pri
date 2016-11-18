@@ -34,6 +34,12 @@ win32-msvc*{
     QMAKE_LFLAGS += -Wl,-rpath .
 }
 
+win32{
+    DEFINES *= LOCAL_CODEC_OF_THE_PROJECT=\\\"GBK\\\"
+}else{
+    DEFINES *= LOCAL_CODEC_OF_THE_PROJECT=\\\"UTF-8\\\"
+}
+
 ###########################################
 #
 #

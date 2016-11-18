@@ -9,12 +9,14 @@ QT += widgets
 TARGET = opencv3_basic_library_test
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        MainWindow.cpp
+SOURCES += main.cpp \
+    MainWindow.cpp \
+    Application.cpp
 
-HEADERS  += MainWindow.hpp
+HEADERS  += MainWindow.hpp \
+    Application.hpp
 
-FORMS    += MainWindow.ui
+FORMS    +=
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 

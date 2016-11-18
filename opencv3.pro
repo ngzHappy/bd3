@@ -24,12 +24,3 @@ SUBDIRS += opencv3_basic_library_test
 
 
 
-
-
-
-
-
-
-
-
-

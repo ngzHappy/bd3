@@ -1,24 +1,27 @@
 ﻿/*MainWindow.hpp*/
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
+#ifndef MAINWINDOW_HPP_0x12778
+#define MAINWINDOW_HPP_0x12778
 
 #include <cplusplus_basic.hpp>
-#include <QtWidgets/QMainWindow>
+#include <ImageShowUtility.hpp>
 
-namespace Ui {
-class MainWindow;
-}
-
-class MainWindow : public QMainWindow
-{
+class MainWindow final : public OpencvMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent=nullptr);
     ~MainWindow();
 
+    QWidget* addImage(const QImage &) override;
 private:
-    Ui::MainWindow *ui;
+    using _Super=OpencvMainWindow;
+    class _PrivateMainWindow;
+    _PrivateMainWindow * _thisp=nullptr;
+public:
+    MainWindow(const MainWindow&)=delete;
+    MainWindow(MainWindow&&)=delete;
+    MainWindow&operator=(const MainWindow&)=delete;
+    MainWindow&operator=(MainWindow&&)=delete;
 private:
     CPLUSPLUS_OBJECT(MainWindow)
 };

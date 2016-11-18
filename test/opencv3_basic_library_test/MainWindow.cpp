@@ -2,15 +2,22 @@
 #include "MainWindow.hpp"
 #include "ui_MainWindow.h"
 
+class MainWindow::_PrivateMainWindow{
+public:
+private:
+    CPLUSPLUS_OBJECT(_PrivateMainWindow)
+};
+
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
+    _Super(parent){
+    _thisp=new _PrivateMainWindow;
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
+MainWindow::~MainWindow(){
+     delete _thisp;
 }
 
+/*write your code here*/
+QWidget* MainWindow::addImage(const QImage &arg) {
+    return _Super::addImage(arg);
+}
