@@ -2,6 +2,7 @@
 #define _MEMORY_HPP_0x877160
 
 #include "../config/config.hpp"
+#include "StackPointer.hpp"
 
 namespace memory {
 
