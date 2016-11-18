@@ -351,11 +351,29 @@ OpencvApplication::~OpencvApplication(){
     delete _mp;
 }
 
+namespace {
+int ErrorCallback(
+    int status/*cv::Error::Code*/,
+    const char* func_name,
+    const char* err_msg,
+    const char* file_name,
+    int line,
+    void* /*userdata*/) {
+    return 0;
+    (void)status;
+    (void)func_name;
+    (void)err_msg;
+    (void)file_name;
+    (void)line;
+}
+}/*namespace*/
+
 OpencvApplication::OpencvApplication(
         const QString &argBuildPath,
         const QString &argImageDirPath,
         int a, char **b)
     :_Super(a,b){
+    cv::redirectError(&ErrorCallback);
     _mp=new _PrivateOpencvApplication;
     _mp->thisp=this;
     _mp->imageDirPath=argImageDirPath;
