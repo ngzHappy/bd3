@@ -74,6 +74,19 @@ int main(int argc,char *argv[])try {
     MainWindow varMainWindow;
 
     varMainWindow.addImage(varMainState->app()->getAllImageNames());
+    
+    {
+        auto var=new ImageShowWidget;
+        var->setImage(QImage(":/0x000000.jpg"));
+        var->setAlgorithm([](const QImage & arg)->QImage {
+            QOpencvImage var(arg);
+            cv::Mat refMat=var.toOpencvRef();
+            cv::flip(refMat,refMat,-1);
+            return var;
+        });
+        varMainWindow.addWidget(var)
+            ->setWindowTitle("abcd");
+    }
     varMainWindow.show();
 
     return varMainState->exec();
