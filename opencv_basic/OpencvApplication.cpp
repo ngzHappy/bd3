@@ -510,6 +510,7 @@ void OpencvApplication::_p_setStype() {
         qApp()->setStyle(ans);
         return ans;
     }();
+    (void)var;
 }
 
 namespace {
