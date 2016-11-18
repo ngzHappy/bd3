@@ -12,12 +12,12 @@ class OPENCV3_BASICHARED_EXPORT ChartBasic :public QtCharts::QChart {
 
 private:
     using _Super=QtCharts::QChart;
-    QtCharts::QValueAxis *_p_x;
-    QtCharts::QValueAxis *_p_y;
+    QtCharts::QValueAxis *_p_x=nullptr;
+    QtCharts::QValueAxis *_p_y=nullptr;
 public:
     ~ChartBasic();
     ChartBasic(QGraphicsItem *parent=nullptr,Qt::WindowFlags wFlags=Qt::WindowFlags());
-    explicit ChartBasic(QObject *arg) { this->setParent(arg); }
+     
     QtCharts::QValueAxis *imageXAxis()const { return _p_x; }
     QtCharts::QValueAxis *imageYAxis()const { return _p_y; }
 

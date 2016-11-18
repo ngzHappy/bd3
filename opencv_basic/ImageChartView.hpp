@@ -15,6 +15,8 @@ private:
 public:
     Q_SIGNAL void imageChanged();
     Q_SIGNAL void algorithmChanged();
+protected:
+    ImageChartView(QtCharts::QChart *chart,QWidget *parent=nullptr);
 public:
     ImageChartView(QWidget *parent=nullptr);
     ~ImageChartView();

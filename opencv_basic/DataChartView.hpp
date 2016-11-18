@@ -10,6 +10,7 @@ class OPENCV3_BASICHARED_EXPORT DataChartView : public ChartView
 
 private:
     using _Super=ChartView;
+    DataChartView(QtCharts::QChart *chart,QWidget *parent=nullptr);
 public:
     DataChartView(QWidget * parent=nullptr);
 
