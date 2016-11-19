@@ -1,4 +1,4 @@
-#ifndef __OPEN_CV_UTILITY_0x998127_HPP
+﻿#ifndef __OPEN_CV_UTILITY_0x998127_HPP
 #define __OPEN_CV_UTILITY_0x998127_HPP
 
 #include "ImageShowUtility.hpp"
