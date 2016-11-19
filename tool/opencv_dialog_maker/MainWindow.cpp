@@ -275,7 +275,7 @@ private:
  )");
             data.replace("XDialog",varClassName);
             {
-                QString varSignal("Q_SIGNAL valueChanged(");
+                QString varSignal("Q_SIGNAL void valueChanged(");
                 bool isFirst=true;
                 for (const auto &i:values) {
                     if (false==isFirst) {
@@ -391,7 +391,10 @@ private:
 class XDialog::_PrivateXDialog{
 public:
     XDialog *super;
-    _PrivateXDialog(XDialog *arg):super(arg){}
+    _PrivateXDialog(XDialog *arg):super(arg){
+ setup_ui();
+}
+
 )~";
 
             data+= u8R"(
@@ -511,6 +514,69 @@ _0x21Q_LineEdit * edit_step_)";
 
                 }
             }
+
+            data+=u8R"~(
+     void setup_ui(){
+        using namespace memory ;
+        auto && lv=makeStackPointer<_0x21Q_VBoxLayout>();
+        super->setLayout(lv.release());
+        lv->setSpacing(0);
+        lv->setMargin(0);
+
+)~";
+
+            for (const auto &i:values) {
+                data+=u8R"({
+)";
+                data+=u8R"!(auto && l0=makeStackPointer<_0x21Q_Label>();
+            auto && l1=makeStackPointer<_0x21Q_Label>();
+            auto && e0=makeStackPointer<_0x21Q_LineEdit>();
+            auto && e1=makeStackPointer<_0x21Q_LineEdit>();
+            auto && p0=makeStackPointer<_0x21Q_ToolButton>();
+            auto && p1=makeStackPointer<_0x21Q_ToolButton>();
+            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+            l->setSpacing(1);
+            l->setMargin(1);
+            lv->addLayout(l.release());
+            l->addWidget(l0.release());
+            l->addWidget(e0.release());
+            l->addWidget(l1.release());
+            l->addWidget(e1.release());
+            l->addWidget(p0.release());
+            l->addWidget(p1.release());
+            l1->setText("step:");
+            p0->setText("+");
+            p1->setText("-");
+)!";                            
+
+                data+=u8R"(} 
+)";
+            }/*for*/
+
+            data+=u8R"!~(
+{
+            auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
+                1,1,QSizePolicy::Minimum,
+                QSizePolicy::MinimumExpanding
+                );
+            lv->addSpacerItem(ls.release());
+        }
+
+        {
+            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+            l->setSpacing(1); 
+            l->setMargin(1);
+            auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
+                1,1,QSizePolicy::MinimumExpanding,
+                QSizePolicy::Minimum);
+            l->addSpacerItem(ls.release());
+            auto && pb=makeStackPointer<_0x21Q_PushButton>();
+            l->addWidget(pb.release());
+            lv->addLayout(l.release());
+            pb->setText(QString::fromUtf8(u8"确定"));
+        }
+}/*function end*/
+)!~";
 
 
             data+=u8R"==(

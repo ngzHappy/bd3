@@ -69,7 +69,10 @@ private:
 class XDialog::_PrivateXDialog{
 public:
     XDialog *super;
-    _PrivateXDialog(XDialog *arg):super(arg){}
+    _PrivateXDialog(XDialog *arg):super(arg){
+        setup_ui();
+    }
+
 
     /*values*/
 
@@ -89,13 +92,79 @@ public:
     double old__x_Dialogtest1_0x2d=default__x_Dialogtest1_0x2d();
     _0x21Q_LineEdit * edit__x_Dialogtest1_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step__x_Dialogtest1_0x2d=nullptr;
-
     void setup_ui(){
         using namespace memory ;
-        {
+        auto && lv=makeStackPointer<_0x21Q_VBoxLayout>();
+        super->setLayout(lv.release());
+        lv->setSpacing(0);
+        lv->setMargin(0);
 
+        {
+            auto && l0=makeStackPointer<_0x21Q_Label>();
+            auto && l1=makeStackPointer<_0x21Q_Label>();
+            auto && e0=makeStackPointer<_0x21Q_LineEdit>();
+            auto && e1=makeStackPointer<_0x21Q_LineEdit>();
+            auto && p0=makeStackPointer<_0x21Q_ToolButton>();
+            auto && p1=makeStackPointer<_0x21Q_ToolButton>();
+            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+            l->setSpacing(1);
+            l->setMargin(1);
+            lv->addLayout(l.release());
+            l->addWidget(l0.release());
+            l->addWidget(e0.release());
+            l->addWidget(l1.release());
+            l->addWidget(e1.release());
+            l->addWidget(p0.release());
+            l->addWidget(p1.release());
+            l1->setText("step:");
+            p0->setText("+");
+            p1->setText("-");
+        } 
+        {
+            auto && l0=makeStackPointer<_0x21Q_Label>();
+            auto && l1=makeStackPointer<_0x21Q_Label>();
+            auto && e0=makeStackPointer<_0x21Q_LineEdit>();
+            auto && e1=makeStackPointer<_0x21Q_LineEdit>();
+            auto && p0=makeStackPointer<_0x21Q_ToolButton>();
+            auto && p1=makeStackPointer<_0x21Q_ToolButton>();
+            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+            l->setSpacing(1);
+            l->setMargin(1);
+            lv->addLayout(l.release());
+            l->addWidget(l0.release());
+            l->addWidget(e0.release());
+            l->addWidget(l1.release());
+            l->addWidget(e1.release());
+            l->addWidget(p0.release());
+            l->addWidget(p1.release());
+            l1->setText("step:");
+            p0->setText("+");
+            p1->setText("-");
+        } 
+
+        {
+            auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
+                1,1,QSizePolicy::Minimum,
+                QSizePolicy::MinimumExpanding
+                );
+            lv->addSpacerItem(ls.release());
         }
-    }
+
+        {
+            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+            l->setSpacing(1); 
+            l->setMargin(1);
+            auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
+                1,1,QSizePolicy::MinimumExpanding,
+                QSizePolicy::Minimum);
+            l->addSpacerItem(ls.release());
+            auto && pb=makeStackPointer<_0x21Q_PushButton>();
+            l->addWidget(pb.release());
+            lv->addLayout(l.release());
+            pb->setText(QString::fromUtf8(u8"确定"));
+        }
+    }/*function end*/
+
 
 private:
     CPLUSPLUS_OBJECT(_PrivateXDialog)

@@ -16,7 +16,7 @@ public:
     explicit XDialog(QWidget * /**/=nullptr);
     virtual ~XDialog();
 public:
-    Q_SIGNAL valueChanged(int /* _x_Dialogtest0 */ , double /* _x_Dialogtest1 */);
+    Q_SIGNAL void valueChanged(int /* _x_Dialogtest0 */ , double /* _x_Dialogtest1 */);
 private:
     XDialog(const XDialog&)=delete;
     XDialog(XDialog&&)=delete;
