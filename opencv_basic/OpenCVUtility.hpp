@@ -19,7 +19,7 @@ point2fvector toCVFloat32Point2Vector(const _TB & argb,const _TE & arge) {
     for (auto i=argb; i!=arge; ++i) {
         ans.emplace_back(
             static_cast<cvfloat_type>(autoGetX(*i)),
-            static_cast<cvfloat_type>(autoGetX(*i))
+            static_cast<cvfloat_type>(autoGetY(*i))
         );
     }
     return std::move(ans);
@@ -33,7 +33,7 @@ point2fvector toCVFloat32Point2Vector(const _TB & argb,size_t size_) {
     for (auto i=argb; count_<size_; ++i,++count_) {
         ans.emplace_back(
             static_cast<cvfloat_type>(autoGetX(*i)),
-            static_cast<cvfloat_type>(autoGetX(*i))
+            static_cast<cvfloat_type>(autoGetY(*i))
         );
     }
     return std::move(ans);
