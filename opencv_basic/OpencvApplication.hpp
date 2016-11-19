@@ -42,6 +42,6 @@ private:
 };
 
 #undef qApp
-#define qApp() OpencvApplication::instance()/**/
+#define qApp OpencvApplication::instance()/**/
 
 #endif // OPENCVAPPLICATION_HPP

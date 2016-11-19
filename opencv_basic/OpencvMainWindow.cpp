@@ -114,7 +114,7 @@ void OpencvMainWindow::_p_open_lua(){
 
     if (varImages.isEmpty()) { return; }
 
-    qApp()->readLuaFile(varImages);
+    qApp->readLuaFile(varImages);
     openLua();
 
 }
@@ -200,7 +200,7 @@ void OpencvMainWindow::_p_finished_add_a_image() {
 }
 
 void OpencvMainWindow::openLua(){
-    addImage(qApp()->getAllImageNames());
+    addImage(qApp->getAllImageNames());
 }
 
 

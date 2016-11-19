@@ -506,9 +506,9 @@ std::atomic<int> OpenCVAPPStype::icon_index;
 
 void OpencvApplication::_p_setStype() {
     static QStyle * var=[]() {
-        auto ans=new OpenCVAPPStype(qApp()->style());
-        qApp()->setStyle(ans);
-        qApp()->setWindowIcon(ans->getTitleBarIcon());
+        auto ans=new OpenCVAPPStype(qApp->style());
+        qApp->setStyle(ans);
+        qApp->setWindowIcon(ans->getTitleBarIcon());
         return ans;
     }();
     (void)var;

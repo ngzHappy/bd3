@@ -54,7 +54,7 @@ public:
 void MainWindow::openLua() {
     using namespace memory;
     /*获得数据*/
-    auto points2d=qApp()->getPoint2d();
+    auto points2d=qApp->getPoint2d();
     /*检查数据*/
     auto rows=(points2d.second-points2d.first);
     constexpr auto cols=2;

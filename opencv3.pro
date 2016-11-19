@@ -12,7 +12,9 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS += $$PWD/tool/opencv_maker/opencv_maker.pro
+SUBDIRS += $$PWD/tool/opencv_maker/opencv_maker.pro \
+    tool/opencv_dialog_maker \
+    test/opencv_dialog_maker_test
 
 library_opencv_basic.file=$$PWD/opencv_basic/opencv_basic.pro
 
