@@ -199,6 +199,7 @@ private:
         auto varFileName=dir_project+"/MainWindow.cpp";
         auto varFileData=u8R"_!_(/*MainWindow.cpp*/
 #include "MainWindow.hpp"
+#include <OpenCVUtility.hpp>
 
 class MainWindow::_PrivateMainWindow{
 public:

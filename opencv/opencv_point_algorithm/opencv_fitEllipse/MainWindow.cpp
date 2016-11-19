@@ -1,5 +1,6 @@
 ﻿/*MainWindow.cpp*/
 #include "MainWindow.hpp"
+#include <OpenCVUtility.hpp>
 #include <vector>
 #include <algorithm>
 
@@ -28,9 +29,9 @@ namespace {
 QList<QPointF> genEllipse(
     const cv::RotatedRect & argRect,
     bool argNeedClose=false) {
-    enum  {SIZE=100};
+    enum { SIZE=100 };
     typedef double eval_type;
-    auto varSize= argRect.size;
+    auto varSize=argRect.size;
     if (varSize.width<=0) { return{}; }
     if (varSize.height<=0) { return{}; }
     QList<QPointF> varAns;
@@ -39,7 +40,7 @@ QList<QPointF> genEllipse(
     const eval_type varB=varSize.height/2;
     constexpr const eval_type varStep=(3.141592654/SIZE)*2;
     eval_type varAngle=0;
-    for (std::int_fast32_t i=0; i<SIZE;++i) {
+    for (std::int_fast32_t i=0; i<SIZE; ++i) {
         varAns.push_back({
             varA*std::cos(varAngle),
             varB*std::sin(varAngle) });
@@ -56,7 +57,7 @@ QList<QPointF> genEllipse(
         const eval_type varY=i.x()*a10+i.y()*a11+varCenter.y;
         i.setX(varX); i.setY(varY);
     }
-    if(argNeedClose){
+    if (argNeedClose) {
         varAns.push_back(varAns.first());
     }
     return std::move(varAns);
@@ -77,7 +78,7 @@ void MainWindow::openLua() {
     /*设置视图*/
     auto&& mainView=makeStackPointer<ImageShowWidget>();
     auto&& view=makeStackPointer<DataChartView>();
- 
+
     mainView->setChartView(view.release());
     auto chart=view->dataChart();
     /*调整坐标轴*/
@@ -88,21 +89,14 @@ void MainWindow::openLua() {
             addScatterSeries(chart,points2d.first,points2d.second);
         series->setPen(QPen(QColor(233,6,2),0));
         series->setBrush(QColor(233,6,2));
-    }      
+    }
 
     addWidget(mainView.release())->resize(600,600);
 
     /*opencv 曲线拟合*/
     try {
-        std::vector<cv::Point2f,memory::Allocator<cv::Point2f>>
-            input_data;
-        input_data.reserve(rows);
-        for (auto i=points2d.first;i!=points2d.second;++i) {
-            input_data.emplace_back(
-                static_cast<cv::Point2f::value_type>(i->x()),
-                static_cast<cv::Point2f::value_type>(i->y())
-            );
-        }
+        auto input_data=
+            toCVFloat32Point2Vector(points2d.first,points2d.second);
         cv::Mat data(
             rows,
             cols/*2*/,
