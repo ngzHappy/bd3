@@ -103,6 +103,7 @@ void MainWindow::openLua() {
             cv::DataType<cv::Point2f::value_type>::type,
             input_data.data()
         );
+
         auto rect=cv::fitEllipse(data);
 
         {

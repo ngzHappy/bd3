@@ -26,3 +26,7 @@ opencv_fitEllipse.file=$$PWD/opencv/opencv_point_algorithm/opencv_fitEllipse/ope
 opencv_fitEllipse.depends+=library_opencv_basic
 SUBDIRS += opencv_fitEllipse
 
+opencv_fitLine.file=$$PWD/opencv/opencv_point_algorithm/opencv_fitLine/opencv_fitLine.pro
+opencv_fitLine.depends+=library_opencv_basic
+SUBDIRS += opencv_fitLine
+
