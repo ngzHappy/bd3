@@ -3,6 +3,7 @@
 
 namespace QtCharts {}
 #include <QtCharts>
+#include <algorithm>
 #include <QtCore/qlist.h>
 #include <QtCore/qvector.h>
 #include "ChartView.hpp"
@@ -118,6 +119,44 @@ inline ChartBasic * attachAxis(ChartBasic * x,__U__ * c) {
     c->attachAxis(x->imageXAxis());
     c->attachAxis(x->imageYAxis());
     return x;
+}
+
+template<typename _Tb_,typename _Te_>
+inline void fitChartAxisRange(ChartBasic *argC,const _Tb_& b,const _Te_ &e) {
+    using _type_t=qreal;
+    if (b!=e) {
+        
+        {
+            auto xAxis=std::minmax_element(b,e,
+                [](const auto &x,const auto &y) {
+                return autoGetX(x)<autoGetX(y);
+            });
+            const auto &xmin=*xAxis.first;
+            const auto &xmax=*xAxis.second;
+            auto distance=std::max(static_cast<_type_t>(0),
+                static_cast<_type_t>(autoGetX(xmax))-autoGetX(xmin));
+            distance*=static_cast<_type_t>(.05);
+            argC->imageXAxis()->setRange(
+                autoGetX(xmin)-distance,autoGetX(xmax)+distance
+            );
+        }
+
+        {
+            auto yAxis=std::minmax_element(b,e,
+                [](const auto &x,const auto &y) {
+                return autoGetY(x)<autoGetY(y);
+            });
+            const auto &ymin=*yAxis.first;
+            const auto &ymax=*yAxis.second;
+            auto distance=std::max(static_cast<_type_t>(0),
+                static_cast<_type_t>(autoGetY(ymax))-autoGetY(ymin));
+            distance*=static_cast<_type_t>(.05);
+            argC->imageYAxis()->setRange(
+                autoGetY(ymin)-distance,autoGetY(ymax)+distance
+            );
+        }
+
+    }
 }
 
 template<
@@ -390,6 +429,7 @@ inline QtCharts::QScatterSeries *addScatterSeries(
 using __private::__ImageShowUtility::addLineSeries;
 using __private::__ImageShowUtility::addScatterSeries;
 using __private::__ImageShowUtility::attachAxis;
+using __private::__ImageShowUtility::fitChartAxisRange;
 
 #endif // IMAGESHOWUTILITY_HPP
 

@@ -81,40 +81,14 @@ void MainWindow::openLua() {
     mainView->setChartView(view.release());
     auto chart=view->dataChart();
     /*调整坐标轴*/
-    auto xAxis=std::minmax_element(points2d.first,points2d.second,
-        [](const auto& x,const auto& y) ->bool {
-        if (x.x()<y.x()) { return true; }
-        return false;
-    });
-
-    auto yAxis=std::minmax_element(points2d.first,points2d.second,
-        [](const auto& x,const auto& y) ->bool {
-        if (x.y()<y.y()) { return true; }
-        return false;
-    });
+    fitChartAxisRange(chart,points2d.first,points2d.second);
 
     {
         auto series=
             addScatterSeries(chart,points2d.first,points2d.second);
         series->setPen(QPen(QColor(233,6,2),0));
         series->setBrush(QColor(233,6,2));
-    }
-
-    {
-        auto distance=std::max(0.0,xAxis.second->x()-xAxis.first->x());
-        distance*=.05;
-        chart->imageXAxis()->setRange(
-            xAxis.first->x()-distance,
-            xAxis.second->x()+distance);
-    }
-
-    {
-        auto distance=std::max(0.0,yAxis.second->y()-yAxis.first->y());
-        distance*=.05;
-        chart->imageYAxis()->setRange(
-            yAxis.first->y()-distance,
-            yAxis.second->y()+distance);
-    }
+    }      
 
     addWidget(mainView.release())->resize(600,600);
 
