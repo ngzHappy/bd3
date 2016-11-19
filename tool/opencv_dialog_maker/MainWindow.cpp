@@ -24,10 +24,10 @@ public:
 private:
     string luaFileData;
     string className;
-   
+
     lua::State *L;
 
-    enum Type{
+    enum Type {
         t_unknow,
         t_int,t_double
     };
@@ -40,7 +40,7 @@ private:
     };
     vector<std::unique_ptr<const Value>> values;
 
-    class IntValue :public Value{
+    class IntValue :public Value {
     public:
         int default_value;
         int max_value;
@@ -51,15 +51,15 @@ private:
         void setName(string _name) {
             name=std::move(_name);
             const static std::regex rg("X");
-            name=std::regex_replace(name,rg,"_x_");
-            u_name=name+"_0x2i";
+            u_name=std::regex_replace(name,rg,"_x_");
+            u_name+="_0x2i";
         }
         Type type() const override { return t_int; }
         const string & unique_name()const override { return u_name; }
     private:
         CPLUSPLUS_OBJECT(IntValue)
     };
-    class DoubleValue :public Value{
+    class DoubleValue :public Value {
     public:
         double default_value;
         double max_value;
@@ -67,11 +67,11 @@ private:
         double step_default;
         string name;
         string u_name;
-        void setName(string _name) { 
-            name=std::move(_name); 
+        void setName(string _name) {
+            name=std::move(_name);
             const static std::regex rg("X");
-            name=std::regex_replace(name,rg,"_x_");
-            u_name=name+"_0x2d";
+            u_name=std::regex_replace(name,rg,"_x_");
+            u_name+="_0x2d";
         }
         Type type() const override { return t_double; }
         const string & unique_name()const override { return u_name; }
@@ -103,8 +103,8 @@ private:
     static bool str_cmp(
         const char *arg,size_t l,
         const char(&arg1)[N]
-        ) {
-        if(l==(N-1)){
+    ) {
+        if (l==(N-1)) {
             return 0==std::strncmp(arg,arg1,(N-1));
         }return false;
     }
@@ -137,7 +137,7 @@ private:
                             lua::rawgeti(L,valuePos,2);
                             skey=lua::tolstring(L,-1,&strl);
                             key.assign(skey,strl);
-                            value->setName( std::move(key) );
+                            value->setName(std::move(key));
                             lua::rawgeti(L,valuePos,3);
                             value->default_value=lua::tointeger(L,-1);
                             lua::rawgeti(L,valuePos,4);
@@ -153,7 +153,7 @@ private:
                             lua::rawgeti(L,valuePos,2);
                             skey=lua::tolstring(L,-1,&strl);
                             key.assign(skey,strl);
-                            value->setName( std::move(key) );
+                            value->setName(std::move(key));
                             lua::rawgeti(L,valuePos,3);
                             value->default_value=lua::tonumber(L,-1);
                             lua::rawgeti(L,valuePos,4);
@@ -212,7 +212,7 @@ private:
             luaL::default_error_function(L);
             return 0;
         }
-
+        return 0;
     }
 
 public:
@@ -233,7 +233,7 @@ public:
             stream<<bom;
 
             const QString varClassName=QString::fromUtf8(className.c_str(),
-              static_cast<int> ( className.size()));
+              static_cast<int> (className.size()));
 
             stream<<QLatin1Literal("#ifndef __HPP_");
             stream<<varClassName.toUpper();
@@ -245,7 +245,7 @@ public:
             stream<<"0x21003";
             stream<<endl;
 
-            QString data=QString::fromUtf8( u8R"(
+            QString data=QString::fromUtf8(u8R"(
 
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/qwidget.h>
@@ -317,11 +317,12 @@ private:
             stream<<bom;
 
             const QString varClassName=QString::fromUtf8(className.c_str(),
-                static_cast<int> ( className.size()));
+                static_cast<int> (className.size()));
 
             QString data;
             data+=u8R"~(#include "XDialog.hpp"
 #include <QtWidgets/qlabel.h>
+#include <QtGui/qvalidator.h>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
@@ -329,6 +330,22 @@ private:
 #include <QtWidgets/qlayoutitem.h>
 
 namespace  {
+
+class _0x21Q_DoubleValidator :public QDoubleValidator {
+    using _Super=QDoubleValidator;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(_0x21Q_DoubleValidator)
+};
+
+class _0x21Q_IntValidator  :public QIntValidator {
+    using _Super=QIntValidator ;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(_0x21Q_IntValidator)
+};
 
 class _0x21Q_Label :public QLabel {
     using _Super=QLabel;
@@ -397,7 +414,7 @@ public:
 
 )~";
 
-            data+= u8R"(
+            data+=u8R"(
 /*values*/
 )";
 
@@ -405,54 +422,61 @@ public:
                 if (i->type()==t_int) {
 
                     auto j=static_cast<const IntValue *>(i.get());
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static int default_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->default_value);
                     data+=u8R"(;})";
 
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static int default_step_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->step_default);
                     data+=u8R"(;})";
 
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static int max_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->max_value);
                     data+=u8R"(;})";
 
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static int min_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->min_value);
                     data+=u8R"(;})";
                     ///////////////////
-                    data+= u8R"(
+                    data+=u8R"(
 int )";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=default_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(();)";
 
-                    data+= u8R"(
+                    data+=u8R"(
+int step_)";
+                    data+=i->unique_name().c_str();
+                    data+=u8R"(=default_step_)";
+                    data+=i->unique_name().c_str();
+                    data+=u8R"(();)";
+
+                    data+=u8R"(
 int old_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=default_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(();)";
 
-                    data+= u8R"(
+                    data+=u8R"(
 _0x21Q_LineEdit * edit_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=nullptr;)";
 
-                    data+= u8R"(
+                    data+=u8R"(
 _0x21Q_LineEdit * edit_step_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=nullptr;)";
@@ -460,54 +484,61 @@ _0x21Q_LineEdit * edit_step_)";
                 }
                 else if (i->type()==t_double) {
                     auto j=static_cast<const DoubleValue *>(i.get());
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static double default_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->default_value);
                     data+=u8R"(;})";
 
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static double default_step_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->step_default);
                     data+=u8R"(;})";
 
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static double max_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->max_value);
                     data+=u8R"(;})";
 
-                    data+= u8R"(
+                    data+=u8R"(
 constexpr static double min_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"((){return )";
                     data+=QString::number(j->min_value);
                     data+=u8R"(;})";
                     ///////////////////
-                    data+= u8R"(
+                    data+=u8R"(
 double )";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=default_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(();)";
 
-                    data+= u8R"(
+                    data+=u8R"(
+int step_)";
+                    data+=i->unique_name().c_str();
+                    data+=u8R"(=default_step_)";
+                    data+=i->unique_name().c_str();
+                    data+=u8R"(();)";
+
+                    data+=u8R"(
 double old_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=default_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(();)";
 
-                    data+= u8R"(
+                    data+=u8R"(
 _0x21Q_LineEdit * edit_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=nullptr;)";
 
-                    data+= u8R"(
+                    data+=u8R"(
 _0x21Q_LineEdit * edit_step_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=nullptr;)";
@@ -526,9 +557,11 @@ _0x21Q_LineEdit * edit_step_)";
 )~";
 
             for (const auto &i:values) {
+
                 data+=u8R"({
 )";
-                data+=u8R"!(auto && l0=makeStackPointer<_0x21Q_Label>();
+                if ((i->type()==t_int)||(i->type()==t_double)) {
+                    data+=u8R"!(auto && l0=makeStackPointer<_0x21Q_Label>();
             auto && l1=makeStackPointer<_0x21Q_Label>();
             auto && e0=makeStackPointer<_0x21Q_LineEdit>();
             auto && e1=makeStackPointer<_0x21Q_LineEdit>();
@@ -547,7 +580,25 @@ _0x21Q_LineEdit * edit_step_)";
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-)!";                            
+)!";
+
+                    data+="edit_";
+                    data+=i->unique_name().c_str();
+                    data+="=e0.pointer();\n";
+
+                    data+="edit_step_";
+                    data+=i->unique_name().c_str();
+                    data+="=e1.pointer();\n";
+
+                    if (i->type()==t_int) {
+
+                    }
+                    else {
+
+                    }
+
+                }
+
 
                 data+=u8R"(} 
 )";
@@ -578,6 +629,94 @@ _0x21Q_LineEdit * edit_step_)";
 }/*function end*/
 )!~";
 
+            data+=u8R"(void readState() {
+bool ok;
+)";
+            for (const auto &i:values) {
+                data+=u8R"(do{
+)";
+                if (i->type()==t_int) {
+                    data+="auto t=edit_";
+                    data+=i->unique_name().c_str();
+                    data+="->text();\n";
+                    data+=i->unique_name().c_str();
+                    data+="= t.toInt(&ok);";
+                    data+="\n";
+                    data+="if (ok) { break; }\n";
+                    data+=i->unique_name().c_str();
+                    data+="=default_";
+                    data+=i->unique_name().c_str();
+                    data+="();\nedit_";
+                    data+=i->unique_name().c_str();
+                    data+="->setText(\n";
+                    data+="QString::number(default_";
+                    data+=i->unique_name().c_str();
+                    data+="()));\n";
+                }
+                else if (i->type()==t_double) {
+                    data+="auto t=edit_";
+                    data+=i->unique_name().c_str();
+                    data+="->text();\n";
+                    data+=i->unique_name().c_str();
+                    data+="= t.toDouble(&ok);";
+                    data+="\n";
+                    data+="if (ok) { break; }\n";
+                    data+=i->unique_name().c_str();
+                    data+="=default_";
+                    data+=i->unique_name().c_str();
+                    data+="();\nedit_";
+                    data+=i->unique_name().c_str();
+                    data+="->setText(\n";
+                    data+="QString::number(default_";
+                    data+=i->unique_name().c_str();
+                    data+="()));\n";
+                }
+                data+=u8R"(} while (false);
+)";
+
+                data+=u8R"(do{
+)";
+                if (i->type()==t_int) {
+                    data+="auto t=edit_step_";
+                    data+=i->unique_name().c_str();
+                    data+="->text();\nstep_";
+                    data+=i->unique_name().c_str();
+                    data+="= t.toInt(&ok);";
+                    data+="\n";
+                    data+="if (ok) { break; }\nstep_";
+                    data+=i->unique_name().c_str();
+                    data+="=default_step_";
+                    data+=i->unique_name().c_str();
+                    data+="();\nedit_step_";
+                    data+=i->unique_name().c_str();
+                    data+="->setText(\n";
+                    data+="QString::number(default_step_";
+                    data+=i->unique_name().c_str();
+                    data+="()));\n";
+                }
+                else if (i->type()==t_double) {
+                    data+="auto t=edit_step_";
+                    data+=i->unique_name().c_str();
+                    data+="->text();\nstep_";
+                    data+=i->unique_name().c_str();
+                    data+="= t.toDouble(&ok);";
+                    data+="\n";
+                    data+="if (ok) { break; }\nstep_";
+                    data+=i->unique_name().c_str();
+                    data+="=default_step_";
+                    data+=i->unique_name().c_str();
+                    data+="();\nedit_step_";
+                    data+=i->unique_name().c_str();
+                    data+="->setText(\n";
+                    data+="QString::number(default_step_";
+                    data+=i->unique_name().c_str();
+                    data+="()));\n";
+                }
+                data+=u8R"(} while (false);
+)";
+            }
+            data+=u8R"(}
+)";
 
             data+=u8R"==(
 
