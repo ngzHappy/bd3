@@ -24,20 +24,17 @@ public:
     constexpr operator const _T_* ()const { return pointer(); }
     constexpr explicit operator bool()const { return pointer()!=nullptr; }
     StackPointer& operator=(_T_* arg) { reset(arg); return *this; }
-    StackPointer(StackPointer&&arg):
-        user_(arg.user_),owner_(arg.owner_) {
+protected:
+    StackPointer(StackPointer&&arg):user_(arg.user_),owner_(arg.owner_) {
         arg.owner_=nullptr;
     }
     StackPointer&operator=(StackPointer&&arg) {
-        if (this==&arg) { return *this; }
-        owner_=arg.owner_;
-        arg.owner_=nullptr;
-        user_=arg.user_;
-        return *this;
+        user_=arg.user_; owner_=arg.owner_; arg.owner_=nullptr;
     }
-private:
     StackPointer(const StackPointer&)=delete;
     StackPointer&operator=(const StackPointer&)=delete;
+    template<typename _1T_,typename ..._1_Args>
+    friend StackPointer<_1T_> makeStackPointer(_1_Args&&...);
 };
 
 template<typename _T_,typename ...Args>

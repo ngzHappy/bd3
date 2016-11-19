@@ -75,8 +75,8 @@ void MainWindow::openLua() {
         return;
     }
     /*设置视图*/
-    auto mainView=makeStackPointer<ImageShowWidget>();
-    auto view=makeStackPointer<DataChartView>();
+    auto&& mainView=makeStackPointer<ImageShowWidget>();
+    auto&& view=makeStackPointer<DataChartView>();
     mainView->setChartView(view.release());
     auto chart=view->dataChart();
     /*调整坐标轴*/
