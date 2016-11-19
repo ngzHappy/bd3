@@ -24,7 +24,7 @@ public:
     constexpr operator const _T_* ()const { return pointer(); }
     constexpr explicit operator bool()const { return pointer()!=nullptr; }
     StackPointer& operator=(_T_* arg) { reset(arg); return *this; }
-    std::unique_ptr<_T_> toStdPointer() { return this->release(); }
+    auto toStdPointer() { return std::unique_ptr<_T_>{ this->release() }; }
 protected:
     StackPointer(StackPointer&&arg):user_(arg.user_),owner_(arg.owner_) {
         arg.owner_=nullptr;
