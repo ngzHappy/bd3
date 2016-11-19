@@ -1,7 +1,7 @@
 ﻿#include "XDialog.hpp"
-
-#include  <QtGui/qvalidator.h>
+#include <QtGui/qvalidator.h>
 #include <QtWidgets/qlabel.h>
+#include <opencv2/opencv.hpp>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>

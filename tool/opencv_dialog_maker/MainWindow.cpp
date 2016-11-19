@@ -1,11 +1,11 @@
-﻿#include <QtCore>
-#include <QtWidgets>
+﻿#include <regex>
+#include <QtCore>
 #include <vector>
 #include <cstring>
-#include <regex>
+#include <QtWidgets>
 #include <lua/lua.hpp>
-#include <text/to_plain_text.hpp>
 #include "MainWindow.hpp"
+#include <text/to_plain_text.hpp>
 
 namespace {
 
@@ -323,6 +323,7 @@ private:
             data+=u8R"~(#include "XDialog.hpp"
 #include <QtWidgets/qlabel.h>
 #include <QtGui/qvalidator.h>
+#include <opencv2/opencv.hpp>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
