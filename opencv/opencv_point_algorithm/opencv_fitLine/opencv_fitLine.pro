@@ -13,12 +13,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    Application.cpp
+    Application.cpp \
+    FitLineDialog.cpp
 
 HEADERS  += MainWindow.hpp \
-    Application.hpp
+    Application.hpp \
+    FitLineDialog.hpp
 
-FORMS    +=  
+FORMS    += \  
+    FitLineDialog.ui
 
 RESOURCES +=  
 

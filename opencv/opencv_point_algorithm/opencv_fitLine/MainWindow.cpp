@@ -1,5 +1,6 @@
 ﻿/*MainWindow.cpp*/
 #include "MainWindow.hpp"
+#include "FitLineDialog.hpp"
 #include <OpenCVUtility.hpp>
 
 class MainWindow::_PrivateMainWindow {
@@ -76,7 +77,17 @@ void MainWindow::openLua() {
         series->setBrush(QColor(233,6,2,80));
     }
 
-    addWidget(mainView.release())->resize(600,600);
+    {
+        auto && fitLineDialog=makeStackPointer<FitLineDialog>();
+        mainView->addImageWidget(
+            fitLineDialog.release(),
+            Qt::RightDockWidgetArea
+        );
+
+    }
+
+    addWidget(mainView.release())
+        ->resize(128+600,600);
 
     /*opencv 曲线拟合*/
     try {
