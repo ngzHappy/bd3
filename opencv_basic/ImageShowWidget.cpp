@@ -1,16 +1,19 @@
 ﻿#include "ImageShowWidget.hpp"
 #include "PlainImageView.hpp"
 #include "ImageChartView.hpp"
+#include <list>
 #include <cmath>
-#include <QtWidgets/qdockwidget.h>
-#include <QtWidgets/qmenu.h>
-#include <QtWidgets/qmenubar.h>
+#include <thread>
 #include <QtGui/qimage.h>
 #include <QtGui/qpixmap.h>
 #include <QtGui/qpainter.h>
 #include <QtCore/qpointer.h>
+#include <QtWidgets/qmenu.h>
 #include <private/qimage_p.h>
-#include <list>
+#include <QtWidgets/qaction.h>
+#include <QtWidgets/qmenubar.h>
+#include <QtWidgets/qdockwidget.h>
+#include <QtWidgets/qfiledialog.h>
 
 /*
  * 简易的gui库,不要用于复杂工程
@@ -21,6 +24,14 @@
 
 namespace {
 namespace __private {
+
+class Action :public QAction {
+    using _Super=QAction;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(Action)
+};
 
 inline QSize imageResizeSize(
         const QSize & argImageSize,
@@ -242,6 +253,35 @@ private:
     CPLUSPLUS_OBJECT(_PrivateImageShowWidget)
 };
 
+namespace {
+namespace __private {
+
+void save_image(
+    QWidget *widgetp,
+    const QString &title,
+    const QImage &arg) {
+    QImage aboutSave=arg;
+    if ((aboutSave.width()<=0)||
+        (aboutSave.height()<=0)) {
+        aboutSave=QImage(8,8,QImage::Format_RGBA8888);
+        aboutSave.fill(QColor(23,55,77));
+    }
+    QString fileName=QFileDialog::getSaveFileName(widgetp,
+        title,{});
+    {
+        QFileInfo info(fileName);
+        if (info.suffix().trimmed().isEmpty()) {
+            fileName+=QLatin1Literal(".png",4);
+        }
+    }
+    std::thread([aboutSave,fileName]() {
+        aboutSave.save(fileName);
+    }).detach();
+}
+
+}/*__private*/
+}/*namespace*/
+
 ImageShowWidget::ImageShowWidget(
         QWidget * var_parent,
         Qt::WindowFlags var_flags):
@@ -253,9 +293,52 @@ ImageShowWidget::ImageShowWidget(
         _pm_this_data->menuBar=new __private::MenuBar(this);
         this->setMenuBar(_pm_this_data->menuBar);
         auto varMenu=new __private::Menu;
-        varMenu->setTitle(u8R"(视图)"_qs);
+        varMenu->setTitle(u8R"(基本操作)"_qs);
         _pm_this_data->menuBar->addMenu(varMenu);
         _pm_this_data->basicMenu=varMenu;
+
+        {
+            auto varTitle=u8R"~=:;:=~(保存原始图片)~=:;:=~"_qs;
+            auto &&varAction=memory::makeStackPointer<__private::Action>();
+            varMenu->addAction(varAction.release());
+            varAction->setText(varTitle);
+            connect(varAction.pointer(),&QAction::triggered,
+                this,[this,varTitle](bool) {
+                __private::save_image(this,varTitle,getImage());
+            });
+        }
+
+        {
+            auto varTitle=u8R"~=:;:=~(保存变换后图片)~=:;:=~"_qs;
+            auto &&varAction=memory::makeStackPointer<__private::Action>();
+            varMenu->addAction(varAction.release());
+            varAction->setText(varTitle);
+            connect(varAction.pointer(),&QAction::triggered,
+                this,[this,varTitle](bool) {
+                __private::save_image(this,varTitle,getImage());
+            });
+        }
+
+        {
+            auto varTitle=u8R"~=:;:=~(保存窗口截图)~=:;:=~"_qs;
+            auto &&varAction=memory::makeStackPointer<__private::Action>();
+            varMenu->addAction(varAction.release());
+            varAction->setText(varTitle);
+            connect(varAction.pointer(),&QAction::triggered,
+                this,[this,varTitle](bool) {
+                QImage varImage(this->size(),QImage::Format_RGBA8888);
+                {
+                    QPainter varPainter(&varImage);
+                    varPainter.setRenderHints(QPainter::HighQualityAntialiasing|
+                        QPainter::TextAntialiasing|
+                        QPainter::Antialiasing|
+                        QPainter::SmoothPixmapTransform
+                    );
+                    this->render(&varPainter);
+                }
+                __private::save_image(this,varTitle,varImage);
+            });
+        }
     }
 
     /*设置原始图片*/
@@ -370,32 +453,32 @@ PlainImageView * ImageShowWidget::setImage(const QImage & arg) {
 ImageChart * ImageShowWidget::setChartImage(
     const QImage & argImage) {
     _pm_this_data->disconnect();
-        {
-            /*设置原始图片*/
-            auto vardt=const_cast<QImage&>(argImage).data_ptr();
-            if (vardt->own_data==false) {
-                _pm_this_data->originalWidget->setImage(argImage.copy());
-            }
-            else {
-                QImage tmp(argImage);
-                _pm_this_data->originalWidget->setImage(std::move(tmp));
-            }
+    {
+        /*设置原始图片*/
+        auto vardt=const_cast<QImage&>(argImage).data_ptr();
+        if (vardt->own_data==false) {
+            _pm_this_data->originalWidget->setImage(argImage.copy());
         }
-        /*设置显示图片*/
-        _pm_this_data->centralWidget=nullptr;
-        _pm_this_data->chartCentralWidget=new ImageChartView;
-        _pm_this_data->chartCentralWidget->setImage(
-            _pm_this_data->originalWidget->getImage(),false);
-        _pm_this_data->chartCentralWidget->setAlgorithm(_pm_this_data->algorithm);
-        emit centralWidgetDataChanged();
-        _pm_this_data->connections.push_back(
-        connect(_pm_this_data->chartCentralWidget,&ImageChartView::imageChanged,
-            this,&ImageShowWidget::centralWidgetDataChanged));
-        _pm_this_data->connections.push_back(
-        connect(_pm_this_data->chartCentralWidget,&ImageChartView::algorithmChanged,
-            this,&ImageShowWidget::centralWidgetDataChanged));
-        setCentralWidget(_pm_this_data->chartCentralWidget);
-        return _pm_this_data->chartCentralWidget->imageChart();
+        else {
+            QImage tmp(argImage);
+            _pm_this_data->originalWidget->setImage(std::move(tmp));
+        }
+    }
+    /*设置显示图片*/
+    _pm_this_data->centralWidget=nullptr;
+    _pm_this_data->chartCentralWidget=new ImageChartView;
+    _pm_this_data->chartCentralWidget->setImage(
+        _pm_this_data->originalWidget->getImage(),false);
+    _pm_this_data->chartCentralWidget->setAlgorithm(_pm_this_data->algorithm);
+    emit centralWidgetDataChanged();
+    _pm_this_data->connections.push_back(
+    connect(_pm_this_data->chartCentralWidget,&ImageChartView::imageChanged,
+        this,&ImageShowWidget::centralWidgetDataChanged));
+    _pm_this_data->connections.push_back(
+    connect(_pm_this_data->chartCentralWidget,&ImageChartView::algorithmChanged,
+        this,&ImageShowWidget::centralWidgetDataChanged));
+    setCentralWidget(_pm_this_data->chartCentralWidget);
+    return _pm_this_data->chartCentralWidget->imageChart();
 }
 
 const QImage &ImageShowWidget::getImage() const {
@@ -408,10 +491,9 @@ const QImage &ImageShowWidget::getAlgorithmImage()const {
     if (_pm_this_data->centralWidget) {
         return _pm_this_data->centralWidget->getAlgorithmImage();
     }
-    else if(_pm_this_data->chartCentralWidget){
+    else if (_pm_this_data->chartCentralWidget) {
         return _pm_this_data->chartCentralWidget->getAlgorithmImage();
     }
-    const static QImage null__;
     static memory::StaticPoionter<QImage> _null__(_d_null);
     return *_null__;
 }
