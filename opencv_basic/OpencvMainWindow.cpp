@@ -89,6 +89,18 @@ OpencvMainWindow::OpencvMainWindow(
     _mp->defaultMenu=new __private::Menu(this);
     _mp->defaultMenu->setTitle(u8R"(基本操作)"_qs);
     {
+        auto openaction=new __private::Action(u8R"(层叠窗口)"_qs,this);
+        _mp->defaultMenu->addAction(openaction);
+        connect(openaction,&QAction::triggered,
+            _mp->mdiArea,&QMdiArea::cascadeSubWindows);
+    }
+    {
+        auto openaction=new __private::Action(u8R"(并排窗口)"_qs,this);
+        _mp->defaultMenu->addAction(openaction);
+        connect(openaction,&QAction::triggered,
+            _mp->mdiArea,&QMdiArea::tileSubWindows);
+    }
+    {
         auto openaction=new __private::Action(u8R"(打开图片)"_qs,this);
         _mp->defaultMenu->addAction(openaction);
         connect(openaction,&QAction::triggered,
