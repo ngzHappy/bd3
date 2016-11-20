@@ -341,6 +341,7 @@ public:
 public:
     //Q_SIGNAL_valueChanged__;
     Q_SLOT void emitValueChanged();
+    QSize sizeHint() const override;
 private:
     XDialog(const XDialog&)=delete;
     XDialog(XDialog&&)=delete;
@@ -1111,6 +1112,10 @@ XDialog::~XDialog(){
 
 void XDialog::emitValueChanged() {
     thisp->directDo();
+}
+
+QSize XDialog::sizeHint() const {
+    return {136,128};
 }
 
 /*End of the file.*/

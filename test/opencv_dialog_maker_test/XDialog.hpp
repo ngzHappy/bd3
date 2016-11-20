@@ -1,7 +1,6 @@
 ﻿#ifndef __HPP_XDIALOG0x21003
 #define __HPP_XDIALOG0x21003
 
-
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/qwidget.h>
 
@@ -18,6 +17,7 @@ public:
 public:
     Q_SIGNAL void valueChanged(int /* XDialogtest0 */,double /* XDialogtest1 */,int /*enum: XDialogtest2 */);
     Q_SLOT void emitValueChanged();
+    QSize sizeHint() const override;
 private:
     XDialog(const XDialog&)=delete;
     XDialog(XDialog&&)=delete;
@@ -28,3 +28,4 @@ private:
 };
 
 #endif /**/
+

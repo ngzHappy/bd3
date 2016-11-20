@@ -196,9 +196,9 @@ public:
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-                /*连接信号槽*/super,[this](bool) {add__x_Dialogtest0_0x2i(); });
+            /*连接信号槽*/super,[this](bool) {add__x_Dialogtest0_0x2i(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-                /*连接信号槽*/super,[this](bool) {sub__x_Dialogtest0_0x2i(); });
+            /*连接信号槽*/super,[this](bool) {sub__x_Dialogtest0_0x2i(); });
         }
         {
 
@@ -239,9 +239,9 @@ public:
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-                /*连接信号槽*/super,[this](bool) {add__x_Dialogtest1_0x2d(); });
+            /*连接信号槽*/super,[this](bool) {add__x_Dialogtest1_0x2d(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-                /*连接信号槽*/super,[this](bool) {sub__x_Dialogtest1_0x2d(); });
+            /*连接信号槽*/super,[this](bool) {sub__x_Dialogtest1_0x2d(); });
         }
         {
 
@@ -294,10 +294,10 @@ public:
             /*连接按钮信号槽*/
 
             super->connect(
-                pb.pointer(),
-                &QPushButton::clicked,
-                super,
-                [this](bool) {checkDo(); }
+                                   pb.pointer(),
+                                   &QPushButton::clicked,
+                                   super,
+                                   [this](bool) {checkDo(); }
             );
 
         }
@@ -311,7 +311,7 @@ public:
             if (ok) { break; }
             _x_Dialogtest0_0x2i=default__x_Dialogtest0_0x2i();
             edit__x_Dialogtest0_0x2i->setText(
-                QString::number(default__x_Dialogtest0_0x2i()));
+            QString::number(default__x_Dialogtest0_0x2i()));
         } while (false);
         do {
             auto t=edit_step__x_Dialogtest0_0x2i->text();
@@ -319,7 +319,7 @@ public:
             if (ok) { break; }
             step__x_Dialogtest0_0x2i=default_step__x_Dialogtest0_0x2i();
             edit_step__x_Dialogtest0_0x2i->setText(
-                QString::number(default_step__x_Dialogtest0_0x2i()));
+            QString::number(default_step__x_Dialogtest0_0x2i()));
         } while (false);
         do {
             auto t=edit__x_Dialogtest1_0x2d->text();
@@ -327,7 +327,7 @@ public:
             if (ok) { break; }
             _x_Dialogtest1_0x2d=default__x_Dialogtest1_0x2d();
             edit__x_Dialogtest1_0x2d->setText(
-                QString::number(default__x_Dialogtest1_0x2d()));
+            QString::number(default__x_Dialogtest1_0x2d()));
         } while (false);
         do {
             auto t=edit_step__x_Dialogtest1_0x2d->text();
@@ -335,16 +335,16 @@ public:
             if (ok) { break; }
             step__x_Dialogtest1_0x2d=default_step__x_Dialogtest1_0x2d();
             edit_step__x_Dialogtest1_0x2d->setText(
-                QString::number(default_step__x_Dialogtest1_0x2d()));
+            QString::number(default_step__x_Dialogtest1_0x2d()));
         } while (false);
 
         {_x_Dialogtest2_0x2e=map__x_Dialogtest2_0x2e(
-            enum__x_Dialogtest2_0x2e->currentIndex()); }
+        enum__x_Dialogtest2_0x2e->currentIndex()); }
     }
     void directDo() {
         super->valueChanged(_x_Dialogtest0_0x2i
-            ,_x_Dialogtest1_0x2d
-            ,_x_Dialogtest2_0x2e);
+        ,_x_Dialogtest1_0x2d
+        ,_x_Dialogtest2_0x2e);
     }
     bool isStateChange() {
         auto ans=false;
@@ -438,4 +438,11 @@ XDialog::~XDialog() {
 void XDialog::emitValueChanged() {
     thisp->directDo();
 }
+
+QSize XDialog::sizeHint() const {
+    return {128,128};
+}
+
+/*End of the file.*/
+
 
