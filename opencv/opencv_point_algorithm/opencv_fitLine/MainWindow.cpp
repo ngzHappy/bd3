@@ -27,11 +27,15 @@ QWidget* MainWindow::addImage(const QImage &arg) {
 namespace {
 
 class SubImageShowWidget :public ImageShowWidget {
+    /*
+    用于求解直线y=k*(x-x0)+y0
+    当k=inf的时候,(x-x0)>0返回ymax,小于0返回ymin,否则返回0
+    */
     class EvalLinePoint {
         using f1type_=qreal;
-        f1type_ cx0=0; f1type_ cy0=0;
-        f1type_ cdx=0; f1type_ cdy=0;
-        f1type_ cymin=0; f1type_ cymax=0;
+        f1type_ cx0=0/*x0*/; f1type_ cy0=0/*y0*/;
+        f1type_ cdx=0/*dx*/; f1type_ cdy=0/*dy*/;
+        f1type_ cymin=0/*ymin*/; f1type_ cymax=0/*ymax*/;
     public:
         template<typename T0,typename T1,
             typename T2,typename T3,
@@ -48,7 +52,8 @@ class SubImageShowWidget :public ImageShowWidget {
             const f1type_ _dx=x-cx0;
             if (cdx==0) {
                 if (_dx>0) { return cymax; }
-                return cymin;
+                if (_dx<0) { return cymin; }
+                return 0;
             }
             return cy0+cdy*_dx;
         }
