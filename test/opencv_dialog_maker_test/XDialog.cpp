@@ -435,4 +435,7 @@ XDialog::~XDialog() {
     delete thisp;
 }
 
+void XDialog::emitValueChanged() {
+    thisp->directDo();
+}
 

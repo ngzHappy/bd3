@@ -17,6 +17,7 @@ public:
     virtual ~XDialog();
 public:
     Q_SIGNAL void valueChanged(int /* XDialogtest0 */,double /* XDialogtest1 */,int /*enum: XDialogtest2 */);
+    Q_SLOT void emitValueChanged();
 private:
     XDialog(const XDialog&)=delete;
     XDialog(XDialog&&)=delete;

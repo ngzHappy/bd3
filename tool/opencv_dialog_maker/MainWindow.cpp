@@ -325,12 +325,10 @@ public:
             stream<<endl;
 
             QString data=QString::fromUtf8(u8R"(
-
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/qwidget.h>
 
-class XDialog : public QWidget
-{
+class XDialog : public QWidget {
     Q_OBJECT
 
 private:
@@ -342,6 +340,7 @@ public:
     virtual ~XDialog();
 public:
     //Q_SIGNAL_valueChanged__;
+    Q_SLOT void emitValueChanged();
 private:
     XDialog(const XDialog&)=delete;
     XDialog(XDialog&&)=delete;
@@ -1109,6 +1108,12 @@ XDialog::XDialog(QWidget *p):_Super(p){
 XDialog::~XDialog(){
     delete thisp;
 }
+
+void XDialog::emitValueChanged() {
+    thisp->directDo();
+}
+
+/*End of the file.*/
 
 )==";
 
