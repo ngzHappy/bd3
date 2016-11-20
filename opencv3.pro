@@ -32,3 +32,11 @@ opencv_fitLine.file=$$PWD/opencv/opencv_point_algorithm/opencv_fitLine/opencv_fi
 opencv_fitLine.depends+=library_opencv_basic
 SUBDIRS += opencv_fitLine
 
+opencv_minAreaRect.file=$$PWD/opencv/opencv_point_algorithm/opencv_minAreaRect/opencv_minAreaRect.pro
+opencv_minAreaRect.depends+=library_opencv_basic
+SUBDIRS += opencv_minAreaRect
+
+opencv_simple_contour.file=$$PWD/opencv/opencv_simple_contour/opencv_simple_contour.pro
+opencv_simple_contour.depends+=library_opencv_basic
+SUBDIRS += opencv_simple_contour
+

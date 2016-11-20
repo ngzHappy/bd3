@@ -122,7 +122,11 @@ inline ChartBasic * attachAxis(ChartBasic * x,__U__ * c) {
 }
 
 template<typename _Tb_,typename _Te_>
-inline void fitChartAxisRange(ChartBasic *argC,const _Tb_& b,const _Te_ &e) {
+inline void fitChartAxisRange(
+    ChartBasic *argC,
+    const _Tb_& b,
+    const _Te_ &e) {
+    constexpr double m=0.05;
     using _type_t=qreal;
     if (b!=e) {
         
@@ -135,7 +139,7 @@ inline void fitChartAxisRange(ChartBasic *argC,const _Tb_& b,const _Te_ &e) {
             const auto &xmax=*xAxis.second;
             auto distance=std::max(static_cast<_type_t>(0),
                 static_cast<_type_t>(autoGetX(xmax))-autoGetX(xmin));
-            distance*=static_cast<_type_t>(.05);
+            distance*=static_cast<_type_t>(m);
             argC->imageXAxis()->setRange(
                 autoGetX(xmin)-distance,autoGetX(xmax)+distance
             );
@@ -150,7 +154,7 @@ inline void fitChartAxisRange(ChartBasic *argC,const _Tb_& b,const _Te_ &e) {
             const auto &ymax=*yAxis.second;
             auto distance=std::max(static_cast<_type_t>(0),
                 static_cast<_type_t>(autoGetY(ymax))-autoGetY(ymin));
-            distance*=static_cast<_type_t>(.05);
+            distance*=static_cast<_type_t>(m);
             argC->imageYAxis()->setRange(
                 autoGetY(ymin)-distance,autoGetY(ymax)+distance
             );

@@ -361,6 +361,7 @@ private:
                         varSignal+=" , ";
                     }
                     switch (i->type()) {
+                        case t_unknow:break;
                         case t_int: {
                             auto j=static_cast<const IntValue*>(i.get());
                             varSignal+="int /* ";
@@ -872,7 +873,7 @@ auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
                 }/*int or double*/
 
 
-                data+=u8R"(} 
+                data+=u8R"(}
 )";
             }/*for*/
 
@@ -889,7 +890,7 @@ auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
                 u8R"!~(
 {/*创建确定按钮*/
             auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
-            l->setSpacing(1); 
+            l->setSpacing(1);
             l->setMargin(1);
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
                 1,1,QSizePolicy::MinimumExpanding,
@@ -912,7 +913,7 @@ auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
 )~=:;:=~";
 
             data+=u8R"!~(
-} 
+}
 )!~";
 
             data+=u8R"!~(
