@@ -82,7 +82,8 @@ public:
             this->addImageWidget(
                 fitLineDialog.release(),
                 Qt::RightDockWidgetArea
-            );
+            )->setWindowTitle(QString::fromUtf8(
+                u8R"(参数面板)"));
             /*连接信号槽*/
             connect(fitLineDialog.pointer(),
                 &FitlineDialog::valueChanged,
@@ -156,6 +157,9 @@ void MainWindow::openLua() {
     using namespace memory;
     /*获得数据*/
     auto points2d=qApp->getPoint2d();
+    if (points2d.second<=points2d.first) {
+        return;
+    }
 
     /*设置视图*/
     auto&& mainView=makeStackPointer<SubImageShowWidget>(
