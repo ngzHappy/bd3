@@ -294,7 +294,7 @@ private:
                         case t_double: {
                             auto j=static_cast<const DoubleValue*>(i.get());
                             varSignal+="double /* ";
-                            varSignal+=j->name.c_str();
+                            varSignal+=j->readable_name().c_str();
                             varSignal+=" */";
                         }break;
                     }
@@ -337,6 +337,16 @@ private:
 #include <QtWidgets/qlayoutitem.h>
 
 namespace  {
+
+class Step_0x21Q_DoubleValidator :public QDoubleValidator {
+    using _Super=QDoubleValidator;
+public:
+    Step_0x21Q_DoubleValidator():_Super(-9999,9999,6) {
+        setNotation(QDoubleValidator::StandardNotation);
+    }
+private:
+    CPLUSPLUS_OBJECT(Step_0x21Q_DoubleValidator)
+};
 
 class _0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
@@ -528,7 +538,7 @@ double )";
                     data+=u8R"(();)";
 
                     data+=u8R"(
-int step_)";
+double step_)";
                     data+=i->unique_name().c_str();
                     data+=u8R"(=default_step_)";
                     data+=i->unique_name().c_str();
@@ -597,7 +607,7 @@ _0x21Q_LineEdit * edit_step_)";
                     data+="l0->setText(u8R\"__(";
                     data+=i->readable_name().c_str();
                     data+=")__\" \" : \" );";
-                    data+= QString::fromUtf8(u8R"(/*设置label name*/
+                    data+=QString::fromUtf8(u8R"(/*设置label name*/
 )");
 
                     data+="edit_";
@@ -619,7 +629,7 @@ auto && v1=makeStackPointer<_0x21Q_IntValidator>();
                         data+=u8R"~=:;:=~(
 /*double value 检查器*/
 auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
-auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
+auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
 )~=:;:=~";
                     }
 
@@ -629,11 +639,9 @@ auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
                     data+=i->unique_name().c_str();
                     data+="());\n";
 
-                    data+="v1->setRange(min_";
-                    data+=i->unique_name().c_str();
-                    data+="(),max_";
-                    data+=i->unique_name().c_str();
-                    data+="());\n";
+                    if (i->type()==t_int) {
+                        data+="v1->setRange(-9999,9999);\n";
+                    }
 
                     data+=u8R"~=:;:=~(v0.release()->setParent(e0);
             v1.release()->setParent(e1);
@@ -647,6 +655,16 @@ auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
                     data+="edit_step_";
                     data+=i->unique_name().c_str();
                     data+="=e1.pointer();\n";
+
+                    QString aWrite=u8R"~=:;:=~(
+/*连接信号槽*/
+/*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
+/*连接信号槽*/super,[this](bool) {add_XXXXXXXXXX(); });
+/*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
+/*连接信号槽*/super,[this](bool) {sub_XXXXXXXXXX(); });
+)~=:;:=~";
+                    data+=aWrite.replace("XXXXXXXXXX",
+                        i->unique_name().c_str());
 
                 }/*int or double*/
 
@@ -665,7 +683,7 @@ auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
         })!~";
 
             data+=
-            u8R"!~(
+                u8R"!~(
 {/*创建确定按钮*/
             auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
             l->setSpacing(1); 
@@ -690,11 +708,11 @@ auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
                         );
 )~=:;:=~";
 
-            data+= u8R"!~(
+            data+=u8R"!~(
 } 
 )!~";
 
-           data+= u8R"!~(
+            data+=u8R"!~(
 }/*function end*/
 )!~";
 
@@ -832,7 +850,50 @@ bool ok;
          }
     }
 
+    template<typename _T_,typename _U_>
+    static void check_max(_T_ & v,const _U_&m) {
+        if (v>m) { v=m; }
+    }
+
+    template<typename _T_,typename _U_>
+    static void check_min(_T_ & v,const _U_&m) {
+        if (v<m) { v=m; }
+    }
+
 )~";
+
+            /*add sub 函数*/
+            for (const auto & i:values) {
+                if ((i->type()==t_int)||(i->type()==t_double)) {
+                    QString aWrite=QString::fromUtf8(u8R"_:_(
+ void add_XXXXXXXXXX() {
+        readState()/*获得当前状态*/;
+        XXXXXXXXXX+=step_XXXXXXXXXX/*增加值*/;
+        check_max(XXXXXXXXXX,max_XXXXXXXXXX())/*检测最大值*/;
+        check_min(XXXXXXXXXX,min_XXXXXXXXXX())/*检测最小值*/;
+        edit_XXXXXXXXXX->setText(
+            QString::number(XXXXXXXXXX))/*重设gui值*/;
+        if (isStateChange()) { directDo(); }/*发送值变化信号*/
+    }
+)_:_");
+                   data+=aWrite.replace("XXXXXXXXXX",i->unique_name().c_str());
+
+                   aWrite=QString::fromUtf8(u8R"_:_(
+ void sub_XXXXXXXXXX() {
+        readState()/*获得当前状态*/;
+        XXXXXXXXXX-=step_XXXXXXXXXX/*增加值*/;
+        check_max(XXXXXXXXXX,max_XXXXXXXXXX())/*检测最大值*/;
+        check_min(XXXXXXXXXX,min_XXXXXXXXXX())/*检测最小值*/;
+        edit_XXXXXXXXXX->setText(
+            QString::number(XXXXXXXXXX))/*重设gui值*/;
+        if (isStateChange()) { directDo(); }/*发送值变化信号*/
+    }
+)_:_");
+
+                   data+=aWrite.replace("XXXXXXXXXX",i->unique_name().c_str());
+                }
+            }
+
             data+=u8R"==(
 
 private:
