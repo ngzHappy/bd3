@@ -1,4 +1,5 @@
-﻿#include <regex>
+﻿#include <list>
+#include <regex>
 #include <QtCore>
 #include <vector>
 #include <cstring>
@@ -13,8 +14,10 @@ template<typename T>
 using vector=std::vector<T,memory::Allocator<T>>;
 using string=std::basic_string<char,
     std::char_traits<char>,memory::Allocator<char> >;
+template<typename T>
+using list=std::list<T,memory::Allocator<T>>;
 
-}
+}/*namespace*/
 
 class MainWindow::_PrivateMainWindow {
 public:
@@ -29,7 +32,9 @@ private:
 
     enum Type {
         t_unknow,
-        t_int,t_double
+        t_int,
+        t_double,
+        t_enum
     };
 
     class Value {
@@ -39,9 +44,37 @@ private:
         virtual const string & readable_name()const=0;
         virtual Type type() const { return t_unknow; }
     };
-    vector<std::unique_ptr<const Value>> values;
 
-    class IntValue :public Value {
+    vector<std::unique_ptr<const Value>> values;
+    class EnumValue final :public Value {
+    public:
+        class KeyVale {
+        public:
+            string key;
+            string value;
+            KeyVale()=default;
+            KeyVale(string &&k,string &&v):key(std::move(k)),value(std::move(v)) {}
+        private:
+            CPLUSPLUS_OBJECT(KeyVale)
+        };
+        string name;
+        string u_name;
+        list<KeyVale> enums;
+
+        void setName(string _name) {
+            name=std::move(_name);
+            const static std::regex rg("X");
+            u_name=std::regex_replace(name,rg,"_x_");
+            u_name+="_0x2e";
+        }
+        const string & readable_name()const override { return name; }
+        Type type() const override { return t_enum; }
+        const string & unique_name()const override { return u_name; }
+    private:
+        CPLUSPLUS_OBJECT(EnumValue)
+    };
+
+    class IntValue final :public Value {
     public:
         int default_value;
         int max_value;
@@ -61,7 +94,8 @@ private:
     private:
         CPLUSPLUS_OBJECT(IntValue)
     };
-    class DoubleValue :public Value {
+
+    class DoubleValue final :public Value {
     public:
         double default_value;
         double max_value;
@@ -111,6 +145,35 @@ private:
             return 0==std::strncmp(arg,arg1,(N-1));
         }return false;
     }
+
+    static void readEnumValues(lua::State *L,
+        EnumValue * value) {
+
+        auto tablePos=lua::gettop(L);
+        auto keypos=tablePos+1;
+        auto valuePos=tablePos+2;
+        lua::pushnil(L);
+        const char * str;
+        size_t strl;
+        string enumName;
+        string enumValue;
+        while (lua::next(L,tablePos)) {
+            if (lua::istable(L,valuePos)) {
+                const auto & kvTablePos=valuePos;
+                lua::rawgeti(L,kvTablePos,1);
+                str=luaL::tolstring(L,-1,&strl)/*enum name*/;
+                enumName.assign(str,strl);
+                lua::rawgeti(L,kvTablePos,2);
+                str=luaL::tolstring(L,-1,&strl)/*enum value*/;
+                enumValue.assign(str,strl);
+                value->enums.emplace_back(std::move(enumName)
+                    ,std::move(enumValue));
+            }
+            lua::settop(L,keypos);
+        }
+
+    }
+
     static void readDateFromLua_(lua::State *L,
         StateUpdateDataFromLua * state) {
 
@@ -166,6 +229,19 @@ private:
                             lua::rawgeti(L,valuePos,6);
                             value->step_default=lua::tonumber(L,-1);
                             values.push_back(value.toConstStdPointer());
+                        }
+                        else if (str_cmp(skey,strl,"enum_value")) {
+                            auto && value=memory::makeStackPointer<EnumValue>();
+                            lua::rawgeti(L,valuePos,2);
+                            skey=lua::tolstring(L,-1,&strl);
+                            key.assign(skey,strl);
+                            value->setName(std::move(key));
+                            if (lua::rawgeti(L,valuePos,3)==lua::TTABLE) {
+                                readEnumValues(L,value);
+                                if (false==value->enums.empty()) {
+                                    values.push_back(value.toConstStdPointer());
+                                }
+                            }
                         }
                     }
                 }
@@ -288,12 +364,18 @@ private:
                         case t_int: {
                             auto j=static_cast<const IntValue*>(i.get());
                             varSignal+="int /* ";
-                            varSignal+=j->name.c_str();
+                            varSignal+=j->readable_name().c_str();
                             varSignal+=" */";
                         }break;
                         case t_double: {
                             auto j=static_cast<const DoubleValue*>(i.get());
                             varSignal+="double /* ";
+                            varSignal+=j->readable_name().c_str();
+                            varSignal+=" */";
+                        }break;
+                        case t_enum: {
+                            auto j=static_cast<const EnumValue*>(i.get());
+                            varSignal+="int /*enum: ";
                             varSignal+=j->readable_name().c_str();
                             varSignal+=" */";
                         }break;
@@ -331,12 +413,23 @@ private:
 #include <opencv2/opencv.hpp>
 #endif
 #include <QtWidgets/qlineedit.h>
+#include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/qtoolbutton.h>
 #include <QtWidgets/qlayoutitem.h>
 
 namespace  {
+
+class _0x21Q_ComboBox :public QComboBox {
+    using _Super=QComboBox;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(_0x21Q_ComboBox)
+};
+
+typedef void (QComboBox::*T_0x21Q_CurrentIndexChanged)(int);
 
 class Step_0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
@@ -562,6 +655,58 @@ _0x21Q_LineEdit * edit_step_)";
                     data+=u8R"(=nullptr;)";
 
                 }
+                else if (i->type()==t_enum) {
+                    auto j=static_cast<const EnumValue *>(i.get());
+
+                    data+=u8R"(
+_0x21Q_ComboBox * enum_)";
+                    data+=j->unique_name().c_str();
+                    data+="=nullptr;";
+
+                    data+=u8R"(
+int/*enum*/old_)";
+                    data+=j->unique_name().c_str();
+                    data+="=static_cast<int/*enum*/>( ";
+                    data+=j->enums.front().value.c_str();
+                    data+=" );";
+
+                    data+=u8R"(
+int/*enum*/)";
+                    data+=j->unique_name().c_str();
+                    data+="=static_cast<int/*enum*/>( ";
+                    data+=j->enums.front().value.c_str();
+                    data+=" );";
+
+                    /* int map__x_Dialogtest2_0x2e(int arg) {
+
+                    }*/
+                    data+=u8R"(
+int/*enum*/map_)";
+                    data+=j->unique_name().c_str();
+                    data+="(int arg) {\n";
+                    data+="switch(arg){\n";
+                    {
+                        int ii=0;
+                        for (const auto & i:j->enums) {
+                            data+="\ncase "+QString::number(ii)+" : return ";
+                            data+="static_cast<int/*enum*/>( ";
+                            data+=i.value.c_str();
+                            data+=" );";
+                            data+="/* ";
+                            data+=i.key.c_str();
+                            data+=" */";
+                            ++ii;
+                        }
+                    }
+                    data+="\n}\n";
+
+                    data+="return ";
+                    data+="static_cast<int/*enum*/>( ";
+                    data+=j->enums.front().value.c_str();
+                    data+=QString::fromUtf8(u8" );/*默认值*/");
+
+                    data+="\n}\n";
+                }
             }
 
             /**void setup_ui*******************************/
@@ -580,7 +725,53 @@ _0x21Q_LineEdit * edit_step_)";
 
                 data+=u8R"({
 )";
-                if ((i->type()==t_int)||(i->type()==t_double)) {
+                if (i->type()==t_enum) {
+                    data+=u8R"~=:;:=~(
+/*创建一个enum选择器*/
+ auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+ auto && l0=makeStackPointer<_0x21Q_Label>();
+ auto && c0=makeStackPointer<_0x21Q_ComboBox>();
+ l0->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
+     QSizePolicy::Minimum));
+ c0->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,
+     QSizePolicy::Minimum));
+ l->setSpacing(1);
+ l->setMargin(1);
+ l->addWidget(l0.release());
+ l->addWidget(c0.release());
+ lv->addLayout(l.release());
+
+)~=:;:=~";
+
+                    data+="l0->setText(u8R\"__(";
+                    data+=i->readable_name().c_str();
+                    data+=")__\" \" : \" );";
+                    data+=QString::fromUtf8(u8R"(/*设置label name*/
+)");
+
+                    auto j=static_cast<const EnumValue*>(i.get());
+                    for (const auto & e:j->enums) {
+                        data+=u8R"_(
+ c0->addItem( u8R"|||()_";
+                        data+=e.key.c_str();
+                        data+=u8R"_()|||" );)_";
+                    }
+
+                    data+=QString::fromUtf8(u8R"~=:;:=~(
+/*连接信号槽*/
+            c0->connect(c0.pointer(),
+                T_0x21Q_CurrentIndexChanged(&QComboBox::currentIndexChanged),
+                super,
+                [this](int) {checkDo(); });
+)~=:;:=~");
+
+                    data+="enum_";
+                    data+=i->unique_name().c_str();
+                    data+="=c0;\n";
+
+                    data+="\n";
+                }
+                else if ((i->type()==t_int)||(i->type()==t_double)) {
                     data+=u8R"!(
 /*创建一个int/double显示*/
             auto && l0=makeStackPointer<_0x21Q_Label>();
@@ -721,87 +912,94 @@ auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
 bool ok;
 )";
             for (const auto &i:values) {
-                data+=u8R"(do{
+                if (i->type()==t_enum) {
+                    QString aWrite="\n{XXX=enum_XXX->currentIndex();}\n";
+                    data+=aWrite.replace("XXX",
+                        i->unique_name().c_str());
+                }
+                else {
+                    data+=u8R"(do{
 )";
-                if (i->type()==t_int) {
-                    data+="auto t=edit_";
-                    data+=i->unique_name().c_str();
-                    data+="->text();\n";
-                    data+=i->unique_name().c_str();
-                    data+="= t.toInt(&ok);";
-                    data+="\n";
-                    data+="if (ok) { break; }\n";
-                    data+=i->unique_name().c_str();
-                    data+="=default_";
-                    data+=i->unique_name().c_str();
-                    data+="();\nedit_";
-                    data+=i->unique_name().c_str();
-                    data+="->setText(\n";
-                    data+="QString::number(default_";
-                    data+=i->unique_name().c_str();
-                    data+="()));\n";
-                }
-                else if (i->type()==t_double) {
-                    data+="auto t=edit_";
-                    data+=i->unique_name().c_str();
-                    data+="->text();\n";
-                    data+=i->unique_name().c_str();
-                    data+="= t.toDouble(&ok);";
-                    data+="\n";
-                    data+="if (ok) { break; }\n";
-                    data+=i->unique_name().c_str();
-                    data+="=default_";
-                    data+=i->unique_name().c_str();
-                    data+="();\nedit_";
-                    data+=i->unique_name().c_str();
-                    data+="->setText(\n";
-                    data+="QString::number(default_";
-                    data+=i->unique_name().c_str();
-                    data+="()));\n";
-                }
-                data+=u8R"(} while (false);
+                    if (i->type()==t_int) {
+                        data+="auto t=edit_";
+                        data+=i->unique_name().c_str();
+                        data+="->text();\n";
+                        data+=i->unique_name().c_str();
+                        data+="= t.toInt(&ok);";
+                        data+="\n";
+                        data+="if (ok) { break; }\n";
+                        data+=i->unique_name().c_str();
+                        data+="=default_";
+                        data+=i->unique_name().c_str();
+                        data+="();\nedit_";
+                        data+=i->unique_name().c_str();
+                        data+="->setText(\n";
+                        data+="QString::number(default_";
+                        data+=i->unique_name().c_str();
+                        data+="()));\n";
+                    }
+                    else if (i->type()==t_double) {
+                        data+="auto t=edit_";
+                        data+=i->unique_name().c_str();
+                        data+="->text();\n";
+                        data+=i->unique_name().c_str();
+                        data+="= t.toDouble(&ok);";
+                        data+="\n";
+                        data+="if (ok) { break; }\n";
+                        data+=i->unique_name().c_str();
+                        data+="=default_";
+                        data+=i->unique_name().c_str();
+                        data+="();\nedit_";
+                        data+=i->unique_name().c_str();
+                        data+="->setText(\n";
+                        data+="QString::number(default_";
+                        data+=i->unique_name().c_str();
+                        data+="()));\n";
+                    }
+                    data+=u8R"(} while (false);
 )";
 
-                data+=u8R"(do{
+                    data+=u8R"(do{
 )";
-                if (i->type()==t_int) {
-                    data+="auto t=edit_step_";
-                    data+=i->unique_name().c_str();
-                    data+="->text();\nstep_";
-                    data+=i->unique_name().c_str();
-                    data+="= t.toInt(&ok);";
-                    data+="\n";
-                    data+="if (ok) { break; }\nstep_";
-                    data+=i->unique_name().c_str();
-                    data+="=default_step_";
-                    data+=i->unique_name().c_str();
-                    data+="();\nedit_step_";
-                    data+=i->unique_name().c_str();
-                    data+="->setText(\n";
-                    data+="QString::number(default_step_";
-                    data+=i->unique_name().c_str();
-                    data+="()));\n";
-                }
-                else if (i->type()==t_double) {
-                    data+="auto t=edit_step_";
-                    data+=i->unique_name().c_str();
-                    data+="->text();\nstep_";
-                    data+=i->unique_name().c_str();
-                    data+="= t.toDouble(&ok);";
-                    data+="\n";
-                    data+="if (ok) { break; }\nstep_";
-                    data+=i->unique_name().c_str();
-                    data+="=default_step_";
-                    data+=i->unique_name().c_str();
-                    data+="();\nedit_step_";
-                    data+=i->unique_name().c_str();
-                    data+="->setText(\n";
-                    data+="QString::number(default_step_";
-                    data+=i->unique_name().c_str();
-                    data+="()));\n";
-                }
-                data+=u8R"(} while (false);
+                    if (i->type()==t_int) {
+                        data+="auto t=edit_step_";
+                        data+=i->unique_name().c_str();
+                        data+="->text();\nstep_";
+                        data+=i->unique_name().c_str();
+                        data+="= t.toInt(&ok);";
+                        data+="\n";
+                        data+="if (ok) { break; }\nstep_";
+                        data+=i->unique_name().c_str();
+                        data+="=default_step_";
+                        data+=i->unique_name().c_str();
+                        data+="();\nedit_step_";
+                        data+=i->unique_name().c_str();
+                        data+="->setText(\n";
+                        data+="QString::number(default_step_";
+                        data+=i->unique_name().c_str();
+                        data+="()));\n";
+                    }
+                    else if (i->type()==t_double) {
+                        data+="auto t=edit_step_";
+                        data+=i->unique_name().c_str();
+                        data+="->text();\nstep_";
+                        data+=i->unique_name().c_str();
+                        data+="= t.toDouble(&ok);";
+                        data+="\n";
+                        data+="if (ok) { break; }\nstep_";
+                        data+=i->unique_name().c_str();
+                        data+="=default_step_";
+                        data+=i->unique_name().c_str();
+                        data+="();\nedit_step_";
+                        data+=i->unique_name().c_str();
+                        data+="->setText(\n";
+                        data+="QString::number(default_step_";
+                        data+=i->unique_name().c_str();
+                        data+="()));\n";
+                    }
+                    data+=u8R"(} while (false);
 )";
+                }/*type int or double*/
             }
             data+=u8R"(}
 )";
@@ -814,9 +1012,19 @@ bool ok;
                 for (const auto & i:values) {
                     if (isFirst) { isFirst=false; }
                     else {
-                        data+=" , ";
+                        data+=u8R"(
+,)";
                     }
-                    data+=i->unique_name().c_str();
+                    if (i->type()==t_enum) {
+                        data+="map_";
+                        data+=i->unique_name().c_str();
+                        data+="(";
+                        data+=i->unique_name().c_str();
+                        data+=")";
+                    }
+                    else {
+                        data+=i->unique_name().c_str();
+                    }
                 }
                 data+=");\n";
             }
@@ -876,9 +1084,9 @@ bool ok;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 )_:_");
-                   data+=aWrite.replace("XXXXXXXXXX",i->unique_name().c_str());
+                    data+=aWrite.replace("XXXXXXXXXX",i->unique_name().c_str());
 
-                   aWrite=QString::fromUtf8(u8R"_:_(
+                    aWrite=QString::fromUtf8(u8R"_:_(
  void sub_XXXXXXXXXX() {
         readState()/*获得当前状态*/;
         XXXXXXXXXX-=step_XXXXXXXXXX/*增加值*/;
@@ -890,7 +1098,7 @@ bool ok;
     }
 )_:_");
 
-                   data+=aWrite.replace("XXXXXXXXXX",i->unique_name().c_str());
+                    data+=aWrite.replace("XXXXXXXXXX",i->unique_name().c_str());
                 }
             }
 

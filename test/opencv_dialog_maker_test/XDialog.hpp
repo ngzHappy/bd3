@@ -1,11 +1,11 @@
 ﻿#ifndef __HPP_XDIALOG0x21003
 #define __HPP_XDIALOG0x21003
 
+
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/qwidget.h>
 
-class XDialog : public QWidget
-{
+class XDialog : public QWidget {
     Q_OBJECT
 
 private:
@@ -16,7 +16,7 @@ public:
     explicit XDialog(QWidget * /**/=nullptr);
     virtual ~XDialog();
 public:
-    Q_SIGNAL void valueChanged(int /* _x_Dialogtest0 */ , double /* _x_Dialogtest1 */);
+    Q_SIGNAL void valueChanged(int /* XDialogtest0 */,double /* XDialogtest1 */,int /*enum: XDialogtest2 */);
 private:
     XDialog(const XDialog&)=delete;
     XDialog(XDialog&&)=delete;
@@ -26,5 +26,4 @@ private:
     CPLUSPLUS_OBJECT(XDialog)
 };
 
- #endif /**/
-
+#endif /**/

@@ -5,12 +5,23 @@
 #include <opencv2/opencv.hpp>
 #endif
 #include <QtWidgets/qlineedit.h>
+#include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/qtoolbutton.h>
 #include <QtWidgets/qlayoutitem.h>
 
 namespace {
+
+class _0x21Q_ComboBox :public QComboBox {
+    using _Super=QComboBox;
+public:
+    using _Super::_Super;
+private:
+    CPLUSPLUS_OBJECT(_0x21Q_ComboBox)
+};
+
+typedef void (QComboBox::*T_0x21Q_CurrentIndexChanged)(int);
 
 class Step_0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
@@ -125,6 +136,18 @@ public:
     double old__x_Dialogtest1_0x2d=default__x_Dialogtest1_0x2d();
     _0x21Q_LineEdit * edit__x_Dialogtest1_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step__x_Dialogtest1_0x2d=nullptr;
+    _0x21Q_ComboBox * enum__x_Dialogtest2_0x2e=nullptr;
+    int/*enum*/old__x_Dialogtest2_0x2e=static_cast<int/*enum*/>(0);
+    int/*enum*/_x_Dialogtest2_0x2e=static_cast<int/*enum*/>(0);
+    int/*enum*/map__x_Dialogtest2_0x2e(int arg) {
+        switch (arg) {
+
+            case 0: return static_cast<int/*enum*/>(0);/* a */
+            case 1: return static_cast<int/*enum*/>(1);/* b */
+        }
+        return static_cast<int/*enum*/>(0);/*默认值*/
+    }
+
     void setup_ui() {
         using namespace memory;
         /*窗口布局*/
@@ -220,6 +243,34 @@ public:
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
                 /*连接信号槽*/super,[this](bool) {sub__x_Dialogtest1_0x2d(); });
         }
+        {
+
+            /*创建一个enum选择器*/
+            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
+            auto && l0=makeStackPointer<_0x21Q_Label>();
+            auto && c0=makeStackPointer<_0x21Q_ComboBox>();
+            l0->setSizePolicy(QSizePolicy(QSizePolicy::Minimum,
+                QSizePolicy::Minimum));
+            c0->setSizePolicy(QSizePolicy(QSizePolicy::MinimumExpanding,
+                QSizePolicy::Minimum));
+            l->setSpacing(1);
+            l->setMargin(1);
+            l->addWidget(l0.release());
+            l->addWidget(c0.release());
+            lv->addLayout(l.release());
+
+            l0->setText(u8R"__(XDialogtest2)__" " : ");/*设置label name*/
+
+            c0->addItem(u8R"|||(a)|||");
+            c0->addItem(u8R"|||(b)|||");
+            /*连接信号槽*/
+            c0->connect(c0.pointer(),
+                T_0x21Q_CurrentIndexChanged(&QComboBox::currentIndexChanged),
+                super,
+                [this](int) {checkDo(); });
+            enum__x_Dialogtest2_0x2e=c0;
+
+        }
 
         {/*创建中间空白*/
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
@@ -286,9 +337,13 @@ public:
             edit_step__x_Dialogtest1_0x2d->setText(
                 QString::number(default_step__x_Dialogtest1_0x2d()));
         } while (false);
+
+        {_x_Dialogtest2_0x2e=enum__x_Dialogtest2_0x2e->currentIndex(); }
     }
     void directDo() {
-        super->valueChanged(_x_Dialogtest0_0x2i,_x_Dialogtest1_0x2d);
+        super->valueChanged(_x_Dialogtest0_0x2i
+            ,_x_Dialogtest1_0x2d
+            ,map__x_Dialogtest2_0x2e(_x_Dialogtest2_0x2e));
     }
     bool isStateChange() {
         auto ans=false;
@@ -299,6 +354,10 @@ public:
         if (old__x_Dialogtest1_0x2d!=_x_Dialogtest1_0x2d) {
             ans=true;
             old__x_Dialogtest1_0x2d=_x_Dialogtest1_0x2d;
+        }
+        if (old__x_Dialogtest2_0x2e!=_x_Dialogtest2_0x2e) {
+            ans=true;
+            old__x_Dialogtest2_0x2e=_x_Dialogtest2_0x2e;
         }
         return ans;
     }
@@ -320,7 +379,6 @@ public:
     static void check_min(_T_ & v,const _U_&m) {
         if (v<m) { v=m; }
     }
-
 
     void add__x_Dialogtest0_0x2i() {
         readState()/*获得当前状态*/;
@@ -361,7 +419,6 @@ public:
             QString::number(_x_Dialogtest1_0x2d))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
-
 
 private:
     CPLUSPLUS_OBJECT(_PrivateXDialog)

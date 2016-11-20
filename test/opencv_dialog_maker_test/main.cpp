@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
     x.show();
 
     x.connect(&x,&XDialog::valueChanged,
-        [](int a,double b) {
-        qDebug()<<a<<b;
+        [](int a,double b,int c) {
+        qDebug()<<a<<b<<c;
     });
 
     MainWindow w;
