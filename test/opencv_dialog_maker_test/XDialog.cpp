@@ -137,15 +137,15 @@ public:
     _0x21Q_LineEdit * edit__x_Dialogtest1_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step__x_Dialogtest1_0x2d=nullptr;
     _0x21Q_ComboBox * enum__x_Dialogtest2_0x2e=nullptr;
-    int/*enum*/old__x_Dialogtest2_0x2e=static_cast<int/*enum*/>(0);
-    int/*enum*/_x_Dialogtest2_0x2e=static_cast<int/*enum*/>(0);
+    int/*enum*/old__x_Dialogtest2_0x2e=static_cast<int/*enum*/>(9);
+    int/*enum*/_x_Dialogtest2_0x2e=static_cast<int/*enum*/>(9);
     int/*enum*/map__x_Dialogtest2_0x2e(int arg) {
         switch (arg) {
 
-            case 0: return static_cast<int/*enum*/>(0);/* a */
-            case 1: return static_cast<int/*enum*/>(1);/* b */
+            case 0: return static_cast<int/*enum*/>(9);/* a */
+            case 1: return static_cast<int/*enum*/>(2);/* b */
         }
-        return static_cast<int/*enum*/>(0);/*默认值*/
+        return static_cast<int/*enum*/>(9);/*默认值*/
     }
 
     void setup_ui() {
@@ -338,12 +338,13 @@ public:
                 QString::number(default_step__x_Dialogtest1_0x2d()));
         } while (false);
 
-        {_x_Dialogtest2_0x2e=enum__x_Dialogtest2_0x2e->currentIndex(); }
+        {_x_Dialogtest2_0x2e=map__x_Dialogtest2_0x2e(
+            enum__x_Dialogtest2_0x2e->currentIndex()); }
     }
     void directDo() {
         super->valueChanged(_x_Dialogtest0_0x2i
             ,_x_Dialogtest1_0x2d
-            ,map__x_Dialogtest2_0x2e(_x_Dialogtest2_0x2e));
+            ,_x_Dialogtest2_0x2e);
     }
     bool isStateChange() {
         auto ans=false;
@@ -379,6 +380,7 @@ public:
     static void check_min(_T_ & v,const _U_&m) {
         if (v<m) { v=m; }
     }
+
 
     void add__x_Dialogtest0_0x2i() {
         readState()/*获得当前状态*/;
@@ -419,6 +421,7 @@ public:
             QString::number(_x_Dialogtest1_0x2d))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
+
 
 private:
     CPLUSPLUS_OBJECT(_PrivateXDialog)

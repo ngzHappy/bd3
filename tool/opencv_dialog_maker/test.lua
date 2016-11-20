@@ -6,7 +6,7 @@ local data={
     values={
         {"int_value",   "XDialogtest0",22,10,30,1},
         {"double_value","XDialogtest1",22.1,10.2,30.3,.1},
-        {"enum_value",  "XDialogtest2", {{"a",0},{"b",1},} },
+        {"enum_value",  "XDialogtest2", {{"a",9},{"b",2},} },
     }
 }
 

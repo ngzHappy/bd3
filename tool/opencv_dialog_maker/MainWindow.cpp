@@ -913,7 +913,10 @@ bool ok;
 )";
             for (const auto &i:values) {
                 if (i->type()==t_enum) {
-                    QString aWrite="\n{XXX=enum_XXX->currentIndex();}\n";
+                    QString aWrite=u8R"___(
+{XXX=map_XXX(
+enum_XXX->currentIndex());}
+)___";
                     data+=aWrite.replace("XXX",
                         i->unique_name().c_str());
                 }
@@ -1015,16 +1018,7 @@ bool ok;
                         data+=u8R"(
 ,)";
                     }
-                    if (i->type()==t_enum) {
-                        data+="map_";
-                        data+=i->unique_name().c_str();
-                        data+="(";
-                        data+=i->unique_name().c_str();
-                        data+=")";
-                    }
-                    else {
-                        data+=i->unique_name().c_str();
-                    }
+                    data+=i->unique_name().c_str();
                 }
                 data+=");\n";
             }
