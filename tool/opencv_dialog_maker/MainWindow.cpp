@@ -36,6 +36,7 @@ private:
     public:
         virtual ~Value() {}
         virtual const string & unique_name()const=0;
+        virtual const string & readable_name()const=0;
         virtual Type type() const { return t_unknow; }
     };
     vector<std::unique_ptr<const Value>> values;
@@ -54,6 +55,7 @@ private:
             u_name=std::regex_replace(name,rg,"_x_");
             u_name+="_0x2i";
         }
+        const string & readable_name()const override { return name; }
         Type type() const override { return t_int; }
         const string & unique_name()const override { return u_name; }
     private:
@@ -73,6 +75,7 @@ private:
             u_name=std::regex_replace(name,rg,"_x_");
             u_name+="_0x2d";
         }
+        const string & readable_name()const override { return name; }
         Type type() const override { return t_double; }
         const string & unique_name()const override { return u_name; }
     private:
@@ -320,10 +323,13 @@ private:
                 static_cast<int> (className.size()));
 
             QString data;
+            data.reserve(1024*32);
             data+=u8R"~(#include "XDialog.hpp"
 #include <QtWidgets/qlabel.h>
 #include <QtGui/qvalidator.h>
+#if defined(HAS_OPENCV_LIBRARY)
 #include <opencv2/opencv.hpp>
+#endif
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
@@ -410,11 +416,12 @@ class XDialog::_PrivateXDialog{
 public:
     XDialog *super;
     _PrivateXDialog(XDialog *arg):super(arg){
- setup_ui();
+setup_ui()/*建立gui并连接信号槽*/;
+readState()/*更新gui数据*/;
 }
 
 )~";
-
+            /**write values*******************************/
             data+=u8R"(
 /*values*/
 )";
@@ -547,9 +554,11 @@ _0x21Q_LineEdit * edit_step_)";
                 }
             }
 
+            /**void setup_ui*******************************/
             data+=u8R"~(
      void setup_ui(){
         using namespace memory ;
+/*窗口布局*/
         auto && lv=makeStackPointer<_0x21Q_VBoxLayout>();
         super->setLayout(lv.release());
         lv->setSpacing(0);
@@ -562,7 +571,9 @@ _0x21Q_LineEdit * edit_step_)";
                 data+=u8R"({
 )";
                 if ((i->type()==t_int)||(i->type()==t_double)) {
-                    data+=u8R"!(auto && l0=makeStackPointer<_0x21Q_Label>();
+                    data+=u8R"!(
+/*创建一个int/double显示*/
+            auto && l0=makeStackPointer<_0x21Q_Label>();
             auto && l1=makeStackPointer<_0x21Q_Label>();
             auto && e0=makeStackPointer<_0x21Q_LineEdit>();
             auto && e1=makeStackPointer<_0x21Q_LineEdit>();
@@ -583,6 +594,12 @@ _0x21Q_LineEdit * edit_step_)";
             p1->setText("-");
 )!";
 
+                    data+="l0->setText(u8R\"__(";
+                    data+=i->readable_name().c_str();
+                    data+=")__\" \" : \" );";
+                    data+= QString::fromUtf8(u8R"(/*设置label name*/
+)");
+
                     data+="edit_";
                     data+=i->unique_name().c_str();
                     data+="=e0.pointer();\n";
@@ -592,13 +609,46 @@ _0x21Q_LineEdit * edit_step_)";
                     data+="=e1.pointer();\n";
 
                     if (i->type()==t_int) {
-
+                        data+=u8R"~=:;:=~(
+/*int value 检查器*/
+auto && v0=makeStackPointer<_0x21Q_IntValidator>();
+auto && v1=makeStackPointer<_0x21Q_IntValidator>();
+)~=:;:=~";
                     }
                     else {
-
+                        data+=u8R"~=:;:=~(
+/*double value 检查器*/
+auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
+auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
+)~=:;:=~";
                     }
 
-                }
+                    data+="v0->setRange(min_";
+                    data+=i->unique_name().c_str();
+                    data+="(),max_";
+                    data+=i->unique_name().c_str();
+                    data+="());\n";
+
+                    data+="v1->setRange(min_";
+                    data+=i->unique_name().c_str();
+                    data+="(),max_";
+                    data+=i->unique_name().c_str();
+                    data+="());\n";
+
+                    data+=u8R"~=:;:=~(v0.release()->setParent(e0);
+            v1.release()->setParent(e1);
+            e0->setValidator(v0);
+            e1->setValidator(v1);
+)~=:;:=~";
+                    data+="edit_";
+                    data+=i->unique_name().c_str();
+                    data+="=e0.pointer();\n";
+
+                    data+="edit_step_";
+                    data+=i->unique_name().c_str();
+                    data+="=e1.pointer();\n";
+
+                }/*int or double*/
 
 
                 data+=u8R"(} 
@@ -606,15 +656,17 @@ _0x21Q_LineEdit * edit_step_)";
             }/*for*/
 
             data+=u8R"!~(
-{
+{/*创建中间空白*/
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
                 1,1,QSizePolicy::Minimum,
                 QSizePolicy::MinimumExpanding
                 );
             lv->addSpacerItem(ls.release());
-        }
+        })!~";
 
-        {
+            data+=
+            u8R"!~(
+{/*创建确定按钮*/
             auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
             l->setSpacing(1); 
             l->setMargin(1);
@@ -626,10 +678,27 @@ _0x21Q_LineEdit * edit_step_)";
             l->addWidget(pb.release());
             lv->addLayout(l.release());
             pb->setText(QString::fromUtf8(u8"确定"));
-        }
+/*连接按钮信号槽*/
+         )!~";
+
+            data+=u8R"~=:;:=~(
+ super->connect(
+                        pb.pointer(),
+                        &QPushButton::clicked,
+                        super,
+                        [this](bool){checkDo();}
+                        );
+)~=:;:=~";
+
+            data+= u8R"!~(
+} 
+)!~";
+
+           data+= u8R"!~(
 }/*function end*/
 )!~";
 
+            /**readState*******************************/
             data+=u8R"(void readState() {
 bool ok;
 )";
@@ -718,7 +787,52 @@ bool ok;
             }
             data+=u8R"(}
 )";
+            /**void directDo*******************************/
+            data+="void directDo() {";
+            data+="\n";
+            data+="super->valueChanged(";
+            {
+                bool isFirst=true;
+                for (const auto & i:values) {
+                    if (isFirst) { isFirst=false; }
+                    else {
+                        data+=" , ";
+                    }
+                    data+=i->unique_name().c_str();
+                }
+                data+=");\n";
+            }
+            data+="}";
+            data+="\n";
+            /**void directDo*******************************/
+            data+=" bool isStateChange() {\n";
+            data+=" auto ans=false;\n";
+            for (const auto & i:values) {
+                data+="if (old_";
+                data+=i->unique_name().c_str();
+                data+="!=";
+                data+=i->unique_name().c_str();
+                data+="){\n";
+                data+="ans=true;\n";
+                data+="old_";
+                data+=i->unique_name().c_str();
+                data+="=";
+                data+=i->unique_name().c_str();
+                data+=";\n}\n";
+            }
+            data+="return ans;\n}\n";
 
+            /**void checkDo*******************************/
+            data+=u8R"~(
+
+ void checkDo(){
+         readState();
+         if(isStateChange()){
+            directDo();
+         }
+    }
+
+)~";
             data+=u8R"==(
 
 private:

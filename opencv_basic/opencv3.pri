@@ -1,3 +1,4 @@
+DEFINES *= HAS_OPENCV_LIBRARY
 
 win32-g++{
 

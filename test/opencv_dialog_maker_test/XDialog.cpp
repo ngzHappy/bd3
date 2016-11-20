@@ -1,7 +1,9 @@
 ﻿#include "XDialog.hpp"
-#include <QtGui/qvalidator.h>
 #include <QtWidgets/qlabel.h>
+#include <QtGui/qvalidator.h>
+#if defined(HAS_OPENCV_LIBRARY)
 #include <opencv2/opencv.hpp>
+#endif
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qboxlayout.h>
 #include <QtWidgets/qpushbutton.h>
@@ -18,8 +20,8 @@ private:
     CPLUSPLUS_OBJECT(_0x21Q_DoubleValidator)
 };
 
-class _0x21Q_IntValidator  :public QIntValidator {
-    using _Super=QIntValidator ;
+class _0x21Q_IntValidator :public QIntValidator {
+    using _Super=QIntValidator;
 public:
     using _Super::_Super;
 private:
@@ -88,8 +90,8 @@ class XDialog::_PrivateXDialog {
 public:
     XDialog *super;
     _PrivateXDialog(XDialog *arg):super(arg) {
-        setup_ui();
-        readState();
+        setup_ui()/*建立gui并连接信号槽*/;
+        readState()/*更新gui数据*/;
     }
 
 
@@ -104,7 +106,6 @@ public:
     int old__x_Dialogtest0_0x2i=default__x_Dialogtest0_0x2i();
     _0x21Q_LineEdit * edit__x_Dialogtest0_0x2i=nullptr;
     _0x21Q_LineEdit * edit_step__x_Dialogtest0_0x2i=nullptr;
-    
     constexpr static double default__x_Dialogtest1_0x2d() { return 22.1; }
     constexpr static double default_step__x_Dialogtest1_0x2d() { return 0.1; }
     constexpr static double max__x_Dialogtest1_0x2d() { return 30.3; }
@@ -114,15 +115,17 @@ public:
     double old__x_Dialogtest1_0x2d=default__x_Dialogtest1_0x2d();
     _0x21Q_LineEdit * edit__x_Dialogtest1_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step__x_Dialogtest1_0x2d=nullptr;
-   
     void setup_ui() {
         using namespace memory;
+        /*窗口布局*/
         auto && lv=makeStackPointer<_0x21Q_VBoxLayout>();
         super->setLayout(lv.release());
         lv->setSpacing(0);
         lv->setMargin(0);
 
         {
+
+            /*创建一个int/double显示*/
             auto && l0=makeStackPointer<_0x21Q_Label>();
             auto && l1=makeStackPointer<_0x21Q_Label>();
             auto && e0=makeStackPointer<_0x21Q_LineEdit>();
@@ -142,10 +145,15 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
+            l0->setText(u8R"__(XDialogtest0)__" " : ");/*设置label name*/
+            edit__x_Dialogtest0_0x2i=e0.pointer();
+            edit_step__x_Dialogtest0_0x2i=e1.pointer();
+
+            /*int value 检查器*/
             auto && v0=makeStackPointer<_0x21Q_IntValidator>();
             auto && v1=makeStackPointer<_0x21Q_IntValidator>();
-            v0->setRange(min__x_Dialogtest0_0x2i(), max__x_Dialogtest0_0x2i());
-            v1->setRange(min__x_Dialogtest0_0x2i(), max__x_Dialogtest0_0x2i());
+            v0->setRange(min__x_Dialogtest0_0x2i(),max__x_Dialogtest0_0x2i());
+            v1->setRange(min__x_Dialogtest0_0x2i(),max__x_Dialogtest0_0x2i());
             v0.release()->setParent(e0);
             v1.release()->setParent(e1);
             e0->setValidator(v0);
@@ -153,8 +161,9 @@ public:
             edit__x_Dialogtest0_0x2i=e0.pointer();
             edit_step__x_Dialogtest0_0x2i=e1.pointer();
         }
-
         {
+
+            /*创建一个int/double显示*/
             auto && l0=makeStackPointer<_0x21Q_Label>();
             auto && l1=makeStackPointer<_0x21Q_Label>();
             auto && e0=makeStackPointer<_0x21Q_LineEdit>();
@@ -174,19 +183,31 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
+            l0->setText(u8R"__(XDialogtest1)__" " : ");/*设置label name*/
+            edit__x_Dialogtest1_0x2d=e0.pointer();
+            edit_step__x_Dialogtest1_0x2d=e1.pointer();
+
+            /*double value 检查器*/
+            auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
+            auto && v1=makeStackPointer<_0x21Q_DoubleValidator>();
+            v0->setRange(min__x_Dialogtest1_0x2d(),max__x_Dialogtest1_0x2d());
+            v1->setRange(min__x_Dialogtest1_0x2d(),max__x_Dialogtest1_0x2d());
+            v0.release()->setParent(e0);
+            v1.release()->setParent(e1);
+            e0->setValidator(v0);
+            e1->setValidator(v1);
             edit__x_Dialogtest1_0x2d=e0.pointer();
             edit_step__x_Dialogtest1_0x2d=e1.pointer();
         }
 
-        {
+        {/*创建中间空白*/
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
                 1,1,QSizePolicy::Minimum,
                 QSizePolicy::MinimumExpanding
                 );
             lv->addSpacerItem(ls.release());
         }
-
-        {
+        {/*创建确定按钮*/
             auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
             l->setSpacing(1);
             l->setMargin(1);
@@ -198,9 +219,18 @@ public:
             l->addWidget(pb.release());
             lv->addLayout(l.release());
             pb->setText(QString::fromUtf8(u8"确定"));
-        }
-    }/*function end*/
+            /*连接按钮信号槽*/
 
+            super->connect(
+                pb.pointer(),
+                &QPushButton::clicked,
+                super,
+                [this](bool) {checkDo(); }
+            );
+
+        }
+
+    }/*function end*/
     void readState() {
         bool ok;
         do {
@@ -240,39 +270,25 @@ public:
         } while (false);
 
     }
-
+    void directDo() {
+        super->valueChanged(_x_Dialogtest0_0x2i,_x_Dialogtest1_0x2d);
+    }
     bool isStateChange() {
         auto ans=false;
         if (old__x_Dialogtest0_0x2i!=_x_Dialogtest0_0x2i) {
             ans=true;
             old__x_Dialogtest0_0x2i=_x_Dialogtest0_0x2i;
         }
+        if (old__x_Dialogtest1_0x2d!=_x_Dialogtest1_0x2d) {
+            ans=true;
+            old__x_Dialogtest1_0x2d=_x_Dialogtest1_0x2d;
+        }
         return ans;
     }
 
-    void checkDo(){
-         readState();
-         if(isStateChange()){
-            directDo();
-         }
-    }
 
-    void directDo() {
-        super->valueChanged(_x_Dialogtest0_0x2i,_x_Dialogtest1_0x2d);
-    }
-
-    void add__x_Dialogtest0_0x2i() {
+    void checkDo() {
         readState();
-
-        _x_Dialogtest0_0x2i+=step__x_Dialogtest0_0x2i;
-        if( _x_Dialogtest0_0x2i>max__x_Dialogtest0_0x2i() ){
-            _x_Dialogtest0_0x2i=max__x_Dialogtest0_0x2i();
-        }else if(_x_Dialogtest0_0x2i<min__x_Dialogtest0_0x2i()){
-            _x_Dialogtest0_0x2i=min__x_Dialogtest0_0x2i();
-        }
-        edit_step__x_Dialogtest0_0x2i->setText(
-                    QString::number(_x_Dialogtest0_0x2i));
-
         if (isStateChange()) {
             directDo();
         }
