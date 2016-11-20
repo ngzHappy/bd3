@@ -11,6 +11,9 @@ namespace __ImageShowUtility {
 using cvfloat_type=cv::Point2f::value_type;
 using point2fvector=std::vector<cv::Point2f,memory::Allocator<cv::Point2f>>;
 
+/*used to decltype never call int*/
+inline point2fvector toCVFloat32Point2Vector() {}
+
 template<typename _TB,typename _TE>
 point2fvector toCVFloat32Point2Vector(const _TB & argb,const _TE & arge) {
     auto size_=Distance<const _TB &,const _TE &>::value(argb,arge);

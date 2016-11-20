@@ -44,8 +44,8 @@ local data={
             {
                 {"DIST_L2","cv::DIST_L2"},
                 {"DIST_L1","cv::DIST_L1"},
-                {"DIST_C","cv::DIST_C"},
-                {"DIST_L12","cv::DIST_L12"},
+                --{"DIST_C","cv::DIST_C"},
+                --{"DIST_L12","cv::DIST_L12"},
                 {"DIST_FAIR","cv::DIST_FAIR"},
                 {"DIST_WELSCH","cv::DIST_WELSCH"},
                 {"DIST_HUBER","cv::DIST_HUBER"},

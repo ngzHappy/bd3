@@ -18,7 +18,7 @@ public:
     using _Super::addImage;
     QWidget* addImage(const QImage &) override;
     void openLua() override;
-
+    
 public:
     MainWindow(const MainWindow&)=delete;
     MainWindow(MainWindow&&)=delete;

@@ -1,4 +1,11 @@
 ﻿--[[lua,input_images,input_data_2d,input_data_1d,input_data_3d--]]
+
+local noise_function=function(arg) 
+	local x=arg[1];
+	local y=arg[2];
+	return {x,y-3};
+end
+
 local application={
 input_images={
 --"images:000001",
@@ -101,6 +108,43 @@ input_data_2d={
 {0.93*10,1.26860853572844*10},
 {0.94*10,1.27436408376902*10},
 {0.95*10,1.26076850950556*10},
+
+--noise data
+
+noise_function({0.39*10,0.816925129498352*10}),
+noise_function({0.4*10,0.831558656579743*10} ),
+noise_function({0.41*10,0.841847578422464*10}),
+noise_function({0.42*10,0.839786622626536*10}),
+noise_function({0.43*10,0.865550525720475*10}),
+noise_function({0.44*10,0.857103156771275*10}),
+noise_function({0.45*10,0.882839958835307*10}),
+noise_function({0.46*10,0.878576670240114*10}),
+noise_function({0.47*10,0.892880838184204*10}),
+noise_function({0.48*10,0.912062976216808*10}),
+noise_function({0.49*10,0.90965789114916*10} ),
+noise_function({0.5*10,0.916503057886554*10} ),
+noise_function({0.51*10,0.931221546305468*10}),
+noise_function({0.52*10,0.942741833689285*10}),
+noise_function({0.53*10,0.931449204874275*10}),
+noise_function({0.54*10,0.948758915755922*10}),
+noise_function({0.55*10,0.945450466738303*10}),
+noise_function({0.56*10,0.971768890471879*10}),
+noise_function({0.57*10,0.96167422310552*10} ),
+noise_function({0.58*10,0.970522482838821*10}),
+noise_function({0.59*10,0.9749079756357*10}  ),
+noise_function({0.6*10,0.998512981225849*10} ),
+noise_function({0.61*10,0.991046581800405*10}),
+noise_function({0.62*10,1.01898444272394*10} ),
+noise_function({0.63*10,1.0265849076517*10}  ),
+noise_function({0.64*10,1.02323151288375*10} ),
+noise_function({0.65*10,1.03378004531574*10} ),
+noise_function({0.66*10,1.04139173051023*10} ),
+noise_function({0.67*10,1.04930911958925*10} ),
+noise_function({0.68*10,1.06463949882656*10} ),
+noise_function({0.69*10,1.05334737961455*10} ),
+noise_function({0.7*10,1.08429616287919*10}  ),
+noise_function({0.71*10,1.07594161611693*10} ),
+noise_function({0.72*10,1.07621873935595*10} ),
 
 }--[[input_data_2d--]]
 }

@@ -339,7 +339,10 @@ public:
         }
 
         /*put the app to top*/
-        luaL::loadstring(L,luaFileData.c_str());
+        if (lua::OK!=luaL::loadstring(L,luaFileData.c_str())) {
+            luaL::default_error_function(L);
+            return;
+        }
         lua::pcall(L,0,lua::MULTRET,0);
 
         if (lua::istable(L,-1)) {
@@ -581,6 +584,10 @@ QPair<const QPointF*,const QPointF*> OpencvApplication::getPoint2d()const {
         auto tmp=_mp->readPoint2d();
         _mp->point2dData.reserve(tmp.size());
         _mp->point2dData.assign(tmp.begin(),tmp.end());
+    }
+
+    if (_mp->point2dData.empty()) {
+        return{nullptr,nullptr}; 
     }
 
     auto * _fs=&(*_mp->point2dData.begin());

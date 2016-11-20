@@ -138,11 +138,9 @@ public:
 
             case 0: return static_cast<int/*enum*/>(cv::DIST_L2);/* DIST_L2 */
             case 1: return static_cast<int/*enum*/>(cv::DIST_L1);/* DIST_L1 */
-            case 2: return static_cast<int/*enum*/>(cv::DIST_C);/* DIST_C */
-            case 3: return static_cast<int/*enum*/>(cv::DIST_L12);/* DIST_L12 */
-            case 4: return static_cast<int/*enum*/>(cv::DIST_FAIR);/* DIST_FAIR */
-            case 5: return static_cast<int/*enum*/>(cv::DIST_WELSCH);/* DIST_WELSCH */
-            case 6: return static_cast<int/*enum*/>(cv::DIST_HUBER);/* DIST_HUBER */
+            case 2: return static_cast<int/*enum*/>(cv::DIST_FAIR);/* DIST_FAIR */
+            case 3: return static_cast<int/*enum*/>(cv::DIST_WELSCH);/* DIST_WELSCH */
+            case 4: return static_cast<int/*enum*/>(cv::DIST_HUBER);/* DIST_HUBER */
         }
         return static_cast<int/*enum*/>(cv::DIST_L2);/*默认值*/
     }
@@ -202,8 +200,6 @@ public:
 
             c0->addItem(u8R"|||(DIST_L2)|||");
             c0->addItem(u8R"|||(DIST_L1)|||");
-            c0->addItem(u8R"|||(DIST_C)|||");
-            c0->addItem(u8R"|||(DIST_L12)|||");
             c0->addItem(u8R"|||(DIST_FAIR)|||");
             c0->addItem(u8R"|||(DIST_WELSCH)|||");
             c0->addItem(u8R"|||(DIST_HUBER)|||");
