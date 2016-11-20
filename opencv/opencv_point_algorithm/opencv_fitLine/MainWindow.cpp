@@ -1,6 +1,6 @@
 ﻿/*MainWindow.cpp*/
 #include "MainWindow.hpp"
-#include "FitLineDialog.hpp"
+#include "private/FitLineDialog.hpp"
 #include <OpenCVUtility.hpp>
 
 class MainWindow::_PrivateMainWindow {
@@ -78,7 +78,7 @@ void MainWindow::openLua() {
     }
 
     {
-        auto && fitLineDialog=makeStackPointer<FitLineDialog>();
+        auto && fitLineDialog=makeStackPointer<FitlineDialog>();
         mainView->addImageWidget(
             fitLineDialog.release(),
             Qt::RightDockWidgetArea

@@ -431,11 +431,17 @@ private:
 
 typedef void (QComboBox::*T_0x21Q_CurrentIndexChanged)(int);
 
+constexpr int _0x21Q_decimals=6;
+
 class Step_0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
 public:
-    Step_0x21Q_DoubleValidator():_Super(-9999,9999,6) {
+    Step_0x21Q_DoubleValidator(QObject * arg=nullptr):
+        _Super(-9999,9999,_0x21Q_decimals,arg) {
         setNotation(QDoubleValidator::StandardNotation);
+    }
+    void setRange(double a,double b) {
+        _Super::setRange(a,b,_0x21Q_decimals);
     }
 private:
     CPLUSPLUS_OBJECT(Step_0x21Q_DoubleValidator)
@@ -444,7 +450,13 @@ private:
 class _0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
 public:
-    using _Super::_Super;
+    _0x21Q_DoubleValidator(QObject * arg=nullptr):
+        _Super(-360,360,_0x21Q_decimals,arg){
+        setNotation(QDoubleValidator::StandardNotation);
+    }
+    void setRange(double a,double b) {
+        _Super::setRange(a,b,_0x21Q_decimals);
+    }
 private:
     CPLUSPLUS_OBJECT(_0x21Q_DoubleValidator)
 };

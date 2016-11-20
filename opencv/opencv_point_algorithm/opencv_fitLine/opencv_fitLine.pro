@@ -14,19 +14,19 @@ TEMPLATE = app
 SOURCES += main.cpp \
     MainWindow.cpp \
     Application.cpp \
-    FitLineDialog.cpp
+    private/FitlineDialog.cpp
 
 HEADERS  += MainWindow.hpp \
     Application.hpp \
-    FitLineDialog.hpp
+    private/FitlineDialog.hpp
 
-FORMS    += \  
-    FitLineDialog.ui
+FORMS    +=
 
-RESOURCES +=  
+RESOURCES +=
 
 DISTFILES += \
-    $$PWD/opencv_fitLine.lua
+    $$PWD/opencv_fitLine.lua \
+    $$PWD/dialog_opencv_fitLine.lua
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 
