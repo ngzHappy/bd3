@@ -88,35 +88,25 @@ void PlainImageView::paintEvent(QPaintEvent *) {
     auto & _pm_DrawImage=_pm->drawImage;
     if (varImage.isNull()) { return; }
     auto varDrawSize=__private::imageResizeSize(varImage.size(),this->size());
-    if (varDrawSize==_pm_DrawImage.size()) {
-        QPainter painter(this);
-        painter.setRenderHints(
-            QPainter::HighQualityAntialiasing|
-            QPainter::TextAntialiasing|
-            QPainter::SmoothPixmapTransform|
-            QPainter::Antialiasing
-        );
-        painter.drawPixmap(
-            std::max(0,(this->size().width()-varDrawSize.width())/2),
-            std::max(0,(this->size().height()-varDrawSize.height())/2),
-            _pm_DrawImage);
-    }
-    else {
+      
+    if (varDrawSize!=_pm_DrawImage.size()) {
         _pm_DrawImage=QPixmap::fromImage(varImage.scaled(varDrawSize,
             Qt::IgnoreAspectRatio,
             Qt::SmoothTransformation));
-        QPainter painter(this);
-        painter.setRenderHints(
-            QPainter::HighQualityAntialiasing|
-            QPainter::TextAntialiasing|
-            QPainter::SmoothPixmapTransform|
-            QPainter::Antialiasing
-        );
-        painter.drawPixmap(
-            std::max(0,(this->size().width()-varDrawSize.width())/2),
-            std::max(0,(this->size().height()-varDrawSize.height())/2),
-            _pm_DrawImage);
     }
+
+    QPainter painter(this);
+    painter.setRenderHints(
+        QPainter::HighQualityAntialiasing|
+        QPainter::TextAntialiasing|
+        QPainter::SmoothPixmapTransform|
+        QPainter::Antialiasing
+    );
+    painter.drawPixmap(
+        std::max(0,(this->size().width()-varDrawSize.width())/2),
+        std::max(0,(this->size().height()-varDrawSize.height())/2),
+        _pm_DrawImage);
+
 }
 
 void PlainImageView::setImage(const QImage & arg,bool _copy) {
