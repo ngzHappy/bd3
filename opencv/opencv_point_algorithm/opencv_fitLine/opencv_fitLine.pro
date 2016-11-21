@@ -1,7 +1,5 @@
 ###opencv_fitLine.pro
 
-###opencv_fitLine.pro
-
 QT += core
 QT += gui
 QT += widgets
