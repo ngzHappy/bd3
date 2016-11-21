@@ -41,7 +41,7 @@ local data={
     name="FitlineDialog",
     values={
         {"enum_value","distType",
-            {--[[http://docs.opencv.org/3.1.0/d3/dc0/group__imgproc__shape.html#gaf849da1fdafa67ee84b1e9a23b93f91f--]]
+            {--[===[http://docs.opencv.org/3.1.0/d3/dc0/group__imgproc__shape.html#gaf849da1fdafa67ee84b1e9a23b93f91f]===]
                 {"DIST_L2","cv::DIST_L2"},
                 {"DIST_L1","cv::DIST_L1"},
                 --{"DIST_C","cv::DIST_C"},

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <limits>
 #include <cassert>
+#include <algorithm>
 #include <OpenCVUtility.hpp>
 
 class MainWindow::_PrivateMainWindow {
@@ -233,7 +234,38 @@ public:
 public:
     template<typename _Tb,typename _Te>
     SubImageShowWidget(const _Tb & arg_b,const _Te& arg_e) {
+        /*将数据点转为opencv可识别类型*/
         data_points2d=toCVFloat32Point2Vector(arg_b,arg_e);
+        {
+            auto sort_function=[](const auto & a,const auto & b) {
+                if (a.x<b.x) { return true; }
+                if (b.x<a.x) { return false; }
+                return a.y<b.y;
+            };
+
+            auto unique_function=[](const auto & a,const auto & b) {
+                if (a.x==b.x) {
+                    return a.y==b.y;
+                }
+                return false;
+            };
+
+            /*删除重复点,减少计算量*/
+            std::sort(data_points2d.begin(),data_points2d.end(),
+                sort_function);
+
+            data_points2d.erase(
+            std::unique(data_points2d.begin(),data_points2d.end(),
+                unique_function),
+                data_points2d.end()  
+            );
+
+            /*有效点太少*/
+            if (data_points2d.size()<2) {
+                return;
+            }
+
+        }
         using namespace memory;
         /*设置散点视图*/
         auto&& view=makeStackPointer<DataChartView>();

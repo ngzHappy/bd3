@@ -10,7 +10,7 @@ local noise_function=function(arg)
 	arg = normal_function( arg );
 	local x=arg[1];
 	local y=arg[2];
-	return {x,y-3};
+	return {x,y+3};
 end
 
 local application={
