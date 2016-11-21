@@ -2,19 +2,19 @@
 #include "MainWindow.hpp"
 #include <OpenCVUtility.hpp>
 
-class MainWindow::_PrivateMainWindow{
+class MainWindow::_PrivateMainWindow {
 public:
 private:
     CPLUSPLUS_OBJECT(_PrivateMainWindow)
 };
 
-MainWindow::MainWindow(QWidget *parent) :
-    _Super(parent){
+MainWindow::MainWindow(QWidget *parent):
+    _Super(parent) {
     _thisp=new _PrivateMainWindow;
 }
 
-MainWindow::~MainWindow(){
-     delete _thisp;
+MainWindow::~MainWindow() {
+    delete _thisp;
 }
 
 /*write your code here*/
@@ -22,18 +22,19 @@ QWidget* MainWindow::addImage(const QImage &arg) {
     return _Super::addImage(arg);
 }
 
-void MainWindow::openLua(){
-    
+void MainWindow::openLua() {
+
     auto points2d=qApp->getPoint2d();
     auto cvPoionts2d=toCVFloat32Point2Vector(points2d.first,points2d.second);
     using namespace memory;
 
     auto && mainWidget=
-    makeStackPointer<ImageShowWidget>();
-    this->addWidget(mainWidget.release());
+        makeStackPointer<ImageShowWidget>();
+    this->addWidget(mainWidget.release())
+        ->resize(512,512);
 
     auto &&chartView=
-    makeStackPointer<DataChartView>();
+        makeStackPointer<DataChartView>();
     mainWidget->setChartView(chartView.release());
 
     auto series=addScatterSeries(chartView->dataChart(),
@@ -41,12 +42,14 @@ void MainWindow::openLua(){
         points2d.second);
 
     series->setPen(QPen(QColor(0,0,0,0),0));
-    series->setMarkerSize(6);    
+    series->setBrush(QColor(210,26,36));
+    series->setMarkerSize(6);
+    mainWidget;
 
     try {
 
         cv::Mat inputMat(
-            cvPoionts2d.size(),
+            cvPoionts2d.size()/*std::vector<cv::cv::Point2f>*/,
             2,
             cv::DataType<cv::Point2f::value_type>::type,
             cvPoionts2d.data()
