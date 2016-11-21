@@ -68,6 +68,32 @@ inline MainState::~MainState() {
 
 #include <vector>
 
+class TestDrawCallBack :public AbstractImageShift{
+public:
+    QImage run(const QImage&arg) const override{
+        try {
+            QOpencvImage var(arg);
+            cv::Mat refMat=var.toOpencvRef();
+            cv::flip(refMat,refMat,-1);
+            return var;
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(true);
+        }
+        return arg;
+    }
+
+    virtual void paint(
+        QPainter * painter,
+        const QSize & size) override{
+        painter->setBrush(QColor(0,0,0,0));
+        painter->setPen(QPen(QColor(0,0,0),3));
+        painter->drawRect(QRect(QPoint(0,0),size));
+        }
+private:
+    CPLUSPLUS_OBJECT(TestDrawCallBack)
+};
+
 int main(int argc,char *argv[])try {
 
     auto varMainState=
@@ -80,18 +106,7 @@ int main(int argc,char *argv[])try {
     {
         auto var=new ImageShowWidget;
         var->setImage(QImage(":/0x000000.jpg"));
-        var->setAlgorithm([](const QImage & arg)->QImage {
-            try {
-                QOpencvImage var(arg);
-                cv::Mat refMat=var.toOpencvRef();
-                cv::flip(refMat,refMat,-1);
-                return var;
-            }
-            catch (...) {
-                CPLUSPLUS_EXCEPTION(true);
-            }
-            return arg;
-        });
+        var->setAlgorithm(memory::make_shared<TestDrawCallBack>());
 
         {
             auto cv=new DataChartView;

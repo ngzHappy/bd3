@@ -102,10 +102,22 @@ void PlainImageView::paintEvent(QPaintEvent *) {
         QPainter::SmoothPixmapTransform|
         QPainter::Antialiasing
     );
-    painter.drawPixmap(
+
+    QPoint varDrawPoint{
         std::max(0,(this->size().width()-varDrawSize.width())/2),
-        std::max(0,(this->size().height()-varDrawSize.height())/2),
-        _pm_DrawImage);
+        std::max(0,(this->size().height()-varDrawSize.height())/2)
+    };
+    painter.drawPixmap(varDrawPoint,_pm_DrawImage);
+
+    try {
+        if (_pm->alg) {/*只有平移*/
+            painter.translate(varDrawPoint);
+            _pm->alg->paint(&painter,varDrawSize);
+        }
+    }
+    catch (...) {
+        CPLUSPLUS_EXCEPTION(false);
+    }
 
 }
 
