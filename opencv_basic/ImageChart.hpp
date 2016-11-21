@@ -26,7 +26,7 @@ public:
         inline void setAlgorithm(_A_&&);
 
     template<typename _A_,typename=_void_t<
-        decltype(std::declval<_A_&&>()->run(std::declval<const QImage&>()))>,
+        decltype((std::declval<_A_&&>())->run(std::declval<const QImage&>()))>,
         typename=double*>
         inline void setAlgorithm(_A_&&arg) {
         _p_setAlgorithm(std::forward<_A_>(arg));

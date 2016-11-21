@@ -11,7 +11,7 @@ public:
     virtual ~AbstractImageShift()=default;
 public:
     virtual QImage run(const QImage&) const=0;
-    virtual void paint(QPainter *,const QSize &/*image size*/){
+    virtual void paint(QPainter *,const QSizeF &/*image size or axis size*/){
         /*gui系统先调用run,再调用paint*/}
 private:
     CPLUSPLUS_OBJECT(AbstractImageShift)

@@ -68,9 +68,9 @@ inline MainState::~MainState() {
 
 #include <vector>
 
-class TestDrawCallBack :public AbstractImageShift{
+class TestDrawCallBack :public AbstractImageShift {
 public:
-    QImage run(const QImage&arg) const override{
+    QImage run(const QImage&arg) const override {
         try {
             QOpencvImage var(arg);
             cv::Mat refMat=var.toOpencvRef();
@@ -85,11 +85,11 @@ public:
 
     virtual void paint(
         QPainter * painter,
-        const QSize & size) override{
+        const QSizeF & size) override {
         painter->setBrush(QColor(0,0,0,0));
         painter->setPen(QPen(QColor(0,0,0),3));
-        painter->drawRect(QRect(QPoint(0,0),size));
-        }
+        painter->drawRect(QRect(QPoint(0,0),size.toSize()));
+    }
 private:
     CPLUSPLUS_OBJECT(TestDrawCallBack)
 };

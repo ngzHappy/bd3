@@ -74,12 +74,12 @@ private:
     CPLUSPLUS_OBJECT(_PrivateImageChart)
 };
 
-ImageChart::~ImageChart(){
+ImageChart::~ImageChart() {
     delete _mp;
 }
 
 ImageChart::ImageChart(QGraphicsItem *parent,Qt::WindowFlags wFlags)
-    :_Super(parent,wFlags){
+    :_Super(parent,wFlags) {
     setBackgroundVisible(false);
     _mp=new _PrivateImageChart;
 }
@@ -87,9 +87,9 @@ ImageChart::ImageChart(QGraphicsItem *parent,Qt::WindowFlags wFlags)
 void ImageChart::paint(
     QPainter *painterx,
     const QStyleOptionGraphicsItem *option,
-    QWidget *widget){
-   
-    if (_mp->drawImage.isNull()) { 
+    QWidget *widget) {
+
+    if (_mp->drawImage.isNull()) {
         return  _Super::paint(painterx,option,widget);
     }
 
@@ -109,6 +109,27 @@ void ImageChart::paint(
         QPainter & painter=*painterx;
         painter.drawPixmap(varPloatArea.x(),varPloatArea.y(),_pm_DrawImage);
 
+        try {
+            const auto varDrawSize=varPloatArea.size();
+            const auto varDrawPos=varPloatArea.topLeft();
+            if (_mp->algorithm) {
+                if (varDrawSize==_mp->oldImage.size()) {/*只有平移*/
+                    painter.translate(varDrawPos);
+                    _mp->algorithm->paint(&painter,varPloatArea.size());
+                }
+                else {
+                    const QSizeF oSize=_mp->oldImage.size();
+                    painter.translate(varDrawPos);
+                    painter.scale(varDrawSize.width()/oSize.width(),
+                        varDrawSize.height()/oSize.height());
+                    _mp->algorithm->paint(&painter,oSize.toSize());
+                }
+            }
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+
     }
     else {
         /*坐标轴有误*/
@@ -120,34 +141,44 @@ void ImageChart::paint(
         auto varDrawSize=__private::imageResizeSize(
             varImage.size(),varSize);
 
-        if (varDrawSize==_pm_DrawImage.size()) {
-            QPainter & painter=*painterx;
-            painter.setRenderHints(
-                QPainter::HighQualityAntialiasing|
-                QPainter::TextAntialiasing|
-                QPainter::SmoothPixmapTransform|
-                QPainter::Antialiasing
-            );
-            painter.drawPixmap(
-                std::max(0,(varSize.width()-varDrawSize.width())/2),
-                std::max(0,(varSize.height()-varDrawSize.height())/2),
-                _pm_DrawImage);
-        }
-        else {
+        if (varDrawSize!=_pm_DrawImage.size()) {
             _pm_DrawImage=QPixmap::fromImage(varImage.scaled(varDrawSize,
                 Qt::IgnoreAspectRatio,
                 Qt::SmoothTransformation));
-            QPainter & painter=*painterx;
-            painter.setRenderHints(
-                QPainter::HighQualityAntialiasing|
-                QPainter::TextAntialiasing|
-                QPainter::SmoothPixmapTransform
-            );
-            painter.drawPixmap(
-                std::max(0,(varSize.width()-varDrawSize.width())/2),
-                std::max(0,(varSize.height()-varDrawSize.height())/2),
-                _pm_DrawImage);
         }
+
+        QPainter & painter=*painterx;
+        painter.setRenderHints(
+            QPainter::HighQualityAntialiasing|
+            QPainter::TextAntialiasing|
+            QPainter::SmoothPixmapTransform
+        );
+
+        QPoint varDrawPos={
+            std::max(0,(varSize.width()-varDrawSize.width())/2),
+            std::max(0,(varSize.height()-varDrawSize.height())/2)
+        };
+        painter.drawPixmap(varDrawPos,_pm_DrawImage);
+
+        try {
+            if (_mp->algorithm) {
+                if (varDrawSize==_mp->oldImage.size()) {/*只有平移*/
+                    painter.translate(varDrawPos);
+                    _mp->algorithm->paint(&painter,varDrawSize);
+                }
+                else {
+                    const QSizeF oSize=_mp->oldImage.size();
+                    painter.translate(varDrawPos);
+                    painter.scale(varDrawSize.width()/oSize.width(),
+                        varDrawSize.height()/oSize.height());
+                    _mp->algorithm->paint(&painter,oSize.toSize());
+                }
+            }
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+
     }
 
     _Super::paint(painterx,option,widget);
@@ -219,7 +250,7 @@ bool ImageChart::_p_update_axis() {
     auto varAxisY=this->imageYAxis();
 
     if (varAxisX&&varAxisY) {
-    
+
         if ((varAxisX->min()==0)&&(0==varAxisY->min())) {
             if (std::abs(varAxisX->max()-varIWidth)<0.5) {
                 if (std::abs(varAxisY->max()-varIHeight)<0.5) {
