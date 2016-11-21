@@ -25,7 +25,8 @@ SOURCES += \
     QOpencvImage.cpp \
     OpencvMainWindow.cpp \
     OpencvApplication.cpp \
-    DataChartView.cpp
+    DataChartView.cpp \
+    DataChart.cpp
 
 HEADERS += \
     OpenCVBasic.hpp \
@@ -42,7 +43,8 @@ HEADERS += \
     QOpencvImage.hpp \
     OpencvMainWindow.hpp \
     OpencvApplication.hpp \
-    DataChartView.hpp
+    DataChartView.hpp \
+    DataChart.hpp
 
 include($$PWD/opencv_basic.pri)
 

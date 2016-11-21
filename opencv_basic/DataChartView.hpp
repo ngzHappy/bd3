@@ -2,7 +2,7 @@
 #define DATACHARTVIEW_HPP
 
 #include "ChartView.hpp"
-#include "ChartBasic.hpp"
+#include "DataChart.hpp"
 
 class OPENCV3_BASICHARED_EXPORT DataChartView : public ChartView
 {
@@ -14,8 +14,8 @@ private:
 public:
     DataChartView(QWidget * parent=nullptr);
 
-    ChartBasic * dataChart()const{
-        return static_cast<ChartBasic *>(chart());}
+    DataChart * dataChart()const{
+        return static_cast<DataChart *>(chart());}
 
 private:
     CPLUSPLUS_OBJECT(DataChartView)

@@ -5,16 +5,21 @@ class QPainter;
 #include <QtGui/qimage.h>
 #include "OpenCVBasic.hpp"
 
-class AbstractImageShift {
+class AbstractDrawFunction{
+public:
+    virtual ~AbstractDrawFunction()=default;
+    virtual void paint(QPainter *,const QSizeF &/*image size or axis size*/)=0;
+};
+
+class AbstractImageShift :public AbstractDrawFunction{
 public:
     AbstractImageShift()=default;
     virtual ~AbstractImageShift()=default;
 public:
     virtual QImage run(const QImage&) const=0;
-    virtual void paint(QPainter *,const QSizeF &/*image size or axis size*/){
+    virtual void paint(QPainter *,const QSizeF &/*image size or axis size*/) override{
         /*gui系统先调用run,再调用paint*/}
 private:
-    CPLUSPLUS_OBJECT(AbstractImageShift)
 };
 
 #endif // ABSTRACTIMAGESHIFT_HPP
