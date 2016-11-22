@@ -39,9 +39,9 @@ class SubImageShowWidget :public ImageShowWidget {
         typedef std::numeric_limits<_value_type> _lt_;
         static_assert(_lt_::has_infinity,"");
         static_assert(_lt_::has_quiet_NaN,"");
-        constexpr static auto _nan() { return _lt_::quiet_NaN(); }
-        constexpr static auto _inf() { return _lt_::infinity(); }
-        constexpr static auto _negative_inf() { return -_inf(); }
+        constexpr static auto __nan() { return _lt_::quiet_NaN(); }
+        constexpr static auto __inf() { return _lt_::infinity(); }
+        constexpr static auto _negative_inf() { return -__inf(); }
         template<typename __I_>
         static bool _isNan(__I_&&arg) { return std::isnan(arg); }
         template<typename __I_>
@@ -257,7 +257,7 @@ public:
             data_points2d.erase(
             std::unique(data_points2d.begin(),data_points2d.end(),
                 unique_function),
-                data_points2d.end()  
+                data_points2d.end()
             );
 
             /*有效点太少*/
@@ -347,7 +347,7 @@ public:
         auto & chart=data_chart;
         QVector<QPointF> points;
         points.resize(2);
-        
+
         {
             const LineCutXYBox<qreal>eval(
                 chart->imageXAxis()->min(),
@@ -359,7 +359,7 @@ public:
                 reinterpret_cast<qreal*>(points.data())
             );
         }
-        
+
         auto & line=data_line;
         if (line) {
             line->replace(points);
