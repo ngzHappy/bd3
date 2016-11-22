@@ -35,6 +35,7 @@ public:
 
     const QImage &getImage() const;
     const QImage &getAlgorithmImage()const;
+    QImage getPaintedAlgorithmImage()const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});
     QDockWidget* addImageWidget(QWidget* aw_a_1,Qt::DockWidgetArea ad_b_2,const QString&as_c_3=QString{}) {
         return _p_addImageWidget(aw_a_1,ad_b_2,as_c_3);

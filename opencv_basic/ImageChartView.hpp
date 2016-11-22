@@ -25,6 +25,7 @@ public:
     ImageChart * setImage(const QImage &,bool _copy=true);
     const QImage &getImage()const;
     const QImage &getAlgorithmImage()const;
+    QImage getPaintedAlgorithmImage()const;
     const std::shared_ptr<AbstractImageShift>&getAlgorithm()const;
 
     template<typename _A_,typename=_void_t<

@@ -197,7 +197,28 @@ const QImage & PlainImageView::getImage()const {
     return _pm->old_image;
 }
 
+QImage PlainImageView::getPaintedAlgorithmImage()const {
+    QImage varAns=_pm->imageToDraw.copy();
+    if (varAns.isNull()) {
+        return{};
+    }
 
+    if (_pm->alg) {
+        QPainter painter(&varAns);
+        painter.setRenderHints(QPainter::HighQualityAntialiasing|
+            QPainter::Antialiasing|
+            QPainter::TextAntialiasing|
+            QPainter::SmoothPixmapTransform);
+        try {
+            _pm->alg->paint(&painter,
+                varAns.size());
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    }
+    return std::move(varAns);
+}
 
 
 

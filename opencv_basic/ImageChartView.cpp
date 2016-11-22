@@ -34,6 +34,10 @@ const QImage &ImageChartView::getAlgorithmImage()const {
     return _mp_image_chart->getAlgorithmImage();
 }
 
+QImage ImageChartView::getPaintedAlgorithmImage()const {
+    return _mp_image_chart->getPaintedAlgorithmImage();
+}
+
 const std::shared_ptr<AbstractImageShift>&
 ImageChartView::getAlgorithm()const {
     return _mp_image_chart->getAlgorithm();

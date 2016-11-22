@@ -4,12 +4,12 @@
 #include "ChartBasic.hpp"
 class AbstractDrawFunction;
 
-class OPENCV3_BASICHARED_EXPORT DataChart : public ChartBasic
-{
+class OPENCV3_BASICHARED_EXPORT DataChart : public ChartBasic {
     Q_OBJECT
 
 private:
     using _Super=ChartBasic;
+public:
     using DrawFunctionType=std::shared_ptr<AbstractDrawFunction>;
     DrawFunctionType _drawFunction;
 public:
@@ -19,7 +19,7 @@ public:
     const  DrawFunctionType & getDrawFunction() const { return _drawFunction; }
     void setDrawFunction(DrawFunctionType &&);
     void setDrawFunction(const DrawFunctionType &arg) {
-        setDrawFunction(DrawFunctionType{arg});
+        setDrawFunction(DrawFunctionType{ arg });
     }
 
 public:

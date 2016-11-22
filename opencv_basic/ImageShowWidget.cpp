@@ -274,6 +274,7 @@ void save_image(
             fileName+=QLatin1Literal(".png",4);
         }
     }
+    /*开线程保存图片*/
     std::thread([aboutSave,fileName]() {
         aboutSave.save(fileName);
     }).detach();
@@ -316,6 +317,18 @@ ImageShowWidget::ImageShowWidget(
             connect(varAction.pointer(),&QAction::triggered,
                 this,[this,varTitle](bool) {
                 __private::save_image(this,varTitle,getImage());
+            });
+        }
+
+        {
+            auto varTitle=u8R"~=:;:=~(保存绘制之后的变换图片)~=:;:=~"_qs;
+            auto &&varAction=memory::makeStackPointer<__private::Action>();
+            varMenu->addAction(varAction.release());
+            varAction->setText(varTitle);
+            connect(varAction.pointer(),&QAction::triggered,
+                this,[this,varTitle](bool) {
+                __private::save_image(this,varTitle,
+                    getPaintedAlgorithmImage());
             });
         }
 
@@ -496,6 +509,16 @@ const QImage &ImageShowWidget::getAlgorithmImage()const {
     }
     static memory::StaticPoionter<QImage> _null__(_d_null);
     return *_null__;
+}
+
+QImage ImageShowWidget::getPaintedAlgorithmImage()const {
+    if (_pm_this_data->centralWidget) {
+        return _pm_this_data->centralWidget->getPaintedAlgorithmImage();
+    }
+    else if (_pm_this_data->chartCentralWidget) {
+        return _pm_this_data->chartCentralWidget->getPaintedAlgorithmImage();
+    }
+    return{};
 }
 
 inline ImageShowWidget::_PrivateImageShowWidget::_PrivateImageShowWidget() {

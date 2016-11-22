@@ -20,6 +20,7 @@ public:
     void setImage(const QImage &,bool/*copy*/=true);
     const QImage & getImage()const;
     const QImage & getAlgorithmImage()const;
+    QImage getPaintedAlgorithmImage()const;
 
     const std::shared_ptr<AbstractImageShift> & getAlgorithm()const;
 

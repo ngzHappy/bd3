@@ -290,5 +290,27 @@ bool ImageChart::_p_update_axis() {
     return false;
 }
 
+QImage ImageChart::getPaintedAlgorithmImage()const {
+    QImage varAns=_mp->drawImage.copy();
+    if (varAns.isNull()) {
+        return{};
+    }
+
+    if (_mp->algorithm) {
+        QPainter painter(&varAns);
+        painter.setRenderHints(QPainter::HighQualityAntialiasing|
+        QPainter::Antialiasing|
+        QPainter::TextAntialiasing|
+        QPainter::SmoothPixmapTransform);
+        try {
+            _mp->algorithm->paint(&painter,
+                varAns.size());
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    }
+    return std::move(varAns);
+}
 
 
