@@ -24,47 +24,6 @@ QWidget* MainWindow::addImage(const QImage &arg) {
     return _Super::addImage(arg);
 }
 
-namespace {
-
-QList<QPointF> genEllipse(
-    const cv::RotatedRect & argRect,
-    bool argNeedClose=false) {
-    enum { SIZE=100 };
-    typedef double eval_type;
-    auto varSize=argRect.size;
-    if (varSize.width<=0) { return{}; }
-    if (varSize.height<=0) { return{}; }
-    QList<QPointF> varAns;
-    varAns.reserve(SIZE+argNeedClose);
-    const eval_type varA=varSize.width/2;
-    const eval_type varB=varSize.height/2;
-    constexpr const eval_type varStep=(3.141592654/SIZE)*2;
-    eval_type varAngle=0;
-    for (std::int_fast32_t i=0; i<SIZE; ++i) {
-        varAns.push_back({
-            varA*std::cos(varAngle),
-            varB*std::sin(varAngle) });
-        varAngle+=varStep;
-    }
-    varAngle=argRect.angle/180*3.141592654;
-    const eval_type a00=std::cos(varAngle);
-    const eval_type a10=std::sin(varAngle);
-    const eval_type a01=-a10;
-    const eval_type a11=a00;
-    const auto &varCenter=argRect.center;
-    for (auto & i:varAns) {
-        const eval_type varX=i.x()*a00+i.y()*a01+varCenter.x;
-        const eval_type varY=i.x()*a10+i.y()*a11+varCenter.y;
-        i.setX(varX); i.setY(varY);
-    }
-    if (argNeedClose) {
-        varAns.push_back(varAns.first());
-    }
-    return std::move(varAns);
-}
-
-}
-
 void MainWindow::openLua() {
     using namespace memory;
     /*获得数据*/
@@ -87,8 +46,8 @@ void MainWindow::openLua() {
     {
         auto series=
             addScatterSeries(chart,points2d.first,points2d.second);
-        series->setPen(QPen(QColor(233,6,2),0));
-        series->setBrush(QColor(233,6,2));
+        series->setPen(QPen(QColor(203,6,2,200),1));
+        series->setBrush(QColor(233,6,2,198/2));
     }
 
     addWidget(mainView.release())->resize(600,600);
@@ -106,10 +65,18 @@ void MainWindow::openLua() {
 
         auto rect=cv::fitEllipse(data);
 
-        {
-            addLineSeries(chart,genEllipse(rect,true))
-                ->setPen(QPen(QColor(2,215,4),1.6));
-        }
+        view->setDrawFunction([cx=static_cast<qreal>(rect.center.x),
+        cy=static_cast<qreal>(rect.center.y),
+        angle=static_cast<qreal>(rect.angle),
+        ewidth=rect.size.width/2.0,
+        eheight=rect.size.height/2.0](
+            QPainter * painter,const QSizeF&) {
+            painter->translate(cx,cy);
+            painter->rotate(angle/*deg*/);
+            painter->setPen(CosmeticQPen(QColor(0,0,0),2));
+            painter->drawEllipse({ 0,0 },ewidth,eheight);
+        });
+
     }
     catch (...) {
         CPLUSPLUS_EXCEPTION(false);

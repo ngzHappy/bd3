@@ -158,7 +158,7 @@ void ImageChart::paint(
         }
 
         QPainter & painter=*painterx;
-        painter.setRenderHints(
+        painter.setRenderHints(QPainter::Antialiasing|
             QPainter::HighQualityAntialiasing|
             QPainter::TextAntialiasing|
             QPainter::SmoothPixmapTransform
