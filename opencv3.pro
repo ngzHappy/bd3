@@ -40,3 +40,7 @@ opencv_simple_contour.file=$$PWD/opencv/opencv_simple_contour/opencv_simple_cont
 opencv_simple_contour.depends+=library_opencv_basic
 SUBDIRS += opencv_simple_contour
 
+opencv_minEnclosingCircle.file=$$PWD/opencv/opencv_point_algorithm/opencv_minEnclosingCircle/opencv_minEnclosingCircle.pro
+opencv_minEnclosingCircle.depends+=library_opencv_basic
+SUBDIRS += opencv_minEnclosingCircle
+
