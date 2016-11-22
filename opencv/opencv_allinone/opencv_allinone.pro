@@ -25,10 +25,6 @@ DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 
 DISTFILES += $$PWD/allinone.lua
 
-!win32 {
-    QMAKE_LFLAGS += -Wl,-rpath .
-}
-
 RESOURCES += $$PWD/qmlSource.qrc
 
 win32:{
