@@ -14,25 +14,11 @@ void DataChart::paint(
     if (_drawFunction) try {
         auto & painter=*painterx;
         painter.save();
-
-        QTransform xxx;
-       
-        xxx.translate( plotArea().topLeft().x(),
-            plotArea().topLeft().y()
-        ); 
-        xxx.scale(20,20);
-        
-        painter.setTransform(xxx);
-        
-
-        //QRectF viewPort={
-        //this->imageXAxis()->min(),
-        //this->imageYAxis()->min(),
-        //this->imageXAxis()->max()-this->imageXAxis()->min(),
-        //this->imageYAxis()->max()-this->imageYAxis()->min(),
-        //};
-        //painter.setViewport(viewPort.toRect());
-        //painter.setWindow(plotArea().toRect());
+             
+        auto translate_= this->mapToPosition({0,0});
+        auto scale_=this->mapToPosition({1,1})-translate_;
+        painter.translate(translate_);
+        painter.scale(scale_.x(),scale_.y());
 
         try {
             _drawFunction->paint(&painter,

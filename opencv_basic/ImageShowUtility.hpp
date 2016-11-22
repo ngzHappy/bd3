@@ -11,6 +11,7 @@ namespace QtCharts {}
 #include "ChartBasic.hpp"
 #include "OpenCVBasic.hpp"
 #include "QOpencvImage.hpp"
+#include "CosmeticQPen.hpp"
 #include "DataChartView.hpp"
 #include "PlainImageView.hpp"
 #include "ImageChartView.hpp"
@@ -129,7 +130,7 @@ inline void fitChartAxisRange(
     constexpr double m=0.05;
     using _type_t=qreal;
     if (b!=e) {
-        
+
         {
             auto xAxis=std::minmax_element(b,e,
                 [](const auto &x,const auto &y) {
