@@ -3,6 +3,7 @@
 
 #include "ChartView.hpp"
 #include "DataChart.hpp"
+#include "AbstractImageShift.hpp"
 
 class OPENCV3_BASICHARED_EXPORT DataChartView : public ChartView {
     Q_OBJECT
