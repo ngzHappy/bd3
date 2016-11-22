@@ -52,3 +52,7 @@ opencv_minEnclosingTriangle.file=$$PWD/opencv/opencv_point_algorithm/opencv_minE
 opencv_minEnclosingTriangle.depends+=library_opencv_basic
 SUBDIRS += opencv_minEnclosingTriangle
 
+opencv_PeterDeJongAttractor.file=$$PWD/opencv/opencv_PeterDeJongAttractor/opencv_PeterDeJongAttractor.pro
+opencv_PeterDeJongAttractor.depends+=library_opencv_basic
+SUBDIRS += opencv_PeterDeJongAttractor
+
