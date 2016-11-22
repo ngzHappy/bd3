@@ -613,6 +613,8 @@ inline auto prepbuffer(Buffer *B) ->char * { return prepbuffsize(B,LUAL_BUFFERSI
 
 }/*luaL*/
 
+#include "private/lua_print_table.hpp"
+#include "private/lua_deep_copy_table.hpp"
 #include "private/lua_default_error_function.hpp"
 
 #endif

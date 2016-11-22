@@ -5,14 +5,16 @@
 #include "lua_print_table.hpp"
 #include "lua_default_error_function.hpp"
 #include "3rd/double-conversion/include/double-conversion/double-conversion.h"
-#include <cstdlib>
-#include <string>
-#include <regex>
-#include <iostream>
+
 #include <map>
 #include <list>
+#include <regex>
 #include <vector>
+#include <string>
+#include <cstdlib>
 #include <sstream>
+#include <iostream>
+#include <cinttypes>
 
 namespace luaL {
 extern int default_error_function(lua_State * L);
@@ -29,11 +31,53 @@ inline auto get_default_lua_error_function() {
 namespace __private {
 
 using IntType=int;
-using string=std::basic_string<char,std::char_traits<char>,memory::Allocator<char>>;
+using basic_string=std::basic_string<char,std::char_traits<char>,memory::Allocator<char>>;
 using TablePath=std::list<IntType,memory::Allocator<int>>;
 
-constexpr const char * a_space() { return "    "; }
+class string_view {
+public:
+    const char * data;
+    size_t data_length;
+    constexpr string_view(const char *a,size_t b):data(a),
+    data_length(b){}
+    operator const char *()const { return data; }
+};
+
+class string :public basic_string{
+    using P=basic_string;
+public:
+    using P::P;
+    string(const string_view&arg):P(arg.data,arg.data_length) {}
+    string()=default;
+    string(const string&)=default;
+    string(string&&)=default;
+    string&operator=(const string&)=default;
+    string&operator=(string&&)=default;
+    string(const P &arg) :P(arg){}
+    string(P &&arg) :P(std::move(arg)){}
+};
+
+constexpr inline string_view operator""_s(const char * args,std::size_t argl) {
+    return{args,argl};
+}
+
+inline string &operator+(string &arg,const string_view &data) {
+    arg.append(data.data,data.data_length);
+    return arg;
+}
+
+inline string &operator+(const string_view &data,string &arg) {
+    string ans;
+    ans.reserve(data.data_length+arg.size());
+    ans.append(data.data,data.data_length);
+    ans+=arg;
+    return std::move(ans);
+}
+
 constexpr int a_space_length() { return 4; }
+constexpr string_view a_space() { return string_view("         ",
+    a_space_length()); }
+
 
 class Function {
     void *data_;
@@ -218,7 +262,7 @@ string to_string(lua::State*L,int k,_T_*) {
 
     if (length_==0) {
         lua::pop(L,1);
-        return{};
+        return string(u8R"_("")_"_s,2);
     }
 
     auto end_=data_+length_;
@@ -231,7 +275,7 @@ string to_string(lua::State*L,int k,_T_*) {
             }
         }
 
-        auto ans="\""+string(data_,length_)+"\"";
+        auto ans="\""_s+string(data_,length_)+"\""_s;
         lua::pop(L,1);
         return std::move(ans);
     }
@@ -265,11 +309,11 @@ template<typename _T_>
 string value_string(lua::State*L,int v,_T_*c) {
     lua::BaseTypes t=lua::type(L,v);
     switch (t) {
-        case lua::TNONE:return"nil"; break;
-        case lua::TNIL:return"nil"; break;
-        case lua::TBOOLEAN: if (lua::toboolean(L,v)) { return"true"; }
-                            else { return "false"; } break;
-        case lua::TLIGHTUSERDATA:return"[==[TLIGHTUSERDATA]==]"; break;
+        case lua::TNONE:return"nil"_s; break;
+        case lua::TNIL:return"nil"_s; break;
+        case lua::TBOOLEAN: if (lua::toboolean(L,v)) { return"true"_s; }
+                            else { return "false"_s; } break;
+        case lua::TLIGHTUSERDATA:return"[==[TLIGHTUSERDATA]==]"_s; break;
         case lua::TNUMBER:
             if (lua::isinteger(L,v)) {
                 auto i=lua::tointeger(L,v);
@@ -285,14 +329,14 @@ string value_string(lua::State*L,int v,_T_*c) {
             }
             break;
         case lua::TSTRING: return to_string(L,v,c); break;
-        case lua::TTABLE:return"[==[TTABLE]==]"; break;
-        case lua::TFUNCTION:return"function() end"; break;
-        case lua::TUSERDATA:return"[==[TUSERDATA]==]"; break;
-        case lua::TTHREAD:return"[==[TTHREAD]==]"; break;
-        case lua::NUMTAGS:return"[==[NUMTAGS]==]"; break;
+        case lua::TTABLE:return"[==[TTABLE]==]"_s; break;
+        case lua::TFUNCTION:return"function() end"_s; break;
+        case lua::TUSERDATA:return"[==[TUSERDATA]==]"_s; break;
+        case lua::TTHREAD:return"[==[TTHREAD]==]"_s; break;
+        case lua::NUMTAGS:return"[==[NUMTAGS]==]"_s; break;
         default:break;
     }
-    return{};
+    return{u8R"_("")_",2};
 }
 
 
@@ -585,7 +629,15 @@ public:
                     str.reserve(64);
                     if (keyItem.isArrayKeyContinue) {
                         str=value_string(L,value_,_m_DataPrintTable->callback);
+
+                        if (str.empty()) {/*空字符串*/
+                            str=string(u8R"("")",2);
+                        }
+#ifndef NDEBUG
+                        str+=" --[[value on debug--]],\n";
+#else
                         str+=" ,\n";
+#endif
                     }
                     else {
                         str=" [ ";

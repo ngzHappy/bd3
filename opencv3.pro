@@ -44,3 +44,6 @@ opencv_minEnclosingCircle.file=$$PWD/opencv/opencv_point_algorithm/opencv_minEnc
 opencv_minEnclosingCircle.depends+=library_opencv_basic
 SUBDIRS += opencv_minEnclosingCircle
 
+opencv_allinone.file=$$PWD/opencv/opencv_allinone/opencv_allinone.pro
+opencv_minEnclosingCircle.depends+=library_opencv_basic
+SUBDIRS += opencv_allinone
