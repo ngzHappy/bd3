@@ -119,7 +119,7 @@ void ImageChart::paint(
                     try {
                         _mp->algorithm->paint(&painter,varPloatArea.size());
                     }
-                    catch (...) { throw; }
+                    catch (...) { painter.restore(); throw; }
                     painter.restore();
                 }
                 else {
@@ -131,7 +131,7 @@ void ImageChart::paint(
                     try {
                         _mp->algorithm->paint(&painter,oSize.toSize());
                     }
-                    catch (...) { throw; }
+                    catch (...) { painter.restore(); throw; }
                     painter.restore();
                 }
             }
@@ -178,7 +178,7 @@ void ImageChart::paint(
                     try {
                         _mp->algorithm->paint(&painter,varDrawSize);
                     }
-                    catch (...) { throw; }
+                    catch (...) { painter.restore(); throw; }
                     painter.restore();
                 }
                 else {
@@ -190,7 +190,7 @@ void ImageChart::paint(
                     try {
                         _mp->algorithm->paint(&painter,oSize.toSize());
                     }
-                    catch (...) { throw; }
+                    catch (...) { painter.restore(); throw; }
                     painter.restore();
                 }
             }
