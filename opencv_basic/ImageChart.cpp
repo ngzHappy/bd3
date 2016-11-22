@@ -113,16 +113,26 @@ void ImageChart::paint(
             const auto varDrawSize=varPloatArea.size();
             const auto varDrawPos=varPloatArea.topLeft();
             if (_mp->algorithm) {
-                if (varDrawSize==_mp->oldImage.size()) {/*只有平移*/
+                if (varDrawSize==varImage.size()) {/*只有平移*/
+                    painter.save();
                     painter.translate(varDrawPos);
-                    _mp->algorithm->paint(&painter,varPloatArea.size());
+                    try {
+                        _mp->algorithm->paint(&painter,varPloatArea.size());
+                    }
+                    catch (...) { throw; }
+                    painter.restore();
                 }
                 else {
-                    const QSizeF oSize=_mp->oldImage.size();
+                    const QSizeF oSize=varImage.size();
+                    painter.save();
                     painter.translate(varDrawPos);
                     painter.scale(varDrawSize.width()/oSize.width(),
                         varDrawSize.height()/oSize.height());
-                    _mp->algorithm->paint(&painter,oSize.toSize());
+                    try {
+                        _mp->algorithm->paint(&painter,oSize.toSize());
+                    }
+                    catch (...) { throw; }
+                    painter.restore();
                 }
             }
         }
@@ -162,16 +172,26 @@ void ImageChart::paint(
 
         try {
             if (_mp->algorithm) {
-                if (varDrawSize==_mp->oldImage.size()) {/*只有平移*/
+                if (varDrawSize==varImage.size()) {/*只有平移*/
+                    painter.save();
                     painter.translate(varDrawPos);
-                    _mp->algorithm->paint(&painter,varDrawSize);
+                    try {
+                        _mp->algorithm->paint(&painter,varDrawSize);
+                    }
+                    catch (...) { throw; }
+                    painter.restore();
                 }
                 else {
-                    const QSizeF oSize=_mp->oldImage.size();
+                    const QSizeF oSize=varImage.size();
+                    painter.save();
                     painter.translate(varDrawPos);
                     painter.scale(varDrawSize.width()/oSize.width(),
                         varDrawSize.height()/oSize.height());
-                    _mp->algorithm->paint(&painter,oSize.toSize());
+                    try {
+                        _mp->algorithm->paint(&painter,oSize.toSize());
+                    }
+                    catch (...) { throw; }
+                    painter.restore();
                 }
             }
         }

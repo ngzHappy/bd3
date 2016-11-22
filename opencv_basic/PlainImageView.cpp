@@ -111,12 +111,12 @@ void PlainImageView::paintEvent(QPaintEvent *) {
 
     try {
         if (_pm->alg) {
-            if (varDrawSize==_pm->old_image.size()) {/*只有平移*/
+            if (varDrawSize==varImage.size()) {/*只有平移*/
                 painter.translate(varDrawPoint);
                 _pm->alg->paint(&painter,varDrawSize);
             }
             else {
-                const QSizeF oSize=_pm->old_image.size();
+                const QSizeF oSize=varImage.size();
                 painter.translate(varDrawPoint);
                 painter.scale(varDrawSize.width()/oSize.width(),
                     varDrawSize.height()/oSize.height());
