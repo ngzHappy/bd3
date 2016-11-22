@@ -6,6 +6,14 @@ local function make_write_endl(file)
     end
 end 
 
+local function make_x(angle)
+    return 7*math.sin(angle)+math.random()
+end 
+
+local function make_y(angle)
+    return 7*math.cos(angle)+math.random()
+end 
+
 local function make_test_data()
     
     local file = io.open("opencv_minEnclosingCircle.lua","w")
@@ -26,15 +34,18 @@ end
     file:write("input_data_2d={")
     write_endl()
 
-    local pi2 =2*math.pi;
+    local points_count = 36
+    local step=2*math.pi/points_count;
+    local angle = 0;
     
-    for i=1,36 do
-        file:write("normal_data_function( { ")
-        file:write(7*math.sin(pi2/i)+math.random())
-        file:write(" , ")
-        file:write(7*math.cos(pi2/i)+math.random())
-        file:write(" } ) , ")
-        write_endl()
+    for i=1,points_count do
+        angle=angle+step;
+        file:write("normal_data_function( { ");
+        file:write(make_x(angle));
+        file:write(" , ");
+        file:write(make_y(angle));
+        file:write(" } ) , ");
+        write_endl();
     end
 
     file:write("},--[[input_daga_2d]]")--input_daga_2d

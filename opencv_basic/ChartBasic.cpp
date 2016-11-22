@@ -34,6 +34,8 @@ ChartBasic::ChartBasic(
     this->setAnimationOptions(QChart::SeriesAnimations);
     auto varLegend=legend();
     varLegend->setVisible(false);
+    setPlotAreaBackgroundVisible(false);
+    setBackgroundVisible(false);
 }
 
 

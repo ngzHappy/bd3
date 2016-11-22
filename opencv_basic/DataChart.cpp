@@ -1,9 +1,10 @@
 ﻿#include "DataChart.hpp"
 #include "AbstractImageShift.hpp"
 #include <QtGui/qpainter.h>
+#include <QtCharts/qvalueaxis.h>
 
-DataChart::DataChart(QGraphicsItem *parent, Qt::WindowFlags wFlags):
-    _Super(parent,wFlags){
+DataChart::DataChart(QGraphicsItem *parent,Qt::WindowFlags wFlags):
+    _Super(parent,wFlags) {
 
 }
 
@@ -13,7 +14,26 @@ void DataChart::paint(
     if (_drawFunction) try {
         auto & painter=*painterx;
         painter.save();
-        painter.translate(plotArea().topLeft());
+
+        QTransform xxx;
+       
+        xxx.translate( plotArea().topLeft().x(),
+            plotArea().topLeft().y()
+        ); 
+        xxx.scale(20,20);
+        
+        painter.setTransform(xxx);
+        
+
+        //QRectF viewPort={
+        //this->imageXAxis()->min(),
+        //this->imageYAxis()->min(),
+        //this->imageXAxis()->max()-this->imageXAxis()->min(),
+        //this->imageYAxis()->max()-this->imageYAxis()->min(),
+        //};
+        //painter.setViewport(viewPort.toRect());
+        //painter.setWindow(plotArea().toRect());
+
         try {
             _drawFunction->paint(&painter,
                 plotArea().size());
@@ -30,7 +50,7 @@ void DataChart::paint(
     return _Super::paint(painterx,a,b);
 }
 
-DataChart::~DataChart(){
+DataChart::~DataChart() {
 
 }
 

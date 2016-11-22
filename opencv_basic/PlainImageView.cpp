@@ -118,7 +118,8 @@ void PlainImageView::paintEvent(QPaintEvent *) {
             else {
                 const QSizeF oSize=varImage.size();
                 painter.translate(varDrawPoint);
-                painter.scale(varDrawSize.width()/oSize.width(),
+                painter.scale(
+                    varDrawSize.width()/oSize.width(),
                     varDrawSize.height()/oSize.height());
                 _pm->alg->paint(&painter,oSize.toSize());
             }
