@@ -1,8 +1,8 @@
 ﻿#ifndef COSMETICQPEN_HPP
 #define COSMETICQPEN_HPP
 
-#include <memory>
 #include <QtGui/qpen.h>
+#include <cplusplus_basic.hpp>
 
 class CosmeticQPen :public QPen {
     void _p_construct_() {
@@ -27,6 +27,8 @@ public:
     CosmeticQPen(CosmeticQPen&&)=default;
     CosmeticQPen&operator=(const CosmeticQPen&)=default;
     CosmeticQPen&operator=(CosmeticQPen&&)=default;
+private:
+    CPLUSPLUS_OBJECT(CosmeticQPen)
 };
 
 #endif // COSMETICQPEN_HPP
