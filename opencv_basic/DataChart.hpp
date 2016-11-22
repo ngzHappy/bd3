@@ -10,10 +10,18 @@ class OPENCV3_BASICHARED_EXPORT DataChart : public ChartBasic
 
 private:
     using _Super=ChartBasic;
-    std::shared_ptr<AbstractDrawFunction> _drawFunction;
+    using DrawFunctionType=std::shared_ptr<AbstractDrawFunction>;
+    DrawFunctionType _drawFunction;
 public:
     DataChart(QGraphicsItem *parent=nullptr,Qt::WindowFlags wFlags=Qt::WindowFlags());
     ~DataChart();
+
+    const  DrawFunctionType & getDrawFunction() const { return _drawFunction; }
+    void setDrawFunction(DrawFunctionType &&);
+    void setDrawFunction(const DrawFunctionType &arg) {
+        setDrawFunction(DrawFunctionType{arg});
+    }
+
 public:
     Q_SIGNAL void algorithmChanged();
 protected:
