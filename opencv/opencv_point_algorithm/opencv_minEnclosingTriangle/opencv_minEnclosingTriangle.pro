@@ -21,7 +21,7 @@ FORMS    +=
 RESOURCES +=
 
 DISTFILES += \
-    $$PWD/minEnclosingTriangle.lua
+    $$PWD/opencv_minEnclosingTriangle.lua
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 
