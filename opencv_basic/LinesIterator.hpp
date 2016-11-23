@@ -1,6 +1,8 @@
 ﻿#ifndef LINESITERATOR_HPP_0x000001
 #define LINESITERATOR_HPP_0x000001
 
+#include <cplusplus_basic.hpp>
+
 namespace _pns_private {
 namespace _pns_opencv_utility {
 
@@ -219,8 +221,12 @@ public:
                 (this->_mp_begin_pointer<=this->_mp_current_pointer);
     }
 
+private:
+    CPLUSPLUS_OBJECT(LinesIterator)
 };
 
+extern template class LinesIterator<true>;
+extern template class LinesIterator<false>;
 
 }/*_pns_opencv_utility*/
 }/*_pns_private*/
