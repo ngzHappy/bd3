@@ -91,12 +91,12 @@ public:
 
     void goNext() {
         _mp_current_pointer+=_mp_step;
-        _mp_current_line+=1;
+        ++_mp_current_line;
     }
 
     void goPrevious() {
         _mp_current_pointer-=_mp_step;
-        _mp_current_line-=1;
+        --_mp_current_line;
     }
 
     void goNext(_p_int_t arg) {
