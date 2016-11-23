@@ -56,3 +56,7 @@ opencv_PeterDeJongAttractor.file=$$PWD/opencv/opencv_PeterDeJongAttractor/opencv
 opencv_PeterDeJongAttractor.depends+=library_opencv_basic
 SUBDIRS += opencv_PeterDeJongAttractor
 
+opencv_simulateFire.file=$$PWD/opencv/opencv_simulateFire/opencv_simulateFire.pro
+opencv_simulateFire.depends+=library_opencv_basic
+SUBDIRS += opencv_simulateFire
+

@@ -12,7 +12,7 @@
 #endif
 
 #ifndef CPLUSPLUS_EXCEPTION
-#define CPLUSPLUS_EXCEPTION(_is_quit_) exception::exception_handle((_is_quit_),__LINE__,__func__,__FILE__)
+#define CPLUSPLUS_EXCEPTION(_is_quit_) exception::exception_handle(static_cast<bool>(_is_quit_),__LINE__,__func__,__FILE__)
 #endif // !CPLUSPLUS_EXCEPTION
 
 #endif
