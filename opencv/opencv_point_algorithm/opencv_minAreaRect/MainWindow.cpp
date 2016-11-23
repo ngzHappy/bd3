@@ -44,7 +44,6 @@ void MainWindow::openLua() {
     series->setPen(QPen(QColor(0,0,0,0),0));
     series->setBrush(QColor(210,26,36));
     series->setMarkerSize(6);
-    mainWidget;
 
     try {
 
