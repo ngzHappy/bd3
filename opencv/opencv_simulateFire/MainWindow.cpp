@@ -63,7 +63,7 @@ public:
     }
 
     void updateFireView() {
-
+         
         double not_used=0;
         /*更新数据*/
         auto data_p=fireData.data;

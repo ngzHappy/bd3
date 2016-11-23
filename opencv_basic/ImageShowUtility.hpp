@@ -12,6 +12,7 @@ namespace QtCharts {}
 #include "OpenCVBasic.hpp"
 #include "QOpencvImage.hpp"
 #include "CosmeticQPen.hpp"
+#include "LinesIterator.hpp"
 #include "DataChartView.hpp"
 #include "PlainImageView.hpp"
 #include "ImageChartView.hpp"

@@ -45,7 +45,8 @@ HEADERS += \
     OpencvApplication.hpp \
     DataChartView.hpp \
     DataChart.hpp \
-    CosmeticQPen.hpp
+    CosmeticQPen.hpp \
+    LinesIterator.hpp
 
 include($$PWD/opencv_basic.pri)
 
