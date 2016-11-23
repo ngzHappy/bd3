@@ -57,7 +57,7 @@ public:
     void timerEvent(QTimerEvent *e)override {
         if (e->timerId()==fireTimerID) {
             control+=0.05;
-            control=std::min(1.0,control);
+            if (control>1) { control=0; }
             updateFireView();
         }
     }
