@@ -17,11 +17,21 @@ MainWindow::~MainWindow(){
      delete _thisp;
 }
 
+namespace  {
 
+class ImageWidget :public ImageShowWidget {
+public:
+    ImageWidget(const QImage &){}
+private:
+    CPLUSPLUS_OBJECT(ImageWidget)
+};
+
+}/*namespace*/
 
 /*write your code here*/
 QWidget* MainWindow::addImage(const QImage &arg) {
-    return _Super::addImage(arg);
+    if( arg.isNull() ){ return nullptr; }
+
 }
 
 void MainWindow::openLua(){
