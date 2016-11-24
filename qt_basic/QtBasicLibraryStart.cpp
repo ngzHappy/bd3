@@ -24,7 +24,8 @@ static void _var() {
 static void _on_qt_start_up_0x99812() {
 
     std::srand(static_cast<int>(std::time(nullptr)));
-    std::thread(&_var).detach();
+    //std::thread(&_var).detach();
+    _var();
 
 }
 
