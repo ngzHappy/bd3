@@ -334,8 +334,6 @@ catch (...) {
         QTextStream textStream(&file);
         auto write_data=u8R"_!_(###$$$.pro
 
-###$$$.pro
-
 QT += core
 QT += gui
 QT += widgets
@@ -352,9 +350,9 @@ SOURCES += main.cpp \
 HEADERS  += MainWindow.hpp \
     Application.hpp
 
-FORMS    +=  
+FORMS    +=
 
-RESOURCES +=  
+RESOURCES +=
 
 DISTFILES += \
     $$PWD/$$$.lua
