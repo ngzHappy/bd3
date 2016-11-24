@@ -57,6 +57,8 @@ end
     file:write("return application")
     write_endl()
 
+    file:close()
+
 end
 
 make_test_data()

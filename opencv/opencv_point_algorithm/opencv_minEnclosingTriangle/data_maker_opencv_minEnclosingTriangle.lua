@@ -5,6 +5,12 @@ local function make_endl(file)
     end
 end
 
+local function make_close(file)
+    return function ()
+        file:close()
+    end
+end
+
 local function make_write(file)
     return function(str)
         file:write(str)
@@ -23,6 +29,7 @@ local function make_data()
     local file = io.open("opencv_minEnclosingTriangle.lua","w")
     local write = make_write(file)
     local endl = make_endl(file)
+    local close = make_close(file)
     local data_count = 100
     local data_step = 2*math.pi/data_count 
 
@@ -64,6 +71,8 @@ end
     endl()
     write("return application")
     endl()
+
+    close()
 
 end
 
