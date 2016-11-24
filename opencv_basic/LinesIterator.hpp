@@ -12,6 +12,7 @@ template<>
 class BasicLinesIterator<false> {
 protected:
     typedef unsigned char *_p_data_t;
+    typedef const unsigned char *_p_cdata_t;
     typedef int _p_int_t;
     _p_data_t _mp_begin_pointer;
     _p_data_t _mp_current_pointer;
@@ -27,16 +28,26 @@ public:
         _mp_begin_pointer(nullptr),
         _mp_current_pointer(nullptr),
         _mp_end_pointer(nullptr),
-        _mp_step(0){}
+        _mp_step(0) {
+    }
 
-    BasicLinesIterator(
-            const _p_data_t begin_arg,
+    BasicLinesIterator(_p_cdata_t begin_arg,
             _p_int_t line_size_arg,
             _p_int_t step_arg):
         _mp_begin_pointer(const_cast<_p_data_t>(begin_arg)),
         _mp_current_pointer(const_cast<_p_data_t>(begin_arg)),
         _mp_end_pointer(const_cast<_p_data_t>(begin_arg)
                         +(line_size_arg*step_arg)),
+        _mp_step(step_arg) {
+    }
+
+
+    BasicLinesIterator(_p_data_t begin_arg,
+        _p_int_t line_size_arg,
+        _p_int_t step_arg):
+        _mp_begin_pointer(begin_arg),
+        _mp_current_pointer(begin_arg),
+        _mp_end_pointer(begin_arg+(line_size_arg*step_arg)),
         _mp_step(step_arg) {
     }
 
@@ -76,11 +87,20 @@ public:
 
     BasicLinesIterator():
         _mp_current_line(0),
-        _mp_lines_count(0){}
+        _mp_lines_count(0) {
+    }
 
-    BasicLinesIterator(const _p_data_t begin_arg,
+    BasicLinesIterator(_p_cdata_t begin_arg,
                        _p_int_t line_size_arg,
                        _p_int_t step_arg):
+        _Super(begin_arg,line_size_arg,step_arg),
+        _mp_current_line(0),
+        _mp_lines_count(line_size_arg) {
+    }
+
+    BasicLinesIterator(_p_data_t begin_arg,
+        _p_int_t line_size_arg,
+        _p_int_t step_arg):
         _Super(begin_arg,line_size_arg,step_arg),
         _mp_current_line(0),
         _mp_lines_count(line_size_arg) {
@@ -126,13 +146,22 @@ class LinesIterator : public BasicLinesIterator<_HasLineNumber_> {
     using _Super=BasicLinesIterator<_HasLineNumber_>;
     using typename _Super::_p_data_t;
     using typename _Super::_p_int_t;
+    using typename _Super::_p_cdata_t;
 public:
 
     LinesIterator()=default;
-    LinesIterator(const _p_data_t begin_arg,
+    LinesIterator(const void * begin_arg,
                   _p_int_t line_size_arg,
                   _p_int_t step_arg)
-        :_Super(begin_arg,line_size_arg,step_arg) {
+        :_Super(reinterpret_cast<_p_cdata_t>(begin_arg),
+            line_size_arg,step_arg) {
+    }
+
+    LinesIterator(void * begin_arg,
+        _p_int_t line_size_arg,
+        _p_int_t step_arg)
+        :_Super(reinterpret_cast<_p_data_t>(begin_arg),
+            line_size_arg,step_arg) {
     }
 
     _p_int_t step()const { return this->_mp_step; }
@@ -209,7 +238,7 @@ public:
 
     bool isFinePointer(const void *arg) const {
         return (arg<static_cast<const void *>(this->_mp_end_pointer))&&
-                (static_cast<const void*>(this->_mp_begin_pointer)<=arg);
+            (static_cast<const void*>(this->_mp_begin_pointer)<=arg);
     }
 
     operator bool() const {
@@ -218,7 +247,7 @@ public:
 
     bool isFinePointer() const {
         return (this->_mp_current_pointer<this->_mp_end_pointer)&&
-                (this->_mp_begin_pointer<=this->_mp_current_pointer);
+            (this->_mp_begin_pointer<=this->_mp_current_pointer);
     }
 
 private:
