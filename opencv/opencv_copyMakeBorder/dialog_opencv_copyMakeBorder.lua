@@ -37,7 +37,7 @@ local RightMin=0;
 local topMax=9999;
 local bottomMax=9999;
 local leftMax=9999;
-local RightMax=9999;
+local rightMax=9999;
 
 local topStep=1;
 local bottomStep=1;
