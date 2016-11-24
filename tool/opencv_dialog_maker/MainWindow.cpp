@@ -327,6 +327,7 @@ public:
             QString data=QString::fromUtf8(u8R"(
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/qwidget.h>
+class QVBoxLayout;
 
 class XDialog : public QWidget {
     Q_OBJECT
@@ -338,6 +339,7 @@ private:
 public:
     explicit XDialog(QWidget * /**/=nullptr);
     virtual ~XDialog();
+    QVBoxLayout * getMainLayout() const;
 public:
     //Q_SIGNAL_valueChanged__;
     Q_SLOT void emitValueChanged();
@@ -531,6 +533,7 @@ private:
 class XDialog::_PrivateXDialog{
 public:
     XDialog *super;
+    QVBoxLayout * mainLayout/*主要布局*/;
     _PrivateXDialog(XDialog *arg):super(arg){
 setup_ui()/*建立gui并连接信号槽*/;
 readState()/*更新gui数据*/;
@@ -732,6 +735,14 @@ int/*enum*/map_)";
         lv->setSpacing(0);
         lv->setMargin(0);
 
+/*dialog 主要布局*/
+        auto && lvv=makeStackPointer<_0x21Q_VBoxLayout>();
+        lvv->setSpacing(0);
+        lvv->setMargin(0);
+        lv->addLayout(lvv.release());
+        mainLayout=lvv.pointer();
+///////////////////////////
+
 )~";
 
             for (const auto &i:values) {
@@ -752,7 +763,7 @@ int/*enum*/map_)";
  l->setMargin(1);
  l->addWidget(l0.release());
  l->addWidget(c0.release());
- lv->addLayout(l.release());
+ lvv->addLayout(l.release())/*加入主要布局*/;
 
 )~=:;:=~";
 
@@ -796,7 +807,7 @@ int/*enum*/map_)";
             auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
             l->setSpacing(1);
             l->setMargin(1);
-            lv->addLayout(l.release());
+            lvv->addLayout(l.release())/*加入主要布局*/;
             l->addWidget(l0.release());
             l->addWidget(e0.release());
             l->addWidget(l1.release());
@@ -1129,6 +1140,10 @@ void XDialog::emitValueChanged() {
 
 QSize XDialog::sizeHint() const {
     return {136,128};
+}
+
+QVBoxLayout * XDialog::getMainLayout() const {
+    return thisp->mainLayout;
 }
 
 /*End of the file.*/

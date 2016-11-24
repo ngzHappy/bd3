@@ -23,7 +23,8 @@ FORMS    +=
 RESOURCES +=
 
 DISTFILES += \
-    $$PWD/opencv_copyMakeBorder.lua
+    $$PWD/opencv_copyMakeBorder.lua \
+    $$PWD/dialog_opencv_copyMakeBorder.lua
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 

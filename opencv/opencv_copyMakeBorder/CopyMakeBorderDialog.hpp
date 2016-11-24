@@ -3,6 +3,7 @@
 
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/qwidget.h>
+class QVBoxLayout;
 
 class CopyMakeBorderDialog : public QWidget {
     Q_OBJECT
@@ -14,6 +15,7 @@ private:
 public:
     explicit CopyMakeBorderDialog(QWidget * /**/=nullptr);
     virtual ~CopyMakeBorderDialog();
+    QVBoxLayout * getMainLayout() const;
 public:
     Q_SIGNAL void valueChanged(int /* top */ , int /* bottom */ , int /* left */ , int /* right */ , int /*enum: borderType */);
     Q_SLOT void emitValueChanged();
