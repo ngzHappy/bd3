@@ -43,7 +43,7 @@ public:
         
         auto varBegin=varValues.constBegin();
         const auto varEnd=varValues.constEnd();
-        const auto varSize=std::min(5,varValues.size());
+        const auto varSize=std::min(4,varValues.size());
         for (int i=0; i<varSize;++i,++varBegin) {
             value[i]=varBegin->toDouble();
         }
