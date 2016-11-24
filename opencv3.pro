@@ -64,3 +64,7 @@ opencv_copyMakeBorder.file=$$PWD/opencv/opencv_copyMakeBorder/opencv_copyMakeBor
 opencv_copyMakeBorder.depends+=library_opencv_basic
 SUBDIRS += opencv_copyMakeBorder
 
+opencv_resize.file=$$PWD/opencv/opencv_resize/opencv_resize.pro
+opencv_resize.depends+=library_opencv_basic
+SUBDIRS += opencv_resize
+
