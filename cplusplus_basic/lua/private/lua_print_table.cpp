@@ -276,7 +276,7 @@ string to_string(lua::State*L,int k,_T_*) {
             }
         }
 
-        auto ans="\""_s+string(data_,length_)+"\""_s;
+        auto ans="\""+string(data_,length_)+"\"";
         lua::pop(L,1);
         return std::move(ans);
     }
