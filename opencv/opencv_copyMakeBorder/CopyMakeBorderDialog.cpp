@@ -178,7 +178,6 @@ public:
             case 2: return static_cast<int/*enum*/>(cv::BORDER_REFLECT);/* BORDER_REFLECT */
             case 3: return static_cast<int/*enum*/>(cv::BORDER_WRAP);/* BORDER_WRAP */
             case 4: return static_cast<int/*enum*/>(cv::BORDER_REFLECT_101);/* BORDER_REFLECT_101 */
-            case 5: return static_cast<int/*enum*/>(cv::BORDER_TRANSPARENT);/* BORDER_TRANSPARENT */
         }
         return static_cast<int/*enum*/>(cv::BORDER_CONSTANT);/*默认值*/
     }
@@ -239,9 +238,9 @@ public:
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {add_top_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {add_top_0x2i(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {sub_top_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {sub_top_0x2i(); });
         }
         {
 
@@ -283,9 +282,9 @@ public:
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {add_bottom_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {add_bottom_0x2i(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {sub_bottom_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {sub_bottom_0x2i(); });
         }
         {
 
@@ -327,9 +326,9 @@ public:
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {add_left_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {add_left_0x2i(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {sub_left_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {sub_left_0x2i(); });
         }
         {
 
@@ -371,9 +370,9 @@ public:
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {add_right_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {add_right_0x2i(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-            /*连接信号槽*/super,[this](bool) {sub_right_0x2i(); });
+                                 /*连接信号槽*/super,[this](bool) {sub_right_0x2i(); });
         }
         {
 
@@ -398,21 +397,20 @@ public:
             c0->addItem(u8R"|||(BORDER_REFLECT)|||");
             c0->addItem(u8R"|||(BORDER_WRAP)|||");
             c0->addItem(u8R"|||(BORDER_REFLECT_101)|||");
-            c0->addItem(u8R"|||(BORDER_TRANSPARENT)|||");
             /*连接信号槽*/
             c0->connect(c0.pointer(),
-                T_0x21Q_CurrentIndexChanged(&QComboBox::currentIndexChanged),
-                super,
-                [this](int) {checkDo(); });
+                        T_0x21Q_CurrentIndexChanged(&QComboBox::currentIndexChanged),
+                        super,
+                        [this](int) {checkDo(); });
             enum_borderType_0x2e=c0;
 
         }
 
         {/*创建中间空白*/
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
-                1,1,QSizePolicy::Minimum,
-                QSizePolicy::MinimumExpanding
-                );
+                        1,1,QSizePolicy::Minimum,
+                        QSizePolicy::MinimumExpanding
+                        );
             lv->addSpacerItem(ls.release());
         }
         {/*创建确定按钮*/
@@ -420,8 +418,8 @@ public:
             l->setSpacing(1);
             l->setMargin(1);
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
-                1,1,QSizePolicy::MinimumExpanding,
-                QSizePolicy::Minimum);
+                        1,1,QSizePolicy::MinimumExpanding,
+                        QSizePolicy::Minimum);
             l->addSpacerItem(ls.release());
             auto && pb=makeStackPointer<_0x21Q_PushButton>();
             l->addWidget(pb.release());
@@ -430,10 +428,10 @@ public:
             /*连接按钮信号槽*/
 
             super->connect(
-                                   pb.pointer(),
-                                   &QPushButton::clicked,
-                                   super,
-                                   [this](bool) {checkDo(); }
+                        pb.pointer(),
+                        &QPushButton::clicked,
+                        super,
+                        [this](bool) {checkDo(); }
             );
 
         }
@@ -447,7 +445,7 @@ public:
             if (ok) { break; }
             top_0x2i=default_top_0x2i();
             edit_top_0x2i->setText(
-            QString::number(default_top_0x2i()));
+                        QString::number(default_top_0x2i()));
         } while (false);
         do {
             auto t=edit_step_top_0x2i->text();
@@ -455,7 +453,7 @@ public:
             if (ok) { break; }
             step_top_0x2i=default_step_top_0x2i();
             edit_step_top_0x2i->setText(
-            QString::number(default_step_top_0x2i()));
+                        QString::number(default_step_top_0x2i()));
         } while (false);
         do {
             auto t=edit_bottom_0x2i->text();
@@ -463,7 +461,7 @@ public:
             if (ok) { break; }
             bottom_0x2i=default_bottom_0x2i();
             edit_bottom_0x2i->setText(
-            QString::number(default_bottom_0x2i()));
+                        QString::number(default_bottom_0x2i()));
         } while (false);
         do {
             auto t=edit_step_bottom_0x2i->text();
@@ -471,7 +469,7 @@ public:
             if (ok) { break; }
             step_bottom_0x2i=default_step_bottom_0x2i();
             edit_step_bottom_0x2i->setText(
-            QString::number(default_step_bottom_0x2i()));
+                        QString::number(default_step_bottom_0x2i()));
         } while (false);
         do {
             auto t=edit_left_0x2i->text();
@@ -479,7 +477,7 @@ public:
             if (ok) { break; }
             left_0x2i=default_left_0x2i();
             edit_left_0x2i->setText(
-            QString::number(default_left_0x2i()));
+                        QString::number(default_left_0x2i()));
         } while (false);
         do {
             auto t=edit_step_left_0x2i->text();
@@ -487,7 +485,7 @@ public:
             if (ok) { break; }
             step_left_0x2i=default_step_left_0x2i();
             edit_step_left_0x2i->setText(
-            QString::number(default_step_left_0x2i()));
+                        QString::number(default_step_left_0x2i()));
         } while (false);
         do {
             auto t=edit_right_0x2i->text();
@@ -495,7 +493,7 @@ public:
             if (ok) { break; }
             right_0x2i=default_right_0x2i();
             edit_right_0x2i->setText(
-            QString::number(default_right_0x2i()));
+                        QString::number(default_right_0x2i()));
         } while (false);
         do {
             auto t=edit_step_right_0x2i->text();
@@ -503,18 +501,18 @@ public:
             if (ok) { break; }
             step_right_0x2i=default_step_right_0x2i();
             edit_step_right_0x2i->setText(
-            QString::number(default_step_right_0x2i()));
+                        QString::number(default_step_right_0x2i()));
         } while (false);
 
         {borderType_0x2e=map_borderType_0x2e(
-        enum_borderType_0x2e->currentIndex()); }
+                        enum_borderType_0x2e->currentIndex()); }
     }
     void directDo() {
         super->valueChanged(top_0x2i
-        ,bottom_0x2i
-        ,left_0x2i
-        ,right_0x2i
-        ,borderType_0x2e);
+                            ,bottom_0x2i
+                            ,left_0x2i
+                            ,right_0x2i
+                            ,borderType_0x2e);
     }
     bool isStateChange() {
         auto ans=false;
@@ -566,7 +564,7 @@ public:
         check_max(top_0x2i,max_top_0x2i())/*检测最大值*/;
         check_min(top_0x2i,min_top_0x2i())/*检测最小值*/;
         edit_top_0x2i->setText(
-            QString::number(top_0x2i))/*重设gui值*/;
+                    QString::number(top_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -576,7 +574,7 @@ public:
         check_max(top_0x2i,max_top_0x2i())/*检测最大值*/;
         check_min(top_0x2i,min_top_0x2i())/*检测最小值*/;
         edit_top_0x2i->setText(
-            QString::number(top_0x2i))/*重设gui值*/;
+                    QString::number(top_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -586,7 +584,7 @@ public:
         check_max(bottom_0x2i,max_bottom_0x2i())/*检测最大值*/;
         check_min(bottom_0x2i,min_bottom_0x2i())/*检测最小值*/;
         edit_bottom_0x2i->setText(
-            QString::number(bottom_0x2i))/*重设gui值*/;
+                    QString::number(bottom_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -596,7 +594,7 @@ public:
         check_max(bottom_0x2i,max_bottom_0x2i())/*检测最大值*/;
         check_min(bottom_0x2i,min_bottom_0x2i())/*检测最小值*/;
         edit_bottom_0x2i->setText(
-            QString::number(bottom_0x2i))/*重设gui值*/;
+                    QString::number(bottom_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -606,7 +604,7 @@ public:
         check_max(left_0x2i,max_left_0x2i())/*检测最大值*/;
         check_min(left_0x2i,min_left_0x2i())/*检测最小值*/;
         edit_left_0x2i->setText(
-            QString::number(left_0x2i))/*重设gui值*/;
+                    QString::number(left_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -616,7 +614,7 @@ public:
         check_max(left_0x2i,max_left_0x2i())/*检测最大值*/;
         check_min(left_0x2i,min_left_0x2i())/*检测最小值*/;
         edit_left_0x2i->setText(
-            QString::number(left_0x2i))/*重设gui值*/;
+                    QString::number(left_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -626,7 +624,7 @@ public:
         check_max(right_0x2i,max_right_0x2i())/*检测最大值*/;
         check_min(right_0x2i,min_right_0x2i())/*检测最小值*/;
         edit_right_0x2i->setText(
-            QString::number(right_0x2i))/*重设gui值*/;
+                    QString::number(right_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -636,7 +634,7 @@ public:
         check_max(right_0x2i,max_right_0x2i())/*检测最大值*/;
         check_min(right_0x2i,min_right_0x2i())/*检测最小值*/;
         edit_right_0x2i->setText(
-            QString::number(right_0x2i))/*重设gui值*/;
+                    QString::number(right_0x2i))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -654,6 +652,7 @@ CopyMakeBorderDialog::~CopyMakeBorderDialog() {
 }
 
 void CopyMakeBorderDialog::emitValueChanged() {
+    thisp->readState();
     thisp->directDo();
 }
 

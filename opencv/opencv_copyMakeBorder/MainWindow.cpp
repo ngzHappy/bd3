@@ -20,7 +20,49 @@ MainWindow::~MainWindow() {
 
 namespace {
 
+class ImageWidget;
+class ScalarLineEdit :public QLineEdit{
+    QString old_value;
+    cv::Scalar value;
+    ImageWidget * super;
+public:
+    ScalarLineEdit(ImageWidget * arg):super(arg) {
+        old_value="0,0,0,0";
+        this->setText(old_value);
+        connect(this,&QLineEdit::editingFinished,
+            this,&ScalarLineEdit::onEditingFinished);
+    }
+
+    bool directOnEditingFinished() {
+        const auto varText=this->text();
+        if (old_value==varText) { return false; }
+        old_value=varText;
+        const auto varValues=varText.split(',',QString::SkipEmptyParts);
+        value=cv::Scalar::all(0);
+        
+        auto varBegin=varValues.constBegin();
+        const auto varEnd=varValues.constEnd();
+        const auto varSize=std::min(4,varValues.size());
+        for (int i=0; i<varSize;++i,++varBegin) {
+            value[i]=varBegin->toDouble();
+        }
+        return true;
+    }
+
+    inline void onEditingFinished();
+
+    cv::Scalar getValue()  { 
+        directOnEditingFinished();
+        return value;
+    }
+
+private:
+    CPLUSPLUS_OBJECT(ScalarLineEdit)
+};
+
 class ImageWidget :public ImageShowWidget {
+    CopyMakeBorderDialog * _p_dialog;
+    ScalarLineEdit * _p_ScalarLineEdit;
 public:
     ImageWidget(const QImage &arg) {
 
@@ -38,7 +80,19 @@ public:
         connect(widget.pointer(),&CopyMakeBorderDialog::valueChanged,
             this,&ImageWidget::valueChanged);
 
+        auto && scalarLineEdit=
+            memory::makeStackPointer<ScalarLineEdit>(this);
+        widget->getMainLayout()->addWidget(
+            scalarLineEdit.release());
+        _p_dialog=widget.pointer();
+        _p_ScalarLineEdit=scalarLineEdit.pointer();
+
+        /*update values*/
         widget->emitValueChanged();
+    }
+
+    void emitValueChanged() {
+        _p_dialog->emitValueChanged();
     }
 
     void valueChanged(
@@ -46,7 +100,7 @@ public:
         int bottom,
         int left,
         int right,
-        int borderType)  {
+        int borderType) {
 
         this->setAlgorithm(
         [=](const QImage & inputImage)->QImage {
@@ -68,7 +122,8 @@ public:
                     outputImage.bytesPerLine());
 
                 cv::copyMakeBorder(inputMat,outputMat,
-                    top,bottom,left,right,borderType);
+                    top,bottom,left,right,borderType,
+                    _p_ScalarLineEdit->getValue());
 
                 return std::move(outputImage);
             }
@@ -79,10 +134,17 @@ public:
         });
 
 
-    } 
+    }
 private:
     CPLUSPLUS_OBJECT(ImageWidget)
 };
+
+void ScalarLineEdit::onEditingFinished() {
+    if (false==this->directOnEditingFinished()) {
+        return; 
+    }
+    super->emitValueChanged();
+}
 
 }/*namespace*/
 

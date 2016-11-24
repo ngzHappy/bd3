@@ -1135,6 +1135,7 @@ XDialog::~XDialog(){
 }
 
 void XDialog::emitValueChanged() {
+    thisp->readState();
     thisp->directDo();
 }
 

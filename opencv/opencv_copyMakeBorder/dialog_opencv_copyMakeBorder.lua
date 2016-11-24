@@ -1,4 +1,4 @@
---name={int_value    valuename default min max step_default} 
+﻿--name={int_value    valuename default min max step_default}
 --name={double_value valuename default min max step_default}
 --name={enum_value,  { {key,value}... } }
 
@@ -12,15 +12,15 @@ void cv::copyMakeBorder     (   InputArray      src,
         int     left,
         int     right,
         int     borderType,
-        const Scalar &      value = Scalar() 
-    )   
+        const Scalar &      value = Scalar()
+    )
 
 BORDER_CONSTANT     iiiiii|abcdefgh|iiiiiii with some specified i
 BORDER_REPLICATE    aaaaaa|abcdefgh|hhhhhhh
 BORDER_REFLECT      fedcba|abcdefgh|hgfedcb
 BORDER_WRAP         cdefgh|abcdefgh|abcdefg
 BORDER_REFLECT_101  gfedcb|abcdefgh|gfedcba
-BORDER_TRANSPARENT  uvwxyz|absdefgh|ijklmno 
+BORDER_TRANSPARENT  uvwxyz|absdefgh|ijklmno
 
 --]]
 
@@ -43,7 +43,7 @@ local topStep=1;
 local bottomStep=1;
 local rightStep=1;
 local leftStep=1;
- 
+
 local data={
     name="CopyMakeBorderDialog",
     values={
@@ -58,7 +58,7 @@ local data={
                 {"BORDER_REFLECT","cv::BORDER_REFLECT"},
                 {"BORDER_WRAP","cv::BORDER_WRAP"},
                 {"BORDER_REFLECT_101","cv::BORDER_REFLECT_101"},
-                {"BORDER_TRANSPARENT","cv::BORDER_TRANSPARENT"},
+                --{"BORDER_TRANSPARENT","cv::BORDER_TRANSPARENT"},
             }
         },
     }
