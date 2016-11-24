@@ -70,8 +70,9 @@ inline string &operator+(const string_view &data,string &arg) {
     string ans;
     ans.reserve(data.data_length+arg.size());
     ans.append(data.data,data.data_length);
-    ans+=arg;
-    return std::move(ans);
+    ans+=std::move(arg);
+    arg=std::move(ans);
+    return arg;
 }
 
 constexpr int a_space_length() { return 4; }
@@ -519,7 +520,7 @@ public:
 
 #ifndef function_return
 #define function_return() lua::settop(L,lock_top);return
-#endif 
+#endif
 
         /*add the table to path*/
         _m_DataPrintTable->tablePath.push_back(_m_TableIndex);
