@@ -25,21 +25,22 @@ BORDER_TRANSPARENT  uvwxyz|absdefgh|ijklmno
 --]]
 
 local topDefault=5;
+local topMin=0;
+local topMax=9999;
+local topStep=1;
+
 local bottomDefault=5;
 local leftDefault=5;
 local rightDefault=5;
 
-local topMin=0;
 local bottomMin=0;
 local leftMin=0;
 local RightMin=0;
 
-local topMax=9999;
 local bottomMax=9999;
 local leftMax=9999;
 local rightMax=9999;
 
-local topStep=1;
 local bottomStep=1;
 local rightStep=1;
 local leftStep=1;
