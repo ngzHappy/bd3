@@ -60,3 +60,7 @@ opencv_simulateFire.file=$$PWD/opencv/opencv_simulateFire/opencv_simulateFire.pr
 opencv_simulateFire.depends+=library_opencv_basic
 SUBDIRS += opencv_simulateFire
 
+opencv_copyMakeBorder.file=$$PWD/opencv/opencv_copyMakeBorder/opencv_copyMakeBorder.pro
+opencv_copyMakeBorder.depends+=library_opencv_basic
+SUBDIRS += opencv_copyMakeBorder
+
