@@ -1,7 +1,5 @@
 ###opencv_copyMakeBorder.pro
 
-###opencv_copyMakeBorder.pro
-
 QT += core
 QT += gui
 QT += widgets
@@ -13,14 +11,16 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    Application.cpp
+    Application.cpp \
+    CopyMakeBorderDialog.cpp
 
 HEADERS  += MainWindow.hpp \
-    Application.hpp
+    Application.hpp \
+    CopyMakeBorderDialog.hpp
 
-FORMS    +=  
+FORMS    +=
 
-RESOURCES +=  
+RESOURCES +=
 
 DISTFILES += \
     $$PWD/opencv_copyMakeBorder.lua
