@@ -1,4 +1,6 @@
-#include <type_traits>
+﻿#include <type_traits>
+
+namespace utility{
 
 template<typename _T_>
 class AddSafeConst {
@@ -27,3 +29,21 @@ class AddSafeConst<_T_*> {
 public:
     typedef typename AddSafeConst<_T_>::type * const type;
 };
+
+template<typename _T_>
+using AddSafeConstType=typename AddSafeConst<_T_>::type;
+
+template<typename _T_>
+inline AddSafeConstType<_T_&&> asSafeConst(_T_&&arg) { return arg; }
+
+}/*utility*/
+
+
+
+
+
+
+
+
+
+

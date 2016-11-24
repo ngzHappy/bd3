@@ -5,6 +5,7 @@
 #include <numeric>
 #include <algorithm>
 #include "memory/Memory.hpp"
+#include "utility/type_traits.hpp"
 #include "exception/Exception.hpp"
 
 #ifndef CPLUSPLUS_OBJECT
