@@ -27,7 +27,7 @@ class ScalarLineEdit :public QLineEdit{
     ImageWidget * super;
 public:
     ScalarLineEdit(ImageWidget * arg):super(arg) {
-        old_value="0,0,0,0";
+        old_value="100,150,200,200";
         this->setText(old_value);
         connect(this,&QLineEdit::editingFinished,
             this,&ScalarLineEdit::onEditingFinished);
@@ -42,7 +42,7 @@ public:
         
         auto varBegin=varValues.constBegin();
         const auto varEnd=varValues.constEnd();
-        const auto varSize=std::min(4,varValues.size());
+        const auto varSize=std::min(5,varValues.size());
         for (int i=0; i<varSize;++i,++varBegin) {
             value[i]=varBegin->toDouble();
         }
