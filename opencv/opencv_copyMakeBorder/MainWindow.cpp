@@ -27,10 +27,11 @@ class ScalarLineEdit :public QLineEdit{
     ImageWidget * super;
 public:
     ScalarLineEdit(ImageWidget * arg):super(arg) {
-        old_value="100,150,200,200";
-        this->setText(old_value);
+        const static auto str=QLatin1String("100,150,200,200");
         connect(this,&QLineEdit::editingFinished,
             this,&ScalarLineEdit::onEditingFinished);
+        this->setText(str);
+        directOnEditingFinished();
     }
 
     bool directOnEditingFinished() {
