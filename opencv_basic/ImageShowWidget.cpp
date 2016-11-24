@@ -316,7 +316,7 @@ ImageShowWidget::ImageShowWidget(
             varAction->setText(varTitle);
             connect(varAction.pointer(),&QAction::triggered,
                 this,[this,varTitle](bool) {
-                __private::save_image(this,varTitle,getImage());
+                __private::save_image(this,varTitle,getAlgorithmImage());
             });
         }
 
