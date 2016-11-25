@@ -22,7 +22,7 @@ namespace {
 
 class ImageWidget :public ImageShowWidget {
 public:
-    
+
     ImageWidget(const QImage & arg) {
         QImage inputImage=arg.convertToFormat(QImage::Format_RGBA8888);
         this->setImage(inputImage);
@@ -33,7 +33,7 @@ public:
         this->addImageWidget(dialog.release());
         dialog->emitValueChanged();
     }
-    
+
     void valueChanged(
         int width,
         int height,
@@ -67,7 +67,9 @@ private:
 /*write your code here*/
 QWidget* MainWindow::addImage(const QImage &arg) {
     if (arg.isNull()) { return nullptr; }
-    this->addWidget(new ImageWidget(arg));
+    auto ans=new ImageWidget(arg);
+    this->addWidget(ans);
+    return ans;
 }
 
 void MainWindow::openLua() {

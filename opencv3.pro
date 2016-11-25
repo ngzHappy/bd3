@@ -68,3 +68,7 @@ opencv_resize.file=$$PWD/opencv/opencv_resize/opencv_resize.pro
 opencv_resize.depends+=library_opencv_basic
 SUBDIRS += opencv_resize
 
+opencv_jpegn.file=$$PWD/opencv/opencv_jpegn/opencv_jpegn.pro
+opencv_jpegn.depends+=library_opencv_basic
+SUBDIRS += opencv_jpegn
+
