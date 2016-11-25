@@ -11,7 +11,7 @@
 #include <QtWidgets/qtoolbutton.h>
 #include <QtWidgets/qlayoutitem.h>
 
-namespace  {
+namespace {
 
 class _0x21Q_ComboBox :public QComboBox {
     using _Super=QComboBox;
@@ -43,7 +43,7 @@ class _0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
 public:
     _0x21Q_DoubleValidator(QObject * arg=nullptr):
-        _Super(-360,360,_0x21Q_decimals,arg){
+        _Super(-360,360,_0x21Q_decimals,arg) {
         setNotation(QDoubleValidator::StandardNotation);
     }
     void setRange(double a,double b) {
@@ -53,8 +53,8 @@ private:
     CPLUSPLUS_OBJECT(_0x21Q_DoubleValidator)
 };
 
-class _0x21Q_IntValidator  :public QIntValidator {
-    using _Super=QIntValidator ;
+class _0x21Q_IntValidator :public QIntValidator {
+    using _Super=QIntValidator;
 public:
     using _Super::_Super;
 private:
@@ -119,46 +119,46 @@ private:
 
 }/*namespace*/
 
-class OldPictureDialog::_PrivateOldPictureDialog{
+class OldPictureDialog::_PrivateOldPictureDialog {
 public:
     OldPictureDialog *super;
     QVBoxLayout * mainLayout/*主要布局*/;
-    _PrivateOldPictureDialog(OldPictureDialog *arg):super(arg){
-setup_ui()/*建立gui并连接信号槽*/;
-readState()/*更新gui数据*/;
-}
+    _PrivateOldPictureDialog(OldPictureDialog *arg):super(arg) {
+        setup_ui()/*建立gui并连接信号槽*/;
+        readState()/*更新gui数据*/;
+    }
 
 
-/*values*/
+    /*values*/
 
-constexpr static double default_blendValue_0x2d(){return 0.5;}
-constexpr static double default_step_blendValue_0x2d(){return 0.05;}
-constexpr static double max_blendValue_0x2d(){return 1;}
-constexpr static double min_blendValue_0x2d(){return 0;}
-double blendValue_0x2d=default_blendValue_0x2d();
-double step_blendValue_0x2d=default_step_blendValue_0x2d();
-double old_blendValue_0x2d=default_blendValue_0x2d();
-_0x21Q_LineEdit * edit_blendValue_0x2d=nullptr;
-_0x21Q_LineEdit * edit_step_blendValue_0x2d=nullptr;
-     void setup_ui(){
-        using namespace memory ;
-/*窗口布局*/
+    constexpr static double default_blendValue_0x2d() { return 0.5; }
+    constexpr static double default_step_blendValue_0x2d() { return 0.05; }
+    constexpr static double max_blendValue_0x2d() { return 1; }
+    constexpr static double min_blendValue_0x2d() { return 0; }
+    double blendValue_0x2d=default_blendValue_0x2d();
+    double step_blendValue_0x2d=default_step_blendValue_0x2d();
+    double old_blendValue_0x2d=default_blendValue_0x2d();
+    _0x21Q_LineEdit * edit_blendValue_0x2d=nullptr;
+    _0x21Q_LineEdit * edit_step_blendValue_0x2d=nullptr;
+    void setup_ui() {
+        using namespace memory;
+        /*窗口布局*/
         auto && lv=makeStackPointer<_0x21Q_VBoxLayout>();
         super->setLayout(lv.release());
         lv->setSpacing(0);
         lv->setMargin(0);
 
-/*dialog 主要布局*/
+        /*dialog 主要布局*/
         auto && lvv=makeStackPointer<_0x21Q_VBoxLayout>();
         lvv->setSpacing(0);
         lvv->setMargin(0);
         lv->addLayout(lvv.release());
         mainLayout=lvv.pointer();
-///////////////////////////
+        ///////////////////////////
 
-{
+        {
 
-/*创建一个int/double显示*/
+            /*创建一个int/double显示*/
             auto && l0=makeStackPointer<_0x21Q_Label>();
             auto && l1=makeStackPointer<_0x21Q_Label>();
             auto && e0=makeStackPointer<_0x21Q_LineEdit>();
@@ -178,36 +178,36 @@ _0x21Q_LineEdit * edit_step_blendValue_0x2d=nullptr;
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-l0->setText(u8R"__(blendValue)__" " : " );/*设置label name*/
-edit_blendValue_0x2d=e0.pointer();
-edit_step_blendValue_0x2d=e1.pointer();
+            l0->setText(u8R"__(blendValue)__" " : ");/*设置label name*/
+            edit_blendValue_0x2d=e0.pointer();
+            edit_step_blendValue_0x2d=e1.pointer();
 
-/*double value 检查器*/
-auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
-auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
-v0->setRange(min_blendValue_0x2d(),max_blendValue_0x2d());
-v0.release()->setParent(e0);
+            /*double value 检查器*/
+            auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
+            auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
+            v0->setRange(min_blendValue_0x2d(),max_blendValue_0x2d());
+            v0.release()->setParent(e0);
             v1.release()->setParent(e1);
             e0->setValidator(v0);
             e1->setValidator(v1);
-edit_blendValue_0x2d=e0.pointer();
-edit_step_blendValue_0x2d=e1.pointer();
+            edit_blendValue_0x2d=e0.pointer();
+            edit_step_blendValue_0x2d=e1.pointer();
 
-/*连接信号槽*/
-/*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-/*连接信号槽*/super,[this](bool) {add_blendValue_0x2d(); });
-/*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-/*连接信号槽*/super,[this](bool) {sub_blendValue_0x2d(); });
-}
+            /*连接信号槽*/
+            /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
+            /*连接信号槽*/super,[this](bool) {add_blendValue_0x2d(); });
+            /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
+            /*连接信号槽*/super,[this](bool) {sub_blendValue_0x2d(); });
+        }
 
-{/*创建中间空白*/
+        {/*创建中间空白*/
             auto && ls=makeStackPointer<_0x21Q_SpacerItem>(
                 1,1,QSizePolicy::Minimum,
                 QSizePolicy::MinimumExpanding
                 );
             lv->addSpacerItem(ls.release());
         }
-{/*创建确定按钮*/
+        {/*创建确定按钮*/
             auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
             l->setSpacing(1);
             l->setMargin(1);
@@ -219,55 +219,55 @@ edit_step_blendValue_0x2d=e1.pointer();
             l->addWidget(pb.release());
             lv->addLayout(l.release());
             pb->setText(QString::fromUtf8(u8"确定"));
-/*连接按钮信号槽*/
-         
- super->connect(
-                        pb.pointer(),
-                        &QPushButton::clicked,
-                        super,
-                        [this](bool){checkDo();}
-                        );
+            /*连接按钮信号槽*/
 
-}
+            super->connect(
+                                   pb.pointer(),
+                                   &QPushButton::clicked,
+                                   super,
+                                   [this](bool) {checkDo(); }
+            );
 
-}/*function end*/
-void readState() {
-bool ok;
-do{
-auto t=edit_blendValue_0x2d->text();
-blendValue_0x2d= t.toDouble(&ok);
-if (ok) { break; }
-blendValue_0x2d=default_blendValue_0x2d();
-edit_blendValue_0x2d->setText(
-QString::number(default_blendValue_0x2d()));
-} while (false);
-do{
-auto t=edit_step_blendValue_0x2d->text();
-step_blendValue_0x2d= t.toDouble(&ok);
-if (ok) { break; }
-step_blendValue_0x2d=default_step_blendValue_0x2d();
-edit_step_blendValue_0x2d->setText(
-QString::number(default_step_blendValue_0x2d()));
-} while (false);
-}
-void directDo() {
-super->valueChanged(blendValue_0x2d);
-}
- bool isStateChange() {
- auto ans=false;
-if (old_blendValue_0x2d!=blendValue_0x2d){
-ans=true;
-old_blendValue_0x2d=blendValue_0x2d;
-}
-return ans;
-}
+        }
+
+    }/*function end*/
+    void readState() {
+        bool ok;
+        do {
+            auto t=edit_blendValue_0x2d->text();
+            blendValue_0x2d=t.toDouble(&ok);
+            if (ok) { break; }
+            blendValue_0x2d=default_blendValue_0x2d();
+            edit_blendValue_0x2d->setText(
+            QString::number(default_blendValue_0x2d()));
+        } while (false);
+        do {
+            auto t=edit_step_blendValue_0x2d->text();
+            step_blendValue_0x2d=t.toDouble(&ok);
+            if (ok) { break; }
+            step_blendValue_0x2d=default_step_blendValue_0x2d();
+            edit_step_blendValue_0x2d->setText(
+            QString::number(default_step_blendValue_0x2d()));
+        } while (false);
+    }
+    void directDo() {
+        super->valueChanged(blendValue_0x2d);
+    }
+    bool isStateChange() {
+        auto ans=false;
+        if (old_blendValue_0x2d!=blendValue_0x2d) {
+            ans=true;
+            old_blendValue_0x2d=blendValue_0x2d;
+        }
+        return ans;
+    }
 
 
- void checkDo(){
-         readState();
-         if(isStateChange()){
+    void checkDo() {
+        readState();
+        if (isStateChange()) {
             directDo();
-         }
+        }
     }
 
     template<typename _T_,typename _U_>
@@ -281,7 +281,7 @@ return ans;
     }
 
 
- void add_blendValue_0x2d() {
+    void add_blendValue_0x2d() {
         readState()/*获得当前状态*/;
         blendValue_0x2d+=step_blendValue_0x2d/*增加值*/;
         check_max(blendValue_0x2d,max_blendValue_0x2d())/*检测最大值*/;
@@ -291,7 +291,7 @@ return ans;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
- void sub_blendValue_0x2d() {
+    void sub_blendValue_0x2d() {
         readState()/*获得当前状态*/;
         blendValue_0x2d-=step_blendValue_0x2d/*增加值*/;
         check_max(blendValue_0x2d,max_blendValue_0x2d())/*检测最大值*/;
@@ -306,11 +306,11 @@ private:
     CPLUSPLUS_OBJECT(_PrivateOldPictureDialog)
 };
 
-OldPictureDialog::OldPictureDialog(QWidget *p):_Super(p){
+OldPictureDialog::OldPictureDialog(QWidget *p):_Super(p) {
     thisp=new _PrivateOldPictureDialog(this);
 }
 
-OldPictureDialog::~OldPictureDialog(){
+OldPictureDialog::~OldPictureDialog() {
     delete thisp;
 }
 
@@ -320,7 +320,7 @@ void OldPictureDialog::emitValueChanged() {
 }
 
 QSize OldPictureDialog::sizeHint() const {
-    return {136,128};
+    return{ 136,128 };
 }
 
 QVBoxLayout * OldPictureDialog::getMainLayout() const {
