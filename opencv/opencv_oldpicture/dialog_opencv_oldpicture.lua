@@ -7,7 +7,7 @@
 
 --]]
 
-local blendValueDefault=0;
+local blendValueDefault=0.5;
 local blendValueMin=0;
 local blendValueMax=1;
 local blendValueStep=0.05;

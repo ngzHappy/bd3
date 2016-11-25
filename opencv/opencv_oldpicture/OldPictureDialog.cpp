@@ -131,7 +131,7 @@ readState()/*更新gui数据*/;
 
 /*values*/
 
-constexpr static double default_blendValue_0x2d(){return 0;}
+constexpr static double default_blendValue_0x2d(){return 0.5;}
 constexpr static double default_step_blendValue_0x2d(){return 0.05;}
 constexpr static double max_blendValue_0x2d(){return 1;}
 constexpr static double min_blendValue_0x2d(){return 0;}
