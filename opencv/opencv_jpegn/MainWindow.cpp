@@ -23,6 +23,7 @@ MainWindow::~MainWindow() {
 namespace {
 
 class ImageWidget :public ImageShowWidget {
+    //https://github.com/libjpeg-turbo/libjpeg-turbo
 public:
     ImageWidget(const QImage & arg) {
         QImage image=arg.convertToFormat(QImage::Format_RGB888);
@@ -44,15 +45,15 @@ public:
             try {
 
                 QImage image=arg.copy();
-                auto imageData=const_cast<uchar*>(image.constBits());
-                auto lineStep=image.bytesPerLine();
-                auto imageHeight=image.height();
-                auto imageWidth3=image.width()*3;
-                auto lineEnd=imageData+imageHeight*lineStep;
+                const auto imageData=const_cast<uchar*>(image.constBits());
+                const auto lineStep=image.bytesPerLine();
+                const auto imageHeight=image.height();
+                const auto imageWidth3=image.width()*3;
+                const auto lineEnd=imageData+imageHeight*lineStep;
                 std::vector<std::uint8_t> buffer;
 
-                std::vector<int> par={
-                    CV_IMWRITE_JPEG_QUALITY,75,
+                const std::vector<int> par={
+                    CV_IMWRITE_JPEG_QUALITY,77,
                 };
                 cv::Mat input(imageHeight,image.width(),CV_8UC3,
                     imageData,lineStep);
@@ -83,18 +84,19 @@ public:
                         auto p=line; auto pend=p+imageWidth3;
                         for (; p<pend; p+=3) {
 
-                            const auto &b=p[0];
-                            const auto &g=p[1];
-                            const auto &r=p[2];
+                            auto &b=p[0];
+                            auto &g=p[1];
+                            auto &r=p[2];
 
                             const auto y=clamp((77*r+150*g+29*b)>>8);
                             const auto u=clampuv(((-43*r-85*g+128*b)>>8)-1);
                             const auto v=clampuv(((128*r-107*g-21*b)>>8)-1);
 
-                            p[0]=clamp((65536*y+91881*v)>>16);
-                            p[1]=clamp((65536*y-22553*u-46802*v)>>16);
-                            p[2]=clamp((65536*y+116130*u)>>16);
+                            r=clamp((65536*y+91881*v)>>16);
+                            g=clamp((65536*y-22553*u-46802*v)>>16);
+                            b=clamp((65536*y+116130*u)>>16);
 
+    
                         }
                     }
 
