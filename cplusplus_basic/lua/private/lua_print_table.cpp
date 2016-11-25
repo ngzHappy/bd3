@@ -294,6 +294,7 @@ label_not_simple:
 
 template<typename _T_>
 string key_string(lua::State*L,int k,_T_*c) {
+    /*先转变为integer*/
     if (lua::isinteger(L,k)) {
         auto key=lua::tointeger(L,k);
         auto tmp_data=c->temp_space();

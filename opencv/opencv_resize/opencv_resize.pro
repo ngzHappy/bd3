@@ -11,17 +11,20 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    Application.cpp
+    Application.cpp \
+    ResizeDialog.cpp
 
 HEADERS  += MainWindow.hpp \
-    Application.hpp
+    Application.hpp \
+    ResizeDialog.hpp
 
 FORMS    +=
 
 RESOURCES +=
 
 DISTFILES += \
-    $$PWD/opencv_resize.lua
+    $$PWD/opencv_resize.lua \
+    $$PWD/dialog_opencv_resize.lua
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 

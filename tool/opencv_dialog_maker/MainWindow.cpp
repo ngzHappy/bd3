@@ -271,7 +271,7 @@ private:
 
                     size_t strSize;
                     while (lua::next(L,tablePos)) {
-                        if (lua::isstring(L,keyPos)) {
+                        if (lua::type(L,keyPos)==lua::TSTRING) {
                             auto str=lua::tolstring(L,keyPos,&strSize);
                             if ((strSize==4)&&(std::strncmp(str,"name",4)==0)) {
                                 str=lua::tolstring(L,valuePos,&strSize);
