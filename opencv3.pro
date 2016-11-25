@@ -72,3 +72,7 @@ opencv_jpegn.file=$$PWD/opencv/opencv_jpegn/opencv_jpegn.pro
 opencv_jpegn.depends+=library_opencv_basic
 SUBDIRS += opencv_jpegn
 
+opencv_oldpicture.file=$$PWD/opencv/opencv_oldpicture/opencv_oldpicture.pro
+opencv_oldpicture.depends+=library_opencv_basic
+SUBDIRS += opencv_oldpicture
+
