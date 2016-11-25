@@ -43,49 +43,49 @@ local fyStep=0.05;
 
 local data={
 
-    name="ResizeDialog",
+name="ResizeDialog",
 
 values={
 
-   {"int_value",
-        "width",
-         widthDefault,
-         widthMin,
-         widthMax,
-         widthStep},
+{"int_value",
+"width",
+widthDefault,
+widthMin,
+widthMax,
+widthStep},
 
-         {"int_value",
-         "height",
-          heightDefault,
-          heightMin,
-          heightMax,
-          heightStep},
+{"int_value",
+"height",
+heightDefault,
+heightMin,
+heightMax,
+heightStep},
 
 {"double_value",
 "fx",
- fxDefault,
- fxMin,
- fxMax,
- fxStep},
+fxDefault,
+fxMin,
+fxMax,
+fxStep},
 
 {"double_value",
 "fy",
- fyDefault,
- fyMin,
- fyMax,
- fyStep},
+fyDefault,
+fyMin,
+fyMax,
+fyStep},
 
-    {"enum_value","interpolation",
-        {
-            {"INTER_NEAREST","cv::INTER_NEAREST"},
-            {"INTER_LINEAR","cv::INTER_LINEAR"},
-            {"INTER_CUBIC","cv::INTER_CUBIC"},
-            {"INTER_AREA","cv::INTER_AREA"},
-            {"INTER_LANCZOS4","cv::INTER_LANCZOS4"},
-        }
-    },
+{"enum_value","interpolation",
+{
+{"INTER_NEAREST","cv::INTER_NEAREST"},
+{"INTER_LINEAR","cv::INTER_LINEAR"},
+{"INTER_CUBIC","cv::INTER_CUBIC"},
+{"INTER_AREA","cv::INTER_AREA"},
+{"INTER_LANCZOS4","cv::INTER_LANCZOS4"},
+}
+},
 
-    }
+}
 }
 
 return data
