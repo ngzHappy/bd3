@@ -142,8 +142,8 @@ _0x21Q_LineEdit * edit_RAlpha_0x2d=nullptr;
 _0x21Q_LineEdit * edit_step_RAlpha_0x2d=nullptr;
 constexpr static double default_RBeta_0x2d(){return 0;}
 constexpr static double default_step_RBeta_0x2d(){return 1.2;}
-constexpr static double max_RBeta_0x2d(){return 9999;}
-constexpr static double min_RBeta_0x2d(){return 0;}
+constexpr static double max_RBeta_0x2d(){return 255;}
+constexpr static double min_RBeta_0x2d(){return -255;}
 double RBeta_0x2d=default_RBeta_0x2d();
 double step_RBeta_0x2d=default_step_RBeta_0x2d();
 double old_RBeta_0x2d=default_RBeta_0x2d();
@@ -160,8 +160,8 @@ _0x21Q_LineEdit * edit_GAlpha_0x2d=nullptr;
 _0x21Q_LineEdit * edit_step_GAlpha_0x2d=nullptr;
 constexpr static double default_GBeta_0x2d(){return 0;}
 constexpr static double default_step_GBeta_0x2d(){return 1.2;}
-constexpr static double max_GBeta_0x2d(){return 9999;}
-constexpr static double min_GBeta_0x2d(){return 0;}
+constexpr static double max_GBeta_0x2d(){return 255;}
+constexpr static double min_GBeta_0x2d(){return -255;}
 double GBeta_0x2d=default_GBeta_0x2d();
 double step_GBeta_0x2d=default_step_GBeta_0x2d();
 double old_GBeta_0x2d=default_GBeta_0x2d();
@@ -178,8 +178,8 @@ _0x21Q_LineEdit * edit_BAlpha_0x2d=nullptr;
 _0x21Q_LineEdit * edit_step_BAlpha_0x2d=nullptr;
 constexpr static double default_BBeta_0x2d(){return 0;}
 constexpr static double default_step_BBeta_0x2d(){return 1.2;}
-constexpr static double max_BBeta_0x2d(){return 9999;}
-constexpr static double min_BBeta_0x2d(){return 0;}
+constexpr static double max_BBeta_0x2d(){return 255;}
+constexpr static double min_BBeta_0x2d(){return -255;}
 double BBeta_0x2d=default_BBeta_0x2d();
 double step_BBeta_0x2d=default_step_BBeta_0x2d();
 double old_BBeta_0x2d=default_BBeta_0x2d();
@@ -196,8 +196,8 @@ _0x21Q_LineEdit * edit_AAlpha_0x2d=nullptr;
 _0x21Q_LineEdit * edit_step_AAlpha_0x2d=nullptr;
 constexpr static double default_ABeta_0x2d(){return 0;}
 constexpr static double default_step_ABeta_0x2d(){return 1.2;}
-constexpr static double max_ABeta_0x2d(){return 9999;}
-constexpr static double min_ABeta_0x2d(){return 0;}
+constexpr static double max_ABeta_0x2d(){return 255;}
+constexpr static double min_ABeta_0x2d(){return -255;}
 double ABeta_0x2d=default_ABeta_0x2d();
 double step_ABeta_0x2d=default_step_ABeta_0x2d();
 double old_ABeta_0x2d=default_ABeta_0x2d();

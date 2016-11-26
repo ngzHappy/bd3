@@ -14,8 +14,8 @@ local RAlphaMax=9999;
 local RAlphaStep=.2;
 
 local RBetaDefault=0;
-local RBetaMin=0;
-local RBetaMax=9999;
+local RBetaMin=-255;
+local RBetaMax=255;
 local RBetaStep=1.2;
 
 local GAlphaDefault=1;
@@ -24,8 +24,8 @@ local GAlphaMax=9999;
 local GAlphaStep=.2;
 
 local GBetaDefault=0;
-local GBetaMin=0;
-local GBetaMax=9999;
+local GBetaMin=-255;
+local GBetaMax=255;
 local GBetaStep=1.2;
 
 local BAlphaDefault=1;
@@ -34,8 +34,8 @@ local BAlphaMax=9999;
 local BAlphaStep=.2;
 
 local BBetaDefault=0;
-local BBetaMin=0;
-local BBetaMax=9999;
+local BBetaMin=-255;
+local BBetaMax=255;
 local BBetaStep=1.2;
 
 local AAlphaDefault=1;
@@ -44,8 +44,8 @@ local AAlphaMax=9999;
 local AAlphaStep=.2;
 
 local ABetaDefault=0;
-local ABetaMin=0;
-local ABetaMax=9999;
+local ABetaMin=-255;
+local ABetaMax=255;
 local ABetaStep=1.2;
 
 local data={
