@@ -42,11 +42,30 @@ public:
         double BAlpha,
         double BBeta) {
         this->setAlgorithm([=](const QImage & arg)->QImage {
-            
+
             try {
                 auto image=arg.convertToFormat(QImage::Format_RGB888);
 
+                cv::Mat inputMat(image.height(),image.width(),
+                    CV_8UC3,const_cast<uchar*>(image.constBits()),
+                    image.bytesPerLine());
 
+                cv::Mat outputMat;
+                cv::cvtColor(inputMat,outputMat,cv::COLOR_RGB2Lab,CV_32FC3);
+
+                cv::Mat labMat[3];
+                cv::split(outputMat,labMat);
+
+                labMat[0]=LAlpha*labMat[0]+LBeta;
+                labMat[1]=AAlpha*labMat[1]+ABeta;
+                labMat[2]=BAlpha*labMat[2]+BBeta;
+
+                cv::merge(labMat,3,outputMat);
+
+                cv::cvtColor(outputMat,outputMat,cv::COLOR_Lab2RGB);
+                outputMat.convertTo(inputMat,CV_8UC3);
+
+                return std::move(image);
 
             }
             catch (...) {
@@ -65,7 +84,10 @@ private:
 
 /*write your code here*/
 QWidget* MainWindow::addImage(const QImage &arg) {
-    return _Super::addImage(arg);
+    if (arg.isNull()) { return nullptr; }
+    auto ans=new ImageWidget(arg);
+    this->addWidget(ans);
+    return ans;
 }
 
 void MainWindow::openLua() {
