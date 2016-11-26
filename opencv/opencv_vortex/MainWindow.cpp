@@ -40,8 +40,17 @@ public:
         this->setAlgorithm([=](const QImage &arg)->QImage {
             try {
 
+                cv::Mat inputMat(arg.height(),arg.width(),CV_8UC3,
+                    const_cast<uchar*>(arg.constBits()),
+                    arg.bytesPerLine());
+
                 /*copy the image*/
                 QImage ans=arg.copy();
+                cv::Mat outputMat(
+                    ans.height(),ans.width(),CV_8UC3,
+                    const_cast<uchar*>(ans.constBits()),
+                    ans.bytesPerLine()
+                );
 
                 using number_type=double;
                 const auto width=arg.width();
@@ -76,8 +85,9 @@ public:
 
                         /*设置颜色*/
                         if ((dx<width)&&(dy<height)&&(dx>0)&&(dy>0)) {
-                            auto color= arg.pixelColor(dx,dy);
-                            ans.setPixelColor({ int(x),int(y) },color);
+                            const auto & oColor=inputMat.at<cv::Vec3b>(dy,dx);
+
+                            outputMat.at<cv::Vec3b>(y,x)=oColor;
                         }
                         
 
