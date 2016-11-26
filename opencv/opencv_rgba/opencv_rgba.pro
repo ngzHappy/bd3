@@ -11,17 +11,20 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    Application.cpp
+    Application.cpp \
+    RGBADialog.cpp
 
 HEADERS  += MainWindow.hpp \
-    Application.hpp
+    Application.hpp \
+    RGBADialog.hpp
 
 FORMS    +=
 
 RESOURCES +=
 
 DISTFILES += \
-    $$PWD/opencv_rgba.lua
+    $$PWD/opencv_rgba.lua \
+    $$PWD/dialog_opencv_rgba.lua
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 

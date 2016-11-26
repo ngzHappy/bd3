@@ -11,17 +11,20 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    Application.cpp
+    Application.cpp \
+    LABDialog.cpp
 
 HEADERS  += MainWindow.hpp \
-    Application.hpp
+    Application.hpp \
+    LABDialog.hpp
 
 FORMS    +=
 
 RESOURCES +=
 
 DISTFILES += \
-    $$PWD/opencv_lab.lua
+    $$PWD/opencv_lab.lua \
+    $$PWD/dialog_opencv_lab.lua
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
 
