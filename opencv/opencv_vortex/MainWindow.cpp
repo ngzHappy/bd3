@@ -78,7 +78,7 @@ public:
 
                         /*不动点*/
                         if ((dx==0)&&(dy==0)) {
-                            continue;
+                            goto not_changed;
                         }
 
                         /*化为极坐标*/
@@ -88,6 +88,7 @@ public:
                         auto dis=std::sqrt(dx*dx+dy*dy);
 
                         if (dis>radius) {
+                        not_changed:
                             mapX.at<float>(y,x)=x;
                             mapY.at<float>(y,x)=y;
                             continue;
@@ -95,7 +96,7 @@ public:
 
                         /*求出偏转角度*/
                         {
-                            auto tmp=std::log(std::abs(dis*rate)+0.0001);
+                            auto tmp=std::log(std::abs(dis*rate)+1.0001);
                             tmp*=tmp;
                             th+=tmp;
                         }
@@ -112,7 +113,7 @@ public:
 
                 cv::remap(inputMat,outputMat,mapX,mapY,
                     cv::INTER_LANCZOS4,
-                    cv::BORDER_REPLICATE );
+                    cv::BORDER_REPLICATE);
 
                 return std::move(ans);
 
