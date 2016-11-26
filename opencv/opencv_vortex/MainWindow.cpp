@@ -95,7 +95,7 @@ public:
 
                         /*求出偏转角度*/
                         {
-                            auto tmp=std::abs(dis*rate)+0.0001;
+                            auto tmp=std::log(std::abs(dis*rate)+0.0001);
                             tmp*=tmp;
                             th+=tmp;
                         }
