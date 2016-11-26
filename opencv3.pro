@@ -80,3 +80,11 @@ opencv_vortex.file=$$PWD/opencv/opencv_vortex/opencv_vortex.pro
 opencv_vortex.depends+=library_opencv_basic
 SUBDIRS += opencv_vortex
 
+opencv_rgba.file=$$PWD/opencv/opencv_rgba/opencv_rgba.pro
+opencv_rgba.depends+=library_opencv_basic
+SUBDIRS += opencv_rgba
+
+opencv_lab.file=$$PWD/opencv/opencv_lab/opencv_lab.pro
+opencv_lab.depends+=library_opencv_basic
+SUBDIRS += opencv_lab
+
