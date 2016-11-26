@@ -41,6 +41,20 @@ public:
         double ABeta,
         double BAlpha,
         double BBeta) {
+        this->setAlgorithm([=](const QImage & arg)->QImage {
+            
+            try {
+                auto image=arg.convertToFormat(QImage::Format_RGB888);
+
+
+
+            }
+            catch (...) {
+                CPLUSPLUS_EXCEPTION(false);
+            }
+            return arg;
+
+        });
     }
 
 private:
