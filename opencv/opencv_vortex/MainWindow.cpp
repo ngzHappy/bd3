@@ -1,4 +1,5 @@
 ﻿/*MainWindow.cpp*/
+#include <cmath>
 #include "MainWindow.hpp"
 #include "VortexDialog.hpp"
 #include <OpenCVUtility.hpp>
@@ -38,6 +39,52 @@ public:
 
         this->setAlgorithm([=](const QImage &arg)->QImage {
             try {
+
+                /*copy the image*/
+                QImage ans=arg.copy();
+
+                using number_type=double;
+                const auto width=arg.width();
+                const auto height=arg.height();
+                const number_type center_x=width/2.;
+                const number_type center_y=height/2.;
+
+                /*(x,y)是变换后的点坐标*/
+                for (auto y=0; y<height;++y ) {
+                    for (auto x=0; x<width;++x) {
+                        
+                        auto dy=y-center_y;
+                        auto dx=x-center_x;
+
+                        /*不动点*/
+                        if ((dx==0)&&(dy==0)) { 
+                            continue;
+                        }
+
+                        /*化为极坐标*/
+                        /*求出偏角*/
+                        auto th=std::atan2(dy,dx);
+                        /*求p*/
+                        auto dis=std::sqrt(dx*dx+dy*dy);
+
+                        /*求出偏转角度*/
+                        th-=dis/50;
+
+                        /*求出原来的坐标*/
+                        dx= dis*std::cos(th)+center_x ;
+                        dy= dis*std::sin(th)+center_y ;
+
+                        /*设置颜色*/
+                        if ((dx<width)&&(dy<height)&&(dx>0)&&(dy>0)) {
+                            auto color= arg.pixelColor(dx,dy);
+                            ans.setPixelColor({ int(x),int(y) },color);
+                        }
+                        
+
+                    }
+                }
+
+                return std::move(ans);
 
             }
             catch (...) {
