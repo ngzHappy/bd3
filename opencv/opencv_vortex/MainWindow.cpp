@@ -4,19 +4,19 @@
 #include "VortexDialog.hpp"
 #include <OpenCVUtility.hpp>
 
-class MainWindow::_PrivateMainWindow{
+class MainWindow::_PrivateMainWindow {
 public:
 private:
     CPLUSPLUS_OBJECT(_PrivateMainWindow)
 };
 
-MainWindow::MainWindow(QWidget *parent) :
-    _Super(parent){
+MainWindow::MainWindow(QWidget *parent):
+    _Super(parent) {
     _thisp=new _PrivateMainWindow;
 }
 
-MainWindow::~MainWindow(){
-     delete _thisp;
+MainWindow::~MainWindow() {
+    delete _thisp;
 }
 
 namespace {
@@ -25,7 +25,7 @@ class ImageWidget : public ImageShowWidget {
 public:
     ImageWidget(const QImage &arg) {
         using DialogType=VortexDialog;
-        auto image = arg.convertToFormat(QImage::Format_RGB888);
+        auto image=arg.convertToFormat(QImage::Format_RGB888);
         this->setImage(image);
         using namespace memory;
         auto && dialog=makeStackPointer<DialogType>();
@@ -35,9 +35,17 @@ public:
         dialog->emitValueChanged();
     }
 
-    void valueChanged(int /* changeCount */) {
+    void valueChanged(double radius,double rate) {
 
-        this->setAlgorithm([=](const QImage &arg)->QImage {
+        this->setAlgorithm([rate_=rate,
+                radius,
+                this
+        ](const QImage &arg)->QImage {
+
+            if (rate_<.00000001) { return arg; }
+            if (radius<.00000001) { return arg; }
+            auto rate=1.0/rate_;
+
             try {
 
                 cv::Mat inputMat(arg.height(),arg.width(),CV_8UC3,
@@ -45,12 +53,15 @@ public:
                     arg.bytesPerLine());
 
                 /*copy the image*/
-                QImage ans=arg.copy();
+                QImage ans={ arg.size(),arg.format() };
                 cv::Mat outputMat(
                     ans.height(),ans.width(),CV_8UC3,
                     const_cast<uchar*>(ans.constBits()),
                     ans.bytesPerLine()
                 );
+
+                cv::Mat mapX(ans.height(),ans.width(),CV_32FC1);
+                cv::Mat mapY(ans.height(),ans.width(),CV_32FC1);
 
                 using number_type=double;
                 const auto width=arg.width();
@@ -59,14 +70,14 @@ public:
                 const number_type center_y=height/2.;
 
                 /*(x,y)是变换后的点坐标*/
-                for (auto y=0; y<height;++y ) {
-                    for (auto x=0; x<width;++x) {
-                        
+                for (auto y=0; y<height; ++y) {
+                    for (auto x=0; x<width; ++x) {
+
                         auto dy=y-center_y;
                         auto dx=x-center_x;
 
                         /*不动点*/
-                        if ((dx==0)&&(dy==0)) { 
+                        if ((dx==0)&&(dy==0)) {
                             continue;
                         }
 
@@ -76,23 +87,32 @@ public:
                         /*求p*/
                         auto dis=std::sqrt(dx*dx+dy*dy);
 
-                        /*求出偏转角度*/
-                        th-=dis/50;
-
-                        /*求出原来的坐标*/
-                        dx= dis*std::cos(th)+center_x ;
-                        dy= dis*std::sin(th)+center_y ;
-
-                        /*设置颜色*/
-                        if ((dx<width)&&(dy<height)&&(dx>0)&&(dy>0)) {
-                            const auto & oColor=inputMat.at<cv::Vec3b>(dy,dx);
-
-                            outputMat.at<cv::Vec3b>(y,x)=oColor;
+                        if (dis>radius) {
+                            mapX.at<float>(y,x)=x;
+                            mapY.at<float>(y,x)=y;
+                            continue;
                         }
-                        
+
+                        /*求出偏转角度*/
+                        {
+                            auto tmp=std::abs(dis*rate)+0.0001;
+                            tmp*=tmp;
+                            th+=tmp;
+                        }
+                        /*求出原来的坐标*/
+                        dx=dis*std::cos(th)+center_x;
+                        dy=dis*std::sin(th)+center_y;
+
+                        /*设置变换矩阵*/
+                        mapX.at<float>(y,x)=static_cast<float>(dx);
+                        mapY.at<float>(y,x)=static_cast<float>(dy);
 
                     }
                 }
+
+                cv::remap(inputMat,outputMat,mapX,mapY,
+                    cv::INTER_LANCZOS4,
+                    cv::BORDER_REPLICATE );
 
                 return std::move(ans);
 
@@ -119,7 +139,7 @@ QWidget* MainWindow::addImage(const QImage &arg) {
     return ans;
 }
 
-void MainWindow::openLua(){
+void MainWindow::openLua() {
     return _Super::openLua();
 }
 

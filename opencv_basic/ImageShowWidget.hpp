@@ -71,7 +71,8 @@ private:
 
 template<typename _A_,typename>
 inline void ImageShowWidget::setAlgorithm(_A_&&arg) {
-    using _A0_=std::remove_reference_t<_A_>;
+    using _A0_=std::remove_cv_t<
+        std::remove_reference_t<_A_>>;
     class _Alg_A0_ :public AbstractImageShift {
         _A0_ _pm;
     public:

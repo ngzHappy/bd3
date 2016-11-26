@@ -17,7 +17,7 @@ public:
     virtual ~VortexDialog();
     QVBoxLayout * getMainLayout() const;
 public:
-    Q_SIGNAL void valueChanged(int /* changeCount */);
+    Q_SIGNAL void valueChanged(double /* radius */ , double /* rate */);
     Q_SLOT void emitValueChanged();
     QSize sizeHint() const override;
 private:

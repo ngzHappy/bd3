@@ -4,27 +4,19 @@
 
 --[[
 
-INTER_NEAREST
-nearest neighbor interpolation
-
-INTER_LINEAR
-bilinear interpolation
-
-INTER_CUBIC
-bicubic interpolation
-
-INTER_AREA
-resampling using pixel area relation.
-It may be a preferred method for image decimation, as it gives
-moire'-free results. But when the image is zoomed, it is similar
-to the INTER_NEAREST method.
+ 
 
 --]]
 
-local valueDefault=0;
-local valueMin=0;
-local valueMax=9999;
-local valueStep=1;
+local radiusDefault=50;
+local radiusMin=0;
+local radiusMax=9999;
+local radiusStep=1.2;
+
+local rateDefault=10;
+local rateMin=0.00001;
+local rateMax=9999;
+local rateStep=0.05;
 
 local data={
 
@@ -32,12 +24,19 @@ name="VortexDialog",
 
 values={
 
-{"int_value",
-"changeCount",
- valueDefault,
- valueMin,
- valueMax,
- valueStep},
+{"double_value",
+"radius",
+ radiusDefault,
+ radiusMin,
+ radiusMax,
+ radiusStep},
+
+ {"double_value",
+"rate",
+ rateDefault,
+ rateMin,
+ rateMax,
+ rateStep},
 
 }--values
 
