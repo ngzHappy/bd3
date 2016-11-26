@@ -14,8 +14,8 @@ local LAlphaMax=9999;
 local LAlphaStep=.2;
 
 local LBetaDefault=0;
-local LBetaMin=0;
-local LBetaMax=9999;
+local LBetaMin=-255;
+local LBetaMax=255;
 local LBetaStep=1.2;
 
 local AAlphaDefault=1;
@@ -24,8 +24,8 @@ local AAlphaMax=9999;
 local AAlphaStep=.2;
 
 local ABetaDefault=0;
-local ABetaMin=0;
-local ABetaMax=9999;
+local ABetaMin=-255;
+local ABetaMax=255;
 local ABetaStep=1.2;
 
 local BAlphaDefault=1;
@@ -34,8 +34,8 @@ local BAlphaMax=9999;
 local BAlphaStep=.2;
 
 local BBetaDefault=0;
-local BBetaMin=0;
-local BBetaMax=9999;
+local BBetaMin=-255;
+local BBetaMax=255;
 local BBetaStep=1.2;
 
 local data={
