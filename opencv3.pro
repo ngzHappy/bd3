@@ -76,3 +76,7 @@ opencv_oldpicture.file=$$PWD/opencv/opencv_oldpicture/opencv_oldpicture.pro
 opencv_oldpicture.depends+=library_opencv_basic
 SUBDIRS += opencv_oldpicture
 
+opencv_vortex.file=$$PWD/opencv/opencv_vortex/opencv_vortex.pro
+opencv_vortex.depends+=library_opencv_basic
+SUBDIRS += opencv_vortex
+
