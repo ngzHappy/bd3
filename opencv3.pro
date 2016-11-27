@@ -88,3 +88,5 @@ opencv_lab.file=$$PWD/opencv/opencv_lab/opencv_lab.pro
 opencv_lab.depends+=library_opencv_basic
 SUBDIRS += opencv_lab
 
+
+
