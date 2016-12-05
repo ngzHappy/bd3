@@ -13,7 +13,7 @@ static memory::StaticData<ShadowThread> _data;
 }/*____ShadowThread*/
 
 ShadowThread * ShadowThread::instance(){
-   static memory::StaticPoionter<ShadowThread> ans(
+   static memory::StaticPointer<ShadowThread> ans(
                ____ShadowThread::_data);
    return ans.pointer();
 }
