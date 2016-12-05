@@ -133,7 +133,6 @@ public:
             }
         });
 
-
     }
 private:
     CPLUSPLUS_OBJECT(ImageWidget)
