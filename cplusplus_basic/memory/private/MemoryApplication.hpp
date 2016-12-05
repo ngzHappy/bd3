@@ -16,12 +16,13 @@ class _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT Application {
     static void _p_main_construct();
     static void _p_main_destruct();
 public:
-    Application() { _p_setMainConstruct(); _p_main_construct();}
-    ~Application() { _p_setMainQuit(); _p_main_destruct();}
+    Application() { _p_setMainConstruct(); _p_main_construct(); }
 
     static bool isMainConstruct();
     static bool isMainQuit();
-    inline void quit() { _p_setMainQuit(); }
+    inline void quit() { _p_setMainQuit(); _p_main_destruct(); }
+
+    ~Application() { quit(); }
 };
 
 }/*namespace memory*/
