@@ -75,6 +75,7 @@ public:
 
                         auto dy=y-center_y;
                         auto dx=x-center_x;
+                        number_type th,dis;
 
                         /*不动点*/
                         if ((dx==0)&&(dy==0)) {
@@ -83,9 +84,9 @@ public:
 
                         /*化为极坐标*/
                         /*求出偏角*/
-                        auto th=std::atan2(dy,dx);
+                        th=std::atan2(dy,dx);
                         /*求p*/
-                        auto dis=std::sqrt(dx*dx+dy*dy);
+                        dis=std::sqrt(dx*dx+dy*dy);
 
                         if (dis>radius) {
                         not_changed:
