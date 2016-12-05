@@ -118,7 +118,7 @@ template<
     bool _is_plugin_=IS_PLUGIN_FIRE,
     bool _is_pod_=std::is_pod<_T_>::value/*false*/
 >
-class StaticPoionter final :
+class StaticPointer final :
     private _ns_static_pointer_private_memory_::NoPODConstruct,
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _N_=_ns_static_pointer_private_memory_::NoPODConstruct;
@@ -136,17 +136,17 @@ class StaticPoionter final :
     };
     static_assert(false==std::is_reference<_T_>::value,"must not ref");
 public:
-    StaticPoionter()=delete;
-    StaticPoionter(const StaticPoionter&)=delete;
-    StaticPoionter(StaticPoionter&&)=delete;
-    StaticPoionter&operator=(const StaticPoionter&)=delete;
-    StaticPoionter&operator=(StaticPoionter&&)=delete;
+    StaticPointer()=delete;
+    StaticPointer(const StaticPointer&)=delete;
+    StaticPointer(StaticPointer&&)=delete;
+    StaticPointer&operator=(const StaticPointer&)=delete;
+    StaticPointer&operator=(StaticPointer&&)=delete;
 public:
     template<typename ..._Args_>
-    StaticPoionter(const void *argData,_Args_&&...args)
+    StaticPointer(const void *argData,_Args_&&...args)
         :_N_(),_S_(argData,std::forward<_Args_>(args)...) {}
 
-    ~StaticPoionter() {
+    ~StaticPointer() {
 
         /*c++17将if改为if constexpr*/
         constexpr bool _has_close=__Close<_T_>::value;
@@ -178,20 +178,20 @@ template<
     typename _T_,
     bool _need_close_,
     bool _is_plugin_
->class StaticPoionter<_T_,_need_close_,_is_plugin_,true> final :
+>class StaticPointer<_T_,_need_close_,_is_plugin_,true> final :
     public _ns_static_pointer_private_memory_::StaticPointerPOD<_T_> {
     using _S_=_ns_static_pointer_private_memory_::StaticPointerPOD<_T_>;
     static_assert(false==std::is_reference<_T_>::value,"must not ref");
 public:
-    StaticPoionter()=default;
+    StaticPointer()=default;
     using _S_::_S_;
     template<typename _U_,bool _0_,bool _1_>
-    StaticPoionter(const StaticPoionter<_U_,_0_,_1_,true>&arg) { this->_m_Data=arg.pointer(); }
+    StaticPointer(const StaticPointer<_U_,_0_,_1_,true>&arg) { this->_m_Data=arg.pointer(); }
     template<typename _U_,bool _0_,bool _1_>
-    StaticPoionter(StaticPoionter<_U_,_0_,_1_,true>&&arg) { this->_m_Data=arg.pointer(); }
-    StaticPoionter&operator=(const StaticPoionter&)=default;
-    StaticPoionter&operator=(StaticPoionter&&)=default;
-    ~StaticPoionter()=default;
+    StaticPointer(StaticPointer<_U_,_0_,_1_,true>&&arg) { this->_m_Data=arg.pointer(); }
+    StaticPointer&operator=(const StaticPointer&)=default;
+    StaticPointer&operator=(StaticPointer&&)=default;
+    ~StaticPointer()=default;
 };
 
 }/*~memory*/
