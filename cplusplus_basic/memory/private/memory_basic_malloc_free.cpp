@@ -1,5 +1,6 @@
 ﻿/*1472*/
 /*std::*/
+extern void __memory_clean_thread_function(void(*)(void *),void *);
 #include <mutex>
 #include <memory>
 #include <atomic>
@@ -703,7 +704,6 @@ public:
             _pm_is_free_memroy_not_used.store(true);
 
             /*__memory_clean_thread_function*/
-            extern void __memory_clean_thread_function(void(*)(void *),void *);
             __memory_clean_thread_function(
                 [](void * arg) {
                 auto this_pointer=reinterpret_cast<Memory*>(arg);
