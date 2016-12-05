@@ -207,6 +207,7 @@ public:
 
     void run_plain_function(TypePlainFunction arg) {
         std::unique_lock<std::mutex> varLock{ __m_mutex };
+        if (__m_quit_) { return; }
         ++__m_functions_count;
         __m_plainfunctions.push_back(arg);
         __m_cv_functions.notify_all();
@@ -214,6 +215,7 @@ public:
 
     void _p_run_std_function(TypeStdFunction && arg) {
         std::unique_lock<std::mutex> varLock{ __m_mutex };
+        if (__m_quit_) { return; }
         ++__m_functions_count;
         __m_stdfunctions.push_back(std::move(arg));
         __m_cv_functions.notify_all();
@@ -222,6 +224,7 @@ public:
     void _p_run_plain_constvoidstar_function(
         TypePlainConstVoidStarFunction arg,const void * argData) {
         std::unique_lock<std::mutex> varLock{ __m_mutex };
+        if (__m_quit_) { return; }
         ++__m_functions_count;
         __m_plain_constvoidstar_functions.emplace_back(arg,argData);
         __m_cv_functions.notify_all();
@@ -230,6 +233,7 @@ public:
     void _p_run_plain_voidstar_function(
         TypePlainVoidStarFunction arg,void * argData) {
         std::unique_lock<std::mutex> varLock{ __m_mutex };
+        if (__m_quit_) { return; }
         ++__m_functions_count;
         __m_plain_voidstar_functions.emplace_back(arg,argData);
         __m_cv_functions.notify_all();
