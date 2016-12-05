@@ -4,7 +4,9 @@
 #include "TestException.hpp"
 #include "TestLua.hpp"
 #include <QtCore/qtimer.h>
+#include <QtCore/qdebug.h>
 #include <text/gzip.hpp>
+#include <thread/ShadowThread.hpp>
 
 int main(int argc, char *argv[])try
 {
@@ -37,12 +39,34 @@ int main(int argc, char *argv[])try
         TestLua test;
     }
 
+    {
+        int a=12;
+        thread::ShadowThread::instance()->run([]() {
+            qDebug()<<"test ShadowThread";
+        });
+
+        thread::ShadowThread::instance()->run([a]() {
+            qDebug()<<"test ShadowThread"<<a;
+        });
+
+        thread::ShadowThread::instance()->run([](void *a) {
+            qDebug()<<"test ShadowThread"<<a;
+        },&a);
+
+        thread::ShadowThread::instance()->run([](const void *a) {
+            qDebug()<<"test ShadowThread const"<<a;
+        },&a);
+
+    }
+
     MainWindow window;
     window.show();
 
     auto app_ans= app.exec();
     memory_app.quit();
     return app_ans;
+
+    thread::ShadowThread::instance()->quit();
 }
 catch (...) {
     exception::exception_handle(true,

@@ -19,8 +19,8 @@ namespace  _p_file {
 
 class Memory {
 public:
-    typedef int int_t;static_assert(sizeof(int_t)>=4,"32bits");
-    typedef size_t uint_t;static_assert(sizeof(uint_t)>=4,"32bits");
+    typedef int int_t; static_assert(sizeof(int_t)>=4,"32bits");
+    typedef size_t uint_t; static_assert(sizeof(uint_t)>=4,"32bits");
     /*boost::pool*/
     class pool_t {
         typedef boost::pool<boost::default_user_allocator_malloc_free> _pool_t;
@@ -75,7 +75,7 @@ public:
     template<int_t N>
     class Item_N final :public MFItem {
         constexpr static auto _next_size_=(((32*1024)/N)>32)?((32*1024)/N):32;
-        pool_t _pm_pool{ N ,_next_size_};
+        pool_t _pm_pool{ N ,_next_size_ };
     public:
         void clean() { _pm_pool.release_memory(); }
         uint_t size(void *)const override { return N; }
@@ -89,7 +89,7 @@ public:
             return nullptr;
         }/*void * malloc()*/
         Item_N() {
-            if /*c++17 constexpr*/(N<(1*256)) { _pm_pool.malloc()/*init without delete*/; }
+            if /*c++17 constexpr*/ (N<(1*256)) { _pm_pool.malloc()/*init without delete*/; }
         }
     }/*class Item_N*/;
 
@@ -701,10 +701,16 @@ public:
     void clean() {
         if (false==_pm_is_free_memroy_not_used.load()) {
             _pm_is_free_memroy_not_used.store(true);
-            std::thread([this]() {
-                _p_clean();
-                _pm_is_free_memroy_not_used.store(false);
-            }).detach();
+
+            /*__memory_clean_thread_function*/
+            extern void __memory_clean_thread_function(void(*)(void *),void *);
+            __memory_clean_thread_function(
+                [](void * arg) {
+                auto this_pointer=reinterpret_cast<Memory*>(arg);
+                this_pointer->_p_clean();
+                this_pointer->_pm_is_free_memroy_not_used.store(false);
+            },this);
+
         }
     }
 };
@@ -741,13 +747,13 @@ inline void _on_memory_zero_()noexcept(true) {
 }/*namespace*/
  /*********************************/
 
-void clean() noexcept(true){
+void clean() noexcept(true) {
     if (false==_memory_is_malloced.load()) { return; }
     _memory_is_malloced.store(false);
     return _p_file::get_memory()->clean();
 }
 
-void * malloc(size_t arg) noexcept(true){
+void * malloc(size_t arg) noexcept(true) {
     if (arg<=0) { return &_memory_private_zero; }
     void * ans=nullptr;
 
@@ -769,17 +775,17 @@ void * malloc(size_t arg) noexcept(true){
     return ans;
 }
 
-void free(void * arg) noexcept(true){
+void free(void * arg) noexcept(true) {
     if (arg==&_memory_private_zero) { return; }
     return _p_file::get_memory()->free(arg);
 }
 
-size_t size(void * arg) noexcept(true){
+size_t size(void * arg) noexcept(true) {
     if (arg==&_memory_private_zero) { return 0; }
     return _p_file::get_memory()->size(arg);
 }
 
-int cookie_size() noexcept(true){
+int cookie_size() noexcept(true) {
     return sizeof(_p_file::Memory::Item);
 }
 

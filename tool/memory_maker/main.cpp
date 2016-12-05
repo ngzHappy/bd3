@@ -290,10 +290,16 @@ public:
     void clean(){
         if( false == _pm_is_free_memroy_not_used.load() ){
             _pm_is_free_memroy_not_used.store(true);
-            std::thread([this](){
-                _p_clean();
-                _pm_is_free_memroy_not_used.store(false);
-            }).detach();
+            
+            /*__memory_clean_thread_function*/
+            extern void __memory_clean_thread_function(void(*)(void *),void *);
+            __memory_clean_thread_function(
+                [](void * arg) {
+                auto this_pointer=reinterpret_cast<Memory*>(arg);
+                this_pointer->_p_clean();
+                this_pointer->_pm_is_free_memroy_not_used.store(false);
+            },this);
+
         }
     }
 };
