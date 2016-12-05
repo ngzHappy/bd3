@@ -1,6 +1,8 @@
 ﻿#ifndef __CPLUSPLUS_BASIC_HPP_0X97721
 #define __CPLUSPLUS_BASIC_HPP_0X97721
 
+#ifdef __cplusplus
+
 #ifndef CPLUSPLUS_OBJECT
 #define CPLUSPLUS_OBJECT(_objname_) inline static constexpr auto __0x21_size() noexcept(true){ return sizeof(_objname_); } MEMORY_CLASS_NEW_DELETE
 #endif // !CPLUSPLUS_OBJECT
@@ -17,5 +19,7 @@
 #include "exception/Exception.hpp"
 #include "thread/ShadowThread.hpp"
 
-#endif
+#endif // !__cplusplus
+
+#endif // !__CPLUSPLUS_BASIC_HPP_0X97721
 
