@@ -40,9 +40,8 @@ public:
         old_value=varText;
         const auto varValues=varText.split(',',QString::SkipEmptyParts);
         value=cv::Scalar::all(0);
-        
+
         auto varBegin=varValues.constBegin();
-        const auto varEnd=varValues.constEnd();
         const auto varSize=std::min(4,varValues.size());
         for (int i=0; i<varSize;++i,++varBegin) {
             value[i]=varBegin->toDouble();
@@ -52,7 +51,7 @@ public:
 
     inline void onEditingFinished();
 
-    cv::Scalar getValue()  { 
+    cv::Scalar getValue()  {
         directOnEditingFinished();
         return value;
     }
@@ -142,7 +141,7 @@ private:
 
 void ScalarLineEdit::onEditingFinished() {
     if (false==this->directOnEditingFinished()) {
-        return; 
+        return;
     }
     super->emitValueChanged();
 }
