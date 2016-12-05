@@ -37,7 +37,7 @@ public:
 
     std::thread __m_thread;
     std::mutex __m_mutex;
-    bool __m_quit_=false;
+    std::atomic<bool> __m_quit_{ false };
     std::condition_variable __m_cv_functions;
     std::atomic<std::size_t> __m_functions_count{ 0 };
     ___ShadowThread::List<TypeStdFunction> __m_stdfunctions;
@@ -63,23 +63,17 @@ public:
             auto thisp=_thisp.get();
             for (;;) {
 
-                do {
-                    /*lock mutex*/
+                {
                     std::unique_lock<std::mutex> varLock{ thisp->__m_mutex };
-                    if (thisp->__m_quit_) { return; }
 
-                    if ((thisp->__m_functions_count)>0) {
-                        break;
+                    while ((thisp->__m_functions_count)<1) {
+                        if (thisp->__m_quit_) { return; }
+                        thisp->__m_cv_functions.wait(varLock);
                     }
-
-                    /*unlock mutex and wait*/
-                    thisp->__m_cv_functions.wait(varLock);
-                    /*lock mutex*/
-                    if (thisp->__m_quit_) { return; }
-                    /*unlock mutex*/
-                } while (false);
+                }
 
                 while ((thisp->__m_functions_count)>0) {
+                    if (thisp->__m_quit_) { return; }
                     thisp->do_plain_functions();
                     thisp->do_plain_void_star_functions();
                     thisp->do_plain_const_void_star_functions();
@@ -206,37 +200,45 @@ public:
     }
 
     void run_plain_function(TypePlainFunction arg) {
-        std::unique_lock<std::mutex> varLock{ __m_mutex };
-        if (__m_quit_) { return; }
-        ++__m_functions_count;
-        __m_plainfunctions.push_back(arg);
+        {
+            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            if (__m_quit_) { return; }
+            ++__m_functions_count;
+            __m_plainfunctions.push_back(arg);
+        }
         __m_cv_functions.notify_all();
     }
 
     void _p_run_std_function(TypeStdFunction && arg) {
-        std::unique_lock<std::mutex> varLock{ __m_mutex };
-        if (__m_quit_) { return; }
-        ++__m_functions_count;
-        __m_stdfunctions.push_back(std::move(arg));
+        {
+            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            if (__m_quit_) { return; }
+            ++__m_functions_count;
+            __m_stdfunctions.push_back(std::move(arg));
+        }
         __m_cv_functions.notify_all();
     }
 
     void _p_run_plain_constvoidstar_function(
         TypePlainConstVoidStarFunction arg,const void * argData) {
-        std::unique_lock<std::mutex> varLock{ __m_mutex };
-        if (__m_quit_) { return; }
-        ++__m_functions_count;
-        __m_plain_constvoidstar_functions.emplace_back(arg,argData);
-        __m_cv_functions.notify_all();
+            {
+                std::unique_lock<std::mutex> varLock{ __m_mutex };
+                if (__m_quit_) { return; }
+                ++__m_functions_count;
+                __m_plain_constvoidstar_functions.emplace_back(arg,argData);
+            }
+            __m_cv_functions.notify_all();
     }
 
     void _p_run_plain_voidstar_function(
         TypePlainVoidStarFunction arg,void * argData) {
-        std::unique_lock<std::mutex> varLock{ __m_mutex };
-        if (__m_quit_) { return; }
-        ++__m_functions_count;
-        __m_plain_voidstar_functions.emplace_back(arg,argData);
-        __m_cv_functions.notify_all();
+            {
+                std::unique_lock<std::mutex> varLock{ __m_mutex };
+                if (__m_quit_) { return; }
+                ++__m_functions_count;
+                __m_plain_voidstar_functions.emplace_back(arg,argData);
+            }
+            __m_cv_functions.notify_all();
     }
 
 private:
