@@ -240,7 +240,7 @@ private:
 };
 
 ShadowThread::ShadowThread() {
-    auto varThisp=::new(__m_thisp)
+    auto varThisp=::new(&__m_thisp)
         auto(memory::make_shared<_PrivateShadowThread>());
     (*varThisp)->start();
 }

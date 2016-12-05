@@ -32,11 +32,14 @@ public:
     >void run(T && arg) { _p_run_std_function(std::move(arg)); }
 
     void run(TypePlainVoidStarFunction a,void *b) { _p_run_plain_voidstar_function(a,b); }
-    void run(TypePlainConstVoidStarFunction a,const void *b) { 
-        _p_run_plain_constvoidstar_function(a,b); }
+    void run(TypePlainConstVoidStarFunction a,const void *b) {
+        _p_run_plain_constvoidstar_function(a,b);
+    }
 private:
     class _PrivateShadowThread;
-    char __m_thisp[sizeof(std::shared_ptr<_PrivateShadowThread>)];
+    std::aligned_storage_t<
+        sizeof(std::shared_ptr<_PrivateShadowThread>),
+        alignof(std::shared_ptr<_PrivateShadowThread>)> __m_thisp;
     std::shared_ptr<_PrivateShadowThread> & thisp();
     std::shared_ptr<const _PrivateShadowThread> & thisp()const;
     void _p_run_plain_function(TypePlainFunction);
@@ -51,7 +54,7 @@ public:
 private:
     CPLUSPLUS_OBJECT(ShadowThread)
 };
- 
+
 template<typename T>
 inline void runInShadowThread(T && arg) {
     ShadowThread::instance()->run(std::move(arg));
@@ -61,8 +64,8 @@ inline void runInShadowThread(ShadowThread::TypePlainVoidStarFunction a,void *b)
     ShadowThread::instance()->run(a,b);
 }
 
-inline void runInShadowThread(ShadowThread::TypePlainConstVoidStarFunction a,const void *b) { 
-    ShadowThread::instance()->run(a,b); 
+inline void runInShadowThread(ShadowThread::TypePlainConstVoidStarFunction a,const void *b) {
+    ShadowThread::instance()->run(a,b);
 }
 
 }/*thread*/
