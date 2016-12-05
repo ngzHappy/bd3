@@ -13,9 +13,11 @@ class _CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT Application {
     static void _p_clearMainConstruct();
     static void _p_setMainQuit();
     static void _p_clearMainQuit();
+    static void _p_main_construct();
+    static void _p_main_destruct();
 public:
-    Application() { _p_setMainConstruct(); }
-    ~Application() { _p_setMainQuit(); }
+    Application() { _p_setMainConstruct(); _p_main_construct();}
+    ~Application() { _p_setMainQuit(); _p_main_destruct();}
 
     static bool isMainConstruct();
     static bool isMainQuit();

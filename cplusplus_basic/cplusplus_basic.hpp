@@ -7,6 +7,7 @@
 #include "memory/Memory.hpp"
 #include "utility/type_traits.hpp"
 #include "exception/Exception.hpp"
+#include "thread/ShadowThread.hpp"
 
 #ifndef CPLUSPLUS_OBJECT
 #define CPLUSPLUS_OBJECT(_objname_) inline static constexpr auto __0x21_size() noexcept(true){ return sizeof(_objname_); } MEMORY_CLASS_NEW_DELETE
