@@ -387,7 +387,7 @@ AbstractImageShift::ImageVector ImageShowWidget::getImages()const {
     AbstractImageShift::ImageVector ans;
     ans.reserve(varImageWidgets.size());
     for (const auto & varI:varImageWidgets) {
-        ans.push_back( varI->getImage() );
+        ans.push_back( &varI->getImage() );
     }
     return std::move(ans);
 }
@@ -407,7 +407,7 @@ QDockWidget* ImageShowWidget::_p_addImageWidget(
             varDock);
         _pm_this_data->basicMenu->addAction(
             varDock->toggleViewAction());
-        
+
         {
            auto var= dynamic_cast<AbstractGetImage*>(arg);
            if (var) {

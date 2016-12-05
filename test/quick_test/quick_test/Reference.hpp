@@ -1,7 +1,7 @@
 #include <utility>
 #include <type_traits>
 
-namespace utiliy{
+namespace utiliy {
 
 template<typename L>
 const auto & rget(const std::reference_wrapper<L> &l) { return l.get(); }

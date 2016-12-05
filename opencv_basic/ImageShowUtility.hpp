@@ -77,7 +77,6 @@ class HasXFunction :public std::false_type {
 public:
 };
 
-
 template<
     typename _XTT_
 >

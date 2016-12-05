@@ -20,8 +20,7 @@ public:
 
 class AbstractImageShift :public AbstractDrawFunction {
 public:
-    using ImageVector=std::vector<std::reference_wrapper<const QImage>,
-        memory::Allocator<std::reference_wrapper<const QImage>/**/>/**/>;
+    using ImageVector=std::vector<const QImage*,memory::Allocator<QImage*>/**/>;
     AbstractImageShift()=default;
     virtual ~AbstractImageShift()=default;
 public:
