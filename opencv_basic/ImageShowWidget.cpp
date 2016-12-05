@@ -507,7 +507,7 @@ const QImage &ImageShowWidget::getAlgorithmImage()const {
     else if (_pm_this_data->chartCentralWidget) {
         return _pm_this_data->chartCentralWidget->getAlgorithmImage();
     }
-    static memory::StaticPoionter<QImage> _null__(_d_null);
+    static memory::StaticPointer<QImage> _null__(_d_null);
     return *_null__;
 }
 
