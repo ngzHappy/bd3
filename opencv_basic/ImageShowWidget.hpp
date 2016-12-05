@@ -1,6 +1,7 @@
 ﻿#ifndef IMAGESHOWWIDGET_HPP
 #define IMAGESHOWWIDGET_HPP
 
+#include <list>
 #include "OpenCVBasic.hpp"
 #include <Qtwidgets/QWidget>
 #include <QtWidgets/QMainWindow>
@@ -14,7 +15,9 @@ namespace QtCharts {
 class QChartView;
 }
 
-class OPENCV3_BASICHARED_EXPORT ImageShowWidget : public QMainWindow {
+class OPENCV3_BASICHARED_EXPORT ImageShowWidget :
+    public QMainWindow,
+    public AbstractGetImage {
     Q_OBJECT
 
 private:
@@ -26,6 +29,9 @@ public:
     ImageShowWidget(QWidget * /*parent*/=nullptr,Qt::WindowFlags /*flags*/=Qt::WindowFlags());
     virtual ~ImageShowWidget();
 public:
+    template<typename _T_>
+    using List=std::list<_T_,memory::Allocator<_T_>>;
+public:
     /*set central widget*/
     PlainImageView * setImage(const QImage &);
     /*set central widget*/
@@ -33,7 +39,9 @@ public:
     /*set central widget*/
     QtCharts::QChartView * setChartView(QtCharts::QChartView *);
 
-    const QImage &getImage() const;
+    const List<AbstractGetImage *> &getImageWidgets() const;
+    AbstractImageShift::ImageVector getImages()const;
+    const QImage &getImage() const override;
     const QImage &getAlgorithmImage()const;
     QImage getPaintedAlgorithmImage()const;
     QDockWidget* addImageWidget(QWidget*,const QString&/*title*/=QString{});

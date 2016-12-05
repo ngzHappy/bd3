@@ -43,7 +43,7 @@ public:
         ](const QImage &arg)->QImage {
 
             if (rate_<.00000001) { return arg; }
-            if (radius<.00000001) { return arg; }
+            if (radius<1.00000001) { return arg; }
             auto rate=1.0/rate_;
 
             try {

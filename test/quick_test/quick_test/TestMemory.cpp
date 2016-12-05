@@ -1,12 +1,48 @@
 ﻿#include "TestMemory.hpp"
 #include<mutex>
+#include<vector>
 #include<memory>
 #include<thread>
 #include<cstdlib>
 #include<cassert>
 #include<iostream>
 
-TestMemory::TestMemory(){
+namespace {
+class TestClass {
+public:
+    char data[128];
+    void foo() {}
+};
+}
+
+#include "Reference.hpp"
+
+TestMemory::TestMemory() {
+
+    {
+        TestClass v1,v0,v2;
+        std::vector< std::reference_wrapper<TestClass>,
+            memory::Allocator<std::reference_wrapper<TestClass>>> test;
+        test.reserve(128);
+        test.push_back(v0);
+        test.push_back(v1);
+        test.push_back(v2);
+        
+        std::reference_wrapper<TestClass> rv1(v1);
+        
+    }
+
+    {
+        using namespace utiliy;
+        int a=1;
+        int b=2;
+
+        std::reference_wrapper<int> ra(a);
+        std::reference_wrapper<int> rb(b);
+
+        
+    }
+
 
     {
         void * data=memory::malloc(4);

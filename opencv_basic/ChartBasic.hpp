@@ -17,7 +17,7 @@ private:
 public:
     ~ChartBasic();
     ChartBasic(QGraphicsItem *parent=nullptr,Qt::WindowFlags wFlags=Qt::WindowFlags());
-     
+
     QtCharts::QValueAxis *imageXAxis()const { return _p_x; }
     QtCharts::QValueAxis *imageYAxis()const { return _p_y; }
 

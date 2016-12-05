@@ -6,7 +6,9 @@
 #include <QtWidgets/qwidget.h>
 class QImage;
 
-class OPENCV3_BASICHARED_EXPORT PlainImageView : public QWidget {
+class OPENCV3_BASICHARED_EXPORT PlainImageView :
+    public QWidget,
+    public AbstractGetImage {
     Q_OBJECT
 
 private:
@@ -18,7 +20,7 @@ public:
     virtual ~PlainImageView();
 
     void setImage(const QImage &,bool/*copy*/=true);
-    const QImage & getImage()const;
+    const QImage & getImage()const override;
     const QImage & getAlgorithmImage()const;
     QImage getPaintedAlgorithmImage()const;
 

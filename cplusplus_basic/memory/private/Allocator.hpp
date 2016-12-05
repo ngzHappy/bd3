@@ -16,7 +16,7 @@ public:
         "The C++ Standard forbids containers of const elements "
         "because allocator<const T> is ill-formed.");
 
-    typedef void _Not_user_specialized;
+    //typedef void _Not_user_specialized;
     typedef _Ty value_type;
     typedef value_type *pointer;
     typedef const value_type *const_pointer;

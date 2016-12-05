@@ -4,7 +4,9 @@
 #include "ChartBasic.hpp"
 #include "AbstractImageShift.hpp"
 
-class OPENCV3_BASICHARED_EXPORT ImageChart : public ChartBasic {
+class OPENCV3_BASICHARED_EXPORT ImageChart :
+    public ChartBasic,
+    public AbstractGetImage {
     Q_OBJECT
 
 private:
@@ -17,7 +19,7 @@ public:
     ~ImageChart();
 public:
     void setImage(const QImage &,bool _copy=true);
-    const QImage &getImage()const;
+    const QImage &getImage()const override;
     const QImage &getAlgorithmImage()const;
     QImage getPaintedAlgorithmImage()const;
 

@@ -5,7 +5,9 @@
 #include "AbstractImageShift.hpp"
 class ImageChart;
 
-class OPENCV3_BASICHARED_EXPORT ImageChartView : public ChartView {
+class OPENCV3_BASICHARED_EXPORT ImageChartView :
+    public ChartView,
+    public AbstractGetImage {
     Q_OBJECT
 
 private:

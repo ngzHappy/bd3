@@ -87,7 +87,9 @@ inline QSize imageResizeSize(
 }
 
 
-class BasicImageView :public QWidget {
+class BasicImageView :
+        public QWidget,
+        public AbstractGetImage {
     QImage _pm_Image;
     QPixmap _pm_DrawImage;
     using _Super=QWidget;
@@ -118,7 +120,7 @@ public:
     }
 
     /*获得图片*/
-    const QImage & getImage() const {
+    const QImage & getImage() const override {
         /*获得独立拷贝*/
         return _pm_Image;
     }
@@ -209,6 +211,7 @@ public:
     inline _PrivateImageShowWidget();
     inline virtual ~_PrivateImageShowWidget();
 public:
+    List<AbstractGetImage *> imageWidgets;
     QPointer<PlainImageView> centralWidget;
     QPointer<ImageChartView> chartCentralWidget;
     __private::BasicImageView * originalWidget=nullptr;
@@ -373,6 +376,20 @@ ImageShowWidget::ImageShowWidget(
     _pm_this_data->centralWidget=new PlainImageView;
     setCentralWidget(_pm_this_data->centralWidget);
     this->setDockNestingEnabled(true);
+    _pm_this_data->imageWidgets.push_back(_pm_this_data->originalWidget);
+}
+
+const ImageShowWidget::List<AbstractGetImage *> &
+ImageShowWidget::getImageWidgets() const { return _pm_this_data->imageWidgets; }
+
+AbstractImageShift::ImageVector ImageShowWidget::getImages()const {
+    const auto &varImageWidgets=getImageWidgets();
+    AbstractImageShift::ImageVector ans;
+    ans.reserve(varImageWidgets.size());
+    for (const auto & varI:varImageWidgets) {
+        ans.push_back( varI->getImage() );
+    }
+    return std::move(ans);
 }
 
 QDockWidget* ImageShowWidget::_p_addImageWidget(
@@ -390,6 +407,14 @@ QDockWidget* ImageShowWidget::_p_addImageWidget(
             varDock);
         _pm_this_data->basicMenu->addAction(
             varDock->toggleViewAction());
+        
+        {
+           auto var= dynamic_cast<AbstractGetImage*>(arg);
+           if (var) {
+               _pm_this_data->imageWidgets.push_back(var);
+           }
+        }
+
         return varDock;
     }
 }
