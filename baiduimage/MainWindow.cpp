@@ -24,7 +24,7 @@ class BaiDuImageState final :
     };
     static memory::StaticData<StaticDataType> _p_staticData;
     static StaticDataType * _p_StaticData() {
-        static memory::StaticPoionter<StaticDataType> ans{ _p_staticData };
+        static memory::StaticPointer<StaticDataType> ans{ _p_staticData };
         return ans.pointer();
     }
 public:
@@ -95,7 +95,7 @@ inline void BaiDuImageState::errorDownLoad() {
 
 inline void BaiDuImageState::next() {
     switch (next_state) {
-        case i_start:return startDownLoad(); 
+        case i_start:return startDownLoad();
         case i_wait:return;
         case i_finished:return finishedDownLoad();
         case i_error:return errorDownLoad();
