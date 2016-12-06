@@ -6,35 +6,25 @@
 
 --]]
 
-local RAlphaDefault=1;
+local RAlphaDefault=0.299;
 local RAlphaMin=0;
 local RAlphaMax=9999;
 local RAlphaStep=.2;
 
-local RBetaDefault=0;
-local RBetaMin=-255;
-local RBetaMax=255;
-local RBetaStep=1.2;
-
-local GAlphaDefault=1;
+local GAlphaDefault=0.587;
 local GAlphaMin=0;
 local GAlphaMax=9999;
 local GAlphaStep=.2;
 
-local GBetaDefault=0;
-local GBetaMin=-255;
-local GBetaMax=255;
-local GBetaStep=1.2;
-
-local BAlphaDefault=1;
+local BAlphaDefault=0.114;
 local BAlphaMin=0;
 local BAlphaMax=9999;
 local BAlphaStep=.2;
 
-local BBetaDefault=0;
-local BBetaMin=-255;
-local BBetaMax=255;
-local BBetaStep=1.2;
+local BetaDefault=0;
+local BetaMin=-255;
+local BetaMax=255;
+local BetaStep=1.2;
 
 local data={
 
@@ -50,25 +40,11 @@ values={
  RAlphaStep},
 
  {"double_value",
-"RBeta",
- RBetaDefault,
- RBetaMin,
- RBetaMax,
- RBetaStep},
-
- {"double_value",
 "GAlpha",
  GAlphaDefault,
  GAlphaMin,
  GAlphaMax,
  GAlphaStep},
-
- {"double_value",
-"GBeta",
- GBetaDefault,
- GBetaMin,
- GBetaMax,
- GBetaStep},
 
   {"double_value",
 "BAlpha",
@@ -78,12 +54,11 @@ values={
  BAlphaStep},
 
  {"double_value",
-"BBeta",
- BBetaDefault,
- BBetaMin,
- BBetaMax,
- BBetaStep},
-
+"Beta",
+ BetaDefault,
+ BetaMin,
+ BetaMax,
+ BetaStep},
 
 }--values
 

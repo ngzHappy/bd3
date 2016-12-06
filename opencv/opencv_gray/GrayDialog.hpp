@@ -17,7 +17,7 @@ public:
     virtual ~GrayDialog();
     QVBoxLayout * getMainLayout() const;
 public:
-    Q_SIGNAL void valueChanged(double /* RAlpha */ , double /* RBeta */ , double /* GAlpha */ , double /* GBeta */ , double /* BAlpha */ , double /* BBeta */);
+    Q_SIGNAL void valueChanged(double /* RAlpha */ , double /* GAlpha */ , double /* BAlpha */ , double /* Beta */);
     Q_SLOT void emitValueChanged();
     QSize sizeHint() const override;
 private:

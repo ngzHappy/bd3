@@ -131,7 +131,7 @@ public:
 
     /*values*/
 
-    constexpr static double default_RAlpha_0x2d(){return 1;}
+    constexpr static double default_RAlpha_0x2d(){return 0.299;}
     constexpr static double default_step_RAlpha_0x2d(){return 0.2;}
     constexpr static double max_RAlpha_0x2d(){return 9999;}
     constexpr static double min_RAlpha_0x2d(){return 0;}
@@ -140,16 +140,7 @@ public:
     double old_RAlpha_0x2d=default_RAlpha_0x2d();
     _0x21Q_LineEdit * edit_RAlpha_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_RAlpha_0x2d=nullptr;
-    constexpr static double default_RBeta_0x2d(){return 0;}
-    constexpr static double default_step_RBeta_0x2d(){return 1.2;}
-    constexpr static double max_RBeta_0x2d(){return 255;}
-    constexpr static double min_RBeta_0x2d(){return -255;}
-    double RBeta_0x2d=default_RBeta_0x2d();
-    double step_RBeta_0x2d=default_step_RBeta_0x2d();
-    double old_RBeta_0x2d=default_RBeta_0x2d();
-    _0x21Q_LineEdit * edit_RBeta_0x2d=nullptr;
-    _0x21Q_LineEdit * edit_step_RBeta_0x2d=nullptr;
-    constexpr static double default_GAlpha_0x2d(){return 1;}
+    constexpr static double default_GAlpha_0x2d(){return 0.587;}
     constexpr static double default_step_GAlpha_0x2d(){return 0.2;}
     constexpr static double max_GAlpha_0x2d(){return 9999;}
     constexpr static double min_GAlpha_0x2d(){return 0;}
@@ -158,16 +149,7 @@ public:
     double old_GAlpha_0x2d=default_GAlpha_0x2d();
     _0x21Q_LineEdit * edit_GAlpha_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_GAlpha_0x2d=nullptr;
-    constexpr static double default_GBeta_0x2d(){return 0;}
-    constexpr static double default_step_GBeta_0x2d(){return 1.2;}
-    constexpr static double max_GBeta_0x2d(){return 255;}
-    constexpr static double min_GBeta_0x2d(){return -255;}
-    double GBeta_0x2d=default_GBeta_0x2d();
-    double step_GBeta_0x2d=default_step_GBeta_0x2d();
-    double old_GBeta_0x2d=default_GBeta_0x2d();
-    _0x21Q_LineEdit * edit_GBeta_0x2d=nullptr;
-    _0x21Q_LineEdit * edit_step_GBeta_0x2d=nullptr;
-    constexpr static double default_BAlpha_0x2d(){return 1;}
+    constexpr static double default_BAlpha_0x2d(){return 0.114;}
     constexpr static double default_step_BAlpha_0x2d(){return 0.2;}
     constexpr static double max_BAlpha_0x2d(){return 9999;}
     constexpr static double min_BAlpha_0x2d(){return 0;}
@@ -176,15 +158,15 @@ public:
     double old_BAlpha_0x2d=default_BAlpha_0x2d();
     _0x21Q_LineEdit * edit_BAlpha_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_BAlpha_0x2d=nullptr;
-    constexpr static double default_BBeta_0x2d(){return 0;}
-    constexpr static double default_step_BBeta_0x2d(){return 1.2;}
-    constexpr static double max_BBeta_0x2d(){return 255;}
-    constexpr static double min_BBeta_0x2d(){return -255;}
-    double BBeta_0x2d=default_BBeta_0x2d();
-    double step_BBeta_0x2d=default_step_BBeta_0x2d();
-    double old_BBeta_0x2d=default_BBeta_0x2d();
-    _0x21Q_LineEdit * edit_BBeta_0x2d=nullptr;
-    _0x21Q_LineEdit * edit_step_BBeta_0x2d=nullptr;
+    constexpr static double default_Beta_0x2d(){return 0;}
+    constexpr static double default_step_Beta_0x2d(){return 1.2;}
+    constexpr static double max_Beta_0x2d(){return 255;}
+    constexpr static double min_Beta_0x2d(){return -255;}
+    double Beta_0x2d=default_Beta_0x2d();
+    double step_Beta_0x2d=default_step_Beta_0x2d();
+    double old_Beta_0x2d=default_Beta_0x2d();
+    _0x21Q_LineEdit * edit_Beta_0x2d=nullptr;
+    _0x21Q_LineEdit * edit_step_Beta_0x2d=nullptr;
     void setup_ui(){
         using namespace memory ;
         /*窗口布局*/
@@ -266,49 +248,6 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-            l0->setText(u8R"__(RBeta)__" " : " );/*设置label name*/
-            edit_RBeta_0x2d=e0.pointer();
-            edit_step_RBeta_0x2d=e1.pointer();
-
-            /*double value 检查器*/
-            auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
-            auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
-            v0->setRange(min_RBeta_0x2d(),max_RBeta_0x2d());
-            v0.release()->setParent(e0);
-            v1.release()->setParent(e1);
-            e0->setValidator(v0);
-            e1->setValidator(v1);
-            edit_RBeta_0x2d=e0.pointer();
-            edit_step_RBeta_0x2d=e1.pointer();
-
-            /*连接信号槽*/
-            /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-                                 /*连接信号槽*/super,[this](bool) {add_RBeta_0x2d(); });
-            /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-                                 /*连接信号槽*/super,[this](bool) {sub_RBeta_0x2d(); });
-        }
-        {
-
-            /*创建一个int/double显示*/
-            auto && l0=makeStackPointer<_0x21Q_Label>();
-            auto && l1=makeStackPointer<_0x21Q_Label>();
-            auto && e0=makeStackPointer<_0x21Q_LineEdit>();
-            auto && e1=makeStackPointer<_0x21Q_LineEdit>();
-            auto && p0=makeStackPointer<_0x21Q_ToolButton>();
-            auto && p1=makeStackPointer<_0x21Q_ToolButton>();
-            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
-            l->setSpacing(1);
-            l->setMargin(1);
-            lvv->addLayout(l.release())/*加入主要布局*/;
-            l->addWidget(l0.release());
-            l->addWidget(e0.release());
-            l->addWidget(l1.release());
-            l->addWidget(e1.release());
-            l->addWidget(p0.release());
-            l->addWidget(p1.release());
-            l1->setText("step:");
-            p0->setText("+");
-            p1->setText("-");
             l0->setText(u8R"__(GAlpha)__" " : " );/*设置label name*/
             edit_GAlpha_0x2d=e0.pointer();
             edit_step_GAlpha_0x2d=e1.pointer();
@@ -329,49 +268,6 @@ public:
                                  /*连接信号槽*/super,[this](bool) {add_GAlpha_0x2d(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
                                  /*连接信号槽*/super,[this](bool) {sub_GAlpha_0x2d(); });
-        }
-        {
-
-            /*创建一个int/double显示*/
-            auto && l0=makeStackPointer<_0x21Q_Label>();
-            auto && l1=makeStackPointer<_0x21Q_Label>();
-            auto && e0=makeStackPointer<_0x21Q_LineEdit>();
-            auto && e1=makeStackPointer<_0x21Q_LineEdit>();
-            auto && p0=makeStackPointer<_0x21Q_ToolButton>();
-            auto && p1=makeStackPointer<_0x21Q_ToolButton>();
-            auto && l=makeStackPointer<_0x21Q_HBoxLayout>();
-            l->setSpacing(1);
-            l->setMargin(1);
-            lvv->addLayout(l.release())/*加入主要布局*/;
-            l->addWidget(l0.release());
-            l->addWidget(e0.release());
-            l->addWidget(l1.release());
-            l->addWidget(e1.release());
-            l->addWidget(p0.release());
-            l->addWidget(p1.release());
-            l1->setText("step:");
-            p0->setText("+");
-            p1->setText("-");
-            l0->setText(u8R"__(GBeta)__" " : " );/*设置label name*/
-            edit_GBeta_0x2d=e0.pointer();
-            edit_step_GBeta_0x2d=e1.pointer();
-
-            /*double value 检查器*/
-            auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
-            auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
-            v0->setRange(min_GBeta_0x2d(),max_GBeta_0x2d());
-            v0.release()->setParent(e0);
-            v1.release()->setParent(e1);
-            e0->setValidator(v0);
-            e1->setValidator(v1);
-            edit_GBeta_0x2d=e0.pointer();
-            edit_step_GBeta_0x2d=e1.pointer();
-
-            /*连接信号槽*/
-            /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-                                 /*连接信号槽*/super,[this](bool) {add_GBeta_0x2d(); });
-            /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-                                 /*连接信号槽*/super,[this](bool) {sub_GBeta_0x2d(); });
         }
         {
 
@@ -438,26 +334,26 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-            l0->setText(u8R"__(BBeta)__" " : " );/*设置label name*/
-            edit_BBeta_0x2d=e0.pointer();
-            edit_step_BBeta_0x2d=e1.pointer();
+            l0->setText(u8R"__(Beta)__" " : " );/*设置label name*/
+            edit_Beta_0x2d=e0.pointer();
+            edit_step_Beta_0x2d=e1.pointer();
 
             /*double value 检查器*/
             auto && v0=makeStackPointer<_0x21Q_DoubleValidator>();
             auto && v1=makeStackPointer<Step_0x21Q_DoubleValidator>();
-            v0->setRange(min_BBeta_0x2d(),max_BBeta_0x2d());
+            v0->setRange(min_Beta_0x2d(),max_Beta_0x2d());
             v0.release()->setParent(e0);
             v1.release()->setParent(e1);
             e0->setValidator(v0);
             e1->setValidator(v1);
-            edit_BBeta_0x2d=e0.pointer();
-            edit_step_BBeta_0x2d=e1.pointer();
+            edit_Beta_0x2d=e0.pointer();
+            edit_step_Beta_0x2d=e1.pointer();
 
             /*连接信号槽*/
             /*连接信号槽*/p0->connect(p0.pointer(),&QToolButton::clicked,
-                                 /*连接信号槽*/super,[this](bool) {add_BBeta_0x2d(); });
+                                 /*连接信号槽*/super,[this](bool) {add_Beta_0x2d(); });
             /*连接信号槽*/p1->connect(p1.pointer(),&QToolButton::clicked,
-                                 /*连接信号槽*/super,[this](bool) {sub_BBeta_0x2d(); });
+                                 /*连接信号槽*/super,[this](bool) {sub_Beta_0x2d(); });
         }
 
         {/*创建中间空白*/
@@ -510,22 +406,6 @@ public:
                         QString::number(default_step_RAlpha_0x2d()));
         } while (false);
         do{
-            auto t=edit_RBeta_0x2d->text();
-            RBeta_0x2d= t.toDouble(&ok);
-            if (ok) { break; }
-            RBeta_0x2d=default_RBeta_0x2d();
-            edit_RBeta_0x2d->setText(
-                        QString::number(default_RBeta_0x2d()));
-        } while (false);
-        do{
-            auto t=edit_step_RBeta_0x2d->text();
-            step_RBeta_0x2d= t.toDouble(&ok);
-            if (ok) { break; }
-            step_RBeta_0x2d=default_step_RBeta_0x2d();
-            edit_step_RBeta_0x2d->setText(
-                        QString::number(default_step_RBeta_0x2d()));
-        } while (false);
-        do{
             auto t=edit_GAlpha_0x2d->text();
             GAlpha_0x2d= t.toDouble(&ok);
             if (ok) { break; }
@@ -540,22 +420,6 @@ public:
             step_GAlpha_0x2d=default_step_GAlpha_0x2d();
             edit_step_GAlpha_0x2d->setText(
                         QString::number(default_step_GAlpha_0x2d()));
-        } while (false);
-        do{
-            auto t=edit_GBeta_0x2d->text();
-            GBeta_0x2d= t.toDouble(&ok);
-            if (ok) { break; }
-            GBeta_0x2d=default_GBeta_0x2d();
-            edit_GBeta_0x2d->setText(
-                        QString::number(default_GBeta_0x2d()));
-        } while (false);
-        do{
-            auto t=edit_step_GBeta_0x2d->text();
-            step_GBeta_0x2d= t.toDouble(&ok);
-            if (ok) { break; }
-            step_GBeta_0x2d=default_step_GBeta_0x2d();
-            edit_step_GBeta_0x2d->setText(
-                        QString::number(default_step_GBeta_0x2d()));
         } while (false);
         do{
             auto t=edit_BAlpha_0x2d->text();
@@ -574,29 +438,27 @@ public:
                         QString::number(default_step_BAlpha_0x2d()));
         } while (false);
         do{
-            auto t=edit_BBeta_0x2d->text();
-            BBeta_0x2d= t.toDouble(&ok);
+            auto t=edit_Beta_0x2d->text();
+            Beta_0x2d= t.toDouble(&ok);
             if (ok) { break; }
-            BBeta_0x2d=default_BBeta_0x2d();
-            edit_BBeta_0x2d->setText(
-                        QString::number(default_BBeta_0x2d()));
+            Beta_0x2d=default_Beta_0x2d();
+            edit_Beta_0x2d->setText(
+                        QString::number(default_Beta_0x2d()));
         } while (false);
         do{
-            auto t=edit_step_BBeta_0x2d->text();
-            step_BBeta_0x2d= t.toDouble(&ok);
+            auto t=edit_step_Beta_0x2d->text();
+            step_Beta_0x2d= t.toDouble(&ok);
             if (ok) { break; }
-            step_BBeta_0x2d=default_step_BBeta_0x2d();
-            edit_step_BBeta_0x2d->setText(
-                        QString::number(default_step_BBeta_0x2d()));
+            step_Beta_0x2d=default_step_Beta_0x2d();
+            edit_step_Beta_0x2d->setText(
+                        QString::number(default_step_Beta_0x2d()));
         } while (false);
     }
     void directDo() {
         super->valueChanged(RAlpha_0x2d
-                            ,RBeta_0x2d
                             ,GAlpha_0x2d
-                            ,GBeta_0x2d
                             ,BAlpha_0x2d
-                            ,BBeta_0x2d);
+                            ,Beta_0x2d);
     }
     bool isStateChange() {
         auto ans=false;
@@ -604,25 +466,17 @@ public:
             ans=true;
             old_RAlpha_0x2d=RAlpha_0x2d;
         }
-        if (old_RBeta_0x2d!=RBeta_0x2d){
-            ans=true;
-            old_RBeta_0x2d=RBeta_0x2d;
-        }
         if (old_GAlpha_0x2d!=GAlpha_0x2d){
             ans=true;
             old_GAlpha_0x2d=GAlpha_0x2d;
-        }
-        if (old_GBeta_0x2d!=GBeta_0x2d){
-            ans=true;
-            old_GBeta_0x2d=GBeta_0x2d;
         }
         if (old_BAlpha_0x2d!=BAlpha_0x2d){
             ans=true;
             old_BAlpha_0x2d=BAlpha_0x2d;
         }
-        if (old_BBeta_0x2d!=BBeta_0x2d){
+        if (old_Beta_0x2d!=Beta_0x2d){
             ans=true;
-            old_BBeta_0x2d=BBeta_0x2d;
+            old_Beta_0x2d=Beta_0x2d;
         }
         return ans;
     }
@@ -666,26 +520,6 @@ public:
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
-    void add_RBeta_0x2d() {
-        readState()/*获得当前状态*/;
-        RBeta_0x2d+=step_RBeta_0x2d/*增加值*/;
-        check_max(RBeta_0x2d,max_RBeta_0x2d())/*检测最大值*/;
-        check_min(RBeta_0x2d,min_RBeta_0x2d())/*检测最小值*/;
-        edit_RBeta_0x2d->setText(
-                    QString::number(RBeta_0x2d))/*重设gui值*/;
-        if (isStateChange()) { directDo(); }/*发送值变化信号*/
-    }
-
-    void sub_RBeta_0x2d() {
-        readState()/*获得当前状态*/;
-        RBeta_0x2d-=step_RBeta_0x2d/*增加值*/;
-        check_max(RBeta_0x2d,max_RBeta_0x2d())/*检测最大值*/;
-        check_min(RBeta_0x2d,min_RBeta_0x2d())/*检测最小值*/;
-        edit_RBeta_0x2d->setText(
-                    QString::number(RBeta_0x2d))/*重设gui值*/;
-        if (isStateChange()) { directDo(); }/*发送值变化信号*/
-    }
-
     void add_GAlpha_0x2d() {
         readState()/*获得当前状态*/;
         GAlpha_0x2d+=step_GAlpha_0x2d/*增加值*/;
@@ -703,26 +537,6 @@ public:
         check_min(GAlpha_0x2d,min_GAlpha_0x2d())/*检测最小值*/;
         edit_GAlpha_0x2d->setText(
                     QString::number(GAlpha_0x2d))/*重设gui值*/;
-        if (isStateChange()) { directDo(); }/*发送值变化信号*/
-    }
-
-    void add_GBeta_0x2d() {
-        readState()/*获得当前状态*/;
-        GBeta_0x2d+=step_GBeta_0x2d/*增加值*/;
-        check_max(GBeta_0x2d,max_GBeta_0x2d())/*检测最大值*/;
-        check_min(GBeta_0x2d,min_GBeta_0x2d())/*检测最小值*/;
-        edit_GBeta_0x2d->setText(
-                    QString::number(GBeta_0x2d))/*重设gui值*/;
-        if (isStateChange()) { directDo(); }/*发送值变化信号*/
-    }
-
-    void sub_GBeta_0x2d() {
-        readState()/*获得当前状态*/;
-        GBeta_0x2d-=step_GBeta_0x2d/*增加值*/;
-        check_max(GBeta_0x2d,max_GBeta_0x2d())/*检测最大值*/;
-        check_min(GBeta_0x2d,min_GBeta_0x2d())/*检测最小值*/;
-        edit_GBeta_0x2d->setText(
-                    QString::number(GBeta_0x2d))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
@@ -746,23 +560,23 @@ public:
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
-    void add_BBeta_0x2d() {
+    void add_Beta_0x2d() {
         readState()/*获得当前状态*/;
-        BBeta_0x2d+=step_BBeta_0x2d/*增加值*/;
-        check_max(BBeta_0x2d,max_BBeta_0x2d())/*检测最大值*/;
-        check_min(BBeta_0x2d,min_BBeta_0x2d())/*检测最小值*/;
-        edit_BBeta_0x2d->setText(
-                    QString::number(BBeta_0x2d))/*重设gui值*/;
+        Beta_0x2d+=step_Beta_0x2d/*增加值*/;
+        check_max(Beta_0x2d,max_Beta_0x2d())/*检测最大值*/;
+        check_min(Beta_0x2d,min_Beta_0x2d())/*检测最小值*/;
+        edit_Beta_0x2d->setText(
+                    QString::number(Beta_0x2d))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
-    void sub_BBeta_0x2d() {
+    void sub_Beta_0x2d() {
         readState()/*获得当前状态*/;
-        BBeta_0x2d-=step_BBeta_0x2d/*增加值*/;
-        check_max(BBeta_0x2d,max_BBeta_0x2d())/*检测最大值*/;
-        check_min(BBeta_0x2d,min_BBeta_0x2d())/*检测最小值*/;
-        edit_BBeta_0x2d->setText(
-                    QString::number(BBeta_0x2d))/*重设gui值*/;
+        Beta_0x2d-=step_Beta_0x2d/*增加值*/;
+        check_max(Beta_0x2d,max_Beta_0x2d())/*检测最大值*/;
+        check_min(Beta_0x2d,min_Beta_0x2d())/*检测最小值*/;
+        edit_Beta_0x2d->setText(
+                    QString::number(Beta_0x2d))/*重设gui值*/;
         if (isStateChange()) { directDo(); }/*发送值变化信号*/
     }
 
