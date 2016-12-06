@@ -48,32 +48,32 @@ public:
 
                 cv::Mat varRGB[4];
 
-               auto & /*⓵*/\u24f5=varRGB[0];
-               auto & /*⓶*/\u24f6=varRGB[1];
-               auto & /*⓷*/\u24f7=varRGB[2];
-               auto & /*⓸*/\u24f8=varRGB[3];
+               auto & var0=varRGB[0];
+               auto & var1=varRGB[1];
+               auto & var2=varRGB[2];
+               auto & var3=varRGB[3];
 
                 cv::split(varInputImage,varRGB);
 
-                /*⓵*/\u24f5.convertTo(/*⓸*/\u24f8,CV_32FC1);
-                /*⓵*/\u24f5=/*⓸*/\u24f8.clone();
-                /*⓶*/\u24f6.convertTo(/*⓸*/\u24f8,CV_32FC1);
-                /*⓶*/\u24f6=/*⓸*/\u24f8.clone();
-                /*⓷*/\u24f7.convertTo(/*⓸*/\u24f8,CV_32FC1);
-                /*⓷*/\u24f7=/*⓸*/\u24f8;
+                var0.convertTo(var3,CV_32FC1);
+                var0=var3.clone();
+                var1.convertTo(var3,CV_32FC1);
+                var1=var3.clone();
+                var2.convertTo(var3,CV_32FC1);
+                var2=var3;
 
-                /*⓵*/\u24f5*=RAlpha;
-                /*⓶*/\u24f6*=GAlpha;
-                /*⓷*/\u24f7*=BAlpha;
+                var0*=RAlpha;
+                var1*=GAlpha;
+                var2*=BAlpha;
 
-                /*⓸*/\u24f8=/*⓷*/\u24f7+/*⓶*/\u24f6+/*⓵*/\u24f5+RGBBeta;
+                var3=var2+var1+var0+RGBBeta;
 
                 QImage varAns(arg.size(),QImage::Format_Grayscale8);
-                /*⓵*/\u24f5=cv::Mat(varAns.height(),varAns.width(),
+                var0=cv::Mat(varAns.height(),varAns.width(),
                     CV_8UC1,
                     const_cast<uchar*>(varAns.constBits()),
                     varAns.bytesPerLine());
-                /*⓸*/\u24f8.convertTo(/*⓵*/\u24f5,CV_8UC1);
+                var3.convertTo(var0,CV_8UC1);
 
                 return std::move(varAns);
 
