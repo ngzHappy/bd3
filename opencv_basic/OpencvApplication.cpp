@@ -547,6 +547,7 @@ OpencvApplication::OpencvApplication(
     _mp->upateImageSearchDir();
     _mp->updateLuaFile();
     _p_setStype();
+    std::srand((int)std::time(nullptr));
 }
 
 OpencvApplication * OpencvApplication::instance() {
@@ -587,7 +588,7 @@ QPair<const QPointF*,const QPointF*> OpencvApplication::getPoint2d()const {
     }
 
     if (_mp->point2dData.empty()) {
-        return{nullptr,nullptr}; 
+        return{ nullptr,nullptr };
     }
 
     auto * _fs=&(*_mp->point2dData.begin());
