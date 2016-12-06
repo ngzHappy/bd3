@@ -84,7 +84,7 @@ inline void ImageShowWidget::setAlgorithm(_A_&&arg) {
     class _Alg_A0_ :public AbstractImageShift {
         _A0_ _pm;
     public:
-        QImage run(const QImage& arg) const override {
+        QImage run(const QImage& arg) override {
             return _pm(arg);
         }
         _Alg_A0_(_A_&&_arg):_pm(std::forward<_A_>(_arg)) {}

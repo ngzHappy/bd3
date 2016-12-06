@@ -24,7 +24,7 @@ public:
     AbstractImageShift()=default;
     virtual ~AbstractImageShift()=default;
 public:
-    virtual QImage run(const QImage &) const=0;
+    virtual QImage run(const QImage &/*the first image*/)=0;
     virtual void paint(QPainter *,const QSizeF &/*image size or axis size*/) override {
         /*gui系统先调用run,再调用paint*/
     }

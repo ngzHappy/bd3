@@ -61,11 +61,11 @@ private:
 
 template<typename _A_,typename>
 inline void ImageChart::setAlgorithm(_A_&&arg) {
-    using _A0_=std::remove_reference_t<_A_>;
+    using _A0_=std::remove_cv_t<std::remove_reference_t<_A_>>;
     class _Alg_A0_ :public AbstractImageShift {
         _A0_ _pm;
     public:
-        QImage run(const QImage& arg) const override {
+        QImage run(const QImage& arg) override {
             return _pm(arg);
         }
         _Alg_A0_(_A_&&_arg):_pm(std::forward<_A_>(_arg)) {}

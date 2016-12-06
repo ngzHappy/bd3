@@ -70,7 +70,7 @@ inline MainState::~MainState() {
 
 class TestDrawCallBack :public AbstractImageShift {
 public:
-    QImage run(const QImage&arg) const override {
+    QImage run(const QImage&arg) override {
         try {
             QOpencvImage var(arg);
             cv::Mat refMat=var.toOpencvRef();
