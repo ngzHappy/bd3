@@ -96,3 +96,7 @@ opencv_gray.file=$$PWD/opencv/opencv_gray/opencv_gray.pro
 opencv_gray.depends+=library_opencv_basic
 SUBDIRS += opencv_gray
 
+opencv_hist_gray.file=$$PWD/opencv/opencv_hist_gray/opencv_hist_gray.pro
+opencv_hist_gray.depends+=library_opencv_basic
+SUBDIRS += opencv_hist_gray
+
