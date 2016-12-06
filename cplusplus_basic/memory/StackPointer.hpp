@@ -1,5 +1,8 @@
-﻿#ifndef STACK_POINTER_HPP_0x79213
-#define STACK_POINTER_HPP_0x79213
+﻿#ifndef STACK_POINTER_HPP_0x79213a5
+#define STACK_POINTER_HPP_0x79213a5
+
+#include "../cplusplus_basic.hpp"
+#include <type_traits>
 
 namespace memory {
 
@@ -37,12 +40,47 @@ protected:
     StackPointer&operator=(const StackPointer&)=delete;
     template<typename _1T_,typename ..._1_Args>
     friend StackPointer<_1T_> makeStackPointer(_1_Args&&...);
+
 };
+
+namespace /*Ⓟ*/\u24c5_memory_makeStackPointer_select_
+{
+
+template<typename T,bool=false>
+class Select {
+public:
+    typedef T type;
+};
+
+template<typename _T_>
+class VirtualWrap :public _T_ {
+public:
+    using _T_::_T_;
+    VirtualWrap() {}
+    VirtualWrap(const _T_&arg):_T_(arg) {}
+    VirtualWrap(const _T_&&arg):_T_(arg) {}
+    VirtualWrap(_T_&arg):_T_(arg) {}
+    VirtualWrap(_T_&&arg):_T_(std::move(arg)) {}
+private:
+    CPLUSPLUS_OBJECT(VirtualWrap)
+};
+
+template<typename T>
+class Select<T,true> {
+public:
+    typedef VirtualWrap<T> type;
+};
+
+}/*\u24c5_memory_makeStackPointer_select_*/
 
 template<typename _T_,typename ...Args>
 StackPointer<_T_> makeStackPointer(Args&&...args) {
+    constexpr bool _isvd_=(std::has_virtual_destructor<_T_>::value)&&
+        (std::is_final<_T_>::value==false);
+    using __T_=typename \
+        \u24c5_memory_makeStackPointer_select_::Select<_T_,_isvd_>::type;
     /*rewrite in c++17*/
-    return new _T_(std::forward<Args>(args)...);
+    return new __T_(std::forward<Args>(args)...);
 }
 
 }/*memory*/

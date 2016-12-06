@@ -2,7 +2,6 @@
 #define _MEMORY_HPP_0x877160
 
 #include "../config/config.hpp"
-#include "StackPointer.hpp"
 
 namespace memory {
 
@@ -48,6 +47,7 @@ protected:
 }/*namespace memory*/
 
 /*****************************************/
+#include "StackPointer.hpp"
 #include "private/Allocator.hpp"
 #include "private/MakeShared.hpp"
 #include "private/MakeFunction.hpp"

@@ -1,5 +1,5 @@
-﻿#ifndef __CPLUSPLUS_BASIC_HPP_0X97721
-#define __CPLUSPLUS_BASIC_HPP_0X97721
+﻿#ifndef __CPLUSPLUS_BASIC_HPP_0X97721a
+#define __CPLUSPLUS_BASIC_HPP_0X97721a
 
 #ifdef __cplusplus
 
