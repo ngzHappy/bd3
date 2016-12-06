@@ -92,3 +92,7 @@ opencv_add.file=$$PWD/opencv/opencv_add/opencv_add.pro
 opencv_add.depends+=library_opencv_basic
 SUBDIRS += opencv_add
 
+opencv_gray.file=$$PWD/opencv/opencv_gray/opencv_gray.pro
+opencv_gray.depends+=library_opencv_basic
+SUBDIRS += opencv_gray
+
