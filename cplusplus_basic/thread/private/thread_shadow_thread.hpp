@@ -1,6 +1,7 @@
 ﻿#ifndef __SHADOW_THREAD__HPP_0x998126_PRIVATE
 #define __SHADOW_THREAD__HPP_0x998126_PRIVATE
 
+#include <deque>
 #include <thread>
 #include <functional>
 #include <type_traits>
@@ -67,6 +68,33 @@ inline void runInShadowThread(ShadowThread::TypePlainVoidStarFunction a,void *b)
 inline void runInShadowThread(ShadowThread::TypePlainConstVoidStarFunction a,const void *b) {
     ShadowThread::instance()->run(a,b);
 }
+
+class AbstractThreadDelete {
+public:
+    virtual ~AbstractThreadDelete()=default;
+    virtual void close() noexcept(true) {}
+};
+
+class DeleteLater {
+    using _DeleteItem=AbstractThreadDelete *;
+    using _List=std::deque<_DeleteItem,memory::Allocator<AbstractThreadDelete *>>;
+    _List /*Ⓜ*/\u24c2Data;
+public:
+    DeleteLater()=default;
+    DeleteLater(const DeleteLater &)=delete;
+    DeleteLater&operator=(const DeleteLater &)=delete;
+    DeleteLater(DeleteLater &&)=default;
+    DeleteLater&operator=(DeleteLater &&)=default;
+    void append(_DeleteItem arg) { \u24c2Data.push_back(arg); }
+    ~DeleteLater() {
+        for (auto *varI:\u24c2Data) {
+            varI->close();
+            runInShadowThread([](void *arg) {
+                delete reinterpret_cast<_DeleteItem>(arg);
+            },varI);
+        }
+    }
+};
 
 }/*thread*/
 
