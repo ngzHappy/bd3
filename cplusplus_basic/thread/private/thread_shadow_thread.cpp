@@ -63,7 +63,7 @@ public:
             auto thisp=_thisp.get();
             for (;;) {
 
-                {
+                {/*读临界区*/
                     std::unique_lock<std::mutex> varLock{ thisp->__m_mutex };
 
                     while ((thisp->__m_functions_count)<1) {
