@@ -11,7 +11,7 @@
 #include <QtWidgets/qtoolbutton.h>
 #include <QtWidgets/qlayoutitem.h>
 
-namespace  {
+namespace {
 
 class _0x21Q_ComboBox :public QComboBox {
     using _Super=QComboBox;
@@ -43,7 +43,7 @@ class _0x21Q_DoubleValidator :public QDoubleValidator {
     using _Super=QDoubleValidator;
 public:
     _0x21Q_DoubleValidator(QObject * arg=nullptr):
-        _Super(-360,360,_0x21Q_decimals,arg){
+        _Super(-360,360,_0x21Q_decimals,arg) {
         setNotation(QDoubleValidator::StandardNotation);
     }
     void setRange(double a,double b) {
@@ -53,8 +53,8 @@ private:
     CPLUSPLUS_OBJECT(_0x21Q_DoubleValidator)
 };
 
-class _0x21Q_IntValidator  :public QIntValidator {
-    using _Super=QIntValidator ;
+class _0x21Q_IntValidator :public QIntValidator {
+    using _Super=QIntValidator;
 public:
     using _Super::_Super;
 private:
@@ -119,11 +119,11 @@ private:
 
 }/*namespace*/
 
-class GrayDialog::_PrivateGrayDialog{
+class GrayDialog::_PrivateGrayDialog {
 public:
     GrayDialog *super;
     QVBoxLayout * mainLayout/*主要布局*/;
-    _PrivateGrayDialog(GrayDialog *arg):super(arg){
+    _PrivateGrayDialog(GrayDialog *arg):super(arg) {
         setup_ui()/*建立gui并连接信号槽*/;
         readState()/*更新gui数据*/;
     }
@@ -131,44 +131,44 @@ public:
 
     /*values*/
 
-    constexpr static double default_RAlpha_0x2d(){return 0.299;}
-    constexpr static double default_step_RAlpha_0x2d(){return 0.2;}
-    constexpr static double max_RAlpha_0x2d(){return 9999;}
-    constexpr static double min_RAlpha_0x2d(){return 0;}
+    constexpr static double default_RAlpha_0x2d() { return 0.299; }
+    constexpr static double default_step_RAlpha_0x2d() { return 0.2; }
+    constexpr static double max_RAlpha_0x2d() { return 9999; }
+    constexpr static double min_RAlpha_0x2d() { return 0; }
     double RAlpha_0x2d=default_RAlpha_0x2d();
     double step_RAlpha_0x2d=default_step_RAlpha_0x2d();
     double old_RAlpha_0x2d=default_RAlpha_0x2d();
     _0x21Q_LineEdit * edit_RAlpha_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_RAlpha_0x2d=nullptr;
-    constexpr static double default_GAlpha_0x2d(){return 0.587;}
-    constexpr static double default_step_GAlpha_0x2d(){return 0.2;}
-    constexpr static double max_GAlpha_0x2d(){return 9999;}
-    constexpr static double min_GAlpha_0x2d(){return 0;}
+    constexpr static double default_GAlpha_0x2d() { return 0.587; }
+    constexpr static double default_step_GAlpha_0x2d() { return 0.2; }
+    constexpr static double max_GAlpha_0x2d() { return 9999; }
+    constexpr static double min_GAlpha_0x2d() { return 0; }
     double GAlpha_0x2d=default_GAlpha_0x2d();
     double step_GAlpha_0x2d=default_step_GAlpha_0x2d();
     double old_GAlpha_0x2d=default_GAlpha_0x2d();
     _0x21Q_LineEdit * edit_GAlpha_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_GAlpha_0x2d=nullptr;
-    constexpr static double default_BAlpha_0x2d(){return 0.114;}
-    constexpr static double default_step_BAlpha_0x2d(){return 0.2;}
-    constexpr static double max_BAlpha_0x2d(){return 9999;}
-    constexpr static double min_BAlpha_0x2d(){return 0;}
+    constexpr static double default_BAlpha_0x2d() { return 0.114; }
+    constexpr static double default_step_BAlpha_0x2d() { return 0.2; }
+    constexpr static double max_BAlpha_0x2d() { return 9999; }
+    constexpr static double min_BAlpha_0x2d() { return 0; }
     double BAlpha_0x2d=default_BAlpha_0x2d();
     double step_BAlpha_0x2d=default_step_BAlpha_0x2d();
     double old_BAlpha_0x2d=default_BAlpha_0x2d();
     _0x21Q_LineEdit * edit_BAlpha_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_BAlpha_0x2d=nullptr;
-    constexpr static double default_Beta_0x2d(){return 0;}
-    constexpr static double default_step_Beta_0x2d(){return 1.2;}
-    constexpr static double max_Beta_0x2d(){return 255;}
-    constexpr static double min_Beta_0x2d(){return -255;}
+    constexpr static double default_Beta_0x2d() { return 0; }
+    constexpr static double default_step_Beta_0x2d() { return 1.2; }
+    constexpr static double max_Beta_0x2d() { return 255; }
+    constexpr static double min_Beta_0x2d() { return -255; }
     double Beta_0x2d=default_Beta_0x2d();
     double step_Beta_0x2d=default_step_Beta_0x2d();
     double old_Beta_0x2d=default_Beta_0x2d();
     _0x21Q_LineEdit * edit_Beta_0x2d=nullptr;
     _0x21Q_LineEdit * edit_step_Beta_0x2d=nullptr;
-    void setup_ui(){
-        using namespace memory ;
+    void setup_ui() {
+        using namespace memory;
         /*窗口布局*/
         auto && lv=makeStackPointer<_0x21Q_VBoxLayout>();
         super->setLayout(lv.release());
@@ -205,7 +205,7 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-            l0->setText(u8R"__(RAlpha)__" " : " );/*设置label name*/
+            l0->setText(u8R"__(RAlpha)__" " : ");/*设置label name*/
             edit_RAlpha_0x2d=e0.pointer();
             edit_step_RAlpha_0x2d=e1.pointer();
 
@@ -248,7 +248,7 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-            l0->setText(u8R"__(GAlpha)__" " : " );/*设置label name*/
+            l0->setText(u8R"__(GAlpha)__" " : ");/*设置label name*/
             edit_GAlpha_0x2d=e0.pointer();
             edit_step_GAlpha_0x2d=e1.pointer();
 
@@ -291,7 +291,7 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-            l0->setText(u8R"__(BAlpha)__" " : " );/*设置label name*/
+            l0->setText(u8R"__(BAlpha)__" " : ");/*设置label name*/
             edit_BAlpha_0x2d=e0.pointer();
             edit_step_BAlpha_0x2d=e1.pointer();
 
@@ -334,7 +334,7 @@ public:
             l1->setText("step:");
             p0->setText("+");
             p1->setText("-");
-            l0->setText(u8R"__(Beta)__" " : " );/*设置label name*/
+            l0->setText(u8R"__(Beta)__" " : ");/*设置label name*/
             edit_Beta_0x2d=e0.pointer();
             edit_step_Beta_0x2d=e1.pointer();
 
@@ -381,7 +381,7 @@ public:
                         pb.pointer(),
                         &QPushButton::clicked,
                         super,
-                        [this](bool){checkDo();}
+                        [this](bool) {checkDo(); }
             );
 
         }
@@ -389,65 +389,65 @@ public:
     }/*function end*/
     void readState() {
         bool ok;
-        do{
+        do {
             auto t=edit_RAlpha_0x2d->text();
-            RAlpha_0x2d= t.toDouble(&ok);
+            RAlpha_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             RAlpha_0x2d=default_RAlpha_0x2d();
             edit_RAlpha_0x2d->setText(
                         QString::number(default_RAlpha_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_step_RAlpha_0x2d->text();
-            step_RAlpha_0x2d= t.toDouble(&ok);
+            step_RAlpha_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             step_RAlpha_0x2d=default_step_RAlpha_0x2d();
             edit_step_RAlpha_0x2d->setText(
                         QString::number(default_step_RAlpha_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_GAlpha_0x2d->text();
-            GAlpha_0x2d= t.toDouble(&ok);
+            GAlpha_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             GAlpha_0x2d=default_GAlpha_0x2d();
             edit_GAlpha_0x2d->setText(
                         QString::number(default_GAlpha_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_step_GAlpha_0x2d->text();
-            step_GAlpha_0x2d= t.toDouble(&ok);
+            step_GAlpha_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             step_GAlpha_0x2d=default_step_GAlpha_0x2d();
             edit_step_GAlpha_0x2d->setText(
                         QString::number(default_step_GAlpha_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_BAlpha_0x2d->text();
-            BAlpha_0x2d= t.toDouble(&ok);
+            BAlpha_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             BAlpha_0x2d=default_BAlpha_0x2d();
             edit_BAlpha_0x2d->setText(
                         QString::number(default_BAlpha_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_step_BAlpha_0x2d->text();
-            step_BAlpha_0x2d= t.toDouble(&ok);
+            step_BAlpha_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             step_BAlpha_0x2d=default_step_BAlpha_0x2d();
             edit_step_BAlpha_0x2d->setText(
                         QString::number(default_step_BAlpha_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_Beta_0x2d->text();
-            Beta_0x2d= t.toDouble(&ok);
+            Beta_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             Beta_0x2d=default_Beta_0x2d();
             edit_Beta_0x2d->setText(
                         QString::number(default_Beta_0x2d()));
         } while (false);
-        do{
+        do {
             auto t=edit_step_Beta_0x2d->text();
-            step_Beta_0x2d= t.toDouble(&ok);
+            step_Beta_0x2d=t.toDouble(&ok);
             if (ok) { break; }
             step_Beta_0x2d=default_step_Beta_0x2d();
             edit_step_Beta_0x2d->setText(
@@ -462,19 +462,19 @@ public:
     }
     bool isStateChange() {
         auto ans=false;
-        if (old_RAlpha_0x2d!=RAlpha_0x2d){
+        if (old_RAlpha_0x2d!=RAlpha_0x2d) {
             ans=true;
             old_RAlpha_0x2d=RAlpha_0x2d;
         }
-        if (old_GAlpha_0x2d!=GAlpha_0x2d){
+        if (old_GAlpha_0x2d!=GAlpha_0x2d) {
             ans=true;
             old_GAlpha_0x2d=GAlpha_0x2d;
         }
-        if (old_BAlpha_0x2d!=BAlpha_0x2d){
+        if (old_BAlpha_0x2d!=BAlpha_0x2d) {
             ans=true;
             old_BAlpha_0x2d=BAlpha_0x2d;
         }
-        if (old_Beta_0x2d!=Beta_0x2d){
+        if (old_Beta_0x2d!=Beta_0x2d) {
             ans=true;
             old_Beta_0x2d=Beta_0x2d;
         }
@@ -482,9 +482,9 @@ public:
     }
 
 
-    void checkDo(){
+    void checkDo() {
         readState();
-        if(isStateChange()){
+        if (isStateChange()) {
             directDo();
         }
     }
@@ -585,11 +585,11 @@ private:
     CPLUSPLUS_OBJECT(_PrivateGrayDialog)
 };
 
-GrayDialog::GrayDialog(QWidget *p):_Super(p){
+GrayDialog::GrayDialog(QWidget *p):_Super(p) {
     thisp=new _PrivateGrayDialog(this);
 }
 
-GrayDialog::~GrayDialog(){
+GrayDialog::~GrayDialog() {
     delete thisp;
 }
 
@@ -599,7 +599,7 @@ void GrayDialog::emitValueChanged() {
 }
 
 QSize GrayDialog::sizeHint() const {
-    return {136,128};
+    return{ 136,128 };
 }
 
 QVBoxLayout * GrayDialog::getMainLayout() const {
