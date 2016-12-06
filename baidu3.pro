@@ -47,4 +47,7 @@ test_qt_charts.depends+=library_cplusplus_basic
 test_qt_charts.depends+=qt_basic_library
 SUBDIRS += test_qt_charts
 
- 
+tool_set_get.file=$$PWD/tool/tool_set_get/tool_set_get.pro
+tool_set_get.depends+=library_cplusplus_basic
+tool_set_get.depends+=qt_basic_library
+SUBDIRS += tool_set_get
