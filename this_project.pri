@@ -2,6 +2,8 @@ CONFIG += c++14
 
 !win32-msvc*{
 QMAKE_CFLAGS*=-std=c11
+#QMAKE_CFLAGS*=-fextended-identifiers
+#QMAKE_CXXFLAGS*=-fextended-identifiers
 }else{
 DEFINES *= _SECURE_SCL=0
 DEFINES *= _HAS_ITERATOR_DEBUGGING=0
