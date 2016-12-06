@@ -13,7 +13,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
- 
+
 
 void MainWindow::on_doButton_clicked() {
 
@@ -35,7 +35,7 @@ void MainWindow::on_doButton_clicked() {
 
     QString varAns;
 
-    varAns+=varType+varElementName+";\n";
+    varAns+=varType+" "+varElementName+";\n";
 
     /*********************************************************/
     varAns+="/*********************************************************/\n";
@@ -88,4 +88,4 @@ void MainWindow::on_doButton_clicked() {
 
 }
 
- 
+
