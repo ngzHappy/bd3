@@ -4,8 +4,6 @@
 
 --[[
 
- 
-
 --]]
 
 local RAlphaDefault=1;
