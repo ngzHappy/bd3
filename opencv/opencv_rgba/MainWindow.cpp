@@ -75,7 +75,7 @@ public:
             catch (...) {
                 CPLUSPLUS_EXCEPTION(false);
             }
-
+            return arg;
         });
     }
 
