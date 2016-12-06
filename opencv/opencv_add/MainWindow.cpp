@@ -27,10 +27,13 @@ QWidget* MainWindow::addImage(const QImage &arg) {
     if (addImageIndex()<0/*the last*/) {
         auto varAns=_thisp->getCurrentImageShowWidget();
         if (varAns==nullptr) { return nullptr; }
-        {
-            auto varImages=varAns->getImages();
-            if (varImages.size()<2) { return nullptr; }
 
+        varAns->setAlgorithm([varImages=varAns->getImages()]
+        (const QImage &arg)->QImage{
+
+            if (varImages.size()<2) { return arg; }
+
+            /*将图片调整到同一大小*/
             QSize varMaxSize;
             for (auto & varI:varImages) {
                 auto varSize=varI->size();
@@ -43,69 +46,80 @@ QWidget* MainWindow::addImage(const QImage &arg) {
             std::vector<cv::Mat,memory::Allocator<cv::Mat>> argImages;
             argImages.reserve(varImages.size());
 
-            for (auto & varI:varImages) {
-                if (varI->size()==varMaxSize) {
-                    cv::Mat var(varI->height(),
-                        varI->width(),
-                        CV_8UC4,
-                        const_cast<uchar*>(varI->constBits()),
-                        varI->bytesPerLine());
-                    argImages.push_back(var.clone());
-                }
-                else {
-                    cv::Mat var(varI->height(),
-                        varI->width(),
-                        CV_8UC4,
-                        const_cast<uchar*>(varI->constBits()),
-                        varI->bytesPerLine());
-                    cv::Mat varAns;
-                    cv::resize(var,varAns,
-                        cv::Size(varMaxSize.width(),varMaxSize.height()),
-                        0.,0.,cv::INTER_LANCZOS4);
-                    argImages.push_back(std::move(varAns));
+            try {
+                for (auto & varI:varImages) {
+                    if (varI->size()==varMaxSize) {
+                        /*使用引用节省内存*/
+                        cv::Mat var(varI->height(),
+                            varI->width(),
+                            CV_8UC4,
+                            const_cast<uchar*>(varI->constBits()),
+                            varI->bytesPerLine());
+                        argImages.push_back(var);
+                    }
+                    else {
+                        /*resize图片*/
+                        cv::Mat var(varI->height(),
+                            varI->width(),
+                            CV_8UC4,
+                            const_cast<uchar*>(varI->constBits()),
+                            varI->bytesPerLine());
+                        cv::Mat varAns;
+                        cv::resize(var,varAns,
+                            cv::Size(varMaxSize.width(),varMaxSize.height()),
+                            0.,0.,cv::INTER_LANCZOS4);
+                        argImages.push_back(std::move(varAns));
+                    }
                 }
             }
+            catch (...) {
+                CPLUSPLUS_EXCEPTION(false);
+                return arg;
+            }
 
-            varAns->setAlgorithm([argImages=std::move(argImages)]
-            (const QImage &arg) ->QImage{
-                try {
-                    
-                    auto varHeight=argImages[0].rows;
-                    auto varWidth=argImages[0].cols;
+            try {
 
+                //std::vector<cv::Mat> argImages/*图片*/;
+                //QSize varMaxSize/*图片大小*/;
+                const auto varHeight=varMaxSize.height();
+                const auto varWidth=varMaxSize.width();
+
+                /*为结果图片预分配内存*/
+                QImage varImageAns(varWidth,varHeight,QImage::Format_RGBA8888);
+                cv::Mat varImageAnsWrap(varHeight,varWidth,
+                                        CV_8UC4,
+                                        const_cast<uchar*>(varImageAns.constBits()),
+                                        varImageAns.bytesPerLine()
+                );
+
+                {/*生成图片*/
                     cv::Mat varAns=cv::Mat::zeros(varHeight,varWidth,CV_32FC4);
                     for (const auto & varI:argImages) {
                         cv::add(varAns,varI,varAns,{},CV_32FC4);
                     }
-
+                    /*结果归一化*/
                     cv::normalize(varAns,varAns,255,0,cv::NORM_MINMAX);
-
-                    QImage varImageAns(varWidth,varHeight,QImage::Format_RGBA8888);
-                    cv::Mat varImageAnsWrap(varHeight,varWidth,
-                        CV_8UC4,
-                        const_cast<uchar*>(varImageAns.constBits()),
-                        varImageAns.bytesPerLine()
-                    );
-
                     varAns.convertTo(varImageAnsWrap,varImageAnsWrap.type());
+                }
 
-                    {
-                        cv::Mat varRGBA[4];
-                        cv::split(varImageAnsWrap,varRGBA);
-                        for (auto & varI:varRGBA) {
-                            cv::equalizeHist(varI,varI);
-                        }
-                        cv::merge(varRGBA,4,varImageAnsWrap);
+                {/*进行直方图均值化*/
+                    argImages.clear();
+                    argImages.resize(4);
+                    cv::split(varImageAnsWrap,argImages.data());
+                    for (auto & varI:argImages) {
+                        cv::equalizeHist(varI,varI);
                     }
+                    cv::merge(argImages.data(),4,varImageAnsWrap);
+                }
 
-                    return std::move(varImageAns);
-                }
-                catch (...) {
-                    CPLUSPLUS_EXCEPTION(false);
-                }
-                return arg;
-            });
-        }
+                return std::move(varImageAns);
+            }
+            catch (...) {
+                CPLUSPLUS_EXCEPTION(false);
+            }
+            return arg;
+        });
+
         _thisp->setCurrentImageShowWidget(nullptr);
         return varAns;
     }
@@ -113,10 +127,10 @@ QWidget* MainWindow::addImage(const QImage &arg) {
         if (_thisp->getCurrentImageShowWidget()==nullptr) {
             if (arg.isNull()) { return nullptr; }
             using namespace memory;
-            auto && widget = makeStackPointer<ImageShowWidget>();
-            widget->setImage( arg.convertToFormat(QImage::Format_RGBA8888) );
-            this->addWidget( widget.release() );
-            _thisp->setCurrentImageShowWidget( widget );
+            auto && widget=makeStackPointer<ImageShowWidget>();
+            widget->setImage(arg.convertToFormat(QImage::Format_RGBA8888));
+            this->addWidget(widget.release());
+            _thisp->setCurrentImageShowWidget(widget);
         }
         return nullptr;
     }
@@ -130,7 +144,7 @@ QWidget* MainWindow::addImage(const QImage &arg) {
         using namespace memory;
         auto && view=makeStackPointer<PlainImageView>();
         varImageShow->addImageWidget(view.release());
-        view->setImage( arg.convertToFormat(QImage::Format_RGBA8888) );
+        view->setImage(arg.convertToFormat(QImage::Format_RGBA8888));
         return nullptr;
     }
 }
