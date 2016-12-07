@@ -1,6 +1,7 @@
 ﻿#include "OpencvMainWindow.hpp"
 #include "ImageShowWidget.hpp"
 #include "PlainImageView.hpp"
+#include <QtGui/qpainter.h>
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qaction.h>
 #include <QtWidgets/qmenubar.h>
@@ -16,6 +17,12 @@ class MdiArea : public QMdiArea {
     using _Super=QMdiArea;
 public:
     using _Super::_Super;
+    MdiArea()=default;
+protected:
+    void paintEvent(QPaintEvent *e)override {
+        return QMdiArea::paintEvent(e);
+    }
+
 private:
     CPLUSPLUS_OBJECT(MdiArea)
 };
@@ -77,10 +84,12 @@ OpencvMainWindow::OpencvMainWindow(
 
     _mp=new _PrivateOpencvMainWindow;
     _mp->mdiArea=new __private::MdiArea(this);
+  
     //_mp->mdiArea->setViewMode(QMdiArea::TabbedView);
 
     setCentralWidget(_mp->mdiArea);
     _mp->mdiArea->setTabsMovable(true);
+    _mp->mdiArea->setBackground(Qt::transparent);
 
     this->setMinimumSize(512,512);
 
@@ -220,6 +229,22 @@ void OpencvMainWindow::_p_end_add_image() {
 
 void OpencvMainWindow::_p_finished_add_a_image() {
     ++_mp->addImageIndex;
+}
+
+void OpencvMainWindow::paintEvent(QPaintEvent *) {
+    // Background
+    static const auto backgroundGradient=[]() {
+        QLinearGradient backgroundGradient(0.5,1.0,0.5,0.0);
+        backgroundGradient.setColorAt(0.0,QRgb(0x2e303a));
+        backgroundGradient.setColorAt(1.0,QRgb(0x121218));
+        backgroundGradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+        return std::move(backgroundGradient);
+    }();
+    QPainter painter(this);
+    painter.setRenderHints(QPainter::Antialiasing|
+    QPainter::HighQualityAntialiasing);
+    painter.setBrush(backgroundGradient);
+    painter.drawRect(this->rect());
 }
 
 void OpencvMainWindow::openLua(){

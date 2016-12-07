@@ -60,6 +60,7 @@ QMenuBar:focus
 }
 
 QMdiArea{
+	background : black ;
 }
 
 QMdiSubWindow{

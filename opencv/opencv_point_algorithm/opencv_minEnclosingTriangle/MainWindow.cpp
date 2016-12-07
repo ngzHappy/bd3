@@ -82,7 +82,7 @@ void MainWindow::openLua() {
             chartView->setDrawFunction([path=std::move(path)](
                 QPainter*painter,const QSizeF&
             )->void {
-                CosmeticQPen pen(QColor(0,0,0),2.2);
+                CosmeticQPen pen(QColor(11,221,111),2.2);
                 painter->setPen(pen);
                 painter->drawPath(path);
             });

@@ -47,6 +47,7 @@ private:
         _AddImageState(OpencvMainWindow *a):_p_m(a) { a->_p_begin_add_image(); }
         ~_AddImageState() { _p_m->_p_end_add_image(); }
     };
+    void paintEvent(QPaintEvent *)override;
 private:
     CPLUSPLUS_OBJECT(OpencvMainWindow)
 };
