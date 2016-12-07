@@ -173,7 +173,7 @@ QMdiSubWindow * OpencvMainWindow::addWidget(ImageShowWidget*arg) {
     arg->setAttribute(Qt::WA_DeleteOnClose);
 
     ans->setOption(QMdiSubWindow::RubberBandResize,true);
-    ans->setOption(QMdiSubWindow::RubberBandMove,true);
+    //ans->setOption(QMdiSubWindow::RubberBandMove,true);
 
     ans->show();
 
