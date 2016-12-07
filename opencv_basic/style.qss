@@ -24,19 +24,20 @@
 QToolTip
 {
     border: 1px solid #76797C;
-    background-color: rgb(90, 102, 117);;
+    background-color: rgb(90, 102, 117);
     color: white;
     padding: 5px;
     opacity: 200;
 }
 
+ 
 QWidget
 {
     color: #eff0f1;
     background-color: #31363b;
     selection-background-color:#3daee9;
     selection-color: #eff0f1;
-    background-clip: border;
+	background-clip: border;
     border-image: none;
     /*border: 0px transparent black;*/
     outline: 0;
@@ -52,6 +53,20 @@ QWidget:item:selected
 {
     background-color: #3daee9;
 }
+
+QMenuBar:focus
+{
+    border: 1px solid #3daee9;
+}
+
+QMdiArea{
+}
+
+QMdiSubWindow{
+    selection-background-color:rgba(0,0,0,0);
+    selection-color: rgba(0,0,0,0);
+}
+
 
 QCheckBox
 {
@@ -310,11 +325,6 @@ QAbstractItemView
     color: #eff0f1;
     border: 1px solid 3A3939;
     border-radius: 2px;
-}
-
-QWidget:focus, QMenuBar:focus
-{
-    border: 1px solid #3daee9;
 }
 
 QTabWidget:focus, QCheckBox:focus, QRadioButton:focus, QSlider:focus

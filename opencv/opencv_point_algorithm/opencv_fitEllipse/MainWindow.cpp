@@ -50,7 +50,7 @@ void MainWindow::openLua() {
         series->setBrush(QColor(233,6,2,198/2));
     }
 
-    addWidget(mainView.release())->resize(600,600);
+    addWidget(mainView.release())->resize(800,600);
 
     /*opencv 曲线拟合*/
     try {
