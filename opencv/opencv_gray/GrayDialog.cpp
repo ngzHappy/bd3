@@ -599,7 +599,7 @@ void GrayDialog::emitValueChanged() {
 }
 
 QSize GrayDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * GrayDialog::getMainLayout() const {

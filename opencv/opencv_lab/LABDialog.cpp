@@ -785,7 +785,7 @@ void LABDialog::emitValueChanged() {
 }
 
 QSize LABDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * LABDialog::getMainLayout() const {

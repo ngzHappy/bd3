@@ -320,7 +320,7 @@ void OldPictureDialog::emitValueChanged() {
 }
 
 QSize OldPictureDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * OldPictureDialog::getMainLayout() const {

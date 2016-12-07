@@ -550,7 +550,7 @@ void FitlineDialog::emitValueChanged() {
 }
 
 QSize FitlineDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 /*End of the file.*/

@@ -390,7 +390,7 @@ void MainWindow::openLua() {
     auto&& mainView=makeStackPointer<SubImageShowWidget>(
         points2d.first,points2d.second);
     this->addWidget(mainView.release())
-        ->resize(128+600,600);
+        ->resize(800,600);
 
 }
 

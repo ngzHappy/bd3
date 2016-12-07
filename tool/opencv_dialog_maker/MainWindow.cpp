@@ -1140,7 +1140,7 @@ void XDialog::emitValueChanged() {
 }
 
 QSize XDialog::sizeHint() const {
-    return {136,128};
+    return {123+136,128};
 }
 
 QVBoxLayout * XDialog::getMainLayout() const {

@@ -413,7 +413,7 @@ void VortexDialog::emitValueChanged() {
 }
 
 QSize VortexDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * VortexDialog::getMainLayout() const {

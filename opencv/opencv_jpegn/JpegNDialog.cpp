@@ -321,7 +321,7 @@ void JpegNDialog::emitValueChanged() {
 }
 
 QSize JpegNDialog::sizeHint() const {
-    return {136,128};
+    return {123+136,128};
 }
 
 QVBoxLayout * JpegNDialog::getMainLayout() const {

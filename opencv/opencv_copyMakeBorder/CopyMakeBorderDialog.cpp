@@ -657,7 +657,7 @@ void CopyMakeBorderDialog::emitValueChanged() {
 }
 
 QSize CopyMakeBorderDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * CopyMakeBorderDialog::getMainLayout() const {

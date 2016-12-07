@@ -971,7 +971,7 @@ void RGBADialog::emitValueChanged() {
 }
 
 QSize RGBADialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * RGBADialog::getMainLayout() const {

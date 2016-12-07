@@ -655,7 +655,7 @@ void ResizeDialog::emitValueChanged() {
 }
 
 QSize ResizeDialog::sizeHint() const {
-    return{ 136,128 };
+    return{ 123+136,128 };
 }
 
 QVBoxLayout * ResizeDialog::getMainLayout() const {

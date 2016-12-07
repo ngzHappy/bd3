@@ -20,7 +20,7 @@ ChartView::~ChartView() {
 }
 
 QSize ChartView::sizeHint() const {
-    return{64,64};
+    return{128,64};
 }
 
 
