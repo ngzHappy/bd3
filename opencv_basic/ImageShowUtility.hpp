@@ -428,9 +428,80 @@ inline QtCharts::QScatterSeries *addScatterSeries(
         argC,std::move(arg));
 }
 
+namespace _p_type {
+class BarSeries : public QtCharts::QBarSeries {
+public:
+private:
+    CPLUSPLUS_OBJECT(BarSeries)
+};
+
+class BarSet :public QtCharts::QBarSet {
+    using Super=QtCharts::QBarSet;
+public:
+    using Super::Super;
+private:
+    CPLUSPLUS_OBJECT(BarSeries)
+};
+
+}/**/
+
+template<typename U=QList<qreal>>
+inline QtCharts::QBarSeries *_p_addBarSet(ChartBasic *argC,
+    U && arg) {
+    if (arg.isEmpty()) { return nullptr; }
+    argC->imageXAxis()->setRange(-.5,arg.size()+.5);
+    argC->imageYAxis()->setRange(-.5,
+        *std::max_element(arg.cbegin(),arg.cend())+5.5);
+    auto *varBarSeries=new _p_type::BarSeries;
+    varBarSeries->setParent(argC);
+    auto *varBarSet=new _p_type::BarSet("...");
+    varBarSet->setParent(varBarSeries);
+    varBarSet->append(std::forward<U>(arg));
+    varBarSeries->append(varBarSet);
+    argC->addSeries(varBarSeries);
+    attachAxis(argC,varBarSeries);
+    varBarSeries->setBarWidth(1.);
+    return varBarSeries;
+}
+
+template<typename _Tb_,typename _Te_>
+inline QtCharts::QBarSeries *addBarSet(ChartBasic *argC,
+    _Tb_ argB,const _Te_&argE) {
+    if (argB!=argE) {
+        QList<qreal> varData;
+        varData.reserve(Distance<_Tb_,const _Te_&>::value(argB,argE));
+        for (; argB!=argE; ++argB) {
+            varData.push_back(*argB);
+        }
+        return _p_addBarSet(argC,std::move(varData));
+    }
+    return nullptr;
+}
+
+inline QtCharts::QBarSeries *addBarSet(ChartBasic *argC,
+    const QList<qreal>& arg) {
+    return _p_addBarSet(argC,arg);
+}
+
+inline QtCharts::QBarSeries *addBarSet(ChartBasic *argC,
+    QList<qreal>&& arg) {
+    return _p_addBarSet(argC,std::move(arg));
+}
+
+inline QtCharts::QBarSeries *addBarSet(ChartBasic *argC,
+    const QVector<qreal>& arg) {
+    return _p_addBarSet(argC,arg.toList());
+}
+
+inline QtCharts::QBarSeries *addBarSet(ChartBasic *argC,
+    QVector<qreal>&& arg) {
+    return _p_addBarSet(argC,std::move(arg).toList());
+}
+
 }/*__ImageShowUtility*/
 }/*__private*/
 
+using __private::__ImageShowUtility::addBarSet;
 using __private::__ImageShowUtility::addLineSeries;
 using __private::__ImageShowUtility::addScatterSeries;
 using __private::__ImageShowUtility::attachAxis;

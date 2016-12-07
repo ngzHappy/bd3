@@ -72,23 +72,9 @@ QWidget* MainWindow::addImage(const QImage &arg) {
         QString::fromUtf8(u8R"(灰度统计直方图)"));
     view->setOriginalImageWidgetVisible(false);
 
-    auto && barSeries=makeStackPointer<QtCharts::QBarSeries>();
-    barSeries.release()->setParent(dataChart);
-
-    auto && barSet=makeStackPointer<QtCharts::QBarSet>("...");
-    for (const auto &varI:histData) {
-        barSet->append(varI);
-    }
-
-    barSet.release()->setParent(barSeries);
-    barSeries->append(barSet);
-    dataChart->addSeries(barSeries);
-
-    dataChart->imageXAxis()->setRange(-.5,255.5);
-    dataChart->imageYAxis()->setRange(-.5,
-        *std::max_element(histData.cbegin(),histData.cend())+5.5);
-    barSeries->attachAxis(dataChart->imageXAxis());
-    barSeries->attachAxis(dataChart->imageYAxis());
+    auto * barSeries=addBarSet(dataChart,
+        histData.cbegin(),histData.cend());
+    auto * barSet=barSeries->barSets().first();
 
     QColor varColor(12+(std::rand()&127),
         16+(std::rand()&127),
@@ -96,7 +82,6 @@ QWidget* MainWindow::addImage(const QImage &arg) {
         200);
     barSet->setPen(CosmeticQPen(varColor,1));
     barSet->setBrush(varColor);
-    barSeries->setBarWidth(1);
 
     return nullptr;
 }
