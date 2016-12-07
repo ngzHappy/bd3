@@ -80,6 +80,8 @@ OpencvMainWindow::OpencvMainWindow(
     //_mp->mdiArea->setViewMode(QMdiArea::TabbedView);
 
     setCentralWidget(_mp->mdiArea);
+    _mp->mdiArea->setTabsMovable(true);
+
     this->setMinimumSize(512,512);
 
     _mp->menuBar=new __private::MenuBar;
@@ -88,30 +90,35 @@ OpencvMainWindow::OpencvMainWindow(
 
     _mp->defaultMenu=new __private::Menu(this);
     _mp->defaultMenu->setTitle(u8R"(基本操作)"_qs);
+    
     {
         auto openaction=new __private::Action(u8R"(层叠窗口)"_qs,this);
         _mp->defaultMenu->addAction(openaction);
         connect(openaction,&QAction::triggered,
             _mp->mdiArea,&QMdiArea::cascadeSubWindows);
     }
+
     {
         auto openaction=new __private::Action(u8R"(并排窗口)"_qs,this);
         _mp->defaultMenu->addAction(openaction);
         connect(openaction,&QAction::triggered,
             _mp->mdiArea,&QMdiArea::tileSubWindows);
     }
+
     {
         auto openaction=new __private::Action(u8R"(打开图片)"_qs,this);
         _mp->defaultMenu->addAction(openaction);
         connect(openaction,&QAction::triggered,
             this,&OpencvMainWindow::_p_open_image);
     }
+
     {
         auto openaction=new __private::Action(u8R"(打开lua)"_qs,this);
         _mp->defaultMenu->addAction(openaction);
         connect(openaction,&QAction::triggered,
             this,&OpencvMainWindow::_p_open_lua);
     }
+
     _mp->menuBar->addMenu(_mp->defaultMenu);
 
 }
@@ -164,6 +171,10 @@ QMdiSubWindow * OpencvMainWindow::addWidget(ImageShowWidget*arg) {
     ans->setMinimumSize(2*128,1*128);
     ans->setAttribute(Qt::WA_DeleteOnClose);
     arg->setAttribute(Qt::WA_DeleteOnClose);
+
+    ans->setOption(QMdiSubWindow::RubberBandResize,true);
+    ans->setOption(QMdiSubWindow::RubberBandMove,true);
+
     ans->show();
 
     return ans;

@@ -89,6 +89,13 @@ void ImageChart::paint(
     const QStyleOptionGraphicsItem *option,
     QWidget *widget) {
 
+   {/*绘制背景，不考虑缩放*/
+       painterx->save();
+       painterx->setBrush(this->backgroundBrush());
+       painterx->drawRect(this->rect());
+       painterx->restore();
+   }
+
     if (_mp->drawImage.isNull()) {
         return  _Super::paint(painterx,option,widget);
     }

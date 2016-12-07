@@ -4,12 +4,13 @@
 #include <lua/lua.hpp>
 #include <list>
 #include <vector>
+#include <atomic>
 #include <forward_list>
 #include <QtWidgets/qproxystyle.h>
-#include <atomic>
 #include <QtGui/qpainter.h>
-#include <QtWidgets/qstylepainter.h>
+#include <QtCore/qresource.h>
 #include <QtWidgets/qstyleoption.h>
+#include <QtWidgets/qstylepainter.h>
 
 namespace {
 
@@ -546,8 +547,19 @@ OpencvApplication::OpencvApplication(
     _mp->buildPath=argBuildPath;
     _mp->upateImageSearchDir();
     _mp->updateLuaFile();
-    _p_setStype();
     std::srand((int)std::time(nullptr));
+    {
+        QResource varQSS(":/qdarkstyle/style.qss");
+        QString varQSSData;
+        if(varQSS.isCompressed()){
+            auto varTmp = qUncompress(varQSS.data(),varQSS.size());
+            varQSSData=QString::fromUtf8(varTmp);
+        }else{
+            varQSSData=QString::fromUtf8((const char *)varQSS.data(),varQSS.size());
+        }
+        this->setStyleSheet(varQSSData);
+    }
+    _p_setStype();
 }
 
 OpencvApplication * OpencvApplication::instance() {

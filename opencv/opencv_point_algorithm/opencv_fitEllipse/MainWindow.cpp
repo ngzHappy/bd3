@@ -73,7 +73,7 @@ void MainWindow::openLua() {
             QPainter * painter,const QSizeF&) {
             painter->translate(cx,cy);
             painter->rotate(angle/*deg*/);
-            painter->setPen(CosmeticQPen(QColor(0,0,0),2));
+            painter->setPen(CosmeticQPen(QColor(55,113,100),2));
             painter->drawEllipse({ 0,0 },ewidth,eheight);
         });
 

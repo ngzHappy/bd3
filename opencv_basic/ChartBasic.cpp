@@ -32,6 +32,7 @@ ChartBasic::ChartBasic(
     this->addAxis(_p_x,Qt::AlignBottom);
     this->addAxis(_p_y,Qt::AlignLeft);
     this->setAnimationOptions(QChart::SeriesAnimations);
+    this->setTheme(ChartThemeDark);
     auto varLegend=legend();
     varLegend->setVisible(false);
     setPlotAreaBackgroundVisible(false);

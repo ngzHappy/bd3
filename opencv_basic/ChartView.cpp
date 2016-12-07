@@ -13,6 +13,7 @@ ChartView::ChartView(
         QPainter::TextAntialiasing|
         QPainter::Antialiasing
     );
+    
 }
 
 ChartView::~ChartView() {
