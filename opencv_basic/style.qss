@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 QToolTip
 {
     border: 1px solid #76797C;
@@ -39,20 +38,9 @@ QWidget
     selection-color: #eff0f1;
     background-clip: border;
     border-image: none;
-    border: 0px transparent black;
+    /*border: 0px transparent black;*/
     outline: 0;
 }
-
-/********************************************/
-QMdiArea
-{
-}
-
-/********************************************/
-QMdiSubWindow
-{
-}
-
 
 QWidget:item:hover
 {
@@ -1021,18 +1009,18 @@ QToolButton {
     background-color: transparent;
     border: 1px transparent #76797C;
     border-radius: 2px;
-    margin: 1px;
-    padding: 1px;
+    margin: 3px;
+    padding: 5px;
 }
 
 QToolButton[popupMode="1"] { /* only for MenuButtonPopup */
- padding-right: 1px; /* make way for the popup button */
+ padding-right: 20px; /* make way for the popup button */
  border: 1px #76797C;
- border-radius: 1px;
+ border-radius: 5px;
 }
 
 QToolButton[popupMode="2"] { /* only for InstantPopup */
- padding-right: 1px; /* make way for the popup button */
+ padding-right: 10px; /* make way for the popup button */
  border: 1px #76797C;
 }
 
@@ -1040,14 +1028,14 @@ QToolButton[popupMode="2"] { /* only for InstantPopup */
 QToolButton:hover, QToolButton::menu-button:hover {
     background-color: transparent;
     border: 1px solid #3daee9;
-    padding: 1px;
+    padding: 5px;
 }
 
 QToolButton:checked, QToolButton:pressed,
         QToolButton::menu-button:pressed {
     background-color: #3daee9;
     border: 1px solid #3daee9;
-    padding: 1px;
+    padding: 5px;
 }
 
 /* the subcontrol below is used only in the InstantPopup or DelayedPopup mode */
@@ -1062,7 +1050,7 @@ QToolButton::menu-button {
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
     /* 16px width + 4px for border = 20px allocated above */
-    width: 12px;
+    width: 16px;
     outline: none;
 }
 
@@ -1270,6 +1258,3 @@ QDateEdit::down-arrow:focus
 {
     image: url(:/qss_icons/rc/down_arrow.png);
 }
-
-
-
