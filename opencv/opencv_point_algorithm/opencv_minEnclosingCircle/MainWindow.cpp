@@ -70,7 +70,7 @@ void MainWindow::openLua(){
             [center=QPointF(center.x,center.y),r](
             QPainter*painter,const QSizeF&
         )->void {
-            CosmeticQPen pen(QColor(0,0,0),2.2);
+            CosmeticQPen pen(QColor(111,121,222),2.2);
             painter->setPen(pen);
             painter->drawEllipse(center,r,r);
         });
