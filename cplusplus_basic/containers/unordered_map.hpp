@@ -8,18 +8,18 @@
 namespace containers {
 
 template < typename K,
-           typename V,
-           typename H = containers::MixHash<K> ,
-           class P = std::equal_to<void> >
-using unordered_map =std::unordered_map<K,V,H,P,
-memory::Allocator<std::pair<const K,V>>> ;
+    typename V,
+    typename H=containers::MixHash<K>,
+    class P=std::equal_to<void> >
+    using unordered_map=std::unordered_map<K,V,H,P,
+    memory::Allocator<std::pair<const K,V>>>;
 
 template < typename K,
-           typename V,
-           typename H = containers::MixHash<K> ,
-           class P = std::equal_to<void> >
-using unordered_multimap =std::unordered_multimap<K,V,H,P,
-memory::Allocator<std::pair<const K,V>>> ;
+    typename V,
+    typename H=containers::MixHash<K>,
+    class P=std::equal_to<void> >
+    using unordered_multimap=std::unordered_multimap<K,V,H,P,
+    memory::Allocator<std::pair<const K,V>>>;
 
 }/*containers*/
 

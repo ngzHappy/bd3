@@ -5,48 +5,79 @@
 #include <functional>
 #include <type_traits>
 
+#if defined(QT_CORE_LIB)
+#include <QtCore/qhash.h>
+class QUrl;
+class QTime;
+class QDate;
+class QDateTime;
+#endif
+
 namespace containers {
 
-namespace /*ⓟ*/\u24df{
-
-template<typename ...>using _void_t=void;
-
-template<typename T,typename U,typename=void>
-class IsStdHash :public std::false_type {};
-
-template<typename T,typename U>
-class IsStdHash<T,U,_void_t<
-        decltype( std::declval<std::hash<T>>()(std::declval<U>()) )
->>:public std::true_type{};
-
-}/**/
-
-template<typename T,typename=void>
-class MixHash{
-public:
-    //std::hash<T>
-//    template<typename U,
-//             typename K=std::enable_if_t<
-//                 u24df::IsStdHash<T,const U&>::value>>
-//    size_t operator()(const U &arg){
-//        std::hash<T> var;
-//        return var(arg);
-//    }
-};
+#if defined(QT_CORE_LIB)
 
 template<typename T>
-class MixHash<T,\u24df::_void_t<
-        std::enable_if_t<sizeof(std::hash<T>)>
->>{
-  std::hash<T> _p_std_hash;
+class MixHash :public std::hash<T> {};
+
+class QMixHash {
 public:
-      template<typename U,
-               typename K=std::enable_if_t<
-                   u24df::IsStdHash<T,const U&>::value>>
-      size_t operator()(const U &arg) const {
-          return _p_std_hash(arg);
-      }
+    template<typename T>
+    size_t operator()(const T &arg)const {
+        return qHash(arg);
+    }
 };
+
+template<>
+class MixHash<QString>:public QMixHash {
+};
+
+template<>
+class MixHash<QStringRef>:public QMixHash {
+};
+
+template<>
+class MixHash<QChar>:public QMixHash {
+};
+
+template<>
+class MixHash<QBitArray>:public QMixHash {
+};
+
+template<>
+class MixHash<QByteArray>:public QMixHash {
+};
+
+template<>
+class MixHash<QLatin1String>:public QMixHash {
+};
+
+template<>
+class MixHash<QTime>:public QMixHash {
+};
+
+template<>
+class MixHash<QUrl>:public QMixHash {
+};
+
+template<>
+class MixHash<QDateTime>:public QMixHash {
+};
+
+template<>
+class MixHash<QDate>:public QMixHash {
+};
+
+template<typename T,typename U>
+class MixHash<QPair<T,U>>:public QMixHash {
+};
+
+#else
+
+template<typename T>
+using MixHash=std::hash<T>;
+
+#endif
 
 }/*containers*/
 
