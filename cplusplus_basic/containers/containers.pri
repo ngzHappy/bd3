@@ -9,4 +9,6 @@ HEADERS += \
     $$PWD/set.hpp \
     $$PWD/stack.hpp \
     $$PWD/containers.hpp \
-    $$PWD/hash.hpp
+    $$PWD/hash.hpp \
+    $$PWD/unordered_map.hpp \
+    $$PWD/unordered_set.hpp

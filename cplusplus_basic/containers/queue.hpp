@@ -1,4 +1,7 @@
-﻿#include <queue>
+﻿#ifndef _queue_HASH_CONTAINERS_HPP_0x1222
+#define _queue_HASH_CONTAINERS_HPP_0x1222
+
+#include <queue>
 #include "deque.hpp"
 #include "vector.hpp"
 
@@ -13,3 +16,5 @@ template <typename T,
 using priority_queue=std::priority_queue<T,C,Cp>;
 
 }/*containers*/
+
+#endif

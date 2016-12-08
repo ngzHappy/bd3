@@ -1,4 +1,7 @@
-﻿#include <stack>
+﻿#ifndef _stack_HASH_CONTAINERS_HPP_0x1222
+#define _stack_HASH_CONTAINERS_HPP_0x1222
+
+#include <stack>
 #include "deque.hpp"
 #include "../cplusplus_basic.hpp"
 
@@ -9,3 +12,5 @@ template <typename T,
 using stack=std::stack<T,C>;
 
 }/*containers*/
+
+#endif
