@@ -97,8 +97,17 @@ void MainWindow::openLua() {
 
     auto varSeries=addScatterSeries(dataView->dataChart(),
         varInputData.first,varInputData.second);
-    varSeries->setPen(Qt::NoPen);
-    varSeries->setBrush(QBrush(QColor(1,122,3,150)));
+    {
+        QRadialGradient varRadialGradient({.5,.5},.5);
+        varRadialGradient.setCoordinateMode(
+            QRadialGradient::ObjectBoundingMode);
+        varRadialGradient.setColorAt(0,QColor(3,255,3,252));
+        varRadialGradient.setColorAt(0.2,QColor(1,202,3,150));
+        varRadialGradient.setColorAt(0.8,QColor(1,122,3,50));
+        varRadialGradient.setColorAt(1,QColor(1,122,3,3));
+        varSeries->setPen(Qt::NoPen);
+        varSeries->setBrush(varRadialGradient);
+    }
     fitChartAxisRange(dataView->dataChart(),
         varInputData.first,varInputData.second);
 
