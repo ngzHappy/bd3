@@ -100,3 +100,15 @@ opencv_hist_gray.file=$$PWD/opencv/opencv_hist_gray/opencv_hist_gray.pro
 opencv_hist_gray.depends+=library_opencv_basic
 SUBDIRS += opencv_hist_gray
 
+opencv_approxPolyDP.file=$$PWD/opencv/opencv_approxPolyDP/opencv_approxPolyDP.pro
+opencv_approxPolyDP.depends+=library_opencv_basic
+SUBDIRS += opencv_approxPolyDP
+
+opencv_convexityDefects.file=$$PWD/opencv/opencv_convexityDefects/opencv_convexityDefects.pro
+opencv_convexityDefects.depends+=library_opencv_basic
+SUBDIRS += opencv_convexityDefects
+
+opencv_pca.file=$$PWD/opencv/opencv_pca/opencv_pca.pro
+opencv_pca.depends+=library_opencv_basic
+SUBDIRS += opencv_pca
+

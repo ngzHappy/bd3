@@ -14,7 +14,8 @@ SOURCES += QtBasicLibrary.cpp \
 
 HEADERS += QtBasicLibrary.hpp\
         qt_basic_global.hpp \
-    QObjectsWatcher.hpp
+    QObjectsWatcher.hpp \
+    _PrivateQObjectsWatcher.hpp
 
 include($$PWD/private_qt3rd_base_library/zlib.pri)
 include($$PWD/quazip/quazip.pri)
