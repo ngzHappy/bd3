@@ -1,16 +1,85 @@
-﻿--[[lua--]]
-local application={
-input_images={
-"images:000001",
-"images:000002",
-"images:000003",
-},--[[input_images--]]
-input_data_2d={
-{0.01*10,0.53213436611265*10},
-}--[[input_data_2d--]]
 
-}
+local function normal_data_function(arg)
+    local  x = arg[1]
+    local  y = arg[2]
+    return {x,y}
+end
+
+local application={
+input_data_2d={
+normal_data_function( { 0.087285024827671 , 0.099807547405231 } ) , 
+normal_data_function( { 0.1802325533417 , 0.19501833571911 } ) , 
+normal_data_function( { 0.28637519897835 , 0.30127880130392 } ) , 
+normal_data_function( { 0.36942946574633 , 0.38614157612057 } ) , 
+normal_data_function( { 0.4907083810945 , 0.49077892792309 } ) , 
+normal_data_function( { 0.53901780358196 , 0.58174640956105 } ) , 
+normal_data_function( { 0.67859405201179 , 0.70131824214564 } ) , 
+normal_data_function( { 0.73365635848431 , 0.81680076664972 } ) , 
+normal_data_function( { 0.79758471535107 , 0.91014683390788 } ) , 
+normal_data_function( { 0.89443930889837 , 1.0189809029172 } ) , 
+normal_data_function( { 1.0962258111259 , 1.1071788647255 } ) , 
+normal_data_function( { 1.0683464619715 , 1.2252191943281 } ) , 
+normal_data_function( { 1.136182582166 , 1.3137172971848 } ) , 
+normal_data_function( { 1.3270217609289 , 1.3964574962079 } ) , 
+normal_data_function( { 1.4349669437057 , 1.4917557157018 } ) , 
+normal_data_function( { 1.4355389075281 , 1.583338654109 } ) , 
+normal_data_function( { 1.5934042025864 , 1.7202565790183 } ) , 
+normal_data_function( { 1.5860190608599 , 1.7900277898879 } ) , 
+normal_data_function( { 1.8569557625681 , 1.8539212837541 } ) , 
+normal_data_function( { 1.8927222949997 , 2.0286125758332 } ) , 
+normal_data_function( { 2.0719060084727 , 2.0654421399149 } ) , 
+normal_data_function( { 2.1864520635991 , 2.1161070701784 } ) , 
+normal_data_function( { 2.1823639162472 , 2.3448900403754 } ) , 
+normal_data_function( { 2.253120568175 , 2.4406294454285 } ) , 
+normal_data_function( { 2.4632669238995 , 2.5444273860878 } ) , 
+normal_data_function( { 2.5400946206525 , 2.5253365832909 } ) , 
+normal_data_function( { 2.6925464202801 , 2.5727273684532 } ) , 
+normal_data_function( { 2.6819273092658 , 2.827273227367 } ) , 
+normal_data_function( { 2.643907151431 , 2.9420811186216 } ) , 
+normal_data_function( { 2.949439142039 , 3.0629274000143 } ) , 
+normal_data_function( { 2.874072579214 , 3.1631833788428 } ) , 
+normal_data_function( { 3.089993157018 , 3.2665064978254 } ) , 
+normal_data_function( { 2.8840960265038 , 3.1768634143348 } ) , 
+normal_data_function( { 3.1044546549743 , 3.4527953153527 } ) , 
+normal_data_function( { 3.3422978184625 , 3.4544001023544 } ) , 
+normal_data_function( { 3.538422884889 , 3.5408229172909 } ) , 
+normal_data_function( { 3.4847269521902 , 3.7662321604984 } ) , 
+normal_data_function( { 3.697792830122 , 3.8191359328546 } ) , 
+normal_data_function( { 3.6591850453124 , 3.740350925917 } ) , 
+normal_data_function( { 3.8927199471056 , 4.080595333695 } ) , 
+normal_data_function( { 3.9208798551242 , 4.1415965159348 } ) , 
+normal_data_function( { 4.0830158085287 , 4.1762751103065 } ) , 
+normal_data_function( { 4.0979801654511 , 4.3491841881181 } ) , 
+normal_data_function( { 3.938271042409 , 4.4760100438262 } ) , 
+normal_data_function( { 4.2023367807676 , 4.3907343180546 } ) , 
+normal_data_function( { 4.3516151930226 , 4.388719247219 } ) , 
+normal_data_function( { 4.5775804412461 , 4.7575671832672 } ) , 
+normal_data_function( { 4.3085451415602 , 4.7525213533857 } ) , 
+normal_data_function( { 4.6193752762549 , 5.0015194773784 } ) , 
+normal_data_function( { 4.8410323053195 , 5.0125717613372 } ) , 
+normal_data_function( { 4.5617775107593 , 4.8909653176806 } ) , 
+normal_data_function( { 4.6467045404117 , 5.0143058532854 } ) , 
+normal_data_function( { 5.1273521248268 , 5.3755659945884 } ) , 
+normal_data_function( { 5.0438282997636 , 5.5115122128089 } ) , 
+normal_data_function( { 5.4711339625172 , 5.43248145633 } ) , 
+normal_data_function( { 5.0137232342242 , 5.4180252930107 } ) , 
+normal_data_function( { 5.5934081426976 , 5.680568469852 } ) , 
+normal_data_function( { 5.225094470335 , 5.9083241145256 } ) , 
+normal_data_function( { 5.786987588922 , 5.9270035594024 } ) , 
+normal_data_function( { 5.373886248954 , 6.0154667901485 } ) , 
+normal_data_function( { 5.9280839127752 , 6.154792435281 } ) , 
+normal_data_function( { 5.6643306588549 , 6.1855234526243 } ) , 
+normal_data_function( { 6.0870843201657 , 6.17791596518 } ) , 
+normal_data_function( { 6.2124627310447 , 6.4292787383294 } ) , 
+normal_data_function( { 5.7906450913536 , 6.572123835103 } ) , 
+normal_data_function( { 6.485185704331 , 6.7381133194828 } ) , 
+normal_data_function( { 6.3381430239254 , 6.6302679532678 } ) , 
+normal_data_function( { 6.3511791600177 , 6.9373981382642 } ) , 
+normal_data_function( { 6.8536161272987 , 6.6404199341946 } ) , 
+normal_data_function( { 6.6510317263162 , 7.0855879870421 } ) , 
+normal_data_function( { 6.6745521241235 , 7.1760400683548 } ) , 
+normal_data_function( { 7.0835083187505 , 7.298151761666 } ) , 
+},--[[input_daga_2d]]
+};--[[application]]
 
 return application
-
---[[lua--]]

@@ -8,11 +8,11 @@ local function make_write_endl(file)
 end 
 
 local function make_x(angle)
-    return .07*math.sin(math.random())+angle;
+    return (.17*math.sin(math.random())+1)*angle;
 end 
 
 local function make_y(angle)
-    return .07*math.cos(math.random())+angle;
+    return (.17*math.cos(math.random())+1)*angle;
 end 
 
 local function make_test_data()
@@ -35,7 +35,7 @@ end
     file:write("input_data_2d={")
     write_endl()
 
-    local points_count = 36
+    local points_count = 72
     local step=2*math.pi/points_count;
     local angle = 0;
     
