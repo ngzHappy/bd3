@@ -9,10 +9,12 @@ QT += concurrent
 DEFINES += QT_BASIC_LIBRARY
 
 SOURCES += QtBasicLibrary.cpp \
-    QtBasicLibraryStart.cpp
+    QtBasicLibraryStart.cpp \
+    QObjectsWatcher.cpp
 
 HEADERS += QtBasicLibrary.hpp\
-        qt_basic_global.hpp
+        qt_basic_global.hpp \
+    QObjectsWatcher.hpp
 
 include($$PWD/private_qt3rd_base_library/zlib.pri)
 include($$PWD/quazip/quazip.pri)
