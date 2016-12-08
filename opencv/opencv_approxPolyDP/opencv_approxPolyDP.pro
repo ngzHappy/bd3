@@ -11,10 +11,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     MainWindow.cpp \
-    Application.cpp
+    Application.cpp \
+    ApproxPolyDPDialog.cpp
 
 HEADERS  += MainWindow.hpp \
-    Application.hpp
+    Application.hpp \
+    ApproxPolyDPDialog.hpp
 
 FORMS    +=
 

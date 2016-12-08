@@ -23,6 +23,7 @@ QWidget* MainWindow::addImage(const QImage &arg) {
 }
 
 void MainWindow::openLua(){
+    //cv::convexityDefects()
     return _Super::openLua();
 }
 

@@ -1,6 +1,7 @@
 ﻿/*MainWindow.cpp*/
 #include "MainWindow.hpp"
 #include <OpenCVUtility.hpp>
+#include "ApproxPolyDPDialog.hpp"
 
 class MainWindow::_PrivateMainWindow{
 public:
