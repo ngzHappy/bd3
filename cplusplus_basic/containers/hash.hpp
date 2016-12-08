@@ -29,47 +29,47 @@ public:
 };
 
 template<>
-class MixHash<QString>:public QMixHash {
+class MixHash<QString> :public QMixHash {
 };
 
 template<>
-class MixHash<QStringRef>:public QMixHash {
+class MixHash<QStringRef> :public QMixHash {
 };
 
 template<>
-class MixHash<QChar>:public QMixHash {
+class MixHash<QChar> :public QMixHash {
 };
 
 template<>
-class MixHash<QBitArray>:public QMixHash {
+class MixHash<QBitArray> :public QMixHash {
 };
 
 template<>
-class MixHash<QByteArray>:public QMixHash {
+class MixHash<QByteArray> :public QMixHash {
 };
 
 template<>
-class MixHash<QLatin1String>:public QMixHash {
+class MixHash<QLatin1String> :public QMixHash {
 };
 
 template<>
-class MixHash<QTime>:public QMixHash {
+class MixHash<QTime> :public QMixHash {
 };
 
 template<>
-class MixHash<QUrl>:public QMixHash {
+class MixHash<QUrl> :public QMixHash {
 };
 
 template<>
-class MixHash<QDateTime>:public QMixHash {
+class MixHash<QDateTime> :public QMixHash {
 };
 
 template<>
-class MixHash<QDate>:public QMixHash {
+class MixHash<QDate> :public QMixHash {
 };
 
 template<typename T,typename U>
-class MixHash<QPair<T,U>>:public QMixHash {
+class MixHash<QPair<T,U>> :public QMixHash {
 };
 
 #else

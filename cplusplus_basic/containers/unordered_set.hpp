@@ -8,16 +8,16 @@
 namespace containers {
 
 template < typename K,
-           typename H = containers::MixHash<K> ,
-           class P = std::equal_to<void> >
-using unordered_set =std::unordered_set<K,H,P,
-memory::Allocator< K >> ;
+    typename H=containers::MixHash<K>,
+    class P=std::equal_to<void> >
+    using unordered_set=std::unordered_set<K,H,P,
+    memory::Allocator< K >>;
 
 template < typename K,
-           typename H = containers::MixHash<K> ,
-           class P = std::equal_to<void> >
-using unordered_multiset =std::unordered_multiset<K,H,P,
-memory::Allocator<K>> ;
+    typename H=containers::MixHash<K>,
+    class P=std::equal_to<void> >
+    using unordered_multiset=std::unordered_multiset<K,H,P,
+    memory::Allocator<K>>;
 
 }/*containers*/
 
