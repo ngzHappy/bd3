@@ -50,7 +50,7 @@ public:
         std::shared_ptr<std::mutex> _data;
         std::unique_lock<std::mutex> _lock_data;
     public:
-        LockerType(std::shared_ptr<std::mutex> arg):_data(arg),
+        LockerType(const std::shared_ptr<std::mutex> & arg):_data(arg),
             _lock_data(*arg) {
         }
     };
