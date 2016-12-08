@@ -23,9 +23,33 @@ QWidget* MainWindow::addImage(const QImage &arg) {
     return _Super::addImage(arg);
 }
 
+namespace {
+
+class DataWidget :public ImageShowWidget {
+
+public:
+    DataWidget( ) {
+
+    }
+
+    void valueChanged(double ) {
+
+
+
+    }
+
+private:
+    CPLUSPLUS_OBJECT(ImageWidget)
+};
+
+}/*namespace*/
+
 void MainWindow::openLua(){
-    return _Super::openLua();
+    auto varPoints = qApp->getPoint2d();
+    auto varRows=varPoints.second-varPoints.first;
+    if(varRows < 2){ return ; }
 }
 
 /*End of the file.*/
+
 

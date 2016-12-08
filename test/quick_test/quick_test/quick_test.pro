@@ -10,12 +10,14 @@ SOURCES += main.cpp\
         MainWindow.cpp \
     TestMemory.cpp \
     TestException.cpp \
-    TestLua.cpp
+    TestLua.cpp \
+    ContainersTest.cpp
 
 HEADERS  += MainWindow.hpp \
     TestMemory.hpp \
     TestException.hpp \
-    TestLua.hpp
+    TestLua.hpp \
+    ContainersTest.hpp
 
 FORMS    += MainWindow.ui
 

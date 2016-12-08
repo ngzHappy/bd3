@@ -7,6 +7,7 @@ TEMPLATE = lib
 
 include($$PWD/_private_cplusplus_basic_headers.pri)
 include($$PWD/_private_cplusplus_basic_files.pri)
+include($$PWD/containers/containers.pri)
 DEFINES*=CPLUSPLUS_BASIC_LIBRARYSHARED_EXPORT
 
 include($$PWD/lua/lua.pri)
