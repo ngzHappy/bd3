@@ -11,4 +11,6 @@ HEADERS += \
     $$PWD/containers.hpp \
     $$PWD/hash.hpp \
     $$PWD/unordered_map.hpp \
-    $$PWD/unordered_set.hpp
+    $$PWD/unordered_set.hpp \
+    $$PWD/string.hpp \
+    $$PWD/sstream.hpp
