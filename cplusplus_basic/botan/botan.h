@@ -29,6 +29,7 @@
 #else
 
 #include "../config/config.hpp"
+#include "../containers/containers.hpp"
 
 #include <iosfwd>
 #include <map>

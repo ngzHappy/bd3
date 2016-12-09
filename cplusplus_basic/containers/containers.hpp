@@ -9,6 +9,8 @@
 #include "deque.hpp"
 #include "array.hpp"
 #include "vector.hpp"
+#include "string.hpp"
+#include "sstream.hpp"
 #include "forward_list.hpp"
 #include "unordered_map.hpp"
 #include "unordered_set.hpp"
