@@ -1247,7 +1247,7 @@ public:
     Exception();
     Exception(const containers::string &);
     Exception(containers::string &&);
-    const char *what()const override;
+    const char *what() const noexcept(true) override ;
 };
 
 class BOTAN_DLL Invalid_Argument : public std::invalid_argument{
@@ -1258,7 +1258,7 @@ public:
     Invalid_Argument();
     Invalid_Argument(const containers::string &);
     Invalid_Argument(containers::string &&);
-    const char *what()const override;
+    const char *what()const noexcept(true) override ;
 };
 
 

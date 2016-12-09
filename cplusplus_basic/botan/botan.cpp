@@ -5,6 +5,10 @@
 * Distributed under the terms of the Botan license
 */
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4244)
+#endif
+
 #include "botan.h"
 #include <deque>
 

@@ -4,5 +4,9 @@
 #include <exception>
 #include <stdexcept>
 
+#if defined(_MSC_VER)
+#pragma warning(disable : 4275)
+#endif
+
 #endif
 
