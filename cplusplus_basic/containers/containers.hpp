@@ -13,4 +13,23 @@
 #include "unordered_map.hpp"
 #include "unordered_set.hpp"
 
+//namespace memory{
+//using containers::map;
+//using containers::multimap;
+//using containers::set;
+//using containers::multiset;
+//using containers::list;
+//using containers::stack;
+//using containers::queue;
+//using containers::priority_queue;
+//using containers::deque;
+//using containers::array;
+//using containers::vector;
+//using containers::forward_list;
+//using containers::unordered_map;
+//using containers::unordered_multimap;
+//using containers::unordered_set;
+//using containers::unordered_multiset;
+//}
+
 #endif

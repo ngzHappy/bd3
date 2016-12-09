@@ -66,8 +66,8 @@ inline void draw_axis_array(
 
 }/*namespace*/
 
-void MainWindow::openLua() {
-
+void MainWindow::openLua() try{
+     
     /*获得数据*/
     auto varInputData=qApp->getPoint2d();
     auto rows=varInputData.second-varInputData.first;
@@ -98,7 +98,7 @@ void MainWindow::openLua() {
     auto varSeries=addScatterSeries(dataView->dataChart(),
         varInputData.first,varInputData.second);
     {
-        QRadialGradient varRadialGradient({.5,.5},.5);
+        QRadialGradient varRadialGradient({ .5,.5 },.5);
         varRadialGradient.setCoordinateMode(
             QRadialGradient::ObjectBoundingMode);
         varRadialGradient.setColorAt(0,QColor(3,255,3,252));
@@ -129,6 +129,9 @@ void MainWindow::openLua() {
         painter->restore();
     });
 
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
 }
 
 /*End of the file.*/

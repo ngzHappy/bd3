@@ -67,7 +67,18 @@ QWidget* MainWindow::addImage(const QImage &arg) {
             QTextStream stream(&varFile);
             stream.setCodec("UTF-8");
             stream<<bom;
+            stream<<endl;
+
+            stream<<QLatin1Literal("local xMax = ",13);
+            stream<<xmax<<endl;
+            stream<<QLatin1Literal("local yMax = ",13)<<ymax;
+
             stream<<u8R"~=:;:=~(
+local function normal_data(arg)
+    local x=arg[1];
+    local y=arg[2];
+    return {x,y};
+end
 
 local application={
 input_data_2d={
@@ -80,11 +91,11 @@ input_data_2d={
                     stream<<(j);
                 }
                 stream<<QLatin1Literal("--]]",4);
-                stream<<QLatin1Literal("{",1);
+                stream<<QLatin1Literal("normal_data({",13);
                 stream<<i.x();
                 stream<<QLatin1Literal(",",1);
                 stream<<i.y();
-                stream<<QLatin1Literal("},\n",3);
+                stream<<QLatin1Literal("}),\n",4);
             }
 
             stream<<u8R"~=:;:=~(
