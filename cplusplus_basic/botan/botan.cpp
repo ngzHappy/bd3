@@ -32,7 +32,7 @@ class Dynamically_Loaded_Library
       * qualified pathnames can help prevent code injection attacks (eg
       * via manipulation of LD_LIBRARY_PATH on Linux)
       */
-      Dynamically_Loaded_Library(const std::string& lib_name);
+      Dynamically_Loaded_Library(const containers::string& lib_name);
 
       /**
       * Unload the DLL
@@ -46,7 +46,7 @@ class Dynamically_Loaded_Library
       * @param symbol names the symbol to load
       * @return address of the loaded symbol
       */
-      void* resolve_symbol(const std::string& symbol);
+      void* resolve_symbol(const containers::string& symbol);
 
       /**
       * Convenience function for casting symbol to the right type
@@ -54,7 +54,7 @@ class Dynamically_Loaded_Library
       * @return address of the loaded symbol
       */
       template<typename T>
-      T resolve(const std::string& symbol)
+      T resolve(const containers::string& symbol)
          {
 #if defined(__GNUC__) && __GNUC__ < 4
          return (T)(resolve_symbol(symbol));
@@ -67,7 +67,7 @@ class Dynamically_Loaded_Library
       Dynamically_Loaded_Library(const Dynamically_Loaded_Library&);
       Dynamically_Loaded_Library& operator=(const Dynamically_Loaded_Library&);
 
-      std::string lib_name;
+      containers::string lib_name;
       void* lib;
    };
 
@@ -82,7 +82,7 @@ namespace Botan {
 class Win32_EntropySource : public EntropySource
    {
    public:
-      std::string name() const { return "Win32 Statistics"; }
+      containers::string name() const { return "Win32 Statistics"; }
       void poll(Entropy_Accumulator& accum);
    };
 
@@ -444,18 +444,18 @@ OutputIterator copy_if(InputIterator current, InputIterator end,
    }
 
 /**
-* Searching through a std::map
+* Searching through a containers::map
 * @param mapping the map to search
 * @param key is what to look for
 * @param null_result is the value to return if key is not in mapping
 * @return mapping[key] or null_result
 */
 template<typename K, typename V>
-inline V search_map(const std::map<K, V>& mapping,
+inline V search_map(const containers::map<K, V>& mapping,
                     const K& key,
                     const V& null_result = V())
    {
-   typename std::map<K, V>::const_iterator i = mapping.find(key);
+   typename containers::map<K, V>::const_iterator i = mapping.find(key);
    if(i == mapping.end())
       return null_result;
    return i->second;
@@ -484,7 +484,7 @@ void delete2nd(Pair& pair)
 * Insert a key/value pair into a multimap
 */
 template<typename K, typename V>
-void multimap_insert(std::multimap<K, V>& multimap,
+void multimap_insert(containers::multimap<K, V>& multimap,
                      const K& key, const V& value)
    {
 #if defined(BOTAN_BUILD_COMPILER_IS_SUN_STUDIO)
@@ -504,7 +504,7 @@ namespace Botan {
 * @param prov_name a provider name
 * @return weight for this provider
 */
-size_t static_provider_weight(const std::string& prov_name);
+size_t static_provider_weight(const containers::string& prov_name);
 
 /**
 * Algorithm_Cache (used by Algorithm_Factory)
@@ -518,8 +518,8 @@ class Algorithm_Cache
       * @param pref_provider suggests a preferred provider
       * @return prototype object, or NULL
       */
-      const T* get(const std::string& algo_spec,
-                   const std::string& pref_provider);
+      const T* get(const containers::string& algo_spec,
+                   const containers::string& pref_provider);
 
       /**
       * Add a new algorithm implementation to the cache
@@ -528,23 +528,23 @@ class Algorithm_Cache
       * @param provider_name is the name of the provider of this prototype
       */
       void add(T* algo,
-               const std::string& requested_name,
-               const std::string& provider_name);
+               const containers::string& requested_name,
+               const containers::string& provider_name);
 
       /**
       * Set the preferred provider
       * @param algo_spec names the algorithm
       * @param provider names the preferred provider
       */
-      void set_preferred_provider(const std::string& algo_spec,
-                                  const std::string& provider);
+      void set_preferred_provider(const containers::string& algo_spec,
+                                  const containers::string& provider);
 
       /**
       * Return the list of providers of this algorithm
       * @param algo_name names the algorithm
       * @return list of providers of this algorithm
       */
-      std::vector<std::string> providers_of(const std::string& algo_name);
+      containers::vector<containers::string> providers_of(const containers::string& algo_name);
 
       /**
       * Clear the cache
@@ -558,17 +558,17 @@ class Algorithm_Cache
       Algorithm_Cache(Mutex* m) : mutex(m) {}
       ~Algorithm_Cache() { clear_cache(); delete mutex; }
    private:
-      typedef typename std::map<std::string, std::map<std::string, T*> >::iterator
+      typedef typename containers::map<containers::string, containers::map<containers::string, T*> >::iterator
          algorithms_iterator;
 
-      typedef typename std::map<std::string, T*>::iterator provider_iterator;
+      typedef typename containers::map<containers::string, T*>::iterator provider_iterator;
 
-      algorithms_iterator find_algorithm(const std::string& algo_spec);
+      algorithms_iterator find_algorithm(const containers::string& algo_spec);
 
       Mutex* mutex;
-      std::map<std::string, std::string> aliases;
-      std::map<std::string, std::string> pref_providers;
-      std::map<std::string, std::map<std::string, T*> > algorithms;
+      containers::map<containers::string, containers::string> aliases;
+      containers::map<containers::string, containers::string> pref_providers;
+      containers::map<containers::string, containers::map<containers::string, T*> > algorithms;
    };
 
 /*
@@ -577,14 +577,14 @@ class Algorithm_Cache
 */
 template<typename T>
 typename Algorithm_Cache<T>::algorithms_iterator
-Algorithm_Cache<T>::find_algorithm(const std::string& algo_spec)
+Algorithm_Cache<T>::find_algorithm(const containers::string& algo_spec)
    {
    algorithms_iterator algo = algorithms.find(algo_spec);
 
    // Not found? Check if a known alias
    if(algo == algorithms.end())
       {
-      std::map<std::string, std::string>::const_iterator alias =
+      containers::map<containers::string, containers::string>::const_iterator alias =
          aliases.find(algo_spec);
 
       if(alias != aliases.end())
@@ -598,8 +598,8 @@ Algorithm_Cache<T>::find_algorithm(const std::string& algo_spec)
 * Look for an algorithm implementation by a particular provider
 */
 template<typename T>
-const T* Algorithm_Cache<T>::get(const std::string& algo_spec,
-                                 const std::string& requested_provider)
+const T* Algorithm_Cache<T>::get(const containers::string& algo_spec,
+                                 const containers::string& requested_provider)
    {
    Mutex_Holder lock(mutex);
 
@@ -617,14 +617,14 @@ const T* Algorithm_Cache<T>::get(const std::string& algo_spec,
       }
 
    const T* prototype = 0;
-   std::string prototype_provider;
+   containers::string prototype_provider;
    size_t prototype_prov_weight = 0;
 
-   const std::string pref_provider = search_map(pref_providers, algo_spec);
+   const containers::string pref_provider = search_map(pref_providers, algo_spec);
 
    for(provider_iterator i = algo->second.begin(); i != algo->second.end(); ++i)
       {
-      const std::string prov_name = i->first;
+      const containers::string prov_name = i->first;
       const size_t prov_weight = static_provider_weight(prov_name);
 
       // preferred prov exists, return immediately
@@ -647,8 +647,8 @@ const T* Algorithm_Cache<T>::get(const std::string& algo_spec,
 */
 template<typename T>
 void Algorithm_Cache<T>::add(T* algo,
-                             const std::string& requested_name,
-                             const std::string& provider)
+                             const containers::string& requested_name,
+                             const containers::string& provider)
    {
    if(!algo)
       return;
@@ -670,12 +670,12 @@ void Algorithm_Cache<T>::add(T* algo,
 /*
 * Find the providers of this algo (if any)
 */
-template<typename T> std::vector<std::string>
-Algorithm_Cache<T>::providers_of(const std::string& algo_name)
+template<typename T> containers::vector<containers::string>
+Algorithm_Cache<T>::providers_of(const containers::string& algo_name)
    {
    Mutex_Holder lock(mutex);
 
-   std::vector<std::string> providers;
+   containers::vector<containers::string> providers;
 
    algorithms_iterator algo = find_algorithm(algo_name);
 
@@ -697,8 +697,8 @@ Algorithm_Cache<T>::providers_of(const std::string& algo_name)
 * Set the preferred provider for an algorithm
 */
 template<typename T>
-void Algorithm_Cache<T>::set_preferred_provider(const std::string& algo_spec,
-                                                const std::string& provider)
+void Algorithm_Cache<T>::set_preferred_provider(const containers::string& algo_spec,
+                                                const containers::string& provider)
    {
    Mutex_Holder lock(mutex);
 
@@ -771,7 +771,7 @@ namespace Botan {
 class SIMD_Engine : public Engine
    {
    public:
-      std::string provider_name() const { return "simd"; }
+      containers::string provider_name() const { return "simd"; }
 
       BlockCipher* find_block_cipher(const SCAN_Name&,
                                      Algorithm_Factory&) const;
@@ -791,14 +791,14 @@ namespace Botan {
 class FTW_EntropySource : public EntropySource
    {
    public:
-      std::string name() const { return "Proc Walker"; }
+      containers::string name() const { return "Proc Walker"; }
 
       void poll(Entropy_Accumulator& accum);
 
-      FTW_EntropySource(const std::string& root_dir);
+      FTW_EntropySource(const containers::string& root_dir);
       ~FTW_EntropySource();
    private:
-      std::string path;
+      containers::string path;
       class File_Descriptor_Source* dir;
    };
 
@@ -816,7 +816,7 @@ namespace Botan {
 class High_Resolution_Timestamp : public EntropySource
    {
    public:
-      std::string name() const { return "High Resolution Timestamp"; }
+      containers::string name() const { return "High Resolution Timestamp"; }
       void poll(Entropy_Accumulator& accum);
    };
 
@@ -1006,9 +1006,9 @@ class Pooling_Allocator : public Allocator
             byte* buffer, *buffer_end;
          };
 
-      std::vector<Memory_Block> blocks;
-      std::vector<Memory_Block>::iterator last_used;
-      std::vector<std::pair<void*, size_t> > allocated;
+      containers::vector<Memory_Block> blocks;
+      containers::vector<Memory_Block>::iterator last_used;
+      containers::vector<std::pair<void*, size_t> > allocated;
       Mutex* mutex;
    };
 
@@ -1026,7 +1026,7 @@ class Malloc_Allocator : public Allocator
       void* allocate(size_t);
       void deallocate(void*, size_t);
 
-      std::string type() const { return "malloc"; }
+      containers::string type() const { return "malloc"; }
    };
 
 /**
@@ -1040,7 +1040,7 @@ class Locking_Allocator : public Pooling_Allocator
       */
       Locking_Allocator(Mutex* mutex) : Pooling_Allocator(mutex) {}
 
-      std::string type() const { return "locking"; }
+      containers::string type() const { return "locking"; }
    private:
       void* alloc_block(size_t);
       void dealloc_block(void*, size_t);
@@ -1069,7 +1069,7 @@ class Fixed_Window_Exponentiator : public Modular_Exponentiator
       Modular_Reducer reducer;
       BigInt exp;
       size_t window_bits;
-      std::vector<BigInt> g;
+      containers::vector<BigInt> g;
       Power_Mod::Usage_Hints hints;
    };
 
@@ -1090,7 +1090,7 @@ class Montgomery_Exponentiator : public Modular_Exponentiator
    private:
       BigInt exp, modulus;
       BigInt R2, R_mod;
-      std::vector<BigInt> g;
+      containers::vector<BigInt> g;
       word mod_prime;
       size_t mod_words, exp_bits, window_bits;
       Power_Mod::Usage_Hints hints;
@@ -1173,7 +1173,7 @@ struct Unix_Program
    /**
    * The name and arguments for this command
    */
-   std::string name_and_args;
+   containers::string name_and_args;
 
    /**
    * Priority: we scan from low to high
@@ -1195,20 +1195,20 @@ class DataSource_Command : public DataSource
       size_t read(byte[], size_t);
       size_t peek(byte[], size_t, size_t) const;
       bool end_of_data() const;
-      std::string id() const;
+      containers::string id() const;
 
       int fd() const;
 
-      DataSource_Command(const std::string&,
-                         const std::vector<std::string>& paths);
+      DataSource_Command(const containers::string&,
+                         const containers::vector<containers::string>& paths);
       ~DataSource_Command();
    private:
-      void create_pipe(const std::vector<std::string>&);
+      void create_pipe(const containers::vector<containers::string>&);
       void shutdown_pipe();
 
       const size_t MAX_BLOCK_USECS, KILL_WAIT;
 
-      std::vector<std::string> arg_list;
+      containers::vector<containers::string> arg_list;
       struct pipe_wrapper* pipe;
    };
 
@@ -1230,7 +1230,7 @@ class MemoryMapping_Allocator : public Pooling_Allocator
       * @param mutex used for internal locking
       */
       MemoryMapping_Allocator(Mutex* mutex) : Pooling_Allocator(mutex) {}
-      std::string type() const { return "mmap"; }
+      containers::string type() const { return "mmap"; }
    private:
       void* alloc_block(size_t);
       void dealloc_block(void*, size_t);
@@ -1262,11 +1262,11 @@ namespace Botan {
 class Device_EntropySource : public EntropySource
    {
    public:
-      std::string name() const { return "RNG Device Reader"; }
+      containers::string name() const { return "RNG Device Reader"; }
 
       void poll(Entropy_Accumulator& accum);
 
-      Device_EntropySource(const std::vector<std::string>& fsnames);
+      Device_EntropySource(const containers::vector<containers::string>& fsnames);
       ~Device_EntropySource();
    private:
 
@@ -1285,12 +1285,12 @@ class Device_EntropySource : public EntropySource
 
             size_t get(byte out[], size_t length, size_t ms_wait_time);
 
-            static fd_type open(const std::string& pathname);
+            static fd_type open(const containers::string& pathname);
          private:
             fd_type fd;
          };
 
-      std::vector<Device_Reader> devices;
+      containers::vector<Device_Reader> devices;
    };
 
 }
@@ -1513,7 +1513,7 @@ namespace Botan {
 class Core_Engine : public Engine
    {
    public:
-      std::string provider_name() const { return "core"; }
+      containers::string provider_name() const { return "core"; }
 
       PK_Ops::Key_Agreement*
          get_key_agreement_op(const Private_Key& key) const;
@@ -1530,7 +1530,7 @@ class Core_Engine : public Engine
       Modular_Exponentiator* mod_exp(const BigInt& n,
                                      Power_Mod::Usage_Hints) const;
 
-      Keyed_Filter* get_cipher(const std::string&, Cipher_Dir,
+      Keyed_Filter* get_cipher(const containers::string&, Cipher_Dir,
                                Algorithm_Factory&);
 
       BlockCipher* find_block_cipher(const SCAN_Name&,
@@ -1558,8 +1558,8 @@ class Core_Engine : public Engine
 */
 Keyed_Filter* get_cipher_mode(const BlockCipher* block_cipher,
                               Cipher_Dir direction,
-                              const std::string& mode,
-                              const std::string& padding);
+                              const containers::string& mode,
+                              const containers::string& padding);
 
 }
 
@@ -1573,18 +1573,18 @@ namespace Botan {
 class Unix_EntropySource : public EntropySource
    {
    public:
-      std::string name() const { return "Unix Entropy Source"; }
+      containers::string name() const { return "Unix Entropy Source"; }
 
       void poll(Entropy_Accumulator& accum);
 
       void add_sources(const Unix_Program[], size_t);
-      Unix_EntropySource(const std::vector<std::string>& path);
+      Unix_EntropySource(const containers::vector<containers::string>& path);
    private:
-      static std::vector<Unix_Program> get_default_sources();
+      static containers::vector<Unix_Program> get_default_sources();
       void fast_poll(Entropy_Accumulator& accum);
 
-      const std::vector<std::string> PATH;
-      std::vector<Unix_Program> sources;
+      const containers::vector<containers::string> PATH;
+      containers::vector<Unix_Program> sources;
    };
 
 }
@@ -1597,28 +1597,28 @@ namespace Botan {
 class EGD_EntropySource : public EntropySource
    {
    public:
-      std::string name() const { return "EGD/PRNGD"; }
+      containers::string name() const { return "EGD/PRNGD"; }
 
       void poll(Entropy_Accumulator& accum);
 
-      EGD_EntropySource(const std::vector<std::string>&);
+      EGD_EntropySource(const containers::vector<containers::string>&);
       ~EGD_EntropySource();
    private:
       class EGD_Socket
          {
          public:
-            EGD_Socket(const std::string& path);
+            EGD_Socket(const containers::string& path);
 
             void close();
             size_t read(byte outbuf[], size_t length);
          private:
-            static int open_socket(const std::string& path);
+            static int open_socket(const containers::string& path);
 
-            std::string socket_path;
+            containers::string socket_path;
             int m_fd; // cached fd
          };
 
-      std::vector<EGD_Socket> sockets;
+      containers::vector<EGD_Socket> sockets;
    };
 
 }
@@ -1658,7 +1658,7 @@ class Output_Buffers
    private:
       class SecureQueue* get(Pipe::message_id) const;
 
-      std::deque<SecureQueue*> buffers;
+      containers::deque<SecureQueue*> buffers;
       Pipe::message_id offset;
    };
 
@@ -1734,7 +1734,7 @@ inline word word_madd3(word a, word b, word c, word* d)
 class Win32_CAPI_EntropySource : public EntropySource
    {
    public:
-      std::string name() const { return "Win32 CryptoGenRandom"; }
+      containers::string name() const { return "Win32 CryptoGenRandom"; }
 
       void poll(Entropy_Accumulator& accum);
 
@@ -1742,9 +1742,9 @@ class Win32_CAPI_EntropySource : public EntropySource
      * Win32_Capi_Entropysource Constructor
      * @param provs list of providers, separated by ':'
      */
-      Win32_CAPI_EntropySource(const std::string& provs = "");
+      Win32_CAPI_EntropySource(const containers::string& provs = "");
    private:
-      std::vector<u64bit> prov_types;
+      containers::vector<u64bit> prov_types;
    };
 
 }
@@ -2748,7 +2748,7 @@ OctetString::OctetString(RandomNumberGenerator& rng,
 /*
 * Create an OctetString from a hex string
 */
-void OctetString::change(const std::string& hex_string)
+void OctetString::change(const containers::string& hex_string)
    {
    bits.resize(1 + hex_string.length() / 2);
    bits.resize(hex_decode(&bits[0], hex_string));
@@ -2799,7 +2799,7 @@ void OctetString::set_odd_parity()
 /*
 * Hex encode an OctetString
 */
-std::string OctetString::as_string() const
+containers::string OctetString::as_string() const
    {
    return hex_encode(&bits[0], bits.size());
    }
@@ -2908,9 +2908,9 @@ PBKDF* engine_get_algo(Engine* engine,
    { return engine->find_pbkdf(request, af); }
 
 template<typename T>
-const T* factory_prototype(const std::string& algo_spec,
-                           const std::string& provider,
-                           const std::vector<Engine*>& engines,
+const T* factory_prototype(const containers::string& algo_spec,
+                           const containers::string& provider,
+                           const containers::vector<Engine*>& engines,
                            Algorithm_Factory& af,
                            Algorithm_Cache<T>* cache)
    {
@@ -2980,8 +2980,8 @@ void Algorithm_Factory::add_engine(Engine* engine)
 /*
 * Set the preferred provider for an algorithm
 */
-void Algorithm_Factory::set_preferred_provider(const std::string& algo_spec,
-                                               const std::string& provider)
+void Algorithm_Factory::set_preferred_provider(const containers::string& algo_spec,
+                                               const containers::string& provider)
    {
    if(prototype_block_cipher(algo_spec))
       block_cipher_cache->set_preferred_provider(algo_spec, provider);
@@ -3009,8 +3009,8 @@ Engine* Algorithm_Factory::get_engine_n(size_t n) const
 * Return the possible providers of a request
 * Note: assumes you don't have different types by the same name
 */
-std::vector<std::string>
-Algorithm_Factory::providers_of(const std::string& algo_spec)
+containers::vector<containers::string>
+Algorithm_Factory::providers_of(const containers::string& algo_spec)
    {
    /* The checks with if(prototype_X(algo_spec)) have the effect of
       forcing a full search, since otherwise there might not be any
@@ -3028,15 +3028,15 @@ Algorithm_Factory::providers_of(const std::string& algo_spec)
    else if(prototype_pbkdf(algo_spec))
       return pbkdf_cache->providers_of(algo_spec);
    else
-      return std::vector<std::string>();
+      return containers::vector<containers::string>();
    }
 
 /*
 * Return the prototypical block cipher corresponding to this request
 */
 const BlockCipher*
-Algorithm_Factory::prototype_block_cipher(const std::string& algo_spec,
-                                          const std::string& provider)
+Algorithm_Factory::prototype_block_cipher(const containers::string& algo_spec,
+                                          const containers::string& provider)
    {
    return factory_prototype<BlockCipher>(algo_spec, provider, engines,
                                           *this, block_cipher_cache);
@@ -3046,8 +3046,8 @@ Algorithm_Factory::prototype_block_cipher(const std::string& algo_spec,
 * Return the prototypical stream cipher corresponding to this request
 */
 const StreamCipher*
-Algorithm_Factory::prototype_stream_cipher(const std::string& algo_spec,
-                                           const std::string& provider)
+Algorithm_Factory::prototype_stream_cipher(const containers::string& algo_spec,
+                                           const containers::string& provider)
    {
    return factory_prototype<StreamCipher>(algo_spec, provider, engines,
                                           *this, stream_cipher_cache);
@@ -3057,8 +3057,8 @@ Algorithm_Factory::prototype_stream_cipher(const std::string& algo_spec,
 * Return the prototypical object corresponding to this request (if found)
 */
 const HashFunction*
-Algorithm_Factory::prototype_hash_function(const std::string& algo_spec,
-                                           const std::string& provider)
+Algorithm_Factory::prototype_hash_function(const containers::string& algo_spec,
+                                           const containers::string& provider)
    {
    return factory_prototype<HashFunction>(algo_spec, provider, engines,
                                           *this, hash_cache);
@@ -3068,8 +3068,8 @@ Algorithm_Factory::prototype_hash_function(const std::string& algo_spec,
 * Return the prototypical object corresponding to this request
 */
 const MessageAuthenticationCode*
-Algorithm_Factory::prototype_mac(const std::string& algo_spec,
-                                 const std::string& provider)
+Algorithm_Factory::prototype_mac(const containers::string& algo_spec,
+                                 const containers::string& provider)
    {
    return factory_prototype<MessageAuthenticationCode>(algo_spec, provider,
                                                        engines,
@@ -3080,8 +3080,8 @@ Algorithm_Factory::prototype_mac(const std::string& algo_spec,
 * Return the prototypical object corresponding to this request
 */
 const PBKDF*
-Algorithm_Factory::prototype_pbkdf(const std::string& algo_spec,
-                                   const std::string& provider)
+Algorithm_Factory::prototype_pbkdf(const containers::string& algo_spec,
+                                   const containers::string& provider)
    {
    return factory_prototype<PBKDF>(algo_spec, provider,
                                    engines,
@@ -3092,8 +3092,8 @@ Algorithm_Factory::prototype_pbkdf(const std::string& algo_spec,
 * Return a new block cipher corresponding to this request
 */
 BlockCipher*
-Algorithm_Factory::make_block_cipher(const std::string& algo_spec,
-                                     const std::string& provider)
+Algorithm_Factory::make_block_cipher(const containers::string& algo_spec,
+                                     const containers::string& provider)
    {
    if(const BlockCipher* proto = prototype_block_cipher(algo_spec, provider))
       return proto->clone();
@@ -3104,8 +3104,8 @@ Algorithm_Factory::make_block_cipher(const std::string& algo_spec,
 * Return a new stream cipher corresponding to this request
 */
 StreamCipher*
-Algorithm_Factory::make_stream_cipher(const std::string& algo_spec,
-                                      const std::string& provider)
+Algorithm_Factory::make_stream_cipher(const containers::string& algo_spec,
+                                      const containers::string& provider)
    {
    if(const StreamCipher* proto = prototype_stream_cipher(algo_spec, provider))
       return proto->clone();
@@ -3116,8 +3116,8 @@ Algorithm_Factory::make_stream_cipher(const std::string& algo_spec,
 * Return a new object corresponding to this request
 */
 HashFunction*
-Algorithm_Factory::make_hash_function(const std::string& algo_spec,
-                                      const std::string& provider)
+Algorithm_Factory::make_hash_function(const containers::string& algo_spec,
+                                      const containers::string& provider)
    {
    if(const HashFunction* proto = prototype_hash_function(algo_spec, provider))
       return proto->clone();
@@ -3128,8 +3128,8 @@ Algorithm_Factory::make_hash_function(const std::string& algo_spec,
 * Return a new object corresponding to this request
 */
 MessageAuthenticationCode*
-Algorithm_Factory::make_mac(const std::string& algo_spec,
-                            const std::string& provider)
+Algorithm_Factory::make_mac(const containers::string& algo_spec,
+                            const containers::string& provider)
    {
    if(const MessageAuthenticationCode* proto = prototype_mac(algo_spec, provider))
       return proto->clone();
@@ -3140,8 +3140,8 @@ Algorithm_Factory::make_mac(const std::string& algo_spec,
 * Return a new object corresponding to this request
 */
 PBKDF*
-Algorithm_Factory::make_pbkdf(const std::string& algo_spec,
-                              const std::string& provider)
+Algorithm_Factory::make_pbkdf(const containers::string& algo_spec,
+                              const containers::string& provider)
    {
    if(const PBKDF* proto = prototype_pbkdf(algo_spec, provider))
       return proto->clone();
@@ -3152,7 +3152,7 @@ Algorithm_Factory::make_pbkdf(const std::string& algo_spec,
 * Add a new block cipher
 */
 void Algorithm_Factory::add_block_cipher(BlockCipher* block_cipher,
-                                         const std::string& provider)
+                                         const containers::string& provider)
    {
    block_cipher_cache->add(block_cipher, block_cipher->name(), provider);
    }
@@ -3161,7 +3161,7 @@ void Algorithm_Factory::add_block_cipher(BlockCipher* block_cipher,
 * Add a new stream cipher
 */
 void Algorithm_Factory::add_stream_cipher(StreamCipher* stream_cipher,
-                                         const std::string& provider)
+                                         const containers::string& provider)
    {
    stream_cipher_cache->add(stream_cipher, stream_cipher->name(), provider);
    }
@@ -3170,7 +3170,7 @@ void Algorithm_Factory::add_stream_cipher(StreamCipher* stream_cipher,
 * Add a new hash
 */
 void Algorithm_Factory::add_hash_function(HashFunction* hash,
-                                          const std::string& provider)
+                                          const containers::string& provider)
    {
    hash_cache->add(hash, hash->name(), provider);
    }
@@ -3179,7 +3179,7 @@ void Algorithm_Factory::add_hash_function(HashFunction* hash,
 * Add a new mac
 */
 void Algorithm_Factory::add_mac(MessageAuthenticationCode* mac,
-                                const std::string& provider)
+                                const containers::string& provider)
    {
    mac_cache->add(mac, mac->name(), provider);
    }
@@ -3188,7 +3188,7 @@ void Algorithm_Factory::add_mac(MessageAuthenticationCode* mac,
 * Add a new PBKDF
 */
 void Algorithm_Factory::add_pbkdf(PBKDF* pbkdf,
-                                  const std::string& provider)
+                                  const containers::string& provider)
    {
    pbkdf_cache->add(pbkdf, pbkdf->name(), provider);
    }
@@ -3207,7 +3207,7 @@ namespace Botan {
 /**
 * Return a static provider weighing
 */
-size_t static_provider_weight(const std::string& prov_name)
+size_t static_provider_weight(const containers::string& prov_name)
    {
    /*
    * Prefer asm over C++, but prefer anything over OpenSSL or GNU MP; to use
@@ -3261,7 +3261,7 @@ namespace {
 class BOTAN_DLL MemoryMapping_Failed : public Exception
    {
    public:
-      MemoryMapping_Failed(const std::string& msg) :
+      MemoryMapping_Failed(const containers::string& msg) :
          Exception("MemoryMapping_Allocator: " + msg) {}
    };
 
@@ -3277,11 +3277,11 @@ void* MemoryMapping_Allocator::alloc_block(size_t n)
       public:
          int get_fd() const { return fd; }
 
-         TemporaryFile(const std::string& base)
+         TemporaryFile(const containers::string& base)
             {
-            const std::string mkstemp_template = base + "XXXXXX";
+            const containers::string mkstemp_template = base + "XXXXXX";
 
-            std::vector<char> filepath(mkstemp_template.begin(),
+            containers::vector<char> filepath(mkstemp_template.begin(),
                                        mkstemp_template.end());
             filepath.push_back(0); // add terminating NULL
 
@@ -3315,7 +3315,7 @@ void* MemoryMapping_Allocator::alloc_block(size_t n)
    if(file.get_fd() == -1)
       throw MemoryMapping_Failed("Could not create file");
 
-   std::vector<byte> zeros(4096);
+   containers::vector<byte> zeros(4096);
 
    size_t remaining = n;
 
@@ -3552,7 +3552,7 @@ void Pooling_Allocator::deallocate(void* ptr, size_t n)
       {
       const size_t block_no = round_up(n, BLOCK_SIZE) / BLOCK_SIZE;
 
-      std::vector<Memory_Block>::iterator i =
+      containers::vector<Memory_Block>::iterator i =
          std::lower_bound(blocks.begin(), blocks.end(), Memory_Block(ptr));
 
       if(i == blocks.end() || !i->contains(ptr, block_no))
@@ -3570,7 +3570,7 @@ byte* Pooling_Allocator::allocate_blocks(size_t n)
    if(blocks.empty())
       return 0;
 
-   std::vector<Memory_Block>::iterator i = last_used;
+   containers::vector<Memory_Block>::iterator i = last_used;
 
    do
       {
@@ -3712,7 +3712,7 @@ void Locking_Allocator::dealloc_block(void* ptr, size_t n)
 */
 Allocator* Allocator::get(bool locking)
    {
-   std::string type = "";
+   containers::string type = "";
    if(!locking)
       type = "malloc";
 
@@ -3747,7 +3747,7 @@ AlgorithmIdentifier::AlgorithmIdentifier(const OID& alg_id,
 /*
 * Create an AlgorithmIdentifier
 */
-AlgorithmIdentifier::AlgorithmIdentifier(const std::string& alg_id,
+AlgorithmIdentifier::AlgorithmIdentifier(const containers::string& alg_id,
                                          const MemoryRegion<byte>& param)
    {
    oid = OIDS::lookup(alg_id);
@@ -3773,7 +3773,7 @@ AlgorithmIdentifier::AlgorithmIdentifier(const OID& alg_id,
 /*
 * Create an AlgorithmIdentifier
 */
-AlgorithmIdentifier::AlgorithmIdentifier(const std::string& alg_id,
+AlgorithmIdentifier::AlgorithmIdentifier(const containers::string& alg_id,
                                          Encoding_Option option)
    {
    const byte DER_NULL[] = { 0x05, 0x00 };
@@ -3861,10 +3861,10 @@ bool is_string_type(ASN1_Tag tag)
 /*
 * Create an AlternativeName
 */
-AlternativeName::AlternativeName(const std::string& email_addr,
-                                 const std::string& uri,
-                                 const std::string& dns,
-                                 const std::string& ip)
+AlternativeName::AlternativeName(const containers::string& email_addr,
+                                 const containers::string& uri,
+                                 const containers::string& dns,
+                                 const containers::string& ip)
    {
    add_attribute("RFC822", email_addr);
    add_attribute("DNS", dns);
@@ -3875,13 +3875,13 @@ AlternativeName::AlternativeName(const std::string& email_addr,
 /*
 * Add an attribute to an alternative name
 */
-void AlternativeName::add_attribute(const std::string& type,
-                                    const std::string& str)
+void AlternativeName::add_attribute(const containers::string& type,
+                                    const containers::string& str)
    {
    if(type == "" || str == "")
       return;
 
-   typedef std::multimap<std::string, std::string>::iterator iter;
+   typedef containers::multimap<containers::string, containers::string>::iterator iter;
    std::pair<iter, iter> range = alt_info.equal_range(type);
    for(iter j = range.first; j != range.second; ++j)
       if(j->second == str)
@@ -3893,7 +3893,7 @@ void AlternativeName::add_attribute(const std::string& type,
 /*
 * Add an OtherName field
 */
-void AlternativeName::add_othername(const OID& oid, const std::string& value,
+void AlternativeName::add_othername(const OID& oid, const containers::string& value,
                                     ASN1_Tag type)
    {
    if(value == "")
@@ -3904,7 +3904,7 @@ void AlternativeName::add_othername(const OID& oid, const std::string& value,
 /*
 * Get the attributes of this alternative name
 */
-std::multimap<std::string, std::string> AlternativeName::get_attributes() const
+containers::multimap<containers::string, containers::string> AlternativeName::get_attributes() const
    {
    return alt_info;
    }
@@ -3912,7 +3912,7 @@ std::multimap<std::string, std::string> AlternativeName::get_attributes() const
 /*
 * Get the otherNames
 */
-std::multimap<OID, ASN1_String> AlternativeName::get_othernames() const
+containers::multimap<OID, ASN1_String> AlternativeName::get_othernames() const
    {
    return othernames;
    }
@@ -3920,15 +3920,15 @@ std::multimap<OID, ASN1_String> AlternativeName::get_othernames() const
 /*
 * Return all of the alternative names
 */
-std::multimap<std::string, std::string> AlternativeName::contents() const
+containers::multimap<containers::string, containers::string> AlternativeName::contents() const
    {
-   std::multimap<std::string, std::string> names;
+   containers::multimap<containers::string, containers::string> names;
 
-   typedef std::multimap<std::string, std::string>::const_iterator rdn_iter;
+   typedef containers::multimap<containers::string, containers::string>::const_iterator rdn_iter;
    for(rdn_iter j = alt_info.begin(); j != alt_info.end(); ++j)
       multimap_insert(names, j->first, j->second);
 
-   typedef std::multimap<OID, ASN1_String>::const_iterator on_iter;
+   typedef containers::multimap<OID, ASN1_String>::const_iterator on_iter;
    for(on_iter j = othernames.begin(); j != othernames.end(); ++j)
       multimap_insert(names, OIDS::lookup(j->first), j->second.value());
 
@@ -3949,10 +3949,10 @@ namespace {
 * DER encode an AlternativeName entry
 */
 void encode_entries(DER_Encoder& encoder,
-                    const std::multimap<std::string, std::string>& attr,
-                    const std::string& type, ASN1_Tag tagging)
+                    const containers::multimap<containers::string, containers::string>& attr,
+                    const containers::string& type, ASN1_Tag tagging)
    {
-   typedef std::multimap<std::string, std::string>::const_iterator iter;
+   typedef containers::multimap<containers::string, containers::string>::const_iterator iter;
 
    std::pair<iter, iter> range = attr.equal_range(type);
    for(iter j = range.first; j != range.second; ++j)
@@ -3986,7 +3986,7 @@ void AlternativeName::encode_into(DER_Encoder& der) const
    encode_entries(der, alt_info, "URI", ASN1_Tag(6));
    encode_entries(der, alt_info, "IP", ASN1_Tag(7));
 
-   std::multimap<OID, ASN1_String>::const_iterator i;
+   containers::multimap<OID, ASN1_String>::const_iterator i;
    for(i = othernames.begin(); i != othernames.end(); ++i)
       {
       der.start_explicit(0)
@@ -4046,7 +4046,7 @@ void AlternativeName::decode_from(BER_Decoder& source)
          }
       else if(tag == 1 || tag == 2 || tag == 6)
          {
-         const std::string value = Charset::transcode(ASN1::to_string(obj),
+         const containers::string value = Charset::transcode(ASN1::to_string(obj),
                                                       LATIN1_CHARSET,
                                                       LOCAL_CHARSET);
 
@@ -4089,7 +4089,7 @@ Attribute::Attribute(const OID& attr_oid, const MemoryRegion<byte>& attr_value)
 /*
 * Create an Attribute
 */
-Attribute::Attribute(const std::string& attr_oid,
+Attribute::Attribute(const containers::string& attr_oid,
                      const MemoryRegion<byte>& attr_value)
    {
    oid = OIDS::lookup(attr_oid);
@@ -4136,13 +4136,13 @@ namespace Botan {
 /*
 * BER Decoding Exceptions
 */
-BER_Decoding_Error::BER_Decoding_Error(const std::string& str) :
+BER_Decoding_Error::BER_Decoding_Error(const containers::string& str) :
    Decoding_Error("BER: " + str) {}
 
-BER_Bad_Tag::BER_Bad_Tag(const std::string& str, ASN1_Tag tag) :
+BER_Bad_Tag::BER_Bad_Tag(const containers::string& str, ASN1_Tag tag) :
       BER_Decoding_Error(str + ": " + to_string(tag)) {}
 
-BER_Bad_Tag::BER_Bad_Tag(const std::string& str,
+BER_Bad_Tag::BER_Bad_Tag(const containers::string& str,
                          ASN1_Tag tag1, ASN1_Tag tag2) :
    BER_Decoding_Error(str + ": " + to_string(tag1) + "/" + to_string(tag2)) {}
 
@@ -4163,9 +4163,9 @@ SecureVector<byte> put_in_sequence(const MemoryRegion<byte>& contents)
 /*
 * Convert a BER object into a string object
 */
-std::string to_string(const BER_Object& obj)
+containers::string to_string(const BER_Object& obj)
    {
-   return std::string(reinterpret_cast<const char*>(&obj.value[0]),
+   return containers::string(reinterpret_cast<const char*>(&obj.value[0]),
                       obj.value.size());
    }
 
@@ -4199,7 +4199,7 @@ namespace Botan {
 /*
 * ASN.1 OID Constructor
 */
-OID::OID(const std::string& oid_str)
+OID::OID(const containers::string& oid_str)
    {
    if(oid_str != "")
       {
@@ -4230,9 +4230,9 @@ void OID::clear()
 /*
 * Return this OID as a string
 */
-std::string OID::as_string() const
+containers::string OID::as_string() const
    {
-   std::string oid_str;
+   containers::string oid_str;
    for(size_t i = 0; i != id.size(); ++i)
       {
       oid_str += to_string(id[i]);
@@ -4287,8 +4287,8 @@ bool operator!=(const OID& a, const OID& b)
 */
 bool operator<(const OID& a, const OID& b)
    {
-   std::vector<u32bit> oid1 = a.get_id();
-   std::vector<u32bit> oid2 = b.get_id();
+   containers::vector<u32bit> oid1 = a.get_id();
+   containers::vector<u32bit> oid2 = b.get_id();
 
    if(oid1.size() < oid2.size())
       return true;
@@ -4380,8 +4380,8 @@ namespace {
 /*
 * Choose an encoding for the string
 */
-ASN1_Tag choose_encoding(const std::string& str,
-                         const std::string& type)
+ASN1_Tag choose_encoding(const containers::string& str,
+                         const containers::string& type)
    {
    static const byte IS_PRINTABLE[256] = {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4424,7 +4424,7 @@ ASN1_Tag choose_encoding(const std::string& str,
 /*
 * Create an ASN1_String
 */
-ASN1_String::ASN1_String(const std::string& str, ASN1_Tag t) : tag(t)
+ASN1_String::ASN1_String(const containers::string& str, ASN1_Tag t) : tag(t)
    {
    iso_8859_str = Charset::transcode(str, LOCAL_CHARSET, LATIN1_CHARSET);
 
@@ -4445,7 +4445,7 @@ ASN1_String::ASN1_String(const std::string& str, ASN1_Tag t) : tag(t)
 /*
 * Create an ASN1_String
 */
-ASN1_String::ASN1_String(const std::string& str)
+ASN1_String::ASN1_String(const containers::string& str)
    {
    iso_8859_str = Charset::transcode(str, LOCAL_CHARSET, LATIN1_CHARSET);
    tag = choose_encoding(iso_8859_str, "latin1");
@@ -4454,7 +4454,7 @@ ASN1_String::ASN1_String(const std::string& str)
 /*
 * Return this string in ISO 8859-1 encoding
 */
-std::string ASN1_String::iso_8859() const
+containers::string ASN1_String::iso_8859() const
    {
    return iso_8859_str;
    }
@@ -4462,7 +4462,7 @@ std::string ASN1_String::iso_8859() const
 /*
 * Return this string in local encoding
 */
-std::string ASN1_String::value() const
+containers::string ASN1_String::value() const
    {
    return Charset::transcode(iso_8859_str, LATIN1_CHARSET, LOCAL_CHARSET);
    }
@@ -4480,7 +4480,7 @@ ASN1_Tag ASN1_String::tagging() const
 */
 void ASN1_String::encode_into(DER_Encoder& encoder) const
    {
-   std::string value = iso_8859();
+   containers::string value = iso_8859();
    if(tagging() == UTF8_STRING)
       value = Charset::transcode(value, LATIN1_CHARSET, UTF8_CHARSET);
    encoder.add_object(tagging(), UNIVERSAL, value);
@@ -4521,7 +4521,7 @@ namespace Botan {
 /*
 * Create an X509_Time
 */
-X509_Time::X509_Time(const std::string& time_str)
+X509_Time::X509_Time(const containers::string& time_str)
    {
    set_to(time_str);
    }
@@ -4546,7 +4546,7 @@ X509_Time::X509_Time(u64bit timer)
 /*
 * Create an X509_Time
 */
-X509_Time::X509_Time(const std::string& t_spec, ASN1_Tag t) : tag(t)
+X509_Time::X509_Time(const containers::string& t_spec, ASN1_Tag t) : tag(t)
    {
    set_to(t_spec, tag);
    }
@@ -4554,7 +4554,7 @@ X509_Time::X509_Time(const std::string& t_spec, ASN1_Tag t) : tag(t)
 /*
 * Set the time with a human readable string
 */
-void X509_Time::set_to(const std::string& time_str)
+void X509_Time::set_to(const containers::string& time_str)
    {
    if(time_str == "")
       {
@@ -4563,8 +4563,8 @@ void X509_Time::set_to(const std::string& time_str)
       return;
       }
 
-   std::vector<std::string> params;
-   std::string current;
+   containers::vector<containers::string> params;
+   containers::string current;
 
    for(size_t j = 0; j != time_str.size(); ++j)
       {
@@ -4599,7 +4599,7 @@ void X509_Time::set_to(const std::string& time_str)
 /*
 * Set the time with an ISO time format string
 */
-void X509_Time::set_to(const std::string& t_spec, ASN1_Tag spec_tag)
+void X509_Time::set_to(const containers::string& t_spec, ASN1_Tag spec_tag)
    {
    if(spec_tag != GENERALIZED_TIME && spec_tag != UTC_TIME)
       throw Invalid_Argument("X509_Time: Invalid tag " + to_string(spec_tag));
@@ -4615,8 +4615,8 @@ void X509_Time::set_to(const std::string& t_spec, ASN1_Tag spec_tag)
 
    const size_t YEAR_SIZE = (spec_tag == UTC_TIME) ? 2 : 4;
 
-   std::vector<std::string> params;
-   std::string current;
+   containers::vector<containers::string> params;
+   containers::string current;
 
    for(size_t j = 0; j != YEAR_SIZE; ++j)
       current += t_spec[j];
@@ -4681,12 +4681,12 @@ void X509_Time::decode_from(BER_Decoder& source)
 /*
 * Return a string representation of the time
 */
-std::string X509_Time::as_string() const
+containers::string X509_Time::as_string() const
    {
    if(time_is_set() == false)
       throw Invalid_State("X509_Time::as_string: No time set");
 
-   std::string asn1rep;
+   containers::string asn1rep;
    if(tag == GENERALIZED_TIME)
       asn1rep = to_string(year, 4);
    else if(tag == UTC_TIME)
@@ -4717,12 +4717,12 @@ bool X509_Time::time_is_set() const
 /*
 * Return a human readable string representation
 */
-std::string X509_Time::readable_string() const
+containers::string X509_Time::readable_string() const
    {
    if(time_is_set() == false)
       throw Invalid_State("X509_Time::readable_string: No time set");
 
-   std::string readable;
+   containers::string readable;
    readable += to_string(year,   4) + "/";
    readable += to_string(month    ) + "/";
    readable += to_string(day      ) + " ";
@@ -5644,7 +5644,7 @@ DER_Encoder& DER_Encoder::add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
 * Write the encoding of the byte(s)
 */
 DER_Encoder& DER_Encoder::add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
-                                     const std::string& rep_str)
+                                     const containers::string& rep_str)
    {
    const byte* rep = reinterpret_cast<const byte*>(rep_str.data());
    const size_t rep_len = rep_str.size();
@@ -5681,9 +5681,9 @@ X509_DN::X509_DN()
 /*
 * Create an X509_DN
 */
-X509_DN::X509_DN(const std::multimap<OID, std::string>& args)
+X509_DN::X509_DN(const containers::multimap<OID, containers::string>& args)
    {
-   std::multimap<OID, std::string>::const_iterator j;
+   containers::multimap<OID, containers::string>::const_iterator j;
    for(j = args.begin(); j != args.end(); ++j)
       add_attribute(j->first, j->second);
    }
@@ -5691,9 +5691,9 @@ X509_DN::X509_DN(const std::multimap<OID, std::string>& args)
 /*
 * Create an X509_DN
 */
-X509_DN::X509_DN(const std::multimap<std::string, std::string>& args)
+X509_DN::X509_DN(const containers::multimap<containers::string, containers::string>& args)
    {
-   std::multimap<std::string, std::string>::const_iterator j;
+   containers::multimap<containers::string, containers::string>::const_iterator j;
    for(j = args.begin(); j != args.end(); ++j)
       add_attribute(OIDS::lookup(j->first), j->second);
    }
@@ -5701,8 +5701,8 @@ X509_DN::X509_DN(const std::multimap<std::string, std::string>& args)
 /*
 * Add an attribute to a X509_DN
 */
-void X509_DN::add_attribute(const std::string& type,
-                            const std::string& str)
+void X509_DN::add_attribute(const containers::string& type,
+                            const containers::string& str)
    {
    OID oid = OIDS::lookup(type);
    add_attribute(oid, str);
@@ -5711,12 +5711,12 @@ void X509_DN::add_attribute(const std::string& type,
 /*
 * Add an attribute to a X509_DN
 */
-void X509_DN::add_attribute(const OID& oid, const std::string& str)
+void X509_DN::add_attribute(const OID& oid, const containers::string& str)
    {
    if(str == "")
       return;
 
-   typedef std::multimap<OID, ASN1_String>::iterator rdn_iter;
+   typedef containers::multimap<OID, ASN1_String>::iterator rdn_iter;
 
    std::pair<rdn_iter, rdn_iter> range = dn_info.equal_range(oid);
    for(rdn_iter j = range.first; j != range.second; ++j)
@@ -5730,11 +5730,11 @@ void X509_DN::add_attribute(const OID& oid, const std::string& str)
 /*
 * Get the attributes of this X509_DN
 */
-std::multimap<OID, std::string> X509_DN::get_attributes() const
+containers::multimap<OID, containers::string> X509_DN::get_attributes() const
    {
-   typedef std::multimap<OID, ASN1_String>::const_iterator rdn_iter;
+   typedef containers::multimap<OID, ASN1_String>::const_iterator rdn_iter;
 
-   std::multimap<OID, std::string> retval;
+   containers::multimap<OID, containers::string> retval;
    for(rdn_iter j = dn_info.begin(); j != dn_info.end(); ++j)
       multimap_insert(retval, j->first, j->second.value());
    return retval;
@@ -5743,11 +5743,11 @@ std::multimap<OID, std::string> X509_DN::get_attributes() const
 /*
 * Get the contents of this X.500 Name
 */
-std::multimap<std::string, std::string> X509_DN::contents() const
+containers::multimap<containers::string, containers::string> X509_DN::contents() const
    {
-   typedef std::multimap<OID, ASN1_String>::const_iterator rdn_iter;
+   typedef containers::multimap<OID, ASN1_String>::const_iterator rdn_iter;
 
-   std::multimap<std::string, std::string> retval;
+   containers::multimap<containers::string, containers::string> retval;
    for(rdn_iter j = dn_info.begin(); j != dn_info.end(); ++j)
       multimap_insert(retval, OIDS::lookup(j->first), j->second.value());
    return retval;
@@ -5756,14 +5756,14 @@ std::multimap<std::string, std::string> X509_DN::contents() const
 /*
 * Get a single attribute type
 */
-std::vector<std::string> X509_DN::get_attribute(const std::string& attr) const
+containers::vector<containers::string> X509_DN::get_attribute(const containers::string& attr) const
    {
-   typedef std::multimap<OID, ASN1_String>::const_iterator rdn_iter;
+   typedef containers::multimap<OID, ASN1_String>::const_iterator rdn_iter;
 
    const OID oid = OIDS::lookup(deref_info_field(attr));
    std::pair<rdn_iter, rdn_iter> range = dn_info.equal_range(oid);
 
-   std::vector<std::string> values;
+   containers::vector<containers::string> values;
    for(rdn_iter j = range.first; j != range.second; ++j)
       values.push_back(j->second.value());
    return values;
@@ -5780,7 +5780,7 @@ MemoryVector<byte> X509_DN::get_bits() const
 /*
 * Deref aliases in a subject/issuer info request
 */
-std::string X509_DN::deref_info_field(const std::string& info)
+containers::string X509_DN::deref_info_field(const containers::string& info)
    {
    if(info == "Name" || info == "CommonName") return "X520.CommonName";
    if(info == "SerialNumber")                 return "X520.SerialNumber";
@@ -5799,10 +5799,10 @@ std::string X509_DN::deref_info_field(const std::string& info)
 */
 bool operator==(const X509_DN& dn1, const X509_DN& dn2)
    {
-   typedef std::multimap<OID, std::string>::const_iterator rdn_iter;
+   typedef containers::multimap<OID, containers::string>::const_iterator rdn_iter;
 
-   std::multimap<OID, std::string> attr1 = dn1.get_attributes();
-   std::multimap<OID, std::string> attr2 = dn2.get_attributes();
+   containers::multimap<OID, containers::string> attr1 = dn1.get_attributes();
+   containers::multimap<OID, containers::string> attr2 = dn2.get_attributes();
 
    if(attr1.size() != attr2.size()) return false;
 
@@ -5837,17 +5837,17 @@ bool operator!=(const X509_DN& dn1, const X509_DN& dn2)
 */
 bool operator<(const X509_DN& dn1, const X509_DN& dn2)
    {
-   typedef std::multimap<OID, std::string>::const_iterator rdn_iter;
+   typedef containers::multimap<OID, containers::string>::const_iterator rdn_iter;
 
-   std::multimap<OID, std::string> attr1 = dn1.get_attributes();
-   std::multimap<OID, std::string> attr2 = dn2.get_attributes();
+   containers::multimap<OID, containers::string> attr1 = dn1.get_attributes();
+   containers::multimap<OID, containers::string> attr2 = dn2.get_attributes();
 
    if(attr1.size() < attr2.size()) return true;
    if(attr1.size() > attr2.size()) return false;
 
    for(rdn_iter p1 = attr1.begin(); p1 != attr1.end(); ++p1)
       {
-      std::multimap<OID, std::string>::const_iterator p2;
+      containers::multimap<OID, containers::string>::const_iterator p2;
       p2 = attr2.find(p1->first);
       if(p2 == attr2.end())       return false;
       if(p1->second > p2->second) return false;
@@ -5862,11 +5862,11 @@ namespace {
 * DER encode a RelativeDistinguishedName
 */
 void do_ava(DER_Encoder& encoder,
-            const std::multimap<OID, std::string>& dn_info,
-            ASN1_Tag string_type, const std::string& oid_str,
+            const containers::multimap<OID, containers::string>& dn_info,
+            ASN1_Tag string_type, const containers::string& oid_str,
             bool must_exist = false)
    {
-   typedef std::multimap<OID, std::string>::const_iterator rdn_iter;
+   typedef containers::multimap<OID, containers::string>::const_iterator rdn_iter;
 
    const OID oid = OIDS::lookup(oid_str);
    const bool exists = (dn_info.find(oid) != dn_info.end());
@@ -5895,7 +5895,7 @@ void do_ava(DER_Encoder& encoder,
 */
 void X509_DN::encode_into(DER_Encoder& der) const
    {
-   std::multimap<OID, std::string> dn_info = get_attributes();
+   containers::multimap<OID, containers::string> dn_info = get_attributes();
 
    der.start_cons(SEQUENCE);
 
@@ -6064,15 +6064,15 @@ bench_mac(MessageAuthenticationCode* mac,
 
 }
 
-std::map<std::string, double>
-algorithm_benchmark(const std::string& name,
+containers::map<containers::string, double>
+algorithm_benchmark(const containers::string& name,
                     Algorithm_Factory& af,
                     RandomNumberGenerator& rng,
                     u32bit milliseconds,
                     size_t buf_size)
    {
-   std::vector<std::string> providers = af.providers_of(name);
-   std::map<std::string, double> all_results;
+   containers::vector<containers::string> providers = af.providers_of(name);
+   containers::map<containers::string, double> all_results;
 
    if(providers.empty()) // no providers, nothing to do
       return all_results;
@@ -6080,12 +6080,12 @@ algorithm_benchmark(const std::string& name,
    const u64bit ns_per_provider =
       (static_cast<u64bit>(milliseconds) * 1000 * 1000) / providers.size();
 
-   std::vector<byte> buf(buf_size * 1024);
+   containers::vector<byte> buf(buf_size * 1024);
    rng.randomize(&buf[0], buf.size());
 
    for(size_t i = 0; i != providers.size(); ++i)
       {
-      const std::string provider = providers[i];
+      const containers::string provider = providers[i];
 
       std::pair<u64bit, u64bit> results(0, 0);
 
@@ -7180,7 +7180,7 @@ void Blowfish::eks_key_schedule(const byte key[], size_t length,
       throw Invalid_Key_Length("EKSBlowfish", length);
 
    if(workfactor == 0)
-      throw std::invalid_argument("Bcrypt work factor must be at least 1");
+      throw Invalid_Argument("Bcrypt work factor must be at least 1");
 
    /*
    * On a 2.8 GHz Core-i7, workfactor == 18 takes about 25 seconds to
@@ -7188,7 +7188,7 @@ void Blowfish::eks_key_schedule(const byte key[], size_t length,
    * time being.
    */
    if(workfactor > 18)
-      throw std::invalid_argument("Requested Bcrypt work factor too large");
+      throw Invalid_Argument("Requested Bcrypt work factor too large");
 
    clear();
 
@@ -7670,7 +7670,7 @@ void Cascade_Cipher::clear()
    cipher2->clear();
    }
 
-std::string Cascade_Cipher::name() const
+containers::string Cascade_Cipher::name() const
    {
    return "Cascade(" + cipher1->name() + "," + cipher2->name() + ")";
    }
@@ -9484,7 +9484,7 @@ byte GOST_28147_89_Params::sbox_entry(size_t row, size_t col) const
    return (row % 2 == 0) ? (x >> 4) : (x & 0x0F);
    }
 
-GOST_28147_89_Params::GOST_28147_89_Params(const std::string& n) : name(n)
+GOST_28147_89_Params::GOST_28147_89_Params(const containers::string& n) : name(n)
    {
    // Encoded in the packed fromat from RFC 4357
 
@@ -9530,7 +9530,7 @@ GOST_28147_89::GOST_28147_89(const GOST_28147_89_Params& param) :
          }
    }
 
-std::string GOST_28147_89::name() const
+containers::string GOST_28147_89::name() const
    {
    /*
    'Guess' the right name for the sbox on the basis of the values.
@@ -9538,7 +9538,7 @@ std::string GOST_28147_89::name() const
    is added. Preferably, we would just store the string value in the
    constructor, but can't break binary compat.
    */
-   std::string sbox_name = "";
+   containers::string sbox_name = "";
    if(SBOX[0] == 0x00072000)
       sbox_name = "R3411_94_TestParam";
    else if(SBOX[0] == 0x0002D000)
@@ -10096,7 +10096,7 @@ void Lion::key_schedule(const byte key[], size_t length)
 /*
 * Return the name of this type
 */
-std::string Lion::name() const
+containers::string Lion::name() const
    {
    return "Lion(" + hash->name() + "," +
                     cipher->name() + "," +
@@ -10259,7 +10259,7 @@ BlockCipher* LubyRackoff::clone() const
 /*
 * Return the name of this type
 */
-std::string LubyRackoff::name() const
+containers::string LubyRackoff::name() const
    {
    return "Luby-Rackoff(" + hash->name() + ")";
    }
@@ -11580,7 +11580,7 @@ void RC5::key_schedule(const byte key[], size_t length)
 /*
 * Return the name of this type
 */
-std::string RC5::name() const
+containers::string RC5::name() const
    {
    return "RC5(" + to_string(get_rounds()) + ")";
    }
@@ -11959,7 +11959,7 @@ void SAFER_SK::key_schedule(const byte key[], size_t)
 /*
 * Return the name of this type
 */
-std::string SAFER_SK::name() const
+containers::string SAFER_SK::name() const
    {
    return "SAFER-SK(" + to_string(get_rounds()) + ")";
    }
@@ -15108,12 +15108,12 @@ void Certificate_Store_Memory::add_certificate(const X509_Certificate& cert)
    certs.push_back(cert);
    }
 
-std::vector<X509_Certificate>
+containers::vector<X509_Certificate>
 Certificate_Store_Memory::find_cert_by_subject_and_key_id(
    const X509_DN& subject_dn,
    const MemoryRegion<byte>& key_id) const
    {
-   std::vector<X509_Certificate> result;
+   containers::vector<X509_Certificate> result;
 
    for(size_t i = 0; i != certs.size(); ++i)
       {
@@ -15154,12 +15154,12 @@ void Certificate_Store_Memory::add_crl(const X509_CRL& crl)
    crls.push_back(crl);
    }
 
-std::vector<X509_CRL>
+containers::vector<X509_CRL>
 Certificate_Store_Memory::find_crl_by_subject_and_key_id(
    const X509_DN& issuer_dn,
    const MemoryRegion<byte>& key_id) const
    {
-   std::vector<X509_CRL> result;
+   containers::vector<X509_CRL> result;
 
    for(size_t i = 0; i != crls.size(); ++i)
       {
@@ -15202,7 +15202,7 @@ PKCS10_Request::PKCS10_Request(DataSource& in) :
 /*
 * PKCS10_Request Constructor
 */
-PKCS10_Request::PKCS10_Request(const std::string& in) :
+PKCS10_Request::PKCS10_Request(const containers::string& in) :
    X509_Object(in, "CERTIFICATE REQUEST/NEW CERTIFICATE REQUEST")
    {
    do_decode();
@@ -15294,7 +15294,7 @@ void PKCS10_Request::handle_attribute(const Attribute& attr)
 /*
 * Return the challenge password (if any)
 */
-std::string PKCS10_Request::challenge_password() const
+containers::string PKCS10_Request::challenge_password() const
    {
    return info.get1("PKCS9.ChallengePassword");
    }
@@ -15344,11 +15344,11 @@ Key_Constraints PKCS10_Request::constraints() const
 /*
 * Return the extendend key constraints (if any)
 */
-std::vector<OID> PKCS10_Request::ex_constraints() const
+containers::vector<OID> PKCS10_Request::ex_constraints() const
    {
-   std::vector<std::string> oids = info.get("X509v3.ExtendedKeyUsage");
+   containers::vector<containers::string> oids = info.get("X509v3.ExtendedKeyUsage");
 
-   std::vector<OID> result;
+   containers::vector<OID> result;
    for(size_t i = 0; i != oids.size(); ++i)
       result.push_back(OID(oids[i]));
    return result;
@@ -15391,7 +15391,7 @@ namespace Botan {
 */
 X509_CA::X509_CA(const X509_Certificate& c,
                  const Private_Key& key,
-                 const std::string& hash_fn) : cert(c)
+                 const containers::string& hash_fn) : cert(c)
    {
    if(!cert.is_CA_cert())
       throw Invalid_Argument("X509_CA: This certificate is not for a CA");
@@ -15503,7 +15503,7 @@ X509_Certificate X509_CA::make_cert(PK_Signer* signer,
 X509_CRL X509_CA::new_crl(RandomNumberGenerator& rng,
                           u32bit next_update) const
    {
-   std::vector<CRL_Entry> empty;
+   containers::vector<CRL_Entry> empty;
    return make_crl(empty, 1, next_update, rng);
    }
 
@@ -15511,11 +15511,11 @@ X509_CRL X509_CA::new_crl(RandomNumberGenerator& rng,
 * Update a CRL with new entries
 */
 X509_CRL X509_CA::update_crl(const X509_CRL& crl,
-                             const std::vector<CRL_Entry>& new_revoked,
+                             const containers::vector<CRL_Entry>& new_revoked,
                              RandomNumberGenerator& rng,
                              u32bit next_update) const
    {
-   std::vector<CRL_Entry> revoked = crl.get_revoked();
+   containers::vector<CRL_Entry> revoked = crl.get_revoked();
 
    std::copy(new_revoked.begin(), new_revoked.end(),
              std::back_inserter(revoked));
@@ -15526,7 +15526,7 @@ X509_CRL X509_CA::update_crl(const X509_CRL& crl,
 /*
 * Create a CRL
 */
-X509_CRL X509_CA::make_crl(const std::vector<CRL_Entry>& revoked,
+X509_CRL X509_CA::make_crl(const containers::vector<CRL_Entry>& revoked,
                            u32bit crl_number, u32bit next_update,
                            RandomNumberGenerator& rng) const
    {
@@ -15580,12 +15580,12 @@ X509_Certificate X509_CA::ca_certificate() const
 * Choose a signing format for the key
 */
 PK_Signer* choose_sig_format(const Private_Key& key,
-                             const std::string& hash_fn,
+                             const containers::string& hash_fn,
                              AlgorithmIdentifier& sig_algo)
    {
-   std::string padding;
+   containers::string padding;
 
-   const std::string algo_name = key.algo_name();
+   const containers::string algo_name = key.algo_name();
 
    const HashFunction* proto_hash = retrieve_hash(hash_fn);
    if(!proto_hash)
@@ -15968,7 +15968,7 @@ void Alternative_Name::decode_inner(const MemoryRegion<byte>& in)
 void Alternative_Name::contents_to(Data_Store& subject_info,
                                    Data_Store& issuer_info) const
    {
-   std::multimap<std::string, std::string> contents =
+   containers::multimap<containers::string, containers::string> contents =
       get_alt_name().contents();
 
    if(oid_name_str == "X509v3.SubjectAlternativeName")
@@ -15984,8 +15984,8 @@ void Alternative_Name::contents_to(Data_Store& subject_info,
 * Alternative_Name Constructor
 */
 Alternative_Name::Alternative_Name(const AlternativeName& alt_name,
-                                   const std::string& oid_name_str,
-                                   const std::string& config_name_str)
+                                   const containers::string& oid_name_str,
+                                   const containers::string& config_name_str)
    {
    this->alt_name = alt_name;
    this->oid_name_str = oid_name_str;
@@ -16076,7 +16076,7 @@ class Policy_Information : public ASN1_Object
 */
 MemoryVector<byte> Certificate_Policies::encode_inner() const
    {
-   std::vector<Policy_Information> policies;
+   containers::vector<Policy_Information> policies;
 
    for(size_t i = 0; i != oids.size(); ++i)
       policies.push_back(oids[i]);
@@ -16093,7 +16093,7 @@ MemoryVector<byte> Certificate_Policies::encode_inner() const
 */
 void Certificate_Policies::decode_inner(const MemoryRegion<byte>& in)
    {
-   std::vector<Policy_Information> policies;
+   containers::vector<Policy_Information> policies;
 
    BER_Decoder(in)
       .start_cons(SEQUENCE)
@@ -16204,7 +16204,7 @@ namespace Botan {
 /*
 * Create a generic X.509 object
 */
-X509_Object::X509_Object(DataSource& stream, const std::string& labels)
+X509_Object::X509_Object(DataSource& stream, const containers::string& labels)
    {
    init(stream, labels);
    }
@@ -16212,7 +16212,7 @@ X509_Object::X509_Object(DataSource& stream, const std::string& labels)
 /*
 * Createa a generic X.509 object
 */
-X509_Object::X509_Object(const std::string& file, const std::string& labels)
+X509_Object::X509_Object(const containers::string& file, const containers::string& labels)
    {
    DataSource_Stream stream(file, true);
    init(stream, labels);
@@ -16221,7 +16221,7 @@ X509_Object::X509_Object(const std::string& file, const std::string& labels)
 /*
 * Read a PEM or BER X.509 object
 */
-void X509_Object::init(DataSource& in, const std::string& labels)
+void X509_Object::init(DataSource& in, const containers::string& labels)
    {
    PEM_labels_allowed = split_on(labels, '/');
    if(PEM_labels_allowed.size() < 1)
@@ -16235,7 +16235,7 @@ void X509_Object::init(DataSource& in, const std::string& labels)
          decode_info(in);
       else
          {
-         std::string got_label;
+         containers::string got_label;
          DataSource_Memory ber(PEM_Code::decode(in, got_label));
 
          if(!std::binary_search(PEM_labels_allowed.begin(),
@@ -16296,7 +16296,7 @@ MemoryVector<byte> X509_Object::BER_encode() const
 /*
 * Return a PEM encoded X.509 object
 */
-std::string X509_Object::PEM_encode() const
+containers::string X509_Object::PEM_encode() const
    {
    return PEM_Code::encode(BER_encode(), PEM_label_pref);
    }
@@ -16328,16 +16328,16 @@ AlgorithmIdentifier X509_Object::signature_algorithm() const
 /*
 * Return the hash used in generating the signature
 */
-std::string X509_Object::hash_used_for_signature() const
+containers::string X509_Object::hash_used_for_signature() const
    {
-   std::vector<std::string> sig_info =
+   containers::vector<containers::string> sig_info =
       split_on(OIDS::lookup(sig_algo.oid), '/');
 
    if(sig_info.size() != 2)
       throw Internal_Error("Invalid name format found for " +
                            sig_algo.oid.as_string());
 
-   std::vector<std::string> pad_and_hash =
+   containers::vector<containers::string> pad_and_hash =
       parse_algorithm_name(sig_info[1]);
 
    if(pad_and_hash.size() != 2)
@@ -16361,13 +16361,13 @@ bool X509_Object::check_signature(Public_Key* pub_key) const
 bool X509_Object::check_signature(Public_Key& pub_key) const
    {
    try {
-      std::vector<std::string> sig_info =
+      containers::vector<containers::string> sig_info =
          split_on(OIDS::lookup(sig_algo.oid), '/');
 
       if(sig_info.size() != 2 || sig_info[0] != pub_key.algo_name())
          return false;
 
-      std::string padding = sig_info[1];
+      containers::string padding = sig_info[1];
       Signature_Format format =
          (pub_key.message_parts() >= 2) ? DER_SEQUENCE : IEEE_1363;
 
@@ -16437,11 +16437,11 @@ namespace {
 /*
 * Lookup each OID in the vector
 */
-std::vector<std::string> lookup_oids(const std::vector<std::string>& in)
+containers::vector<containers::string> lookup_oids(const containers::vector<containers::string>& in)
    {
-   std::vector<std::string> out;
+   containers::vector<containers::string> out;
 
-   std::vector<std::string>::const_iterator i = in.begin();
+   containers::vector<containers::string>::const_iterator i = in.begin();
    while(i != in.end())
       {
       out.push_back(OIDS::lookup(OID(*i)));
@@ -16465,7 +16465,7 @@ X509_Certificate::X509_Certificate(DataSource& in) :
 /*
 * X509_Certificate Constructor
 */
-X509_Certificate::X509_Certificate(const std::string& in) :
+X509_Certificate::X509_Certificate(const containers::string& in) :
    X509_Object(in, "CERTIFICATE/X509 CERTIFICATE")
    {
    self_signed = false;
@@ -16570,7 +16570,7 @@ u32bit X509_Certificate::x509_version() const
 /*
 * Return the time this cert becomes valid
 */
-std::string X509_Certificate::start_time() const
+containers::string X509_Certificate::start_time() const
    {
    return subject.get1("X509.Certificate.start");
    }
@@ -16578,7 +16578,7 @@ std::string X509_Certificate::start_time() const
 /*
 * Return the time this cert becomes invalid
 */
-std::string X509_Certificate::end_time() const
+containers::string X509_Certificate::end_time() const
    {
    return subject.get1("X509.Certificate.end");
    }
@@ -16586,8 +16586,8 @@ std::string X509_Certificate::end_time() const
 /*
 * Return information about the subject
 */
-std::vector<std::string>
-X509_Certificate::subject_info(const std::string& what) const
+containers::vector<containers::string>
+X509_Certificate::subject_info(const containers::string& what) const
    {
    return subject.get(X509_DN::deref_info_field(what));
    }
@@ -16595,8 +16595,8 @@ X509_Certificate::subject_info(const std::string& what) const
 /*
 * Return information about the issuer
 */
-std::vector<std::string>
-X509_Certificate::issuer_info(const std::string& what) const
+containers::vector<containers::string>
+X509_Certificate::issuer_info(const containers::string& what) const
    {
    return issuer.get(X509_DN::deref_info_field(what));
    }
@@ -16642,7 +16642,7 @@ Key_Constraints X509_Certificate::constraints() const
 /*
 * Return the list of extended key usage OIDs
 */
-std::vector<std::string> X509_Certificate::ex_constraints() const
+containers::vector<containers::string> X509_Certificate::ex_constraints() const
    {
    return lookup_oids(subject.get("X509v3.ExtendedKeyUsage"));
    }
@@ -16650,7 +16650,7 @@ std::vector<std::string> X509_Certificate::ex_constraints() const
 /*
 * Return the list of certificate policies
 */
-std::vector<std::string> X509_Certificate::policies() const
+containers::vector<containers::string> X509_Certificate::policies() const
    {
    return lookup_oids(subject.get("X509v3.CertificatePolicies"));
    }
@@ -16715,7 +16715,7 @@ bool operator!=(const X509_Certificate& cert1, const X509_Certificate& cert2)
    return !(cert1 == cert2);
    }
 
-std::string X509_Certificate::to_string() const
+containers::string X509_Certificate::to_string() const
    {
    const char* dn_fields[] = { "Name",
                                "Email",
@@ -16730,11 +16730,11 @@ std::string X509_Certificate::to_string() const
                                "PKIX.XMPPAddr",
                                0 };
 
-   std::ostringstream out;
+   containers::ostringstream out;
 
    for(size_t i = 0; dn_fields[i]; ++i)
       {
-      const std::vector<std::string> vals = this->subject_info(dn_fields[i]);
+      const containers::vector<containers::string> vals = this->subject_info(dn_fields[i]);
 
       if(vals.empty())
          continue;
@@ -16747,7 +16747,7 @@ std::string X509_Certificate::to_string() const
 
    for(size_t i = 0; dn_fields[i]; ++i)
       {
-      const std::vector<std::string> vals = this->issuer_info(dn_fields[i]);
+      const containers::vector<containers::string> vals = this->issuer_info(dn_fields[i]);
 
       if(vals.empty())
          continue;
@@ -16785,7 +16785,7 @@ std::string X509_Certificate::to_string() const
          out << "   CRL Sign\n";
       }
 
-   std::vector<std::string> policies = this->policies();
+   containers::vector<containers::string> policies = this->policies();
    if(policies.size())
       {
       out << "Policies: " << "\n";
@@ -16793,7 +16793,7 @@ std::string X509_Certificate::to_string() const
          out << "   " << policies[i] << "\n";
       }
 
-   std::vector<std::string> ex_constraints = this->ex_constraints();
+   containers::vector<containers::string> ex_constraints = this->ex_constraints();
    if(ex_constraints.size())
       {
       out << "Extended Constraints:\n";
@@ -16827,20 +16827,20 @@ X509_DN create_dn(const Data_Store& info)
    class DN_Matcher : public Data_Store::Matcher
       {
       public:
-         bool operator()(const std::string& key, const std::string&) const
+         bool operator()(const containers::string& key, const containers::string&) const
             {
-            if(key.find("X520.") != std::string::npos)
+            if(key.find("X520.") != containers::string::npos)
                return true;
             return false;
             }
       };
 
-   std::multimap<std::string, std::string> names =
+   containers::multimap<containers::string, containers::string> names =
       info.search_with(DN_Matcher());
 
    X509_DN dn;
 
-   std::multimap<std::string, std::string>::iterator i;
+   containers::multimap<containers::string, containers::string>::iterator i;
    for(i = names.begin(); i != names.end(); ++i)
       dn.add_attribute(i->first, i->second);
 
@@ -16855,7 +16855,7 @@ AlternativeName create_alt_name(const Data_Store& info)
    class AltName_Matcher : public Data_Store::Matcher
       {
       public:
-         bool operator()(const std::string& key, const std::string&) const
+         bool operator()(const containers::string& key, const containers::string&) const
             {
             for(size_t i = 0; i != matches.size(); ++i)
                if(key.compare(matches[i]) == 0)
@@ -16863,20 +16863,20 @@ AlternativeName create_alt_name(const Data_Store& info)
             return false;
             }
 
-         AltName_Matcher(const std::string& match_any_of)
+         AltName_Matcher(const containers::string& match_any_of)
             {
             matches = split_on(match_any_of, '/');
             }
       private:
-         std::vector<std::string> matches;
+         containers::vector<containers::string> matches;
       };
 
-   std::multimap<std::string, std::string> names =
+   containers::multimap<containers::string, containers::string> names =
       info.search_with(AltName_Matcher("RFC822/DNS/URI/IP"));
 
    AlternativeName alt_name;
 
-   std::multimap<std::string, std::string>::iterator i;
+   containers::multimap<containers::string, containers::string>::iterator i;
    for(i = names.begin(); i != names.end(); ++i)
       alt_name.add_attribute(i->first, i->second);
 
@@ -17003,7 +17003,7 @@ X509_CRL::X509_CRL(DataSource& in, bool touc) :
 /*
 * Load a X.509 CRL
 */
-X509_CRL::X509_CRL(const std::string& in, bool touc) :
+X509_CRL::X509_CRL(const containers::string& in, bool touc) :
    X509_Object(in, "CRL/X509 CRL"), throw_on_unknown_critical(touc)
    {
    do_decode();
@@ -17076,7 +17076,7 @@ void X509_CRL::force_decode()
 /*
 * Return the list of revoked certificates
 */
-std::vector<CRL_Entry> X509_CRL::get_revoked() const
+containers::vector<CRL_Entry> X509_CRL::get_revoked() const
    {
    return revoked;
    }
@@ -17135,7 +17135,7 @@ namespace Botan {
 /*
 * Set when the certificate should become valid
 */
-void X509_Cert_Options::not_before(const std::string& time_string)
+void X509_Cert_Options::not_before(const containers::string& time_string)
    {
    start = X509_Time(time_string);
    }
@@ -17143,7 +17143,7 @@ void X509_Cert_Options::not_before(const std::string& time_string)
 /*
 * Set when the certificate should expire
 */
-void X509_Cert_Options::not_after(const std::string& time_string)
+void X509_Cert_Options::not_after(const containers::string& time_string)
    {
    end = X509_Time(time_string);
    }
@@ -17167,7 +17167,7 @@ void X509_Cert_Options::add_ex_constraint(const OID& oid)
 /*
 * Set key constraint information
 */
-void X509_Cert_Options::add_ex_constraint(const std::string& oid_str)
+void X509_Cert_Options::add_ex_constraint(const containers::string& oid_str)
    {
    ex_constraints.push_back(OIDS::lookup(oid_str));
    }
@@ -17197,7 +17197,7 @@ void X509_Cert_Options::sanity_check() const
 /*
 * Initialize the certificate options
 */
-X509_Cert_Options::X509_Cert_Options(const std::string& initial_opts,
+X509_Cert_Options::X509_Cert_Options(const containers::string& initial_opts,
                                      u32bit expiration_time_in_seconds)
    {
    is_CA = false;
@@ -17212,7 +17212,7 @@ X509_Cert_Options::X509_Cert_Options(const std::string& initial_opts,
    if(initial_opts == "")
       return;
 
-   std::vector<std::string> parsed = split_on(initial_opts, '/');
+   containers::vector<containers::string> parsed = split_on(initial_opts, '/');
 
    if(parsed.size() > 4)
       throw Invalid_Argument("X.509 cert options: Too many names: "
@@ -17265,7 +17265,7 @@ namespace X509 {
 */
 X509_Certificate create_self_signed_cert(const X509_Cert_Options& opts,
                                          const Private_Key& key,
-                                         const std::string& hash_fn,
+                                         const containers::string& hash_fn,
                                          RandomNumberGenerator& rng)
    {
    AlgorithmIdentifier sig_algo;
@@ -17311,7 +17311,7 @@ X509_Certificate create_self_signed_cert(const X509_Cert_Options& opts,
 */
 PKCS10_Request create_cert_req(const X509_Cert_Options& opts,
                                const Private_Key& key,
-                               const std::string& hash_fn,
+                               const containers::string& hash_fn,
                                RandomNumberGenerator& rng)
    {
    AlgorithmIdentifier sig_algo;
@@ -17445,12 +17445,12 @@ bool check_usage(const X509_Certificate& cert, X509_Store::Cert_Usage usage,
 */
 bool check_usage(const X509_Certificate& cert, X509_Store::Cert_Usage usage,
                  X509_Store::Cert_Usage check_for,
-                 const std::string& usage_oid)
+                 const containers::string& usage_oid)
    {
    if((usage & check_for) == 0)
       return true;
 
-   const std::vector<std::string> constraints = cert.ex_constraints();
+   const containers::vector<containers::string> constraints = cert.ex_constraints();
 
    if(constraints.empty())
       return true;
@@ -17588,7 +17588,7 @@ X509_Code X509_Store::validate_cert(const X509_Certificate& cert,
    {
    recompute_revoked_info();
 
-   std::vector<size_t> indexes;
+   containers::vector<size_t> indexes;
    X509_Code chaining_result = construct_cert_chain(cert, indexes);
    if(chaining_result != VERIFIED)
       return chaining_result;
@@ -17658,7 +17658,7 @@ size_t X509_Store::find_parent_of(const X509_Certificate& cert)
 
    for(size_t j = 0; j != stores.size(); ++j)
       {
-      std::vector<X509_Certificate> got =
+      containers::vector<X509_Certificate> got =
          stores[j]->find_cert_by_subject_and_key_id(issuer_dn, auth_key_id);
 
       for(size_t k = 0; k != got.size(); ++k)
@@ -17672,7 +17672,7 @@ size_t X509_Store::find_parent_of(const X509_Certificate& cert)
 * Construct a chain of certificate relationships
 */
 X509_Code X509_Store::construct_cert_chain(const X509_Certificate& end_cert,
-                                           std::vector<size_t>& indexes,
+                                           containers::vector<size_t>& indexes,
                                            bool need_full_chain)
    {
    size_t parent = find_parent_of(end_cert);
@@ -17758,13 +17758,13 @@ X509_Code X509_Store::check_sig(const X509_Object& object, Public_Key* key)
    std::unique_ptr<Public_Key> pub_key(key);
 
    try {
-      std::vector<std::string> sig_info =
+      containers::vector<containers::string> sig_info =
          split_on(OIDS::lookup(object.signature_algorithm().oid), '/');
 
       if(sig_info.size() != 2 || sig_info[0] != pub_key->algo_name())
          return SIGNATURE_ERROR;
 
-      std::string padding = sig_info[1];
+      containers::string padding = sig_info[1];
       Signature_Format format;
       if(key->message_parts() >= 2) format = DER_SEQUENCE;
       else                          format = IEEE_1363;
@@ -17825,11 +17825,11 @@ bool X509_Store::is_revoked(const X509_Certificate& cert) const
 /*
 * Construct a path back to a root for this cert
 */
-std::vector<X509_Certificate>
+containers::vector<X509_Certificate>
 X509_Store::get_cert_chain(const X509_Certificate& cert)
    {
-   std::vector<X509_Certificate> result;
-   std::vector<size_t> indexes;
+   containers::vector<X509_Certificate> result;
+   containers::vector<size_t> indexes;
    X509_Code chaining_result = construct_cert_chain(cert, indexes, true);
 
    if(chaining_result != VERIFIED)
@@ -17941,7 +17941,7 @@ X509_Code X509_Store::add_crl(const X509_CRL& crl)
    if(verify_result != VERIFIED)
       return verify_result;
 
-   std::vector<CRL_Entry> revoked_certs = crl.get_revoked();
+   containers::vector<CRL_Entry> revoked_certs = crl.get_revoked();
 
    for(size_t j = 0; j != revoked_certs.size(); ++j)
       {
@@ -17950,7 +17950,7 @@ X509_Code X509_Store::add_crl(const X509_CRL& crl)
       revoked_info.serial = revoked_certs[j].serial_number();
       revoked_info.auth_key_id = crl.authority_key_id();
 
-      std::vector<CRL_Data>::iterator p =
+      containers::vector<CRL_Data>::iterator p =
          std::find(revoked.begin(), revoked.end(), revoked_info);
 
       if(revoked_certs[j].reason_code() == REMOVE_FROM_CRL)
@@ -17974,9 +17974,9 @@ X509_Code X509_Store::add_crl(const X509_CRL& crl)
 /*
 * PEM encode the set of certificates
 */
-std::string X509_Store::PEM_encode() const
+containers::string X509_Store::PEM_encode() const
    {
-   std::string cert_store;
+   containers::string cert_store;
    for(size_t j = 0; j != certs.size(); ++j)
       cert_store += certs[j].cert.PEM_encode();
    return cert_store;
@@ -18393,10 +18393,10 @@ size_t base64_encode(char out[],
    return output_produced;
    }
 
-std::string base64_encode(const byte input[],
+containers::string base64_encode(const byte input[],
                           size_t input_length)
    {
-   std::string output((round_up<size_t>(input_length, 3) / 3) * 4, 0);
+   containers::string output((round_up<size_t>(input_length, 3) / 3) * 4, 0);
 
    size_t consumed = 0;
    size_t produced = base64_encode(&output[0],
@@ -18409,7 +18409,7 @@ std::string base64_encode(const byte input[],
    return output;
    }
 
-std::string base64_encode(const MemoryRegion<byte>& input)
+containers::string base64_encode(const MemoryRegion<byte>& input)
    {
    return base64_encode(&input[0], input.size());
    }
@@ -18471,7 +18471,7 @@ size_t base64_decode(byte output[],
          }
       else if(!(bin == 0x81 || (bin == 0x80 && ignore_ws)))
          {
-         std::string bad_char(1, input[i]);
+         containers::string bad_char(1, input[i]);
          if(bad_char == "\t")
            bad_char = "\\t";
          else if(bad_char == "\n")
@@ -18479,8 +18479,8 @@ size_t base64_decode(byte output[],
          else if(bad_char == "\r")
            bad_char = "\\r";
 
-         throw std::invalid_argument(
-           std::string("base64_decode: invalid base64 character '") +
+         throw Invalid_Argument(
+           containers::string("base64_decode: invalid base64 character '") +
            bad_char + "'");
          }
 
@@ -18531,13 +18531,13 @@ size_t base64_decode(byte output[],
                                   consumed, true, ignore_ws);
 
    if(consumed != input_length)
-      throw std::invalid_argument("base64_decode: input did not have full bytes");
+      throw Invalid_Argument("base64_decode: input did not have full bytes");
 
    return written;
    }
 
 size_t base64_decode(byte output[],
-                     const std::string& input,
+                     const containers::string& input,
                      bool ignore_ws)
    {
    return base64_decode(output, &input[0], input.length(), ignore_ws);
@@ -18558,7 +18558,7 @@ SecureVector<byte> base64_decode(const char input[],
    return bin;
    }
 
-SecureVector<byte> base64_decode(const std::string& input,
+SecureVector<byte> base64_decode(const containers::string& input,
                                  bool ignore_ws)
    {
    return base64_decode(&input[0], input.size(), ignore_ws);
@@ -18600,17 +18600,17 @@ void hex_encode(char output[],
       }
    }
 
-std::string hex_encode(const MemoryRegion<byte>& input,
+containers::string hex_encode(const MemoryRegion<byte>& input,
                        bool uppercase)
    {
    return hex_encode(&input[0], input.size(), uppercase);
    }
 
-std::string hex_encode(const byte input[],
+containers::string hex_encode(const byte input[],
                        size_t input_length,
                        bool uppercase)
    {
-   std::string output(2 * input_length, 0);
+   containers::string output(2 * input_length, 0);
 
    if(input_length)
       hex_encode(&output[0], input, input_length, uppercase);
@@ -18675,14 +18675,14 @@ size_t hex_decode(byte output[],
          if(bin == 0x80 && ignore_ws)
             continue;
 
-         std::string bad_char(1, input[i]);
+         containers::string bad_char(1, input[i]);
          if(bad_char == "\t")
            bad_char = "\\t";
          else if(bad_char == "\n")
            bad_char = "\\n";
 
-         throw std::invalid_argument(
-           std::string("hex_decode: invalid hex character '") +
+         throw Invalid_Argument(
+           containers::string("hex_decode: invalid hex character '") +
            bad_char + "'");
          }
 
@@ -18719,13 +18719,13 @@ size_t hex_decode(byte output[],
                                consumed, ignore_ws);
 
    if(consumed != input_length)
-      throw std::invalid_argument("hex_decode: input did not have full bytes");
+      throw Invalid_Argument("hex_decode: input did not have full bytes");
 
    return written;
    }
 
 size_t hex_decode(byte output[],
-                  const std::string& input,
+                  const containers::string& input,
                   bool ignore_ws)
    {
    return hex_decode(output, &input[0], input.length(), ignore_ws);
@@ -18746,7 +18746,7 @@ SecureVector<byte> hex_decode(const char input[],
    return bin;
    }
 
-SecureVector<byte> hex_decode(const std::string& input,
+SecureVector<byte> hex_decode(const containers::string& input,
                               bool ignore_ws)
    {
    return hex_decode(&input[0], input.size(), ignore_ws);
@@ -18766,21 +18766,21 @@ namespace Botan {
 /*
 * OpenPGP Base64 encoding
 */
-std::string PGP_encode(
+containers::string PGP_encode(
    const byte input[], size_t length,
-   const std::string& label,
-   const std::map<std::string, std::string>& headers)
+   const containers::string& label,
+   const containers::map<containers::string, containers::string>& headers)
    {
-   const std::string PGP_HEADER = "-----BEGIN PGP " + label + "-----\n";
-   const std::string PGP_TRAILER = "-----END PGP " + label + "-----\n";
+   const containers::string PGP_HEADER = "-----BEGIN PGP " + label + "-----\n";
+   const containers::string PGP_TRAILER = "-----END PGP " + label + "-----\n";
    const size_t PGP_WIDTH = 64;
 
-   std::string pgp_encoded = PGP_HEADER;
+   containers::string pgp_encoded = PGP_HEADER;
 
    if(headers.find("Version") != headers.end())
       pgp_encoded += "Version: " + headers.find("Version")->second + '\n';
 
-   std::map<std::string, std::string>::const_iterator i = headers.begin();
+   containers::map<containers::string, containers::string>::const_iterator i = headers.begin();
    while(i != headers.end())
       {
       if(i->first != "Version")
@@ -18807,10 +18807,10 @@ std::string PGP_encode(
 /*
 * OpenPGP Base64 encoding
 */
-std::string PGP_encode(const byte input[], size_t length,
-                       const std::string& type)
+containers::string PGP_encode(const byte input[], size_t length,
+                       const containers::string& type)
    {
-   std::map<std::string, std::string> empty;
+   containers::map<containers::string, containers::string> empty;
    return PGP_encode(input, length, type, empty);
    }
 
@@ -18818,13 +18818,13 @@ std::string PGP_encode(const byte input[], size_t length,
 * OpenPGP Base64 decoding
 */
 SecureVector<byte> PGP_decode(DataSource& source,
-                              std::string& label,
-                              std::map<std::string, std::string>& headers)
+                              containers::string& label,
+                              containers::map<containers::string, containers::string>& headers)
    {
    const size_t RANDOM_CHAR_LIMIT = 5;
 
-   const std::string PGP_HEADER1 = "-----BEGIN PGP ";
-   const std::string PGP_HEADER2 = "-----";
+   const containers::string PGP_HEADER1 = "-----BEGIN PGP ";
+   const containers::string PGP_HEADER2 = "-----";
    size_t position = 0;
 
    while(position != PGP_HEADER1.length())
@@ -18858,7 +18858,7 @@ SecureVector<byte> PGP_decode(DataSource& source,
    bool end_of_headers = false;
    while(!end_of_headers)
       {
-      std::string this_header;
+      containers::string this_header;
       byte b = 0;
       while(b != '\n')
          {
@@ -18875,12 +18875,12 @@ SecureVector<byte> PGP_decode(DataSource& source,
 
       if(!end_of_headers)
          {
-         std::string::size_type pos = this_header.find(": ");
-         if(pos == std::string::npos)
+         containers::string::size_type pos = this_header.find(": ");
+         if(pos == containers::string::npos)
             throw Decoding_Error("OpenPGP: Bad headers");
 
-         std::string key = this_header.substr(0, pos);
-         std::string value = this_header.substr(pos + 2, std::string::npos);
+         containers::string key = this_header.substr(0, pos);
+         containers::string value = this_header.substr(pos + 2, containers::string::npos);
          headers[key] = value;
          }
       }
@@ -18893,10 +18893,10 @@ SecureVector<byte> PGP_decode(DataSource& source,
       );
    base64.start_msg();
 
-   const std::string PGP_TRAILER = "-----END PGP " + label + "-----";
+   const containers::string PGP_TRAILER = "-----END PGP " + label + "-----";
    position = 0;
    bool newline_seen = 0;
-   std::string crc;
+   containers::string crc;
    while(position != PGP_TRAILER.length())
       {
       byte b;
@@ -18936,9 +18936,9 @@ SecureVector<byte> PGP_decode(DataSource& source,
 /*
 * OpenPGP Base64 decoding
 */
-SecureVector<byte> PGP_decode(DataSource& source, std::string& label)
+SecureVector<byte> PGP_decode(DataSource& source, containers::string& label)
    {
-   std::map<std::string, std::string> ignored;
+   containers::map<containers::string, containers::string> ignored;
    return PGP_decode(source, label, ignored);
    }
 
@@ -18959,11 +18959,11 @@ namespace PEM_Code {
 /*
 * PEM encode BER/DER-encoded objects
 */
-std::string encode(const byte der[], size_t length, const std::string& label,
+containers::string encode(const byte der[], size_t length, const containers::string& label,
                    size_t width)
    {
-   const std::string PEM_HEADER = "-----BEGIN " + label + "-----\n";
-   const std::string PEM_TRAILER = "-----END " + label + "-----\n";
+   const containers::string PEM_HEADER = "-----BEGIN " + label + "-----\n";
+   const containers::string PEM_TRAILER = "-----END " + label + "-----\n";
 
    Pipe pipe(new Base64_Encoder(true, width));
    pipe.process_msg(der, length);
@@ -18973,7 +18973,7 @@ std::string encode(const byte der[], size_t length, const std::string& label,
 /*
 * PEM encode BER/DER-encoded objects
 */
-std::string encode(const MemoryRegion<byte>& data, const std::string& label,
+containers::string encode(const MemoryRegion<byte>& data, const containers::string& label,
                    size_t width)
    {
    return encode(&data[0], data.size(), label, width);
@@ -18983,9 +18983,9 @@ std::string encode(const MemoryRegion<byte>& data, const std::string& label,
 * Decode PEM down to raw BER/DER
 */
 SecureVector<byte> decode_check_label(DataSource& source,
-                                      const std::string& label_want)
+                                      const containers::string& label_want)
    {
-   std::string label_got;
+   containers::string label_got;
    SecureVector<byte> ber = decode(source, label_got);
    if(label_got != label_want)
       throw Decoding_Error("PEM: Label mismatch, wanted " + label_want +
@@ -18996,12 +18996,12 @@ SecureVector<byte> decode_check_label(DataSource& source,
 /*
 * Decode PEM down to raw BER/DER
 */
-SecureVector<byte> decode(DataSource& source, std::string& label)
+SecureVector<byte> decode(DataSource& source, containers::string& label)
    {
    const size_t RANDOM_CHAR_LIMIT = 8;
 
-   const std::string PEM_HEADER1 = "-----BEGIN ";
-   const std::string PEM_HEADER2 = "-----";
+   const containers::string PEM_HEADER1 = "-----BEGIN ";
+   const containers::string PEM_HEADER2 = "-----";
    size_t position = 0;
 
    while(position != PEM_HEADER1.length())
@@ -19034,7 +19034,7 @@ SecureVector<byte> decode(DataSource& source, std::string& label)
    Pipe base64(new Base64_Decoder);
    base64.start_msg();
 
-   const std::string PEM_TRAILER = "-----END " + label + "-----";
+   const containers::string PEM_TRAILER = "-----END " + label + "-----";
    position = 0;
    while(position != PEM_TRAILER.length())
       {
@@ -19056,10 +19056,10 @@ SecureVector<byte> decode(DataSource& source, std::string& label)
 /*
 * Search for a PEM signature
 */
-bool matches(DataSource& source, const std::string& extra,
+bool matches(DataSource& source, const containers::string& extra,
              size_t search_range)
    {
-   const std::string PEM_HEADER = "-----BEGIN " + extra;
+   const containers::string PEM_HEADER = "-----BEGIN " + extra;
 
    SecureVector<byte> search_buf(search_range);
    size_t got = source.peek(&search_buf[0], search_buf.size(), 0);
@@ -19106,7 +19106,7 @@ void aont_package(RandomNumberGenerator& rng,
       throw Invalid_Argument("AONT::package: Invalid cipher");
 
    // The all-zero string which is used both as the CTR IV and as K0
-   const std::string all_zeros(BLOCK_SIZE*2, '0');
+   const containers::string all_zeros(BLOCK_SIZE*2, '0');
 
    SymmetricKey package_key(rng, BLOCK_SIZE);
 
@@ -19160,7 +19160,7 @@ void aont_unpackage(BlockCipher* cipher,
       throw Invalid_Argument("AONT::unpackage: Input too short");
 
    // The all-zero string which is used both as the CTR IV and as K0
-   const std::string all_zeros(BLOCK_SIZE*2, '0');
+   const containers::string all_zeros(BLOCK_SIZE*2, '0');
 
    cipher->set_key(SymmetricKey(all_zeros));
 
@@ -19231,8 +19231,8 @@ const size_t PBKDF_OUTPUT_LEN = CIPHER_KEY_LEN + CIPHER_IV_LEN + MAC_KEY_LEN;
 
 }
 
-std::string encrypt(const byte input[], size_t input_len,
-                    const std::string& passphrase,
+containers::string encrypt(const byte input[], size_t input_len,
+                    const containers::string& passphrase,
                     RandomNumberGenerator& rng)
    {
    SecureVector<byte> pbkdf_salt(PBKDF_SALT_LEN);
@@ -19287,8 +19287,8 @@ std::string encrypt(const byte input[], size_t input_len,
    return PEM_Code::encode(out_buf, "BOTAN CRYPTOBOX MESSAGE");
    }
 
-std::string decrypt(const byte input[], size_t input_len,
-                    const std::string& passphrase)
+containers::string decrypt(const byte input[], size_t input_len,
+                    const containers::string& passphrase)
    {
    DataSource_Memory input_src(input, input_len);
    SecureVector<byte> ciphertext =
@@ -19341,8 +19341,8 @@ std::string decrypt(const byte input[], size_t input_len,
    return pipe.read_all_as_string(0);
    }
 
-std::string decrypt(const std::string& input,
-                    const std::string& passphrase)
+containers::string decrypt(const containers::string& input,
+                    const containers::string& passphrase)
    {
    return decrypt(reinterpret_cast<const byte*>(&input[0]),
                   input.size(),
@@ -19564,7 +19564,7 @@ BlockCipher* make_aes(size_t keylength,
    else if(keylength == 32)
       return af.make_block_cipher("AES-256");
    else
-      throw std::invalid_argument("Bad KEK length for NIST keywrap");
+      throw Invalid_Argument("Bad KEK length for NIST keywrap");
    }
 
 }
@@ -19574,7 +19574,7 @@ SecureVector<byte> rfc3394_keywrap(const MemoryRegion<byte>& key,
                                    Algorithm_Factory& af)
    {
    if(key.size() % 8 != 0)
-      throw std::invalid_argument("Bad input key size for NIST key wrap");
+      throw Invalid_Argument("Bad input key size for NIST key wrap");
 
    std::unique_ptr<BlockCipher> aes(make_aes(kek.length(), af));
    aes->set_key(kek);
@@ -19616,7 +19616,7 @@ SecureVector<byte> rfc3394_keyunwrap(const MemoryRegion<byte>& key,
                                      Algorithm_Factory& af)
    {
    if(key.size() < 16 || key.size() % 8 != 0)
-      throw std::invalid_argument("Bad input key size for NIST key unwrap");
+      throw Invalid_Argument("Bad input key size for NIST key unwrap");
 
    std::unique_ptr<BlockCipher> aes(make_aes(kek.length(), af));
    aes->set_key(kek);
@@ -19670,7 +19670,7 @@ namespace Botan {
 
 namespace {
 
-BigInt hash_seq(const std::string& hash_id,
+BigInt hash_seq(const containers::string& hash_id,
                 size_t pad_to,
                 const BigInt& in1,
                 const BigInt& in2)
@@ -19684,9 +19684,9 @@ BigInt hash_seq(const std::string& hash_id,
    return BigInt::decode(hash_fn->final());
    }
 
-BigInt compute_x(const std::string& hash_id,
-                 const std::string& identifier,
-                 const std::string& password,
+BigInt compute_x(const containers::string& hash_id,
+                 const containers::string& identifier,
+                 const containers::string& password,
                  const MemoryRegion<byte>& salt)
    {
    std::unique_ptr<HashFunction> hash_fn(
@@ -19708,7 +19708,7 @@ BigInt compute_x(const std::string& hash_id,
 
 }
 
-std::string srp6_group_identifier(const BigInt& N, const BigInt& g)
+containers::string srp6_group_identifier(const BigInt& N, const BigInt& g)
    {
    /*
    This function assumes that only one 'standard' SRP parameter set has
@@ -19716,7 +19716,7 @@ std::string srp6_group_identifier(const BigInt& N, const BigInt& g)
    */
    try
       {
-      const std::string group_name = "modp/srp/" + to_string(N.bits());
+      const containers::string group_name = "modp/srp/" + to_string(N.bits());
 
       DL_Group group(group_name);
 
@@ -19732,10 +19732,10 @@ std::string srp6_group_identifier(const BigInt& N, const BigInt& g)
    }
 
 std::pair<BigInt, SymmetricKey>
-srp6_client_agree(const std::string& identifier,
-                  const std::string& password,
-                  const std::string& group_id,
-                  const std::string& hash_id,
+srp6_client_agree(const containers::string& identifier,
+                  const containers::string& password,
+                  const containers::string& group_id,
+                  const containers::string& hash_id,
                   const MemoryRegion<byte>& salt,
                   const BigInt& B,
                   RandomNumberGenerator& rng)
@@ -19766,11 +19766,11 @@ srp6_client_agree(const std::string& identifier,
    return std::make_pair(A, Sk);
    }
 
-BigInt generate_srp6_verifier(const std::string& identifier,
-                              const std::string& password,
+BigInt generate_srp6_verifier(const containers::string& identifier,
+                              const containers::string& password,
                               const MemoryRegion<byte>& salt,
-                              const std::string& group_id,
-                              const std::string& hash_id)
+                              const containers::string& group_id,
+                              const containers::string& hash_id)
    {
    const BigInt x = compute_x(hash_id, identifier, password, salt);
 
@@ -19779,8 +19779,8 @@ BigInt generate_srp6_verifier(const std::string& identifier,
    }
 
 BigInt SRP6_Server_Session::step1(const BigInt& v,
-                                  const std::string& group_id,
-                                  const std::string& hash_id,
+                                  const containers::string& group_id,
+                                  const containers::string& hash_id,
                                   RandomNumberGenerator& rng)
    {
    DL_Group group(group_id);
@@ -19894,7 +19894,7 @@ byte gfp_mul(byte x, byte y)
    return RTSS_EXP[(RTSS_LOG[x] + RTSS_LOG[y]) % 255];
    }
 
-byte rtss_hash_id(const std::string& hash_name)
+byte rtss_hash_id(const containers::string& hash_name)
    {
    if(hash_name == "SHA-160")
       return 1;
@@ -19916,7 +19916,7 @@ HashFunction* get_rtss_hash_by_id(byte id)
 
 }
 
-RTSS_Share::RTSS_Share(const std::string& hex_input)
+RTSS_Share::RTSS_Share(const containers::string& hex_input)
    {
    contents = hex_decode(hex_input);
    }
@@ -19929,12 +19929,12 @@ byte RTSS_Share::share_id() const
    return contents[20];
    }
 
-std::string RTSS_Share::to_string() const
+containers::string RTSS_Share::to_string() const
    {
    return hex_encode(&contents[0], contents.size());
    }
 
-std::vector<RTSS_Share>
+containers::vector<RTSS_Share>
 RTSS_Share::split(byte M, byte N,
                   const byte S[], u16bit S_len,
                   const byte identifier[16],
@@ -19945,7 +19945,7 @@ RTSS_Share::split(byte M, byte N,
 
    SHA_256 hash; // always use SHA-256 when generating shares
 
-   std::vector<RTSS_Share> shares(N);
+   containers::vector<RTSS_Share> shares(N);
 
    // Create RTSS header in each share
    for(byte i = 0; i != N; ++i)
@@ -19967,7 +19967,7 @@ RTSS_Share::split(byte M, byte N,
 
    for(size_t i = 0; i != secret.size(); ++i)
       {
-      std::vector<byte> coefficients(M-1);
+      containers::vector<byte> coefficients(M-1);
       rng.randomize(&coefficients[0], coefficients.size());
 
       for(byte j = 0; j != N; ++j)
@@ -19991,7 +19991,7 @@ RTSS_Share::split(byte M, byte N,
    }
 
 SecureVector<byte>
-RTSS_Share::reconstruct(const std::vector<RTSS_Share>& shares)
+RTSS_Share::reconstruct(const containers::vector<RTSS_Share>& shares)
    {
    const size_t RTSS_HEADER_SIZE = 20;
 
@@ -20022,7 +20022,7 @@ RTSS_Share::reconstruct(const std::vector<RTSS_Share>& shares)
    if(shares[0].size() != secret_len + hash->output_length() + RTSS_HEADER_SIZE + 1)
       throw Decoding_Error("Bad RTSS length field in header");
 
-   std::vector<byte> V(shares.size());
+   containers::vector<byte> V(shares.size());
    SecureVector<byte> secret;
 
    for(size_t i = RTSS_HEADER_SIZE + 1; i != shares[0].size(); ++i)
@@ -20112,8 +20112,8 @@ namespace {
 /**
 * Get a block cipher padding method by name
 */
-BlockCipherModePaddingMethod* get_bc_pad(const std::string& algo_spec,
-                                         const std::string& def_if_empty)
+BlockCipherModePaddingMethod* get_bc_pad(const containers::string& algo_spec,
+                                         const containers::string& def_if_empty)
    {
 #if defined(BOTAN_HAS_CIPHER_MODE_PADDING)
    if(algo_spec == "NoPadding" || (algo_spec == "" && def_if_empty == "NoPadding"))
@@ -20137,8 +20137,8 @@ BlockCipherModePaddingMethod* get_bc_pad(const std::string& algo_spec,
 
 Keyed_Filter* get_cipher_mode(const BlockCipher* block_cipher,
                               Cipher_Dir direction,
-                              const std::string& mode,
-                              const std::string& padding)
+                              const containers::string& mode,
+                              const containers::string& padding)
    {
 #if defined(BOTAN_HAS_OFB)
    if(mode == "OFB")
@@ -20198,13 +20198,13 @@ Keyed_Filter* get_cipher_mode(const BlockCipher* block_cipher,
       }
 #endif
 
-   if(mode.find("CFB") != std::string::npos ||
-      mode.find("EAX") != std::string::npos)
+   if(mode.find("CFB") != containers::string::npos ||
+      mode.find("EAX") != containers::string::npos)
       {
       size_t bits = 0;
 
-      std::vector<std::string> algo_info = parse_algorithm_name(mode);
-      std::string mode_name = algo_info[0];
+      containers::vector<containers::string> algo_info = parse_algorithm_name(mode);
+      containers::string mode_name = algo_info[0];
       if(algo_info.size() == 1)
          bits = 8 * block_cipher->block_size();
       else if(algo_info.size() == 2)
@@ -20239,15 +20239,15 @@ Keyed_Filter* get_cipher_mode(const BlockCipher* block_cipher,
 /*
 * Get a cipher object
 */
-Keyed_Filter* Core_Engine::get_cipher(const std::string& algo_spec,
+Keyed_Filter* Core_Engine::get_cipher(const containers::string& algo_spec,
                                       Cipher_Dir direction,
                                       Algorithm_Factory& af)
    {
-   std::vector<std::string> algo_parts = split_on(algo_spec, '/');
+   containers::vector<containers::string> algo_parts = split_on(algo_spec, '/');
    if(algo_parts.empty())
       throw Invalid_Algorithm_Name(algo_spec);
 
-   const std::string cipher_name = algo_parts[0];
+   const containers::string cipher_name = algo_parts[0];
 
    // check if it is a stream cipher first (easy case)
    const StreamCipher* stream_cipher = af.prototype_stream_cipher(cipher_name);
@@ -20265,9 +20265,9 @@ Keyed_Filter* Core_Engine::get_cipher(const std::string& algo_spec,
       throw Lookup_Error("Cipher specification '" + algo_spec +
                          "' is missing mode identifier");
 
-   std::string mode = algo_parts[1];
+   containers::string mode = algo_parts[1];
 
-   std::string padding;
+   containers::string padding;
    if(algo_parts.size() == 3)
       padding = algo_parts[2];
    else
@@ -20915,7 +20915,7 @@ HashFunction* Core_Engine::find_hash(const SCAN_Name& request,
 
    if(request.algo_name() == "Parallel")
       {
-      std::vector<const HashFunction*> hash_prototypes;
+      containers::vector<const HashFunction*> hash_prototypes;
 
       /* First pass, just get the prototypes (no memory allocation). Then
          if all were found, replace each prototype with a newly created clone
@@ -20929,7 +20929,7 @@ HashFunction* Core_Engine::find_hash(const SCAN_Name& request,
          hash_prototypes.push_back(hash);
          }
 
-      std::vector<HashFunction*> hashes;
+      containers::vector<HashFunction*> hashes;
       for(size_t i = 0; i != hash_prototypes.size(); ++i)
          hashes.push_back(hash_prototypes[i]->clone());
 
@@ -21125,7 +21125,7 @@ extern "C" {
 }
 
 Dynamically_Loaded_Engine::Dynamically_Loaded_Engine(
-   const std::string& library_path) :
+   const containers::string& library_path) :
    engine(0)
    {
    lib = new Dynamically_Loaded_Library(library_path);
@@ -21138,7 +21138,7 @@ Dynamically_Loaded_Engine::Dynamically_Loaded_Engine(
       const u32bit mod_version = get_version();
 
       if(mod_version != 20101003)
-         throw std::runtime_error("Incompatible version in " +
+         throw Exception("Incompatible version in " +
                                   library_path + " of " +
                                   to_string(mod_version));
 
@@ -21148,7 +21148,7 @@ Dynamically_Loaded_Engine::Dynamically_Loaded_Engine(
       engine = creator();
 
       if(!engine)
-         throw std::runtime_error("Creator function in " +
+         throw Exception("Creator function in " +
                                   library_path + " failed");
       }
    catch(...)
@@ -21218,7 +21218,7 @@ Engine::mod_exp(const BigInt&,
    return 0;
    }
 
-Keyed_Filter* Engine::get_cipher(const std::string&,
+Keyed_Filter* Engine::get_cipher(const containers::string&,
                                  Cipher_Dir,
                                  Algorithm_Factory&)
    {
@@ -21411,9 +21411,9 @@ void Win32_CAPI_EntropySource::poll(Entropy_Accumulator& accum)
 /*
 * Win32_Capi_Entropysource Constructor
 */
-Win32_CAPI_EntropySource::Win32_CAPI_EntropySource(const std::string& provs)
+Win32_CAPI_EntropySource::Win32_CAPI_EntropySource(const containers::string& provs)
    {
-   std::vector<std::string> capi_provs = split_on(provs, ':');
+   containers::vector<containers::string> capi_provs = split_on(provs, ':');
 
    for(size_t i = 0; i != capi_provs.size(); ++i)
       {
@@ -21494,7 +21494,7 @@ size_t Device_EntropySource::Device_Reader::get(byte out[], size_t length,
 Attempt to open a device
 */
 Device_EntropySource::Device_Reader::fd_type
-Device_EntropySource::Device_Reader::open(const std::string& pathname)
+Device_EntropySource::Device_Reader::open(const containers::string& pathname)
    {
 #ifndef O_NONBLOCK
   #define O_NONBLOCK 0
@@ -21513,7 +21513,7 @@ Device_EntropySource constructor
 Open a file descriptor to each (available) device in fsnames
 */
 Device_EntropySource::Device_EntropySource(
-   const std::vector<std::string>& fsnames)
+   const containers::vector<containers::string>& fsnames)
    {
    for(size_t i = 0; i != fsnames.size(); ++i)
       {
@@ -21584,7 +21584,7 @@ void Device_EntropySource::poll(Entropy_Accumulator& accum)
 
 namespace Botan {
 
-EGD_EntropySource::EGD_Socket::EGD_Socket(const std::string& path) :
+EGD_EntropySource::EGD_Socket::EGD_Socket(const containers::string& path) :
    socket_path(path), m_fd(-1)
    {
    }
@@ -21592,7 +21592,7 @@ EGD_EntropySource::EGD_Socket::EGD_Socket(const std::string& path) :
 /**
 * Attempt a connection to an EGD/PRNGD socket
 */
-int EGD_EntropySource::EGD_Socket::open_socket(const std::string& path)
+int EGD_EntropySource::EGD_Socket::open_socket(const containers::string& path)
    {
    int fd = ::socket(PF_LOCAL, SOCK_STREAM, 0);
 
@@ -21603,7 +21603,7 @@ int EGD_EntropySource::EGD_Socket::open_socket(const std::string& path)
       addr.sun_family = PF_LOCAL;
 
       if(sizeof(addr.sun_path) < path.length() + 1)
-         throw std::invalid_argument("EGD socket path is too long");
+         throw Invalid_Argument("EGD socket path is too long");
 
       std::strncpy(addr.sun_path, path.c_str(), sizeof(addr.sun_path));
 
@@ -21678,7 +21678,7 @@ void EGD_EntropySource::EGD_Socket::close()
 /**
 * EGD_EntropySource constructor
 */
-EGD_EntropySource::EGD_EntropySource(const std::vector<std::string>& paths)
+EGD_EntropySource::EGD_EntropySource(const containers::vector<containers::string>& paths)
    {
    for(size_t i = 0; i != paths.size(); ++i)
       sockets.push_back(EGD_Socket(paths[i]));
@@ -21860,8 +21860,8 @@ namespace {
 class Directory_Walker : public File_Descriptor_Source
    {
    public:
-      Directory_Walker(const std::string& root) :
-         m_cur_dir(std::make_pair<DIR*, std::string>(0, ""))
+      Directory_Walker(const containers::string& root) :
+         m_cur_dir(std::make_pair<DIR*, containers::string>(0, ""))
          {
          if(DIR* root_dir = ::opendir(root.c_str()))
             m_cur_dir = std::make_pair(root_dir, root);
@@ -21875,18 +21875,18 @@ class Directory_Walker : public File_Descriptor_Source
 
       int next_fd();
    private:
-      void add_directory(const std::string& dirname)
+      void add_directory(const containers::string& dirname)
          {
          m_dirlist.push_back(dirname);
          }
 
-      std::pair<struct dirent*, std::string> get_next_dirent();
+      std::pair<struct dirent*, containers::string> get_next_dirent();
 
-      std::pair<DIR*, std::string> m_cur_dir;
-      std::deque<std::string> m_dirlist;
+      std::pair<DIR*, containers::string> m_cur_dir;
+      containers::deque<containers::string> m_dirlist;
    };
 
-std::pair<struct dirent*, std::string> Directory_Walker::get_next_dirent()
+std::pair<struct dirent*, containers::string> Directory_Walker::get_next_dirent()
    {
    while(m_cur_dir.first)
       {
@@ -21896,11 +21896,11 @@ std::pair<struct dirent*, std::string> Directory_Walker::get_next_dirent()
          return std::make_pair(dir, m_cur_dir.second);
 
       ::closedir(m_cur_dir.first);
-      m_cur_dir = std::make_pair<DIR*, std::string>(0, "");
+      m_cur_dir = std::make_pair<DIR*, containers::string>(0, "");
 
       while(!m_dirlist.empty() && m_cur_dir.first == 0)
          {
-         const std::string next_dir_name = m_dirlist[0];
+         const containers::string next_dir_name = m_dirlist[0];
          m_dirlist.pop_front();
 
          if(DIR* next_dir = ::opendir(next_dir_name.c_str()))
@@ -21908,24 +21908,24 @@ std::pair<struct dirent*, std::string> Directory_Walker::get_next_dirent()
          }
       }
 
-   return std::make_pair<struct dirent*, std::string>(0, ""); // nothing left
+   return std::make_pair<struct dirent*, containers::string>(0, ""); // nothing left
    }
 
 int Directory_Walker::next_fd()
    {
    while(true)
       {
-      std::pair<struct dirent*, std::string> entry = get_next_dirent();
+      std::pair<struct dirent*, containers::string> entry = get_next_dirent();
 
       if(!entry.first)
          break; // no more dirs
 
-      const std::string filename = entry.first->d_name;
+      const containers::string filename = entry.first->d_name;
 
       if(filename == "." || filename == "..")
          continue;
 
-      const std::string full_path = entry.second + '/' + filename;
+      const containers::string full_path = entry.second + '/' + filename;
 
       struct stat stat_buf;
       if(::lstat(full_path.c_str(), &stat_buf) == -1)
@@ -21952,7 +21952,7 @@ int Directory_Walker::next_fd()
 /**
 * FTW_EntropySource Constructor
 */
-FTW_EntropySource::FTW_EntropySource(const std::string& p) : path(p)
+FTW_EntropySource::FTW_EntropySource(const containers::string& p) : path(p)
    {
    dir = 0;
    }
@@ -22033,10 +22033,10 @@ bool Unix_Program_Cmp(const Unix_Program& a, const Unix_Program& b)
 /**
 * Unix_EntropySource Constructor
 */
-Unix_EntropySource::Unix_EntropySource(const std::vector<std::string>& path) :
+Unix_EntropySource::Unix_EntropySource(const containers::vector<containers::string>& path) :
    PATH(path)
    {
-   std::vector<Unix_Program> default_sources = get_default_sources();
+   containers::vector<Unix_Program> default_sources = get_default_sources();
    add_sources(&default_sources[0], default_sources.size());
    }
 
@@ -22138,8 +22138,8 @@ namespace {
 /**
 * Attempt to execute the command
 */
-void do_exec(const std::vector<std::string>& arg_list,
-             const std::vector<std::string>& paths)
+void do_exec(const containers::vector<containers::string>& arg_list,
+             const containers::vector<containers::string>& paths)
    {
    const size_t args = arg_list.size() - 1;
 
@@ -22150,7 +22150,7 @@ void do_exec(const std::vector<std::string>& arg_list,
 
    for(size_t j = 0; j != paths.size(); j++)
       {
-      const std::string full_path = paths[j] + "/" + arg_list[0];
+      const containers::string full_path = paths[j] + "/" + arg_list[0];
       const char* fsname = full_path.c_str();
 
       ::execl(fsname, fsname, arg1, arg2, arg3, arg4, NULL);
@@ -22234,7 +22234,7 @@ int DataSource_Command::fd() const
 /**
 * Return a human-readable ID for this stream
 */
-std::string DataSource_Command::id() const
+containers::string DataSource_Command::id() const
    {
    return "Unix command: " + arg_list[0];
    }
@@ -22242,13 +22242,13 @@ std::string DataSource_Command::id() const
 /**
 * Create the pipe
 */
-void DataSource_Command::create_pipe(const std::vector<std::string>& paths)
+void DataSource_Command::create_pipe(const containers::vector<containers::string>& paths)
    {
    bool found_something = false;
 
    for(size_t j = 0; j != paths.size(); j++)
       {
-      const std::string full_path = paths[j] + "/" + arg_list[0];
+      const containers::string full_path = paths[j] + "/" + arg_list[0];
       if(::access(full_path.c_str(), X_OK) == 0)
          {
          found_something = true;
@@ -22326,8 +22326,8 @@ void DataSource_Command::shutdown_pipe()
 /**
 * DataSource_Command Constructor
 */
-DataSource_Command::DataSource_Command(const std::string& prog_and_args,
-                                       const std::vector<std::string>& paths) :
+DataSource_Command::DataSource_Command(const containers::string& prog_and_args,
+                                       const containers::vector<containers::string>& paths) :
    MAX_BLOCK_USECS(100000), KILL_WAIT(10000)
    {
    arg_list = split_on(prog_and_args, ' ');
@@ -22364,9 +22364,9 @@ namespace Botan {
 /**
 * Default Commands for Entropy Gathering
 */
-std::vector<Unix_Program> Unix_EntropySource::get_default_sources()
+containers::vector<Unix_Program> Unix_EntropySource::get_default_sources()
    {
-   std::vector<Unix_Program> srcs;
+   containers::vector<Unix_Program> srcs;
 
    srcs.push_back(Unix_Program("netstat -in",           1));
    srcs.push_back(Unix_Program("pfstat",                1));
@@ -22571,7 +22571,7 @@ StreamCipher_Filter::StreamCipher_Filter(StreamCipher* stream_cipher,
 /*
 * StreamCipher_Filter Constructor
 */
-StreamCipher_Filter::StreamCipher_Filter(const std::string& sc_name) :
+StreamCipher_Filter::StreamCipher_Filter(const containers::string& sc_name) :
    buffer(DEFAULT_BUFFERSIZE)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
@@ -22581,7 +22581,7 @@ StreamCipher_Filter::StreamCipher_Filter(const std::string& sc_name) :
 /*
 * StreamCipher_Filter Constructor
 */
-StreamCipher_Filter::StreamCipher_Filter(const std::string& sc_name,
+StreamCipher_Filter::StreamCipher_Filter(const containers::string& sc_name,
                                          const SymmetricKey& key) :
    buffer(DEFAULT_BUFFERSIZE)
    {
@@ -22616,7 +22616,7 @@ void StreamCipher_Filter::write(const byte input[], size_t length)
 /*
 * Hash_Filter Constructor
 */
-Hash_Filter::Hash_Filter(const std::string& algo_spec,
+Hash_Filter::Hash_Filter(const containers::string& algo_spec,
                          size_t len) :
    OUTPUT_LENGTH(len)
    {
@@ -22639,7 +22639,7 @@ void Hash_Filter::end_msg()
 /*
 * MAC_Filter Constructor
 */
-MAC_Filter::MAC_Filter(const std::string& mac_name, size_t len) :
+MAC_Filter::MAC_Filter(const containers::string& mac_name, size_t len) :
    OUTPUT_LENGTH(len)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
@@ -22649,7 +22649,7 @@ MAC_Filter::MAC_Filter(const std::string& mac_name, size_t len) :
 /*
 * MAC_Filter Constructor
 */
-MAC_Filter::MAC_Filter(const std::string& mac_name, const SymmetricKey& key,
+MAC_Filter::MAC_Filter(const containers::string& mac_name, const SymmetricKey& key,
                        size_t len) : OUTPUT_LENGTH(len)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
@@ -22710,7 +22710,7 @@ Chain::Chain(Filter* filters[], size_t count)
          }
    }
 
-std::string Chain::name() const
+containers::string Chain::name() const
    {
    return "Chain";
    }
@@ -22732,7 +22732,7 @@ Fork::Fork(Filter* filters[], size_t count)
    set_next(filters, count);
    }
 
-std::string Fork::name() const
+containers::string Fork::name() const
    {
    return "Fork";
    }
@@ -22756,10 +22756,10 @@ Buffered_Filter::Buffered_Filter(size_t b, size_t f) :
    main_block_mod(b), final_minimum(f)
    {
    if(main_block_mod == 0)
-      throw std::invalid_argument("main_block_mod == 0");
+      throw Invalid_Argument("main_block_mod == 0");
 
    if(final_minimum > main_block_mod)
-      throw std::invalid_argument("final_minimum > main_block_mod");
+      throw Invalid_Argument("final_minimum > main_block_mod");
 
    buffer.resize(2 * main_block_mod);
    buffer_pos = 0;
@@ -23008,7 +23008,7 @@ void Base64_Decoder::end_msg()
    position = 0;
 
    if(not_full_bytes)
-      throw std::invalid_argument("Base64_Decoder: Input not full bytes");
+      throw Invalid_Argument("Base64_Decoder: Input not full bytes");
    }
 
 }
@@ -23175,7 +23175,7 @@ void Hex_Decoder::end_msg()
    position = 0;
 
    if(not_full_bytes)
-      throw std::invalid_argument("Hex_Decoder: Input not full bytes");
+      throw Invalid_Argument("Hex_Decoder: Input not full bytes");
    }
 
 }
@@ -23206,7 +23206,7 @@ void DataSink_Stream::write(const byte out[], size_t length)
 * DataSink_Stream Constructor
 */
 DataSink_Stream::DataSink_Stream(std::ostream& out,
-                                 const std::string& name) :
+                                 const containers::string& name) :
    identifier(name),
    sink_p(0),
    sink(out)
@@ -23216,7 +23216,7 @@ DataSink_Stream::DataSink_Stream(std::ostream& out,
 /*
 * DataSink_Stream Constructor
 */
-DataSink_Stream::DataSink_Stream(const std::string& path,
+DataSink_Stream::DataSink_Stream(const containers::string& path,
                                  bool use_binary) :
    identifier(path),
    sink_p(new std::ofstream(
@@ -23335,7 +23335,7 @@ DataSource_Memory::DataSource_Memory(const MemoryRegion<byte>& in) :
 /*
 * DataSource_Memory Constructor
 */
-DataSource_Memory::DataSource_Memory(const std::string& in) :
+DataSource_Memory::DataSource_Memory(const containers::string& in) :
    source(reinterpret_cast<const byte*>(in.data()), in.length())
    {
    offset = 0;
@@ -23400,7 +23400,7 @@ bool DataSource_Stream::end_of_data() const
 /*
 * Return a human-readable ID for this stream
 */
-std::string DataSource_Stream::id() const
+containers::string DataSource_Stream::id() const
    {
    return identifier;
    }
@@ -23408,7 +23408,7 @@ std::string DataSource_Stream::id() const
 /*
 * DataSource_Stream Constructor
 */
-DataSource_Stream::DataSource_Stream(const std::string& path,
+DataSource_Stream::DataSource_Stream(const containers::string& path,
                                      bool use_binary) :
    identifier(path),
    source_p(new std::ifstream(
@@ -23428,7 +23428,7 @@ DataSource_Stream::DataSource_Stream(const std::string& path,
 * DataSource_Stream Constructor
 */
 DataSource_Stream::DataSource_Stream(std::istream& in,
-                                     const std::string& name) :
+                                     const containers::string& name) :
    identifier(name),
    source_p(0),
    source(in),
@@ -23729,7 +23729,7 @@ void CBC_Encryption::end_msg()
 /*
 * Return a CBC mode name
 */
-std::string CBC_Encryption::name() const
+containers::string CBC_Encryption::name() const
    {
    return (cipher->name() + "/CBC/" + padder->name());
    }
@@ -23853,7 +23853,7 @@ void CBC_Decryption::end_msg()
 /*
 * Return a CBC mode name
 */
-std::string CBC_Decryption::name() const
+containers::string CBC_Decryption::name() const
    {
    return (cipher->name() + "/CBC/" + padder->name());
    }
@@ -24344,7 +24344,7 @@ void EAX_Base::set_header(const byte header[], size_t length)
 /*
 * Return the name of this cipher mode
 */
-std::string EAX_Base::name() const
+containers::string EAX_Base::name() const
    {
    return (cipher_name + "/EAX");
    }
@@ -24540,7 +24540,7 @@ ECB_Encryption::~ECB_Encryption()
 /*
 * Return an ECB mode name
 */
-std::string ECB_Encryption::name() const
+containers::string ECB_Encryption::name() const
    {
    return (cipher->name() + "/ECB/" + padder->name());
    }
@@ -24637,7 +24637,7 @@ ECB_Decryption::~ECB_Decryption()
 /*
 * Return an ECB mode name
 */
-std::string ECB_Decryption::name() const
+containers::string ECB_Decryption::name() const
    {
    return (cipher->name() + "/ECB/" + padder->name());
    }
@@ -24877,7 +24877,7 @@ XTS_Encryption::XTS_Encryption(BlockCipher* ciph) :
    cipher(ciph)
    {
    if(cipher->block_size() != 8 && cipher->block_size() != 16)
-      throw std::invalid_argument("Bad cipher for XTS: " + cipher->name());
+      throw Invalid_Argument("Bad cipher for XTS: " + cipher->name());
 
    cipher2 = cipher->clone();
    tweak.resize(buffered_block_size());
@@ -24893,7 +24893,7 @@ XTS_Encryption::XTS_Encryption(BlockCipher* ciph,
    cipher(ciph)
    {
    if(cipher->block_size() != 8 && cipher->block_size() != 16)
-       throw std::invalid_argument("Bad cipher for XTS: " + cipher->name());
+       throw Invalid_Argument("Bad cipher for XTS: " + cipher->name());
 
    cipher2 = cipher->clone();
    tweak.resize(buffered_block_size());
@@ -24905,7 +24905,7 @@ XTS_Encryption::XTS_Encryption(BlockCipher* ciph,
 /*
 * Return the name
 */
-std::string XTS_Encryption::name() const
+containers::string XTS_Encryption::name() const
    {
    return (cipher->name() + "/XTS");
    }
@@ -25049,7 +25049,7 @@ XTS_Decryption::XTS_Decryption(BlockCipher* ciph) :
    cipher(ciph)
    {
    if(cipher->block_size() != 8 && cipher->block_size() != 16)
-       throw std::invalid_argument("Bad cipher for XTS: " + cipher->name());
+       throw Invalid_Argument("Bad cipher for XTS: " + cipher->name());
 
    cipher2 = ciph->clone();
    tweak.resize(buffered_block_size());
@@ -25065,7 +25065,7 @@ XTS_Decryption::XTS_Decryption(BlockCipher* ciph,
    cipher(ciph)
    {
    if(cipher->block_size() != 8 && cipher->block_size() != 16)
-       throw std::invalid_argument("Bad cipher for XTS: " + cipher->name());
+       throw Invalid_Argument("Bad cipher for XTS: " + cipher->name());
 
    cipher2 = ciph->clone();
    tweak.resize(buffered_block_size());
@@ -25077,7 +25077,7 @@ XTS_Decryption::XTS_Decryption(BlockCipher* ciph,
 /*
 * Return the name
 */
-std::string XTS_Decryption::name() const
+containers::string XTS_Decryption::name() const
    {
    return (cipher->name() + "/XTS");
    }
@@ -25351,7 +25351,7 @@ class Null_Filter : public Filter
       void write(const byte input[], size_t length)
          { send(input, length); }
 
-      std::string name() const { return "Null"; }
+      containers::string name() const { return "Null"; }
    };
 
 }
@@ -25459,7 +25459,7 @@ void Pipe::process_msg(const MemoryRegion<byte>& input)
 /*
 * Process a full message at once
 */
-void Pipe::process_msg(const std::string& input)
+void Pipe::process_msg(const containers::string& input)
    {
    process_msg(reinterpret_cast<const byte*>(input.data()), input.length());
    }
@@ -25679,7 +25679,7 @@ namespace Botan {
 /*
 * Look up the canonical ID for a queue
 */
-Pipe::message_id Pipe::get_message_no(const std::string& func_name,
+Pipe::message_id Pipe::get_message_no(const containers::string& func_name,
                                       message_id msg) const
    {
    if(msg == DEFAULT_MESSAGE)
@@ -25714,7 +25714,7 @@ void Pipe::write(const MemoryRegion<byte>& input)
 /*
 * Write a string into a Pipe
 */
-void Pipe::write(const std::string& str)
+void Pipe::write(const containers::string& str)
    {
    write(reinterpret_cast<const byte*>(str.data()), str.size());
    }
@@ -25779,11 +25779,11 @@ SecureVector<byte> Pipe::read_all(message_id msg)
 /*
 * Return all data in the pipe as a string
 */
-std::string Pipe::read_all_as_string(message_id msg)
+containers::string Pipe::read_all_as_string(message_id msg)
    {
    msg = ((msg != DEFAULT_MESSAGE) ? msg : default_msg());
    SecureVector<byte> buffer(DEFAULT_BUFFERSIZE);
-   std::string str;
+   containers::string str;
    str.reserve(remaining(msg));
 
    while(true)
@@ -26393,10 +26393,10 @@ Comb4P::Comb4P(HashFunction* h1, HashFunction* h2) :
    hash1(h1), hash2(h2)
    {
    if(hash1->name() == hash2->name())
-      throw std::invalid_argument("Comb4P: Must use two distinct hashes");
+      throw Invalid_Argument("Comb4P: Must use two distinct hashes");
 
    if(hash1->output_length() != hash2->output_length())
-      throw std::invalid_argument("Comb4P: Incompatible hashes " +
+      throw Invalid_Argument("Comb4P: Incompatible hashes " +
                                   hash1->name() + " and " +
                                   hash2->name());
 
@@ -26966,7 +26966,7 @@ Keccak_1600::Keccak_1600(size_t output_bits) :
                              to_string(output_bits));
    }
 
-std::string Keccak_1600::name() const
+containers::string Keccak_1600::name() const
    {
    return "Keccak-1600(" + to_string(output_bits) + ")";
    }
@@ -27553,9 +27553,9 @@ size_t Parallel::output_length() const
 /*
 * Return the name of this type
 */
-std::string Parallel::name() const
+containers::string Parallel::name() const
    {
-   std::string hash_names;
+   containers::string hash_names;
    for(size_t i = 0; i != hashes.size(); ++i)
       {
       if(i)
@@ -27570,7 +27570,7 @@ std::string Parallel::name() const
 */
 HashFunction* Parallel::clone() const
    {
-   std::vector<HashFunction*> hash_copies;
+   containers::vector<HashFunction*> hash_copies;
    for(size_t i = 0; i != hashes.size(); ++i)
       hash_copies.push_back(hashes[i]->clone());
    return new Parallel(hash_copies);
@@ -27588,7 +27588,7 @@ void Parallel::clear()
 /*
 * Parallel Constructor
 */
-Parallel::Parallel(const std::vector<HashFunction*>& hash_in) :
+Parallel::Parallel(const containers::vector<HashFunction*>& hash_in) :
    hashes(hash_in)
    {
    }
@@ -28739,7 +28739,7 @@ void reset_tweak(MemoryRegion<u64bit>& T,
 void initial_block(MemoryRegion<u64bit>& H,
                    MemoryRegion<u64bit>& T,
                    size_t output_bits,
-                   const std::string& personalization)
+                   const containers::string& personalization)
    {
    zeroise(H);
 
@@ -28772,7 +28772,7 @@ void initial_block(MemoryRegion<u64bit>& H,
 }
 
 Skein_512::Skein_512(size_t arg_output_bits,
-                     const std::string& arg_personalization) :
+                     const containers::string& arg_personalization) :
    personalization(arg_personalization),
    output_bits(arg_output_bits),
    H(9), T(3), buffer(64), buf_pos(0)
@@ -28783,7 +28783,7 @@ Skein_512::Skein_512(size_t arg_output_bits,
    initial_block(H, T, output_bits, personalization);
    }
 
-std::string Skein_512::name() const
+containers::string Skein_512::name() const
    {
    if(personalization != "")
       return "Skein-512(" + to_string(output_bits) + "," + personalization + ")";
@@ -29391,7 +29391,7 @@ void Tiger::clear()
 /*
 * Return the name of this type
 */
-std::string Tiger::name() const
+containers::string Tiger::name() const
    {
    return "Tiger(" + to_string(output_length()) + "," + to_string(passes) + ")";
    }
@@ -30115,7 +30115,7 @@ namespace Botan {
 */
 SecureVector<byte> KDF::derive_key(size_t key_len,
                                    const MemoryRegion<byte>& secret,
-                                   const std::string& salt) const
+                                   const containers::string& salt) const
    {
    return derive_key(key_len, &secret[0], secret.size(),
                      reinterpret_cast<const byte*>(salt.data()),
@@ -30149,7 +30149,7 @@ SecureVector<byte> KDF::derive_key(size_t key_len,
 */
 SecureVector<byte> KDF::derive_key(size_t key_len,
                                    const byte secret[], size_t secret_len,
-                                   const std::string& salt) const
+                                   const containers::string& salt) const
    {
    return derive_key(key_len, secret, secret_len,
                      reinterpret_cast<const byte*>(salt.data()),
@@ -30533,7 +30533,7 @@ SecureVector<byte> X942_PRF::derive(size_t key_len,
 /*
 * X9.42 Constructor
 */
-X942_PRF::X942_PRF(const std::string& oid)
+X942_PRF::X942_PRF(const containers::string& oid)
    {
    if(OIDS::have_oid(oid))
       key_wrap_oid = OIDS::lookup(oid).as_string();
@@ -30597,7 +30597,7 @@ namespace Botan {
 /*
 * Get a PBKDF algorithm by name
 */
-PBKDF* get_pbkdf(const std::string& algo_spec)
+PBKDF* get_pbkdf(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -30610,7 +30610,7 @@ PBKDF* get_pbkdf(const std::string& algo_spec)
 /*
 * Get an EMSA by name
 */
-EMSA* get_emsa(const std::string& algo_spec)
+EMSA* get_emsa(const containers::string& algo_spec)
    {
    SCAN_Name request(algo_spec);
 
@@ -30667,7 +30667,7 @@ EMSA* get_emsa(const std::string& algo_spec)
 /*
 * Get an EME by name
 */
-EME* get_eme(const std::string& algo_spec)
+EME* get_eme(const containers::string& algo_spec)
    {
    SCAN_Name request(algo_spec);
 
@@ -30698,7 +30698,7 @@ EME* get_eme(const std::string& algo_spec)
 /*
 * Get an KDF by name
 */
-KDF* get_kdf(const std::string& algo_spec)
+KDF* get_kdf(const containers::string& algo_spec)
    {
    SCAN_Name request(algo_spec);
 
@@ -30855,7 +30855,7 @@ class Serialized_PRNG : public RandomNumberGenerator
          rng->clear();
          }
 
-      std::string name() const
+      containers::string name() const
          {
          Mutex_Holder lock(mutex);
          return rng->name();
@@ -31028,26 +31028,26 @@ namespace Botan {
 /*
 * Library Initialization
 */
-void LibraryInitializer::initialize(const std::string& arg_string)
+void LibraryInitializer::initialize(const containers::string& arg_string)
    {
    bool thread_safe = false;
 
-   const std::vector<std::string> arg_list = split_on(arg_string, ' ');
+   const containers::vector<containers::string> arg_list = split_on(arg_string, ' ');
    for(size_t i = 0; i != arg_list.size(); ++i)
       {
       if(arg_list[i].size() == 0)
          continue;
 
-      std::string name, value;
+      containers::string name, value;
 
-      if(arg_list[i].find('=') == std::string::npos)
+      if(arg_list[i].find('=') == containers::string::npos)
          {
          name = arg_list[i];
          value = "true";
          }
       else
          {
-         std::vector<std::string> name_and_value = split_on(arg_list[i], '=');
+         containers::vector<containers::string> name_and_value = split_on(arg_list[i], '=');
          name = name_and_value[0];
          value = name_and_value[1];
          }
@@ -31134,17 +31134,17 @@ Mutex* Library_State::get_mutex() const
 /*
 * Get an allocator by its name
 */
-Allocator* Library_State::get_allocator(const std::string& type) const
+Allocator* Library_State::get_allocator(const containers::string& type) const
    {
    Mutex_Holder lock(allocator_lock);
 
    if(type != "")
-      return search_map<std::string, Allocator*>(alloc_factory, type, 0);
+      return search_map<containers::string, Allocator*>(alloc_factory, type, 0);
 
    if(!cached_default_allocator)
       {
       cached_default_allocator =
-         search_map<std::string, Allocator*>(alloc_factory,
+         search_map<containers::string, Allocator*>(alloc_factory,
                                              default_allocator_name, 0);
       }
 
@@ -31167,7 +31167,7 @@ void Library_State::add_allocator(Allocator* allocator)
 /*
 * Set the default allocator type
 */
-void Library_State::set_default_allocator(const std::string& type)
+void Library_State::set_default_allocator(const containers::string& type)
    {
    Mutex_Holder lock(allocator_lock);
 
@@ -31181,20 +31181,20 @@ void Library_State::set_default_allocator(const std::string& type)
 /*
 * Get a configuration value
 */
-std::string Library_State::get(const std::string& section,
-                               const std::string& key) const
+containers::string Library_State::get(const containers::string& section,
+                               const containers::string& key) const
    {
    Mutex_Holder lock(config_lock);
 
-   return search_map<std::string, std::string>(config,
+   return search_map<containers::string, containers::string>(config,
                                                section + "/" + key, "");
    }
 
 /*
 * See if a particular option has been set
 */
-bool Library_State::is_set(const std::string& section,
-                           const std::string& key) const
+bool Library_State::is_set(const containers::string& section,
+                           const containers::string& key) const
    {
    Mutex_Holder lock(config_lock);
 
@@ -31204,14 +31204,14 @@ bool Library_State::is_set(const std::string& section,
 /*
 * Set a configuration value
 */
-void Library_State::set(const std::string& section, const std::string& key,
-                        const std::string& value, bool overwrite)
+void Library_State::set(const containers::string& section, const containers::string& key,
+                        const containers::string& value, bool overwrite)
    {
    Mutex_Holder lock(config_lock);
 
-   std::string full_key = section + "/" + key;
+   containers::string full_key = section + "/" + key;
 
-   std::map<std::string, std::string>::const_iterator i =
+   containers::map<containers::string, containers::string>::const_iterator i =
       config.find(full_key);
 
    if(overwrite || i == config.end() || i->second == "")
@@ -31221,7 +31221,7 @@ void Library_State::set(const std::string& section, const std::string& key,
 /*
 * Add an alias
 */
-void Library_State::add_alias(const std::string& key, const std::string& value)
+void Library_State::add_alias(const containers::string& key, const containers::string& value)
    {
    set("alias", key, value);
    }
@@ -31229,9 +31229,9 @@ void Library_State::add_alias(const std::string& key, const std::string& value)
 /*
 * Dereference an alias to a fixed name
 */
-std::string Library_State::deref_alias(const std::string& key) const
+containers::string Library_State::deref_alias(const containers::string& key) const
    {
-   std::string result = key;
+   containers::string result = key;
    while(is_set("alias", result))
       result = get("alias", result);
    return result;
@@ -31380,7 +31380,7 @@ namespace Botan {
 /*
 * Query if an algorithm exists
 */
-bool have_algorithm(const std::string& name)
+bool have_algorithm(const containers::string& name)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -31398,7 +31398,7 @@ bool have_algorithm(const std::string& name)
 /*
 * Query the block size of a cipher or hash
 */
-size_t block_size_of(const std::string& name)
+size_t block_size_of(const containers::string& name)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -31414,7 +31414,7 @@ size_t block_size_of(const std::string& name)
 /*
 * Query the output_length() of a hash or MAC
 */
-size_t output_length_of(const std::string& name)
+size_t output_length_of(const containers::string& name)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -31430,7 +31430,7 @@ size_t output_length_of(const std::string& name)
 /*
 * Query the minimum allowed key length of an algorithm implementation
 */
-size_t min_keylength_of(const std::string& name)
+size_t min_keylength_of(const containers::string& name)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -31449,7 +31449,7 @@ size_t min_keylength_of(const std::string& name)
 /*
 * Query the maximum allowed keylength of an algorithm implementation
 */
-size_t max_keylength_of(const std::string& name)
+size_t max_keylength_of(const containers::string& name)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -31468,7 +31468,7 @@ size_t max_keylength_of(const std::string& name)
 /*
 * Query the number of byte a valid key must be a multiple of
 */
-size_t keylength_multiple_of(const std::string& name)
+size_t keylength_multiple_of(const containers::string& name)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
 
@@ -31487,7 +31487,7 @@ size_t keylength_multiple_of(const std::string& name)
 /*
 * Get a cipher object
 */
-Keyed_Filter* get_cipher(const std::string& algo_spec,
+Keyed_Filter* get_cipher(const containers::string& algo_spec,
                          Cipher_Dir direction)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
@@ -31506,7 +31506,7 @@ Keyed_Filter* get_cipher(const std::string& algo_spec,
 /*
 * Get a cipher object
 */
-Keyed_Filter* get_cipher(const std::string& algo_spec,
+Keyed_Filter* get_cipher(const containers::string& algo_spec,
                          const SymmetricKey& key,
                          const InitializationVector& iv,
                          Cipher_Dir direction)
@@ -31523,7 +31523,7 @@ Keyed_Filter* get_cipher(const std::string& algo_spec,
 /*
 * Get a cipher object
 */
-Keyed_Filter* get_cipher(const std::string& algo_spec,
+Keyed_Filter* get_cipher(const containers::string& algo_spec,
                          const SymmetricKey& key,
                          Cipher_Dir direction)
    {
@@ -31547,9 +31547,9 @@ namespace OIDS {
 /*
 * Register an OID to string mapping
 */
-void add_oid(const OID& oid, const std::string& name)
+void add_oid(const OID& oid, const containers::string& name)
    {
-   const std::string oid_str = oid.as_string();
+   const containers::string oid_str = oid.as_string();
 
    if(!global_state().is_set("oid2str", oid_str))
       global_state().set("oid2str", oid_str, name);
@@ -31560,9 +31560,9 @@ void add_oid(const OID& oid, const std::string& name)
 /*
 * Do an OID to string lookup
 */
-std::string lookup(const OID& oid)
+containers::string lookup(const OID& oid)
    {
-   std::string name = global_state().get("oid2str", oid.as_string());
+   containers::string name = global_state().get("oid2str", oid.as_string());
    if(name == "")
       return oid.as_string();
    return name;
@@ -31571,9 +31571,9 @@ std::string lookup(const OID& oid)
 /*
 * Do a string to OID lookup
 */
-OID lookup(const std::string& name)
+OID lookup(const containers::string& name)
    {
-   std::string value = global_state().get("str2oid", name);
+   containers::string value = global_state().get("str2oid", name);
    if(value != "")
       return OID(value);
 
@@ -31590,7 +31590,7 @@ OID lookup(const std::string& name)
 /*
 * Check to see if an OID exists in the table
 */
-bool have_oid(const std::string& name)
+bool have_oid(const containers::string& name)
    {
    return global_state().is_set("str2oid", name);
    }
@@ -31598,7 +31598,7 @@ bool have_oid(const std::string& name)
 /*
 * Check to see if an OID exists in the table
 */
-bool name_of(const OID& oid, const std::string& name)
+bool name_of(const OID& oid, const containers::string& name)
    {
    return (oid == lookup(name));
    }
@@ -31622,8 +31622,8 @@ namespace {
 * OID loading helper function
 */
 void add_oid(Library_State& config,
-             const std::string& oid_str,
-             const std::string& name)
+             const containers::string& oid_str,
+             const containers::string& name)
    {
    if(!config.is_set("oid2str", oid_str))
       config.set("oid2str", oid_str, name);
@@ -32541,10 +32541,10 @@ namespace Botan {
 
 namespace {
 
-std::string make_arg(
-   const std::vector<std::pair<size_t, std::string> >& name, size_t start)
+containers::string make_arg(
+   const containers::vector<std::pair<size_t, containers::string> >& name, size_t start)
    {
-   std::string output = name[start].second;
+   containers::string output = name[start].second;
    size_t level = name[start].first;
 
    size_t paren_depth = 0;
@@ -32580,8 +32580,8 @@ std::string make_arg(
    return output;
    }
 
-std::pair<size_t, std::string>
-deref_aliases(const std::pair<size_t, std::string>& in)
+std::pair<size_t, containers::string>
+deref_aliases(const std::pair<size_t, containers::string>& in)
    {
    return std::make_pair(in.first,
                          global_state().deref_alias(in.second));
@@ -32589,15 +32589,15 @@ deref_aliases(const std::pair<size_t, std::string>& in)
 
 }
 
-SCAN_Name::SCAN_Name(std::string algo_spec)
+SCAN_Name::SCAN_Name(containers::string algo_spec)
    {
    orig_algo_spec = algo_spec;
 
-   std::vector<std::pair<size_t, std::string> > name;
+   containers::vector<std::pair<size_t, containers::string> > name;
    size_t level = 0;
-   std::pair<size_t, std::string> accum = std::make_pair(level, "");
+   std::pair<size_t, containers::string> accum = std::make_pair(level, "");
 
-   std::string decoding_error = "Bad SCAN name '" + algo_spec + "': ";
+   containers::string decoding_error = "Bad SCAN name '" + algo_spec + "': ";
 
    algo_spec = global_state().deref_alias(algo_spec);
 
@@ -32654,9 +32654,9 @@ SCAN_Name::SCAN_Name(std::string algo_spec)
       }
    }
 
-std::string SCAN_Name::algo_name_and_args() const
+containers::string SCAN_Name::algo_name_and_args() const
    {
-   std::string out;
+   containers::string out;
 
    out = algo_name();
 
@@ -32676,14 +32676,14 @@ std::string SCAN_Name::algo_name_and_args() const
    return out;
    }
 
-std::string SCAN_Name::arg(size_t i) const
+containers::string SCAN_Name::arg(size_t i) const
    {
    if(i >= arg_count())
       throw std::range_error("SCAN_Name::argument - i out of range");
    return args[i];
    }
 
-std::string SCAN_Name::arg(size_t i, const std::string& def_value) const
+containers::string SCAN_Name::arg(size_t i, const containers::string& def_value) const
    {
    if(i >= arg_count())
       return def_value;
@@ -32770,7 +32770,7 @@ void CBC_MAC::clear()
 /*
 * Return the name of this type
 */
-std::string CBC_MAC::name() const
+containers::string CBC_MAC::name() const
    {
    return "CBC-MAC(" + e->name() + ")";
    }
@@ -32914,7 +32914,7 @@ void CMAC::clear()
 /*
 * Return the name of this type
 */
-std::string CMAC::name() const
+containers::string CMAC::name() const
    {
    return "CMAC(" + e->name() + ")";
    }
@@ -33023,7 +33023,7 @@ void HMAC::clear()
 /*
 * Return the name of this type
 */
-std::string HMAC::name() const
+containers::string HMAC::name() const
    {
    return "HMAC(" + hash->name() + ")";
    }
@@ -33130,7 +33130,7 @@ void SSL3_MAC::clear()
 /*
 * Return the name of this type
 */
-std::string SSL3_MAC::name() const
+containers::string SSL3_MAC::name() const
    {
    return "SSL3-MAC(" + hash->name() + ")";
    }
@@ -33231,7 +33231,7 @@ void ANSI_X919_MAC::clear()
    position = 0;
    }
 
-std::string ANSI_X919_MAC::name() const
+containers::string ANSI_X919_MAC::name() const
    {
    return "X9.19-MAC";
    }
@@ -33457,7 +33457,7 @@ std::ostream& operator<<(std::ostream& stream, const BigInt& n)
 */
 std::istream& operator>>(std::istream& stream, BigInt& n)
    {
-   std::string str;
+   containers::string str;
    std::getline(stream, str);
    if(stream.bad() || (stream.fail() && !stream.eof()))
       throw Stream_IO_Error("BigInt input operator has failed");
@@ -33987,7 +33987,7 @@ BigInt::BigInt(const BigInt& b)
 /*
 * Construct a BigInt from a string
 */
-BigInt::BigInt(const std::string& str)
+BigInt::BigInt(const containers::string& str)
    {
    Base base = Decimal;
    size_t markers = 0;
@@ -34486,7 +34486,7 @@ void PointGFp::monty_sqr(BigInt& z, const BigInt& x) const
    }
 
 // Point addition
-void PointGFp::add(const PointGFp& rhs, std::vector<BigInt>& ws_bn)
+void PointGFp::add(const PointGFp& rhs, containers::vector<BigInt>& ws_bn)
    {
    if(is_zero())
       {
@@ -34566,7 +34566,7 @@ void PointGFp::add(const PointGFp& rhs, std::vector<BigInt>& ws_bn)
    }
 
 // *this *= 2
-void PointGFp::mult2(std::vector<BigInt>& ws_bn)
+void PointGFp::mult2(containers::vector<BigInt>& ws_bn)
    {
    if(is_zero())
       return;
@@ -34635,7 +34635,7 @@ void PointGFp::mult2(std::vector<BigInt>& ws_bn)
 // arithmetic operators
 PointGFp& PointGFp::operator+=(const PointGFp& rhs)
    {
-   std::vector<BigInt> ws(9);
+   containers::vector<BigInt> ws(9);
    add(rhs, ws);
    return *this;
    }
@@ -34666,7 +34666,7 @@ PointGFp multi_exponentiate(const PointGFp& p1, const BigInt& z1,
    PointGFp H(p1.curve); // create as zero
    size_t bits_left = std::max(z1.bits(), z2.bits());
 
-   std::vector<BigInt> ws(9);
+   containers::vector<BigInt> ws(9);
 
    while(bits_left)
       {
@@ -34698,7 +34698,7 @@ PointGFp operator*(const BigInt& scalar, const PointGFp& point)
    if(scalar.is_zero())
       return PointGFp(curve); // zero point
 
-   std::vector<BigInt> ws(9);
+   containers::vector<BigInt> ws(9);
 
    if(scalar.abs() <= 2) // special cases for small values
       {
@@ -34751,7 +34751,7 @@ PointGFp operator*(const BigInt& scalar, const PointGFp& point)
 #else
    const size_t window_size = 4;
 
-   std::vector<PointGFp> Ps(1 << window_size);
+   containers::vector<PointGFp> Ps(1 << window_size);
    Ps[0] = PointGFp(curve);
    Ps[1] = point;
 
@@ -38700,7 +38700,7 @@ Mutex* Noop_Mutex_Factory::make()
          class Mutex_State_Error : public Internal_Error
             {
             public:
-               Mutex_State_Error(const std::string& where) :
+               Mutex_State_Error(const containers::string& where) :
                   Internal_Error("Noop_Mutex::" + where + ": " +
                                  "Mutex is already " + where + "ed") {}
             };
@@ -38836,7 +38836,7 @@ namespace Botan {
 
 namespace {
 
-std::string bcrypt_base64_encode(const byte input[], size_t length)
+containers::string bcrypt_base64_encode(const byte input[], size_t length)
    {
    // Bcrypt uses a non-standard base64 alphabet
    const byte OPENBSD_BASE64_SUB[256] = {
@@ -38864,7 +38864,7 @@ std::string bcrypt_base64_encode(const byte input[], size_t length)
       0x80, 0x80, 0x80, 0x80
    };
 
-   std::string b64 = base64_encode(input, length);
+   containers::string b64 = base64_encode(input, length);
 
    while(b64.size() && b64[b64.size()-1] == '=')
       b64 = b64.substr(0, b64.size() - 1);
@@ -38875,7 +38875,7 @@ std::string bcrypt_base64_encode(const byte input[], size_t length)
    return b64;
    }
 
-MemoryVector<byte> bcrypt_base64_decode(std::string input)
+MemoryVector<byte> bcrypt_base64_decode(containers::string input)
    {
    const byte OPENBSD_BASE64_SUB[256] = {
       0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80,
@@ -38908,7 +38908,7 @@ MemoryVector<byte> bcrypt_base64_decode(std::string input)
    return base64_decode(input);
    }
 
-std::string make_bcrypt(const std::string& pass,
+containers::string make_bcrypt(const containers::string& pass,
                         const MemoryRegion<byte>& salt,
                         u16bit work_factor)
    {
@@ -38931,7 +38931,7 @@ std::string make_bcrypt(const std::string& pass,
    for(size_t i = 0; i != 64; ++i)
       blowfish.encrypt_n(&ctext[0], &ctext[0], 3);
 
-   std::string salt_b64 = bcrypt_base64_encode(&salt[0], salt.size());
+   containers::string salt_b64 = bcrypt_base64_encode(&salt[0], salt.size());
 
    return "$2a$" + to_string(work_factor, 2) + "$" + salt_b64.substr(0, 22) +
              bcrypt_base64_encode(&ctext[0], ctext.size() - 1);
@@ -38939,14 +38939,14 @@ std::string make_bcrypt(const std::string& pass,
 
 }
 
-std::string generate_bcrypt(const std::string& pass,
+containers::string generate_bcrypt(const containers::string& pass,
                             RandomNumberGenerator& rng,
                             u16bit work_factor)
    {
    return make_bcrypt(pass, rng.random_vec(16), work_factor);
    }
 
-bool check_bcrypt(const std::string& pass, const std::string& hash)
+bool check_bcrypt(const containers::string& pass, const containers::string& hash)
    {
    if(hash.size() != 60 ||
       hash[0] != '$' || hash[1] != '2' || hash[2] != 'a' ||
@@ -38959,7 +38959,7 @@ bool check_bcrypt(const std::string& pass, const std::string& hash)
 
    MemoryVector<byte> salt = bcrypt_base64_decode(hash.substr(7, 22));
 
-   const std::string compare = make_bcrypt(pass, salt, workfactor);
+   const containers::string compare = make_bcrypt(pass, salt, workfactor);
 
    return (hash == compare);
    }
@@ -38977,7 +38977,7 @@ namespace Botan {
 
 namespace {
 
-const std::string MAGIC_PREFIX = "$9$";
+const containers::string MAGIC_PREFIX = "$9$";
 
 const size_t WORKFACTOR_BYTES = 2;
 const size_t ALGID_BYTES = 1;
@@ -39006,7 +39006,7 @@ MessageAuthenticationCode* get_pbkdf_prf(byte alg_id)
 
 }
 
-std::string generate_passhash9(const std::string& pass,
+containers::string generate_passhash9(const containers::string& pass,
                                RandomNumberGenerator& rng,
                                u16bit work_factor,
                                byte alg_id)
@@ -39042,7 +39042,7 @@ std::string generate_passhash9(const std::string& pass,
    return MAGIC_PREFIX + pipe.read_all_as_string();
    }
 
-bool check_passhash9(const std::string& pass, const std::string& hash)
+bool check_passhash9(const containers::string& pass, const containers::string& hash)
    {
    const size_t BINARY_LENGTH =
      ALGID_BYTES +
@@ -39116,20 +39116,20 @@ namespace Botan {
 /*
 * Get an encryption PBE, set new parameters
 */
-PBE* get_pbe(const std::string& algo_spec)
+PBE* get_pbe(const containers::string& algo_spec)
    {
    SCAN_Name request(algo_spec);
 
-   const std::string pbe = request.algo_name();
-   std::string digest_name = request.arg(0);
-   const std::string cipher = request.arg(1);
+   const containers::string pbe = request.algo_name();
+   containers::string digest_name = request.arg(0);
+   const containers::string cipher = request.arg(1);
 
-   std::vector<std::string> cipher_spec = split_on(cipher, '/');
+   containers::vector<containers::string> cipher_spec = split_on(cipher, '/');
    if(cipher_spec.size() != 2)
       throw Invalid_Argument("PBE: Invalid cipher spec " + cipher);
 
-   const std::string cipher_algo = global_state().deref_alias(cipher_spec[0]);
-   const std::string cipher_mode = cipher_spec[1];
+   const containers::string cipher_algo = global_state().deref_alias(cipher_spec[0]);
+   const containers::string cipher_mode = cipher_spec[1];
 
    if(cipher_mode != "CBC")
       throw Invalid_Argument("PBE: Invalid cipher mode " + cipher);
@@ -39170,7 +39170,7 @@ PBE* get_pbe(const OID& pbe_oid, DataSource& params)
    {
    SCAN_Name request(OIDS::lookup(pbe_oid));
 
-   const std::string pbe = request.algo_name();
+   const containers::string pbe = request.algo_name();
 
 #if defined(BOTAN_HAS_PBE_PKCS_V15)
    if(pbe == "PBE-PKCS5v15")
@@ -39178,15 +39178,15 @@ PBE* get_pbe(const OID& pbe_oid, DataSource& params)
       if(request.arg_count() != 2)
          throw Invalid_Algorithm_Name(request.as_string());
 
-      std::string digest_name = request.arg(0);
-      const std::string cipher = request.arg(1);
+      containers::string digest_name = request.arg(0);
+      const containers::string cipher = request.arg(1);
 
-      std::vector<std::string> cipher_spec = split_on(cipher, '/');
+      containers::vector<containers::string> cipher_spec = split_on(cipher, '/');
       if(cipher_spec.size() != 2)
          throw Invalid_Argument("PBE: Invalid cipher spec " + cipher);
 
-      const std::string cipher_algo = global_state().deref_alias(cipher_spec[0]);
-      const std::string cipher_mode = cipher_spec[1];
+      const containers::string cipher_algo = global_state().deref_alias(cipher_spec[0]);
+      const containers::string cipher_mode = cipher_spec[1];
 
       if(cipher_mode != "CBC")
          throw Invalid_Argument("PBE: Invalid cipher mode " + cipher);
@@ -39288,7 +39288,7 @@ void PBE_PKCS5v15::flush_pipe(bool safe_to_skip)
 /*
 * Set the passphrase to use
 */
-void PBE_PKCS5v15::set_key(const std::string& passphrase)
+void PBE_PKCS5v15::set_key(const containers::string& passphrase)
    {
    PKCS5_PBKDF1 pbkdf(hash_function->clone());
 
@@ -39347,8 +39347,8 @@ OID PBE_PKCS5v15::get_oid() const
    {
    const OID base_pbes1_oid("1.2.840.113549.1.5");
 
-   const std::string cipher = block_cipher->name();
-   const std::string digest = hash_function->name();
+   const containers::string cipher = block_cipher->name();
+   const containers::string digest = hash_function->name();
 
    if(cipher == "DES" && digest == "MD2")
       return (base_pbes1_oid + 1);
@@ -39366,7 +39366,7 @@ OID PBE_PKCS5v15::get_oid() const
       throw Internal_Error("PBE-PKCS5 v1.5: get_oid() has run out of options");
    }
 
-std::string PBE_PKCS5v15::name() const
+containers::string PBE_PKCS5v15::name() const
    {
    return "PBE-PKCS5v15(" + block_cipher->name() + "," +
                             hash_function->name() + ")";
@@ -39470,7 +39470,7 @@ void PBE_PKCS5v20::flush_pipe(bool safe_to_skip)
 /*
 * Set the passphrase to use
 */
-void PBE_PKCS5v20::set_key(const std::string& passphrase)
+void PBE_PKCS5v20::set_key(const containers::string& passphrase)
    {
    PKCS5_PBKDF2 pbkdf(new HMAC(hash_function->clone()));
 
@@ -39550,8 +39550,8 @@ void PBE_PKCS5v20::decode_params(DataSource& source)
 
    Algorithm_Factory& af = global_state().algorithm_factory();
 
-   std::string cipher = OIDS::lookup(enc_algo.oid);
-   std::vector<std::string> cipher_spec = split_on(cipher, '/');
+   containers::string cipher = OIDS::lookup(enc_algo.oid);
+   containers::vector<containers::string> cipher_spec = split_on(cipher, '/');
    if(cipher_spec.size() != 2)
       throw Decoding_Error("PBE-PKCS5 v2.0: Invalid cipher spec " + cipher);
 
@@ -39582,7 +39582,7 @@ OID PBE_PKCS5v20::get_oid() const
 /*
 * Check if this is a known PBES2 cipher
 */
-bool PBE_PKCS5v20::known_cipher(const std::string& algo)
+bool PBE_PKCS5v20::known_cipher(const containers::string& algo)
    {
    if(algo == "AES-128" || algo == "AES-192" || algo == "AES-256")
       return true;
@@ -39591,7 +39591,7 @@ bool PBE_PKCS5v20::known_cipher(const std::string& algo)
    return false;
    }
 
-std::string PBE_PKCS5v20::name() const
+containers::string PBE_PKCS5v20::name() const
    {
    return "PBE-PKCS5v20(" + block_cipher->name() + "," +
                             hash_function->name() + ")";
@@ -39641,7 +39641,7 @@ namespace Botan {
 * Return a PKCS#5 PBKDF1 derived key
 */
 OctetString PKCS5_PBKDF1::derive_key(size_t key_len,
-                                     const std::string& passphrase,
+                                     const containers::string& passphrase,
                                      const byte salt[], size_t salt_size,
                                      size_t iterations) const
    {
@@ -39679,7 +39679,7 @@ namespace Botan {
 * Return a PKCS #5 PBKDF2 derived key
 */
 OctetString PKCS5_PBKDF2::derive_key(size_t key_len,
-                                     const std::string& passphrase,
+                                     const containers::string& passphrase,
                                      const byte salt[], size_t salt_size,
                                      size_t iterations) const
    {
@@ -39744,7 +39744,7 @@ namespace Botan {
 * Derive a key using the OpenPGP S2K algorithm
 */
 OctetString OpenPGP_S2K::derive_key(size_t key_len,
-                                    const std::string& passphrase,
+                                    const containers::string& passphrase,
                                     const byte salt_buf[], size_t salt_size,
                                     size_t iterations) const
    {
@@ -39956,7 +39956,7 @@ size_t EME1::maximum_input_size(size_t keybits) const
 /*
 * EME1 Constructor
 */
-EME1::EME1(HashFunction* hash, const std::string& P)
+EME1::EME1(HashFunction* hash, const containers::string& P)
    {
    Phash = hash->process(P);
    mgf = new MGF1(hash);
@@ -40267,7 +40267,7 @@ EMSA2::EMSA2(HashFunction* hash_in) : hash(hash_in)
 
    if(hash_id == 0)
       {
-      const std::string hashName = hash->name();
+      const containers::string hashName = hash->name();
       delete hash;
       throw Encoding_Error("EMSA2 cannot be used with " + hashName);
       }
@@ -40690,7 +40690,7 @@ const byte TIGER_PKCS_ID[] = {
 /*
 * HashID as specified by PKCS
 */
-MemoryVector<byte> pkcs_hash_id(const std::string& name)
+MemoryVector<byte> pkcs_hash_id(const containers::string& name)
    {
    // Special case for SSL/TLS RSA signatures
    if(name == "Parallel(MD5,SHA-160)")
@@ -40723,7 +40723,7 @@ MemoryVector<byte> pkcs_hash_id(const std::string& name)
 /*
 * HashID as specified by IEEE 1363/X9.31
 */
-byte ieee1363_hash_id(const std::string& name)
+byte ieee1363_hash_id(const containers::string& name)
    {
    if(name == "SHA-160")    return 0x33;
 
@@ -40983,9 +40983,9 @@ DL_Group::DL_Group()
 /*
 * DL_Group Constructor
 */
-DL_Group::DL_Group(const std::string& type)
+DL_Group::DL_Group(const containers::string& type)
    {
-   std::string grp_contents = global_state().get("dl", type);
+   containers::string grp_contents = global_state().get("dl", type);
 
    if(grp_contents == "")
       throw Invalid_Argument("DL_Group: Unknown group " + type);
@@ -41199,7 +41199,7 @@ SecureVector<byte> DL_Group::DER_encode(Format format) const
 /*
 * PEM encode the parameters
 */
-std::string DL_Group::PEM_encode(Format format) const
+containers::string DL_Group::PEM_encode(Format format) const
    {
    SecureVector<byte> encoding = DER_encode(format);
    if(format == PKCS_3)
@@ -41253,7 +41253,7 @@ void DL_Group::BER_decode(DataSource& source, Format format)
 */
 void DL_Group::PEM_decode(DataSource& source)
    {
-   std::string label;
+   containers::string label;
    DataSource_Memory ber(PEM_Code::decode(source, label));
 
    if(label == "DH PARAMETERS")
@@ -41571,7 +41571,7 @@ namespace Botan {
 
 EC_Group::EC_Group(const OID& domain_oid)
    {
-   std::string pem =
+   containers::string pem =
       global_state().get("ec", OIDS::lookup(domain_oid));
 
    if(pem == "")
@@ -41581,7 +41581,7 @@ EC_Group::EC_Group(const OID& domain_oid)
    oid = domain_oid.as_string();
    }
 
-EC_Group::EC_Group(const std::string& str)
+EC_Group::EC_Group(const containers::string& str)
    {
    if(str == "")
       return; // no initialization / uninitialized
@@ -41681,7 +41681,7 @@ EC_Group::DER_encode(EC_Group_Encoding form) const
       throw Internal_Error("EC_Group::DER_encode: Unknown encoding");
    }
 
-std::string EC_Group::PEM_encode() const
+containers::string EC_Group::PEM_encode() const
    {
    SecureVector<byte> der = DER_encode(EC_DOMPAR_ENC_EXPLICIT);
    return PEM_Code::encode(der, "EC PARAMETERS");
@@ -42391,7 +42391,7 @@ namespace KeyPair {
 */
 bool encryption_consistency_check(RandomNumberGenerator& rng,
                                   const Private_Key& key,
-                                  const std::string& padding)
+                                  const containers::string& padding)
    {
    PK_Encryptor_EME encryptor(key, padding);
    PK_Decryptor_EME decryptor(key, padding);
@@ -42420,7 +42420,7 @@ bool encryption_consistency_check(RandomNumberGenerator& rng,
 */
 bool signature_consistency_check(RandomNumberGenerator& rng,
                                  const Private_Key& key,
-                                 const std::string& padding)
+                                 const containers::string& padding)
    {
    PK_Signer signer(key, padding);
    PK_Verifier verifier(key, padding);
@@ -42629,7 +42629,7 @@ namespace Botan {
 Public_Key* make_public_key(const AlgorithmIdentifier& alg_id,
                             const MemoryRegion<byte>& key_bits)
    {
-   const std::string alg_name = OIDS::lookup(alg_id.oid);
+   const containers::string alg_name = OIDS::lookup(alg_id.oid);
    if(alg_name == "")
       throw Decoding_Error("Unknown algorithm OID: " + alg_id.oid.as_string());
 
@@ -42685,7 +42685,7 @@ Private_Key* make_private_key(const AlgorithmIdentifier& alg_id,
                               const MemoryRegion<byte>& key_bits,
                               RandomNumberGenerator& rng)
    {
-   const std::string alg_name = OIDS::lookup(alg_id.oid);
+   const containers::string alg_name = OIDS::lookup(alg_id.oid);
    if(alg_name == "")
       throw Decoding_Error("Unknown algorithm OID: " + alg_id.oid.as_string());
 
@@ -42837,7 +42837,7 @@ SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
          key_data = PKCS8_extract(source, pbe_alg_id);
       else
          {
-         std::string label;
+         containers::string label;
          key_data = PEM_Code::decode(source, label);
          if(label == "PRIVATE KEY")
             is_encrypted = false;
@@ -42876,7 +42876,7 @@ SecureVector<byte> PKCS8_decode(DataSource& source, const User_Interface& ui,
             std::unique_ptr<PBE> pbe(get_pbe(pbe_alg_id.oid, params));
 
             User_Interface::UI_Result result = User_Interface::OK;
-            const std::string passphrase =
+            const containers::string passphrase =
                ui.get_passphrase("PKCS #8 private key", source.id(), result);
 
             if(result == User_Interface::CANCEL_ACTION)
@@ -42931,7 +42931,7 @@ SecureVector<byte> BER_encode(const Private_Key& key)
 /*
 * PEM encode a PKCS #8 private key, unencrypted
 */
-std::string PEM_encode(const Private_Key& key)
+containers::string PEM_encode(const Private_Key& key)
    {
    return PEM_Code::encode(PKCS8::BER_encode(key), "PRIVATE KEY");
    }
@@ -42941,10 +42941,10 @@ std::string PEM_encode(const Private_Key& key)
 */
 SecureVector<byte> BER_encode(const Private_Key& key,
                               RandomNumberGenerator& rng,
-                              const std::string& pass,
-                              const std::string& pbe_algo)
+                              const containers::string& pass,
+                              const containers::string& pbe_algo)
    {
-   const std::string DEFAULT_PBE = "PBE-PKCS5v20(SHA-1,AES-256/CBC)";
+   const containers::string DEFAULT_PBE = "PBE-PKCS5v20(SHA-1,AES-256/CBC)";
 
    std::unique_ptr<PBE> pbe(get_pbe(((pbe_algo != "") ? pbe_algo : DEFAULT_PBE)));
 
@@ -42967,10 +42967,10 @@ SecureVector<byte> BER_encode(const Private_Key& key,
 /*
 * PEM encode a PKCS #8 private key, encrypted
 */
-std::string PEM_encode(const Private_Key& key,
+containers::string PEM_encode(const Private_Key& key,
                        RandomNumberGenerator& rng,
-                       const std::string& pass,
-                       const std::string& pbe_algo)
+                       const containers::string& pass,
+                       const containers::string& pbe_algo)
    {
    if(pass == "")
       return PEM_encode(key);
@@ -42989,7 +42989,7 @@ Private_Key* load_key(DataSource& source,
    AlgorithmIdentifier alg_id;
    SecureVector<byte> pkcs8_key = PKCS8_decode(source, ui, alg_id);
 
-   const std::string alg_name = OIDS::lookup(alg_id.oid);
+   const containers::string alg_name = OIDS::lookup(alg_id.oid);
    if(alg_name == "" || alg_name == alg_id.oid.as_string())
       throw PKCS8_Exception("Unknown algorithm OID: " +
                             alg_id.oid.as_string());
@@ -43000,7 +43000,7 @@ Private_Key* load_key(DataSource& source,
 /*
 * Extract a private key and return it
 */
-Private_Key* load_key(const std::string& fsname,
+Private_Key* load_key(const containers::string& fsname,
                       RandomNumberGenerator& rng,
                       const User_Interface& ui)
    {
@@ -43013,7 +43013,7 @@ Private_Key* load_key(const std::string& fsname,
 */
 Private_Key* load_key(DataSource& source,
                       RandomNumberGenerator& rng,
-                      const std::string& pass)
+                      const containers::string& pass)
    {
    return PKCS8::load_key(source, rng, User_Interface(pass));
    }
@@ -43021,9 +43021,9 @@ Private_Key* load_key(DataSource& source,
 /*
 * Extract a private key and return it
 */
-Private_Key* load_key(const std::string& fsname,
+Private_Key* load_key(const containers::string& fsname,
                       RandomNumberGenerator& rng,
-                      const std::string& pass)
+                      const containers::string& pass)
    {
    return PKCS8::load_key(fsname, rng, User_Interface(pass));
    }
@@ -43056,7 +43056,7 @@ namespace Botan {
 * PK_Encryptor_EME Constructor
 */
 PK_Encryptor_EME::PK_Encryptor_EME(const Public_Key& key,
-                                   const std::string& eme_name)
+                                   const containers::string& eme_name)
    {
    Algorithm_Factory::Engine_Iterator i(global_state().algorithm_factory());
 
@@ -43116,7 +43116,7 @@ size_t PK_Encryptor_EME::maximum_input_size() const
 * PK_Decryptor_EME Constructor
 */
 PK_Decryptor_EME::PK_Decryptor_EME(const Private_Key& key,
-                                   const std::string& eme_name)
+                                   const containers::string& eme_name)
    {
    Algorithm_Factory::Engine_Iterator i(global_state().algorithm_factory());
 
@@ -43157,7 +43157,7 @@ SecureVector<byte> PK_Decryptor_EME::dec(const byte msg[],
 * PK_Signer Constructor
 */
 PK_Signer::PK_Signer(const Private_Key& key,
-                     const std::string& emsa_name,
+                     const containers::string& emsa_name,
                      Signature_Format format,
                      Fault_Protection prot)
    {
@@ -43259,7 +43259,7 @@ SecureVector<byte> PK_Signer::signature(RandomNumberGenerator& rng)
          throw Encoding_Error("PK_Signer: strange signature size found");
       const size_t SIZE_OF_PART = plain_sig.size() / op->message_parts();
 
-      std::vector<BigInt> sig_parts(op->message_parts());
+      containers::vector<BigInt> sig_parts(op->message_parts());
       for(size_t j = 0; j != sig_parts.size(); ++j)
          sig_parts[j].binary_decode(&plain_sig[SIZE_OF_PART*j], SIZE_OF_PART);
 
@@ -43278,7 +43278,7 @@ SecureVector<byte> PK_Signer::signature(RandomNumberGenerator& rng)
 * PK_Verifier Constructor
 */
 PK_Verifier::PK_Verifier(const Public_Key& key,
-                         const std::string& emsa_name,
+                         const containers::string& emsa_name,
                          Signature_Format format)
    {
    Algorithm_Factory::Engine_Iterator i(global_state().algorithm_factory());
@@ -43388,7 +43388,7 @@ bool PK_Verifier::validate_signature(const MemoryRegion<byte>& msg,
 * PK_Key_Agreement Constructor
 */
 PK_Key_Agreement::PK_Key_Agreement(const PK_Key_Agreement_Key& key,
-                                   const std::string& kdf_name)
+                                   const containers::string& kdf_name)
    {
    Algorithm_Factory::Engine_Iterator i(global_state().algorithm_factory());
 
@@ -43769,7 +43769,7 @@ MemoryVector<byte> BER_encode(const Public_Key& key)
 /*
 * PEM encode a X.509 public key
 */
-std::string PEM_encode(const Public_Key& key)
+containers::string PEM_encode(const Public_Key& key)
    {
    return PEM_Code::encode(X509::BER_encode(key),
                            "PUBLIC KEY");
@@ -43821,7 +43821,7 @@ Public_Key* load_key(DataSource& source)
 /*
 * Extract a public key and return it
 */
-Public_Key* load_key(const std::string& fsname)
+Public_Key* load_key(const containers::string& fsname)
    {
    DataSource_Stream source(fsname, true);
    return X509::load_key(source);
@@ -43851,7 +43851,7 @@ Public_Key* copy_key(const Public_Key& key)
 Key_Constraints find_constraints(const Public_Key& pub_key,
                                  Key_Constraints limits)
    {
-   const std::string name = pub_key.algo_name();
+   const containers::string name = pub_key.algo_name();
 
    size_t constraints = 0;
 
@@ -43890,7 +43890,7 @@ namespace {
 void hmac_prf(MessageAuthenticationCode* prf,
               MemoryRegion<byte>& K,
               u32bit& counter,
-              const std::string& label)
+              const containers::string& label)
    {
    prf->update(K);
    prf->update(label);
@@ -44035,7 +44035,7 @@ void HMAC_RNG::clear()
 /*
 * Return the name of this type
 */
-std::string HMAC_RNG::name() const
+containers::string HMAC_RNG::name() const
    {
    return "HMAC_RNG(" + extractor->name() + "," + prf->name() + ")";
    }
@@ -44259,7 +44259,7 @@ void Randpool::clear()
 /*
 * Return the name of this type
 */
-std::string Randpool::name() const
+containers::string Randpool::name() const
    {
    return "Randpool(" + cipher->name() + "," + mac->name() + ")";
    }
@@ -44283,8 +44283,8 @@ Randpool::Randpool(BlockCipher* cipher_in,
       !cipher->valid_keylength(OUTPUT_LENGTH) ||
       !mac->valid_keylength(OUTPUT_LENGTH))
       {
-      const std::string cipherName = cipher->name();
-      const std::string macName = mac->name();
+      const containers::string cipherName = cipher->name();
+      const containers::string macName = mac->name();
       delete cipher;
       delete mac;
       throw Internal_Error("Randpool: Invalid algorithm combination " +
@@ -44467,7 +44467,7 @@ void ANSI_X931_RNG::clear()
 /*
 * Return the name of this type
 */
-std::string ANSI_X931_RNG::name() const
+containers::string ANSI_X931_RNG::name() const
    {
    return "X9.31(" + cipher->name() + ")";
    }
@@ -44514,13 +44514,13 @@ namespace {
 * Perform a Known Answer Test
 */
 bool test_filter_kat(Filter* filter,
-                     const std::string& input,
-                     const std::string& expected_output)
+                     const containers::string& input,
+                     const containers::string& expected_output)
    {
    Pipe pipe(new Hex_Decoder, filter, new Hex_Encoder);
    pipe.process_msg(input);
 
-   const std::string output = pipe.read_all_as_string();
+   const containers::string output = pipe.read_all_as_string();
 
    return (output == expected_output);
    }
@@ -44530,28 +44530,28 @@ bool test_filter_kat(Filter* filter,
 /*
 * Run a set of KATs
 */
-std::map<std::string, bool>
+containers::map<containers::string, bool>
 algorithm_kat(const SCAN_Name& algo_name,
-              const std::map<std::string, std::string>& vars,
+              const containers::map<containers::string, containers::string>& vars,
               Algorithm_Factory& af)
    {
-   const std::string& algo = algo_name.algo_name_and_args();
+   const containers::string& algo = algo_name.algo_name_and_args();
 
-   std::vector<std::string> providers = af.providers_of(algo);
-   std::map<std::string, bool> all_results;
+   containers::vector<containers::string> providers = af.providers_of(algo);
+   containers::map<containers::string, bool> all_results;
 
    if(providers.empty()) // no providers, nothing to do
       return all_results;
 
-   const std::string input = search_map(vars, std::string("input"));
-   const std::string output = search_map(vars, std::string("output"));
+   const containers::string input = search_map(vars, containers::string("input"));
+   const containers::string output = search_map(vars, containers::string("output"));
 
-   SymmetricKey key(search_map(vars, std::string("key")));
-   InitializationVector iv(search_map(vars, std::string("iv")));
+   SymmetricKey key(search_map(vars, containers::string("key")));
+   InitializationVector iv(search_map(vars, containers::string("iv")));
 
    for(size_t i = 0; i != providers.size(); ++i)
       {
-      const std::string provider = providers[i];
+      const containers::string provider = providers[i];
 
       if(const HashFunction* proto =
             af.prototype_hash_function(algo, provider))
@@ -44618,10 +44618,10 @@ algorithm_kat(const SCAN_Name& algo_name,
 
 namespace {
 
-void verify_results(const std::string& algo,
-                    const std::map<std::string, bool>& results)
+void verify_results(const containers::string& algo,
+                    const containers::map<containers::string, bool>& results)
    {
-   for(std::map<std::string, bool>::const_iterator i = results.begin();
+   for(containers::map<containers::string, bool>::const_iterator i = results.begin();
        i != results.end(); ++i)
       {
       if(!i->second)
@@ -44631,11 +44631,11 @@ void verify_results(const std::string& algo,
    }
 
 void hash_test(Algorithm_Factory& af,
-               const std::string& name,
-               const std::string& in,
-               const std::string& out)
+               const containers::string& name,
+               const containers::string& in,
+               const containers::string& out)
    {
-   std::map<std::string, std::string> vars;
+   containers::map<containers::string, containers::string> vars;
    vars["input"] = in;
    vars["output"] = out;
 
@@ -44643,12 +44643,12 @@ void hash_test(Algorithm_Factory& af,
    }
 
 void mac_test(Algorithm_Factory& af,
-              const std::string& name,
-              const std::string& in,
-              const std::string& out,
-              const std::string& key)
+              const containers::string& name,
+              const containers::string& in,
+              const containers::string& out,
+              const containers::string& key)
    {
-   std::map<std::string, std::string> vars;
+   containers::map<containers::string, containers::string> vars;
    vars["input"] = in;
    vars["output"] = out;
    vars["key"] = key;
@@ -44660,25 +44660,25 @@ void mac_test(Algorithm_Factory& af,
 * Perform a KAT for a cipher
 */
 void cipher_kat(Algorithm_Factory& af,
-                const std::string& algo,
-                const std::string& key_str,
-                const std::string& iv_str,
-                const std::string& in,
-                const std::string& ecb_out,
-                const std::string& cbc_out,
-                const std::string& cfb_out,
-                const std::string& ofb_out,
-                const std::string& ctr_out)
+                const containers::string& algo,
+                const containers::string& key_str,
+                const containers::string& iv_str,
+                const containers::string& in,
+                const containers::string& ecb_out,
+                const containers::string& cbc_out,
+                const containers::string& cfb_out,
+                const containers::string& ofb_out,
+                const containers::string& ctr_out)
    {
    SymmetricKey key(key_str);
    InitializationVector iv(iv_str);
 
-   std::map<std::string, std::string> vars;
+   containers::map<containers::string, containers::string> vars;
    vars["key"] = key_str;
    vars["iv"] = iv_str;
    vars["input"] = in;
 
-   std::map<std::string, bool> results;
+   containers::map<containers::string, bool> results;
 
    vars["output"] = ecb_out;
    verify_results(algo + "/ECB", algorithm_kat(algo + "/ECB", vars, af));
@@ -44877,7 +44877,7 @@ void ARC4::key_schedule(const byte key[], size_t length)
 /*
 * Return the name of this type
 */
-std::string ARC4::name() const
+containers::string ARC4::name() const
    {
    if(SKIP == 0)   return "ARC4";
    if(SKIP == 256) return "MARK-4";
@@ -44960,7 +44960,7 @@ void CTR_BE::key_schedule(const byte key[], size_t key_len)
 /*
 * Return the name of this type
 */
-std::string CTR_BE::name() const
+containers::string CTR_BE::name() const
    {
    return ("CTR-BE(" + permutation->name() + ")");
    }
@@ -45089,7 +45089,7 @@ void OFB::key_schedule(const byte key[], size_t key_len)
 /*
 * Return the name of this type
 */
-std::string OFB::name() const
+containers::string OFB::name() const
    {
    return ("OFB(" + permutation->name() + ")");
    }
@@ -45348,7 +45348,7 @@ void Salsa20::set_iv(const byte iv[], size_t length)
 /*
 * Return the name of this type
 */
-std::string Salsa20::name() const
+containers::string Salsa20::name() const
    {
    return "Salsa20";
    }
@@ -45954,7 +45954,7 @@ void assertion_failure(const char* expr_str,
                        const char* file,
                        int line)
    {
-   std::ostringstream format;
+   containers::ostringstream format;
 
    format << "Assertion " << expr_str << " failed ";
 
@@ -45988,12 +45988,12 @@ namespace {
 /*
 * Convert from UCS-2 to ISO 8859-1
 */
-std::string ucs2_to_latin1(const std::string& ucs2)
+containers::string ucs2_to_latin1(const containers::string& ucs2)
    {
    if(ucs2.size() % 2 == 1)
       throw Decoding_Error("UCS-2 string has an odd number of bytes");
 
-   std::string latin1;
+   containers::string latin1;
 
    for(size_t i = 0; i != ucs2.size(); i += 2)
       {
@@ -46012,9 +46012,9 @@ std::string ucs2_to_latin1(const std::string& ucs2)
 /*
 * Convert from UTF-8 to ISO 8859-1
 */
-std::string utf8_to_latin1(const std::string& utf8)
+containers::string utf8_to_latin1(const containers::string& utf8)
    {
-   std::string iso8859;
+   containers::string iso8859;
 
    size_t position = 0;
    while(position != utf8.size())
@@ -46046,9 +46046,9 @@ std::string utf8_to_latin1(const std::string& utf8)
 /*
 * Convert from ISO 8859-1 to UTF-8
 */
-std::string latin1_to_utf8(const std::string& iso8859)
+containers::string latin1_to_utf8(const containers::string& iso8859)
    {
-   std::string utf8;
+   containers::string utf8;
    for(size_t i = 0; i != iso8859.size(); ++i)
       {
       const byte c = static_cast<byte>(iso8859[i]);
@@ -46069,7 +46069,7 @@ std::string latin1_to_utf8(const std::string& iso8859)
 /*
 * Perform character set transcoding
 */
-std::string transcode(const std::string& str,
+containers::string transcode(const containers::string& str,
                       Character_Set to, Character_Set from)
    {
    if(to == LOCAL_CHARSET)
@@ -46393,9 +46393,9 @@ namespace Botan {
 /*
 * Default Matcher transform operation (identity)
 */
-std::pair<std::string, std::string>
-Data_Store::Matcher::transform(const std::string& key,
-                               const std::string& value) const
+std::pair<containers::string, containers::string>
+Data_Store::Matcher::transform(const containers::string& key,
+                               const containers::string& value) const
    {
    return std::make_pair(key, value);
    }
@@ -46411,7 +46411,7 @@ bool Data_Store::operator==(const Data_Store& other) const
 /*
 * Check if this key has at least one value
 */
-bool Data_Store::has_value(const std::string& key) const
+bool Data_Store::has_value(const containers::string& key) const
    {
    return (contents.lower_bound(key) != contents.end());
    }
@@ -46419,19 +46419,19 @@ bool Data_Store::has_value(const std::string& key) const
 /*
 * Search based on an arbitrary predicate
 */
-std::multimap<std::string, std::string>
+containers::multimap<containers::string, containers::string>
 Data_Store::search_with(const Matcher& matcher) const
    {
-   std::multimap<std::string, std::string> out;
+   containers::multimap<containers::string, containers::string> out;
 
-   std::multimap<std::string, std::string>::const_iterator i =
+   containers::multimap<containers::string, containers::string>::const_iterator i =
       contents.begin();
 
    while(i != contents.end())
       {
       if(matcher(i->first, i->second))
          {
-         std::pair<std::string, std::string> p(
+         std::pair<containers::string, containers::string> p(
             matcher.transform(i->first, i->second));
 
          multimap_insert(out, p.first, p.second);
@@ -46446,13 +46446,13 @@ Data_Store::search_with(const Matcher& matcher) const
 /*
 * Search based on key equality
 */
-std::vector<std::string> Data_Store::get(const std::string& looking_for) const
+containers::vector<containers::string> Data_Store::get(const containers::string& looking_for) const
    {
-   typedef std::multimap<std::string, std::string>::const_iterator iter;
+   typedef containers::multimap<containers::string, containers::string>::const_iterator iter;
 
    std::pair<iter, iter> range = contents.equal_range(looking_for);
 
-   std::vector<std::string> out;
+   containers::vector<containers::string> out;
    for(iter i = range.first; i != range.second; ++i)
       out.push_back(i->second);
    return out;
@@ -46461,9 +46461,9 @@ std::vector<std::string> Data_Store::get(const std::string& looking_for) const
 /*
 * Get a single atom
 */
-std::string Data_Store::get1(const std::string& key) const
+containers::string Data_Store::get1(const containers::string& key) const
    {
-   std::vector<std::string> vals = get(key);
+   containers::vector<containers::string> vals = get(key);
 
    if(vals.empty())
       throw Invalid_State("Data_Store::get1: Not values for " + key);
@@ -46477,9 +46477,9 @@ std::string Data_Store::get1(const std::string& key) const
 * Get a single MemoryVector atom
 */
 MemoryVector<byte>
-Data_Store::get1_memvec(const std::string& key) const
+Data_Store::get1_memvec(const containers::string& key) const
    {
-   std::vector<std::string> vals = get(key);
+   containers::vector<containers::string> vals = get(key);
 
    if(vals.empty())
       return MemoryVector<byte>();
@@ -46494,10 +46494,10 @@ Data_Store::get1_memvec(const std::string& key) const
 /*
 * Get a single u32bit atom
 */
-u32bit Data_Store::get1_u32bit(const std::string& key,
+u32bit Data_Store::get1_u32bit(const containers::string& key,
                                u32bit default_val) const
    {
-   std::vector<std::string> vals = get(key);
+   containers::vector<containers::string> vals = get(key);
 
    if(vals.empty())
       return default_val;
@@ -46511,7 +46511,7 @@ u32bit Data_Store::get1_u32bit(const std::string& key,
 /*
 * Insert a single key and value
 */
-void Data_Store::add(const std::string& key, const std::string& val)
+void Data_Store::add(const containers::string& key, const containers::string& val)
    {
    multimap_insert(contents, key, val);
    }
@@ -46519,7 +46519,7 @@ void Data_Store::add(const std::string& key, const std::string& val)
 /*
 * Insert a single key and value
 */
-void Data_Store::add(const std::string& key, u32bit val)
+void Data_Store::add(const containers::string& key, u32bit val)
    {
    add(key, to_string(val));
    }
@@ -46527,7 +46527,7 @@ void Data_Store::add(const std::string& key, u32bit val)
 /*
 * Insert a single key and value
 */
-void Data_Store::add(const std::string& key, const MemoryRegion<byte>& val)
+void Data_Store::add(const containers::string& key, const MemoryRegion<byte>& val)
    {
    add(key, hex_encode(&val[0], val.size()));
    }
@@ -46535,9 +46535,9 @@ void Data_Store::add(const std::string& key, const MemoryRegion<byte>& val)
 /*
 * Insert a mapping of key/value pairs
 */
-void Data_Store::add(const std::multimap<std::string, std::string>& in)
+void Data_Store::add(const containers::multimap<containers::string, containers::string>& in)
    {
-   std::multimap<std::string, std::string>::const_iterator i = in.begin();
+   containers::multimap<containers::string, containers::string>::const_iterator i = in.begin();
    while(i != in.end())
       {
       contents.insert(*i);
@@ -46565,17 +46565,17 @@ namespace Botan {
 
 namespace {
 
-void raise_runtime_loader_exception(const std::string& lib_name,
+void raise_runtime_loader_exception(const containers::string& lib_name,
                                     const char* msg)
    {
-   throw std::runtime_error("Failed to load " + lib_name + ": " +
+   throw Exception("Failed to load " + lib_name + ": " +
                             (msg ? msg : "Unknown error"));
    }
 
 }
 
 Dynamically_Loaded_Library::Dynamically_Loaded_Library(
-   const std::string& library) :
+   const containers::string& library) :
    lib_name(library), lib(0)
    {
 #if defined(BOTAN_TARGET_OS_HAS_DLOPEN)
@@ -46604,7 +46604,7 @@ Dynamically_Loaded_Library::~Dynamically_Loaded_Library()
 #endif
    }
 
-void* Dynamically_Loaded_Library::resolve_symbol(const std::string& symbol)
+void* Dynamically_Loaded_Library::resolve_symbol(const containers::string& symbol)
    {
    void* addr = 0;
 
@@ -46616,7 +46616,7 @@ void* Dynamically_Loaded_Library::resolve_symbol(const std::string& symbol)
 #endif
 
    if(!addr)
-      throw std::runtime_error("Failed to resolve symbol " + symbol +
+      throw Exception("Failed to resolve symbol " + symbol +
                                " in " + lib_name);
 
    return addr;
@@ -46693,11 +46693,11 @@ namespace Botan {
 /*
 * Convert a string into an integer
 */
-u32bit to_u32bit(const std::string& number)
+u32bit to_u32bit(const containers::string& number)
    {
    u32bit n = 0;
 
-   for(std::string::const_iterator i = number.begin(); i != number.end(); ++i)
+   for(containers::string::const_iterator i = number.begin(); i != number.end(); ++i)
       {
       const u32bit OVERFLOW_MARK = 0xFFFFFFFF / 10;
 
@@ -46717,9 +46717,9 @@ u32bit to_u32bit(const std::string& number)
 /*
 * Convert an integer into a string
 */
-std::string to_string(u64bit n, size_t min_len)
+containers::string to_string(u64bit n, size_t min_len)
    {
-   std::string lenstr;
+   containers::string lenstr;
    if(n)
       {
       while(n > 0)
@@ -46740,13 +46740,13 @@ std::string to_string(u64bit n, size_t min_len)
 /*
 * Convert a string into a time duration
 */
-u32bit timespec_to_u32bit(const std::string& timespec)
+u32bit timespec_to_u32bit(const containers::string& timespec)
    {
    if(timespec == "")
       return 0;
 
    const char suffix = timespec[timespec.size()-1];
-   std::string value = timespec.substr(0, timespec.size()-1);
+   containers::string value = timespec.substr(0, timespec.size()-1);
 
    u32bit scale = 1;
 
@@ -46771,20 +46771,20 @@ u32bit timespec_to_u32bit(const std::string& timespec)
 /*
 * Parse a SCAN-style algorithm name
 */
-std::vector<std::string> parse_algorithm_name(const std::string& namex)
+containers::vector<containers::string> parse_algorithm_name(const containers::string& namex)
    {
-   if(namex.find('(') == std::string::npos &&
-      namex.find(')') == std::string::npos)
-      return std::vector<std::string>(1, namex);
+   if(namex.find('(') == containers::string::npos &&
+      namex.find(')') == containers::string::npos)
+      return containers::vector<containers::string>(1, namex);
 
-   std::string name = namex, substring;
-   std::vector<std::string> elems;
+   containers::string name = namex, substring;
+   containers::vector<containers::string> elems;
    size_t level = 0;
 
    elems.push_back(name.substr(0, name.find('(')));
    name = name.substr(name.find('('));
 
-   for(std::string::const_iterator i = name.begin(); i != name.end(); ++i)
+   for(containers::string::const_iterator i = name.begin(); i != name.end(); ++i)
       {
       char c = *i;
 
@@ -46827,13 +46827,13 @@ std::vector<std::string> parse_algorithm_name(const std::string& namex)
 /*
 * Split the string on slashes
 */
-std::vector<std::string> split_on(const std::string& str, char delim)
+containers::vector<containers::string> split_on(const containers::string& str, char delim)
    {
-   std::vector<std::string> elems;
+   containers::vector<containers::string> elems;
    if(str == "") return elems;
 
-   std::string substr;
-   for(std::string::const_iterator i = str.begin(); i != str.end(); ++i)
+   containers::string substr;
+   for(containers::string::const_iterator i = str.begin(); i != str.end(); ++i)
       {
       if(*i == delim)
          {
@@ -46855,12 +46855,12 @@ std::vector<std::string> split_on(const std::string& str, char delim)
 /*
 * Parse an ASN.1 OID string
 */
-std::vector<u32bit> parse_asn1_oid(const std::string& oid)
+containers::vector<u32bit> parse_asn1_oid(const containers::string& oid)
    {
-   std::string substring;
-   std::vector<u32bit> oid_elems;
+   containers::string substring;
+   containers::vector<u32bit> oid_elems;
 
-   for(std::string::const_iterator i = oid.begin(); i != oid.end(); ++i)
+   for(containers::string::const_iterator i = oid.begin(); i != oid.end(); ++i)
       {
       char c = *i;
 
@@ -46888,10 +46888,10 @@ std::vector<u32bit> parse_asn1_oid(const std::string& oid)
 /*
 * X.500 String Comparison
 */
-bool x500_name_cmp(const std::string& name1, const std::string& name2)
+bool x500_name_cmp(const containers::string& name1, const containers::string& name2)
    {
-   std::string::const_iterator p1 = name1.begin();
-   std::string::const_iterator p2 = name2.begin();
+   containers::string::const_iterator p1 = name1.begin();
+   containers::string::const_iterator p2 = name2.begin();
 
    while((p1 != name1.end()) && Charset::is_space(*p1)) ++p1;
    while((p2 != name2.end()) && Charset::is_space(*p2)) ++p2;
@@ -46927,9 +46927,9 @@ bool x500_name_cmp(const std::string& name1, const std::string& name2)
 /*
 * Convert a decimal-dotted string to binary IP
 */
-u32bit string_to_ipv4(const std::string& str)
+u32bit string_to_ipv4(const containers::string& str)
    {
-   std::vector<std::string> parts = split_on(str, '.');
+   containers::vector<containers::string> parts = split_on(str, '.');
 
    if(parts.size() != 4)
       throw Decoding_Error("Invalid IP string " + str);
@@ -46952,9 +46952,9 @@ u32bit string_to_ipv4(const std::string& str)
 /*
 * Convert an IP address to decimal-dotted string
 */
-std::string ipv4_to_string(u32bit ip)
+containers::string ipv4_to_string(u32bit ip)
    {
-   std::string str;
+   containers::string str;
 
    for(size_t i = 0; i != sizeof(ip); ++i)
       {
@@ -47103,8 +47103,8 @@ namespace Botan {
 /*
 * Get a passphrase from the user
 */
-std::string User_Interface::get_passphrase(const std::string&,
-                                           const std::string&,
+containers::string User_Interface::get_passphrase(const containers::string&,
+                                           const containers::string&,
                                            UI_Result& action) const
    {
    action = OK;
@@ -47118,7 +47118,7 @@ std::string User_Interface::get_passphrase(const std::string&,
 /*
 * User_Interface Constructor
 */
-User_Interface::User_Interface(const std::string& preset) :
+User_Interface::User_Interface(const containers::string& preset) :
    preset_passphrase(preset)
    {
    first_try = true;
@@ -47145,9 +47145,9 @@ namespace Botan {
 /*
 * Return the version as a string
 */
-std::string version_string()
+containers::string version_string()
    {
-   std::ostringstream out;
+   containers::ostringstream out;
 
    out << "Botan " << version_major() << "."
        << version_minor() << "."

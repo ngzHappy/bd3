@@ -30,6 +30,7 @@
 
 #include "../config/config.hpp"
 #include "../containers/containers.hpp"
+//containers
 
 #include <iosfwd>
 #include <map>
@@ -387,7 +388,7 @@ class BOTAN_DLL Allocator
       /**
       * @return name of this allocator type
       */
-      virtual std::string type() const = 0;
+      virtual containers::string type() const = 0;
 
       /**
       * Initialize the allocator
@@ -942,11 +943,11 @@ class BOTAN_DLL Buffered_Computation
 
       /**
       * Add new input to process.
-      * @param str the input to process as a std::string. Will be interpreted
+      * @param str the input to process as a containers::string. Will be interpreted
       * as a byte array based on
       * the strings encoding.
       */
-      void update(const std::string& str)
+      void update(const containers::string& str)
          {
          add_data(reinterpret_cast<const byte*>(str.data()), str.size());
          }
@@ -1008,7 +1009,7 @@ class BOTAN_DLL Buffered_Computation
       * @param in the input to process as a string
       * @result the result of the call to final()
       */
-      SecureVector<byte> process(const std::string& in)
+      SecureVector<byte> process(const containers::string& in)
          {
          update(in);
          return final();
@@ -1147,7 +1148,7 @@ class BOTAN_DLL EntropySource
       /**
       * @return name identifying this entropy source
       */
-      virtual std::string name() const = 0;
+      virtual containers::string name() const = 0;
 
       /**
       * Perform an entropy gathering poll
@@ -1168,8 +1169,8 @@ namespace Botan {
 * @param scan_name the name
 * @return the name components
 */
-BOTAN_DLL std::vector<std::string>
-parse_algorithm_name(const std::string& scan_name);
+BOTAN_DLL containers::vector<containers::string>
+parse_algorithm_name(const containers::string& scan_name);
 
 /**
 * Split a string
@@ -1177,15 +1178,15 @@ parse_algorithm_name(const std::string& scan_name);
 * @param delim the delimitor
 * @return string split by delim
 */
-BOTAN_DLL std::vector<std::string> split_on(
-   const std::string& str, char delim);
+BOTAN_DLL containers::vector<containers::string> split_on(
+   const containers::string& str, char delim);
 
 /**
 * Parse an ASN.1 OID
 * @param oid the OID in string form
 * @return OID components
 */
-BOTAN_DLL std::vector<u32bit> parse_asn1_oid(const std::string& oid);
+BOTAN_DLL containers::vector<u32bit> parse_asn1_oid(const containers::string& oid);
 
 /**
 * Compare two names using the X.509 comparison algorithm
@@ -1193,8 +1194,8 @@ BOTAN_DLL std::vector<u32bit> parse_asn1_oid(const std::string& oid);
 * @param name2 the second name
 * @return true if name1 is the same as name2 by the X.509 comparison rules
 */
-BOTAN_DLL bool x500_name_cmp(const std::string& name1,
-                             const std::string& name2);
+BOTAN_DLL bool x500_name_cmp(const containers::string& name1,
+                             const containers::string& name2);
 
 /**
 * Convert a number to a string
@@ -1202,50 +1203,75 @@ BOTAN_DLL bool x500_name_cmp(const std::string& name1,
 * @param min_len the min length of the output string
 * @return n convert to a string
 */
-BOTAN_DLL std::string to_string(u64bit n, size_t min_len = 0);
+BOTAN_DLL containers::string to_string(u64bit n, size_t min_len = 0);
 
 /**
 * Convert a string to a number
 * @param str the string to convert
 * @return number value of the string
 */
-BOTAN_DLL u32bit to_u32bit(const std::string& str);
+BOTAN_DLL u32bit to_u32bit(const containers::string& str);
 
 /**
 * Convert a time specification to a number
 * @param timespec the time specification
 * @return number of seconds represented by timespec
 */
-BOTAN_DLL u32bit timespec_to_u32bit(const std::string& timespec);
+BOTAN_DLL u32bit timespec_to_u32bit(const containers::string& timespec);
 
 /**
 * Convert a string representation of an IPv4 address to a number
 * @param ip_str the string representation
 * @return integer IPv4 address
 */
-BOTAN_DLL u32bit string_to_ipv4(const std::string& ip_str);
+BOTAN_DLL u32bit string_to_ipv4(const containers::string& ip_str);
 
 /**
 * Convert an IPv4 address to a string
 * @param ip_addr the IPv4 address to convert
 * @return string representation of the IPv4 address
 */
-BOTAN_DLL std::string ipv4_to_string(u32bit ip_addr);
+BOTAN_DLL containers::string ipv4_to_string(u32bit ip_addr);
 
 }
 
+#include "botan_exception.hpp"
 
 namespace Botan {
 
-typedef std::runtime_error Exception;
-typedef std::invalid_argument Invalid_Argument;
+class BOTAN_DLL Exception : public std::runtime_error {
+    using _Super=std::runtime_error;
+    std::shared_ptr<void> _pm_data;
+public:
+    using _Super::_Super;
+    Exception();
+    Exception(const containers::string &);
+    Exception(containers::string &&);
+    const char *what()const override;
+};
+
+class BOTAN_DLL Invalid_Argument : public std::invalid_argument{
+    using _Super=std::invalid_argument;
+    std::shared_ptr<void> _pm_data;
+public:
+    using _Super::_Super;
+    Invalid_Argument();
+    Invalid_Argument(const containers::string &);
+    Invalid_Argument(containers::string &&);
+    const char *what()const override;
+};
+
+
+}/*namespace Botan*/
+
+namespace Botan {
 
 /**
 * Invalid_State Exception
 */
 struct BOTAN_DLL Invalid_State : public Exception
    {
-   Invalid_State(const std::string& err) :
+   Invalid_State(const containers::string& err) :
       Exception(err)
       {}
    };
@@ -1255,7 +1281,7 @@ struct BOTAN_DLL Invalid_State : public Exception
 */
 struct BOTAN_DLL Lookup_Error : public Exception
    {
-   Lookup_Error(const std::string& err) :
+   Lookup_Error(const containers::string& err) :
       Exception(err)
       {}
    };
@@ -1265,7 +1291,7 @@ struct BOTAN_DLL Lookup_Error : public Exception
 */
 struct BOTAN_DLL Internal_Error : public Exception
    {
-   Internal_Error(const std::string& err) :
+   Internal_Error(const containers::string& err) :
       Exception("Internal error: " + err)
       {}
    };
@@ -1275,7 +1301,7 @@ struct BOTAN_DLL Internal_Error : public Exception
 */
 struct BOTAN_DLL Invalid_Key_Length : public Invalid_Argument
    {
-   Invalid_Key_Length(const std::string& name, size_t length) :
+   Invalid_Key_Length(const containers::string& name, size_t length) :
       Invalid_Argument(name + " cannot accept a key of length " +
                        to_string(length))
       {}
@@ -1286,8 +1312,8 @@ struct BOTAN_DLL Invalid_Key_Length : public Invalid_Argument
 */
 struct BOTAN_DLL Invalid_Block_Size : public Invalid_Argument
    {
-   Invalid_Block_Size(const std::string& mode,
-                      const std::string& pad) :
+   Invalid_Block_Size(const containers::string& mode,
+                      const containers::string& pad) :
       Invalid_Argument("Padding method " + pad +
                        " cannot be used with " + mode)
       {}
@@ -1298,7 +1324,7 @@ struct BOTAN_DLL Invalid_Block_Size : public Invalid_Argument
 */
 struct BOTAN_DLL Invalid_IV_Length : public Invalid_Argument
    {
-   Invalid_IV_Length(const std::string& mode, size_t bad_len) :
+   Invalid_IV_Length(const containers::string& mode, size_t bad_len) :
       Invalid_Argument("IV length " + to_string(bad_len) +
                        " is invalid for " + mode)
       {}
@@ -1309,7 +1335,7 @@ struct BOTAN_DLL Invalid_IV_Length : public Invalid_Argument
 */
 struct BOTAN_DLL PRNG_Unseeded : public Invalid_State
    {
-   PRNG_Unseeded(const std::string& algo) :
+   PRNG_Unseeded(const containers::string& algo) :
       Invalid_State("PRNG not seeded: " + algo)
       {}
    };
@@ -1319,7 +1345,7 @@ struct BOTAN_DLL PRNG_Unseeded : public Invalid_State
 */
 struct BOTAN_DLL Policy_Violation : public Invalid_State
    {
-   Policy_Violation(const std::string& err) :
+   Policy_Violation(const containers::string& err) :
       Invalid_State("Policy violation: " + err)
       {}
    };
@@ -1329,7 +1355,7 @@ struct BOTAN_DLL Policy_Violation : public Invalid_State
 */
 struct BOTAN_DLL Algorithm_Not_Found : public Lookup_Error
    {
-   Algorithm_Not_Found(const std::string& name) :
+   Algorithm_Not_Found(const containers::string& name) :
       Lookup_Error("Could not find any algorithm named \"" + name + "\"")
       {}
    };
@@ -1339,7 +1365,7 @@ struct BOTAN_DLL Algorithm_Not_Found : public Lookup_Error
 */
 struct BOTAN_DLL Invalid_Algorithm_Name : public Invalid_Argument
    {
-   Invalid_Algorithm_Name(const std::string& name):
+   Invalid_Algorithm_Name(const containers::string& name):
       Invalid_Argument("Invalid algorithm name: " + name)
       {}
    };
@@ -1349,7 +1375,7 @@ struct BOTAN_DLL Invalid_Algorithm_Name : public Invalid_Argument
 */
 struct BOTAN_DLL Encoding_Error : public Invalid_Argument
    {
-   Encoding_Error(const std::string& name) :
+   Encoding_Error(const containers::string& name) :
       Invalid_Argument("Encoding error: " + name) {}
    };
 
@@ -1358,7 +1384,7 @@ struct BOTAN_DLL Encoding_Error : public Invalid_Argument
 */
 struct BOTAN_DLL Decoding_Error : public Invalid_Argument
    {
-   Decoding_Error(const std::string& name) :
+   Decoding_Error(const containers::string& name) :
       Invalid_Argument("Decoding error: " + name) {}
    };
 
@@ -1367,7 +1393,7 @@ struct BOTAN_DLL Decoding_Error : public Invalid_Argument
 */
 struct BOTAN_DLL Integrity_Failure : public Exception
    {
-   Integrity_Failure(const std::string& msg) :
+   Integrity_Failure(const containers::string& msg) :
       Exception("Integrity failure: " + msg) {}
    };
 
@@ -1376,7 +1402,7 @@ struct BOTAN_DLL Integrity_Failure : public Exception
 */
 struct BOTAN_DLL Invalid_OID : public Decoding_Error
    {
-   Invalid_OID(const std::string& oid) :
+   Invalid_OID(const containers::string& oid) :
       Decoding_Error("Invalid ASN.1 OID: " + oid) {}
    };
 
@@ -1385,7 +1411,7 @@ struct BOTAN_DLL Invalid_OID : public Decoding_Error
 */
 struct BOTAN_DLL Stream_IO_Error : public Exception
    {
-   Stream_IO_Error(const std::string& err) :
+   Stream_IO_Error(const containers::string& err) :
       Exception("I/O error: " + err)
       {}
    };
@@ -1395,7 +1421,7 @@ struct BOTAN_DLL Stream_IO_Error : public Exception
 */
 struct BOTAN_DLL Self_Test_Failure : public Internal_Error
    {
-   Self_Test_Failure(const std::string& err) :
+   Self_Test_Failure(const containers::string& err) :
       Internal_Error("Self test failed: " + err)
       {}
    };
@@ -1464,7 +1490,7 @@ class BOTAN_DLL RandomNumberGenerator
       /**
       * Return the name of this object
       */
-      virtual std::string name() const = 0;
+      virtual containers::string name() const = 0;
 
       /**
       * Seed this RNG using the entropy sources it contains.
@@ -1502,7 +1528,7 @@ class BOTAN_DLL Null_RNG : public RandomNumberGenerator
    public:
       void randomize(byte[], size_t) { throw PRNG_Unseeded("Null_RNG"); }
       void clear() {}
-      std::string name() const { return "Null_RNG"; }
+      containers::string name() const { return "Null_RNG"; }
 
       void reseed(size_t) {}
       bool is_seeded() const { return false; }
@@ -1577,7 +1603,7 @@ class BOTAN_DLL Algorithm
       /**
       * @return name of this algorithm
       */
-      virtual std::string name() const = 0;
+      virtual containers::string name() const = 0;
 
       Algorithm() {}
       virtual ~Algorithm() {}
@@ -1666,7 +1692,7 @@ class BOTAN_DLL Keccak_1600 : public HashFunction
       size_t output_length() const { return output_bits / 8; }
 
       HashFunction* clone() const;
-      std::string name() const;
+      containers::string name() const;
       void clear();
    private:
       void add_data(const byte input[], size_t length);
@@ -1692,22 +1718,22 @@ class BOTAN_DLL SCAN_Name
       /**
       * @param algo_spec A SCAN-format name
       */
-      SCAN_Name(std::string algo_spec);
+      SCAN_Name(containers::string algo_spec);
 
       /**
       * @return original input string
       */
-      std::string as_string() const { return orig_algo_spec; }
+      containers::string as_string() const { return orig_algo_spec; }
 
       /**
       * @return algorithm name
       */
-      std::string algo_name() const { return alg_name; }
+      containers::string algo_name() const { return alg_name; }
 
       /**
       * @return algorithm name plus any arguments
       */
-      std::string algo_name_and_args() const;
+      containers::string algo_name_and_args() const;
 
       /**
       * @return number of arguments
@@ -1726,14 +1752,14 @@ class BOTAN_DLL SCAN_Name
       * @param i which argument
       * @return ith argument
       */
-      std::string arg(size_t i) const;
+      containers::string arg(size_t i) const;
 
       /**
       * @param i which argument
       * @param def_value the default value
       * @return ith argument or the default value
       */
-      std::string arg(size_t i, const std::string& def_value) const;
+      containers::string arg(size_t i, const containers::string& def_value) const;
 
       /**
       * @param i which argument
@@ -1745,20 +1771,20 @@ class BOTAN_DLL SCAN_Name
       /**
       * @return cipher mode (if any)
       */
-      std::string cipher_mode() const
+      containers::string cipher_mode() const
          { return (mode_info.size() >= 1) ? mode_info[0] : ""; }
 
       /**
       * @return cipher mode padding (if any)
       */
-      std::string cipher_mode_pad() const
+      containers::string cipher_mode_pad() const
          { return (mode_info.size() >= 2) ? mode_info[1] : ""; }
 
    private:
-      std::string orig_algo_spec;
-      std::string alg_name;
-      std::vector<std::string> args;
-      std::vector<std::string> mode_info;
+      containers::string orig_algo_spec;
+      containers::string alg_name;
+      containers::vector<containers::string> args;
+      containers::vector<containers::string> mode_info;
    };
 
 }
@@ -1871,7 +1897,7 @@ class BOTAN_DLL OctetString
       /**
       * @return this encoded as hex
       */
-      std::string as_string() const;
+      containers::string as_string() const;
 
       /**
       * XOR the contents of another octet string into this one
@@ -1889,7 +1915,7 @@ class BOTAN_DLL OctetString
       * Change the contents of this octet string
       * @param hex_string a hex encoded bytestring
       */
-      void change(const std::string& hex_string);
+      void change(const containers::string& hex_string);
 
       /**
       * Change the contents of this octet string
@@ -1915,7 +1941,7 @@ class BOTAN_DLL OctetString
       * Create a new OctetString
       * @param str is a hex encoded string
       */
-      OctetString(const std::string& str = "") { change(str); }
+      OctetString(const containers::string& str = "") { change(str); }
 
       /**
       * Create a new OctetString
@@ -2236,7 +2262,7 @@ class BOTAN_DLL MessageAuthenticationCode : public Buffered_Computation,
       * Get the name of this algorithm.
       * @return name of this algorithm
       */
-      virtual std::string name() const = 0;
+      virtual containers::string name() const = 0;
    };
 
 }
@@ -2269,7 +2295,7 @@ class BOTAN_DLL PBKDF : public Algorithm
       * @param iterations the number of iterations to use (use 10K or more)
       */
       virtual OctetString derive_key(size_t output_len,
-                                     const std::string& passphrase,
+                                     const containers::string& passphrase,
                                      const byte salt[], size_t salt_len,
                                      size_t iterations) const = 0;
    };
@@ -2756,7 +2782,7 @@ class BOTAN_DLL BigInt
      *
      * @param str the string to parse for an integer value
      */
-     BigInt(const std::string& str);
+     BigInt(const containers::string& str);
 
      /**
      * Create a BigInt from an integer in a byte array
@@ -3009,7 +3035,7 @@ class DataSource;
 namespace ASN1 {
 
 SecureVector<byte> put_in_sequence(const MemoryRegion<byte>& val);
-std::string to_string(const BER_Object& obj);
+containers::string to_string(const BER_Object& obj);
 
 /**
 * Heuristics tests; is this object possibly BER?
@@ -3024,7 +3050,7 @@ bool maybe_BER(DataSource& src);
 */
 struct BOTAN_DLL BER_Decoding_Error : public Decoding_Error
    {
-   BER_Decoding_Error(const std::string&);
+   BER_Decoding_Error(const containers::string&);
    };
 
 /**
@@ -3032,8 +3058,8 @@ struct BOTAN_DLL BER_Decoding_Error : public Decoding_Error
 */
 struct BOTAN_DLL BER_Bad_Tag : public BER_Decoding_Error
    {
-   BER_Bad_Tag(const std::string& msg, ASN1_Tag tag);
-   BER_Bad_Tag(const std::string& msg, ASN1_Tag tag1, ASN1_Tag tag2);
+   BER_Bad_Tag(const containers::string& msg, ASN1_Tag tag);
+   BER_Bad_Tag(const containers::string& msg, ASN1_Tag tag1, ASN1_Tag tag2);
    };
 
 }
@@ -3060,13 +3086,13 @@ class BOTAN_DLL OID : public ASN1_Object
       * Get this OID as list (vector) of its components.
       * @return vector representing this OID
       */
-      std::vector<u32bit> get_id() const { return id; }
+      containers::vector<u32bit> get_id() const { return id; }
 
       /**
       * Get this OID as a string
       * @return string representing this OID
       */
-      std::string as_string() const;
+      containers::string as_string() const;
 
       /**
       * Compare two OIDs.
@@ -3090,9 +3116,9 @@ class BOTAN_DLL OID : public ASN1_Object
       * Construct an OID from a string.
       * @param str a string in the form "a.b.c" etc., where a,b,c are numbers
       */
-      OID(const std::string& str = "");
+      OID(const containers::string& str = "");
    private:
-      std::vector<u32bit> id;
+      containers::vector<u32bit> id;
    };
 
 /**
@@ -3136,10 +3162,10 @@ class BOTAN_DLL AlgorithmIdentifier : public ASN1_Object
 
       AlgorithmIdentifier() {}
       AlgorithmIdentifier(const OID&, Encoding_Option);
-      AlgorithmIdentifier(const std::string&, Encoding_Option);
+      AlgorithmIdentifier(const containers::string&, Encoding_Option);
 
       AlgorithmIdentifier(const OID&, const MemoryRegion<byte>&);
-      AlgorithmIdentifier(const std::string&, const MemoryRegion<byte>&);
+      AlgorithmIdentifier(const containers::string&, const MemoryRegion<byte>&);
 
       OID oid;
       SecureVector<byte> parameters;
@@ -3168,7 +3194,7 @@ class BOTAN_DLL Public_Key
       * Get the name of the underlying public key scheme.
       * @return name of the public key scheme
       */
-      virtual std::string algo_name() const = 0;
+      virtual containers::string algo_name() const = 0;
 
       /**
       * Get the OID of the underlying public key scheme.
@@ -3448,7 +3474,7 @@ class BOTAN_DLL Engine
       /**
       * @return name of this engine
       */
-      virtual std::string provider_name() const = 0;
+      virtual containers::string provider_name() const = 0;
 
       /**
       * @param algo_spec the algorithm name/specification
@@ -3510,7 +3536,7 @@ class BOTAN_DLL Engine
       * @param af an algorithm factory object
       * @return newly allocated object, or NULL
       */
-      virtual Keyed_Filter* get_cipher(const std::string& algo_spec,
+      virtual Keyed_Filter* get_cipher(const containers::string& algo_spec,
                                        Cipher_Dir dir,
                                        Algorithm_Factory& af);
 
@@ -3570,11 +3596,11 @@ class BOTAN_DLL Dynamically_Loaded_Engine : public Engine
       /**
       * @param lib_path full pathname to DLL to load
       */
-      Dynamically_Loaded_Engine(const std::string& lib_path);
+      Dynamically_Loaded_Engine(const containers::string& lib_path);
 
       ~Dynamically_Loaded_Engine();
 
-      std::string provider_name() const { return engine->provider_name(); }
+      containers::string provider_name() const { return engine->provider_name(); }
 
       BlockCipher* find_block_cipher(const SCAN_Name& algo_spec,
                                      Algorithm_Factory& af) const
@@ -3612,7 +3638,7 @@ class BOTAN_DLL Dynamically_Loaded_Engine : public Engine
          return engine->mod_exp(n, hints);
          }
 
-      Keyed_Filter* get_cipher(const std::string& algo_spec,
+      Keyed_Filter* get_cipher(const containers::string& algo_spec,
                                Cipher_Dir dir,
                                Algorithm_Factory& af)
          {
@@ -3668,15 +3694,15 @@ class BOTAN_DLL ASN1_String : public ASN1_Object
       void encode_into(class DER_Encoder&) const;
       void decode_from(class BER_Decoder&);
 
-      std::string value() const;
-      std::string iso_8859() const;
+      containers::string value() const;
+      containers::string iso_8859() const;
 
       ASN1_Tag tagging() const;
 
-      ASN1_String(const std::string& = "");
-      ASN1_String(const std::string&, ASN1_Tag);
+      ASN1_String(const containers::string& = "");
+      ASN1_String(const containers::string&, ASN1_Tag);
    private:
-      std::string iso_8859_str;
+      containers::string iso_8859_str;
       ASN1_Tag tag;
    };
 
@@ -3699,7 +3725,7 @@ class BOTAN_DLL Attribute : public ASN1_Object
 
       Attribute() {}
       Attribute(const OID&, const MemoryRegion<byte>&);
-      Attribute(const std::string&, const MemoryRegion<byte>&);
+      Attribute(const containers::string&, const MemoryRegion<byte>&);
    };
 
 /**
@@ -3711,18 +3737,18 @@ class BOTAN_DLL X509_Time : public ASN1_Object
       void encode_into(class DER_Encoder&) const;
       void decode_from(class BER_Decoder&);
 
-      std::string as_string() const;
-      std::string readable_string() const;
+      containers::string as_string() const;
+      containers::string readable_string() const;
       bool time_is_set() const;
 
       s32bit cmp(const X509_Time&) const;
 
-      void set_to(const std::string&);
-      void set_to(const std::string&, ASN1_Tag);
+      void set_to(const containers::string&);
+      void set_to(const containers::string&, ASN1_Tag);
 
       X509_Time(u64bit);
-      X509_Time(const std::string& = "");
-      X509_Time(const std::string&, ASN1_Tag);
+      X509_Time(const containers::string& = "");
+      X509_Time(const containers::string&, ASN1_Tag);
    private:
       bool passes_sanity_check() const;
       u32bit year, month, day, hour, minute, second;
@@ -3738,21 +3764,21 @@ class BOTAN_DLL AlternativeName : public ASN1_Object
       void encode_into(class DER_Encoder&) const;
       void decode_from(class BER_Decoder&);
 
-      std::multimap<std::string, std::string> contents() const;
+      containers::multimap<containers::string, containers::string> contents() const;
 
-      void add_attribute(const std::string&, const std::string&);
-      std::multimap<std::string, std::string> get_attributes() const;
+      void add_attribute(const containers::string&, const containers::string&);
+      containers::multimap<containers::string, containers::string> get_attributes() const;
 
-      void add_othername(const OID&, const std::string&, ASN1_Tag);
-      std::multimap<OID, ASN1_String> get_othernames() const;
+      void add_othername(const OID&, const containers::string&, ASN1_Tag);
+      containers::multimap<OID, ASN1_String> get_othernames() const;
 
       bool has_items() const;
 
-      AlternativeName(const std::string& = "", const std::string& = "",
-                      const std::string& = "", const std::string& = "");
+      AlternativeName(const containers::string& = "", const containers::string& = "",
+                      const containers::string& = "", const containers::string& = "");
    private:
-      std::multimap<std::string, std::string> alt_info;
-      std::multimap<OID, ASN1_String> othernames;
+      containers::multimap<containers::string, containers::string> alt_info;
+      containers::multimap<OID, ASN1_String> othernames;
    };
 
 /*
@@ -3808,9 +3834,9 @@ class BOTAN_DLL DataSource
       virtual bool end_of_data() const = 0;
       /**
       * return the id of this data source
-      * @return std::string representing the id of this data source
+      * @return containers::string representing the id of this data source
       */
-      virtual std::string id() const { return ""; }
+      virtual containers::string id() const { return ""; }
 
       /**
       * Read one byte.
@@ -3856,7 +3882,7 @@ class BOTAN_DLL DataSource_Memory : public DataSource
       * Construct a memory source that reads from a string
       * @param in the string to read from
       */
-      DataSource_Memory(const std::string& in);
+      DataSource_Memory(const containers::string& in);
 
       /**
       * Construct a memory source that reads from a byte array
@@ -3884,21 +3910,21 @@ class BOTAN_DLL DataSource_Stream : public DataSource
       size_t read(byte[], size_t);
       size_t peek(byte[], size_t, size_t) const;
       bool end_of_data() const;
-      std::string id() const;
+      containers::string id() const;
 
       DataSource_Stream(std::istream&,
-                        const std::string& id = "<std::istream>");
+                        const containers::string& id = "<std::istream>");
 
       /**
       * Construct a Stream-Based DataSource from file
       * @param file the name of the file
       * @param use_binary whether to treat the file as binary or not
       */
-      DataSource_Stream(const std::string& file, bool use_binary = false);
+      DataSource_Stream(const containers::string& file, bool use_binary = false);
 
       ~DataSource_Stream();
    private:
-      const std::string identifier;
+      const containers::string identifier;
 
       std::istream* source_p;
       std::istream& source;
@@ -3919,7 +3945,7 @@ class BOTAN_DLL Filter
       /**
       * @return descriptive name for this filter
       */
-      virtual std::string name() const = 0;
+      virtual containers::string name() const = 0;
 
       /**
       * Write a portion of a message to this filter.
@@ -4018,7 +4044,7 @@ class BOTAN_DLL Filter
       Filter* get_next() const;
 
       SecureVector<byte> write_queue;
-      std::vector<Filter*> next;
+      containers::vector<Filter*> next;
       size_t port_num, filter_owns;
 
       // true if filter belongs to a pipe --> prohibit filter sharing!
@@ -4081,7 +4107,7 @@ class BOTAN_DLL Pipe : public DataSource
          * @param where the error occured
          * @param msg the invalid message id that was used
          */
-         Invalid_Message_Number(const std::string& where, message_id msg) :
+         Invalid_Message_Number(const containers::string& where, message_id msg) :
             Invalid_Argument("Pipe::" + where + ": Invalid message number " +
                              to_string(msg))
             {}
@@ -4114,7 +4140,7 @@ class BOTAN_DLL Pipe : public DataSource
       * Write input to the pipe, i.e. to its first filter.
       * @param in the string containing the data to write
       */
-      void write(const std::string& in);
+      void write(const containers::string& in);
 
       /**
       * Write input to the pipe, i.e. to its first filter.
@@ -4145,7 +4171,7 @@ class BOTAN_DLL Pipe : public DataSource
       * Perform start_msg(), write() and end_msg() sequentially.
       * @param in the string containing the data to write
       */
-      void process_msg(const std::string& in);
+      void process_msg(const containers::string& in);
 
       /**
       * Perform start_msg(), write() and end_msg() sequentially.
@@ -4206,7 +4232,7 @@ class BOTAN_DLL Pipe : public DataSource
       * @param msg the number identifying the message to read from
       * @return string holding the contents of the pipe
       */
-      std::string read_all_as_string(message_id = DEFAULT_MESSAGE);
+      containers::string read_all_as_string(message_id = DEFAULT_MESSAGE);
 
       /** Read from the default message but do not modify the internal
       * offset. Consecutive calls to peek() will return portions of
@@ -4319,7 +4345,7 @@ class BOTAN_DLL Pipe : public DataSource
       void find_endpoints(Filter*);
       void clear_endpoints(Filter*);
 
-      message_id get_message_no(const std::string&, message_id) const;
+      message_id get_message_no(const containers::string&, message_id) const;
 
       Filter* pipe;
       class Output_Buffers* outputs;
@@ -4414,12 +4440,12 @@ class BOTAN_DLL BER_Decoder
                                       const T& default_value = T());
 
       template<typename T>
-         BER_Decoder& decode_list(std::vector<T>& out,
+         BER_Decoder& decode_list(containers::vector<T>& out,
                                   bool clear_out = true);
 
       template<typename T>
          BER_Decoder& decode_and_check(const T& expected,
-                                       const std::string& error_msg)
+                                       const containers::string& error_msg)
          {
          T actual;
          decode(actual);
@@ -4481,7 +4507,7 @@ BER_Decoder& BER_Decoder::decode_optional(T& out,
 * Decode a list of homogenously typed values
 */
 template<typename T>
-BER_Decoder& BER_Decoder::decode_list(std::vector<T>& vec, bool clear_it)
+BER_Decoder& BER_Decoder::decode_list(containers::vector<T>& vec, bool clear_it)
    {
    if(clear_it)
       vec.clear();
@@ -4585,7 +4611,7 @@ class BOTAN_DLL X509_Object
       /**
       * @return hash algorithm that was used to generate signature
       */
-      std::string hash_used_for_signature() const;
+      containers::string hash_used_for_signature() const;
 
       /**
       * Create a signed X509 object.
@@ -4623,7 +4649,7 @@ class BOTAN_DLL X509_Object
       /**
       * @return PEM encoding of this
       */
-      std::string PEM_encode() const;
+      containers::string PEM_encode() const;
 
       /**
       * Encode this to a pipe
@@ -4636,8 +4662,8 @@ class BOTAN_DLL X509_Object
 
       virtual ~X509_Object() {}
    protected:
-      X509_Object(DataSource& src, const std::string& pem_labels);
-      X509_Object(const std::string& file, const std::string& pem_labels);
+      X509_Object(DataSource& src, const containers::string& pem_labels);
+      X509_Object(const containers::string& file, const containers::string& pem_labels);
 
       void do_decode();
       X509_Object() {}
@@ -4645,10 +4671,10 @@ class BOTAN_DLL X509_Object
       MemoryVector<byte> tbs_bits, sig;
    private:
       virtual void force_decode() = 0;
-      void init(DataSource&, const std::string&);
+      void init(DataSource&, const containers::string&);
       void decode_info(DataSource&);
-      std::vector<std::string> PEM_labels_allowed;
-      std::string PEM_label_pref;
+      containers::vector<containers::string> PEM_labels_allowed;
+      containers::string PEM_label_pref;
    };
 
 }
@@ -4665,23 +4691,23 @@ class BOTAN_DLL X509_DN : public ASN1_Object
       void encode_into(class DER_Encoder&) const;
       void decode_from(class BER_Decoder&);
 
-      std::multimap<OID, std::string> get_attributes() const;
-      std::vector<std::string> get_attribute(const std::string&) const;
+      containers::multimap<OID, containers::string> get_attributes() const;
+      containers::vector<containers::string> get_attribute(const containers::string&) const;
 
-      std::multimap<std::string, std::string> contents() const;
+      containers::multimap<containers::string, containers::string> contents() const;
 
-      void add_attribute(const std::string&, const std::string&);
-      void add_attribute(const OID&, const std::string&);
+      void add_attribute(const containers::string&, const containers::string&);
+      void add_attribute(const OID&, const containers::string&);
 
-      static std::string deref_info_field(const std::string&);
+      static containers::string deref_info_field(const containers::string&);
 
       MemoryVector<byte> get_bits() const;
 
       X509_DN();
-      X509_DN(const std::multimap<OID, std::string>&);
-      X509_DN(const std::multimap<std::string, std::string>&);
+      X509_DN(const containers::multimap<OID, containers::string>&);
+      X509_DN(const containers::multimap<containers::string, containers::string>&);
    private:
-      std::multimap<OID, ASN1_String> dn_info;
+      containers::multimap<OID, ASN1_String> dn_info;
       MemoryVector<byte> dn_bits;
    };
 
@@ -4711,7 +4737,7 @@ BOTAN_DLL MemoryVector<byte> BER_encode(const Public_Key& key);
 * @param key the key to encode
 * @return PEM encoded key
 */
-BOTAN_DLL std::string PEM_encode(const Public_Key& key);
+BOTAN_DLL containers::string PEM_encode(const Public_Key& key);
 
 /**
 * Create a public key from a data source.
@@ -4725,7 +4751,7 @@ BOTAN_DLL Public_Key* load_key(DataSource& source);
 * @param filename pathname to the file to load
 * @return new public key object
 */
-BOTAN_DLL Public_Key* load_key(const std::string& filename);
+BOTAN_DLL Public_Key* load_key(const containers::string& filename);
 
 /**
 * Create a public key from a memory region.
@@ -4791,35 +4817,35 @@ class BOTAN_DLL Data_Store
       class BOTAN_DLL Matcher
          {
          public:
-            virtual bool operator()(const std::string&,
-                                    const std::string&) const = 0;
+            virtual bool operator()(const containers::string&,
+                                    const containers::string&) const = 0;
 
-            virtual std::pair<std::string, std::string>
-               transform(const std::string&, const std::string&) const;
+            virtual std::pair<containers::string, containers::string>
+               transform(const containers::string&, const containers::string&) const;
 
             virtual ~Matcher() {}
          };
 
       bool operator==(const Data_Store&) const;
 
-      std::multimap<std::string, std::string>
+      containers::multimap<containers::string, containers::string>
          search_with(const Matcher&) const;
 
-      std::vector<std::string> get(const std::string&) const;
+      containers::vector<containers::string> get(const containers::string&) const;
 
-      std::string get1(const std::string&) const;
+      containers::string get1(const containers::string&) const;
 
-      MemoryVector<byte> get1_memvec(const std::string&) const;
-      u32bit get1_u32bit(const std::string&, u32bit = 0) const;
+      MemoryVector<byte> get1_memvec(const containers::string&) const;
+      u32bit get1_u32bit(const containers::string&, u32bit = 0) const;
 
-      bool has_value(const std::string&) const;
+      bool has_value(const containers::string&) const;
 
-      void add(const std::multimap<std::string, std::string>&);
-      void add(const std::string&, const std::string&);
-      void add(const std::string&, u32bit);
-      void add(const std::string&, const MemoryRegion<byte>&);
+      void add(const containers::multimap<containers::string, containers::string>&);
+      void add(const containers::string&, const containers::string&);
+      void add(const containers::string&, u32bit);
+      void add(const containers::string&, const MemoryRegion<byte>&);
    private:
-      std::multimap<std::string, std::string> contents;
+      containers::multimap<containers::string, containers::string> contents;
    };
 
 }
@@ -4863,7 +4889,7 @@ class BOTAN_DLL X509_Certificate : public X509_Object
       * "X509.Certificate.serial".
       * @return value(s) of the specified parameter
       */
-      std::vector<std::string> subject_info(const std::string& name) const;
+      containers::vector<containers::string> subject_info(const containers::string& name) const;
 
       /**
       * Get a value for a specific subject_info parameter name.
@@ -4871,19 +4897,19 @@ class BOTAN_DLL X509_Certificate : public X509_Object
       * "X509.Certificate.v2.key_id" or "X509v3.AuthorityKeyIdentifier".
       * @return value(s) of the specified parameter
       */
-      std::vector<std::string> issuer_info(const std::string& name) const;
+      containers::vector<containers::string> issuer_info(const containers::string& name) const;
 
       /**
       * Get the notBefore of the certificate.
       * @return notBefore of the certificate
       */
-      std::string start_time() const;
+      containers::string start_time() const;
 
       /**
       * Get the notAfter of the certificate.
       * @return notAfter of the certificate
       */
-      std::string end_time() const;
+      containers::string end_time() const;
 
       /**
       * Get the X509 version of this certificate object.
@@ -4941,19 +4967,19 @@ class BOTAN_DLL X509_Certificate : public X509_Object
       * certificate.
       * @return key constraints
       */
-      std::vector<std::string> ex_constraints() const;
+      containers::vector<containers::string> ex_constraints() const;
 
       /**
       * Get the policies as defined in the CertificatePolicies extension
       * of this certificate.
       * @return certificate policies
       */
-      std::vector<std::string> policies() const;
+      containers::vector<containers::string> policies() const;
 
       /**
       * @return a string describing the certificate
       */
-      std::string to_string() const;
+      containers::string to_string() const;
 
       /**
       * Check to certificates for equality.
@@ -4973,7 +4999,7 @@ class BOTAN_DLL X509_Certificate : public X509_Object
       * encoded certificate.
       * @param filename the name of the certificate file
       */
-      X509_Certificate(const std::string& filename);
+      X509_Certificate(const containers::string& filename);
    private:
       void force_decode();
       friend class X509_CA;
@@ -5074,7 +5100,7 @@ class BOTAN_DLL X509_CRL : public X509_Object
       */
       struct BOTAN_DLL X509_CRL_Error : public Exception
          {
-         X509_CRL_Error(const std::string& error) :
+         X509_CRL_Error(const containers::string& error) :
             Exception("X509_CRL: " + error) {}
          };
 
@@ -5082,7 +5108,7 @@ class BOTAN_DLL X509_CRL : public X509_Object
       * Get the entries of this CRL in the form of a vector.
       * @return vector containing the entries of this CRL.
       */
-      std::vector<CRL_Entry> get_revoked() const;
+      containers::vector<CRL_Entry> get_revoked() const;
 
       /**
       * Get the issuer DN of this CRL.
@@ -5128,13 +5154,13 @@ class BOTAN_DLL X509_CRL : public X509_Object
       * @param throw_on_unknown_critical should we throw an exception
       * if an unknown CRL extension marked as critical is encountered.
       */
-      X509_CRL(const std::string& filename,
+      X509_CRL(const containers::string& filename,
                bool throw_on_unknown_critical = false);
    private:
       void force_decode();
 
       bool throw_on_unknown_critical;
-      std::vector<CRL_Entry> revoked;
+      containers::vector<CRL_Entry> revoked;
       Data_Store info;
    };
 
@@ -5160,7 +5186,7 @@ class BOTAN_DLL LubyRackoff : public BlockCipher
          }
 
       void clear();
-      std::string name() const;
+      containers::string name() const;
       BlockCipher* clone() const;
 
       /**
@@ -5579,7 +5605,7 @@ namespace Botan {
 */
 struct BOTAN_DLL Illegal_Transformation : public Exception
    {
-   Illegal_Transformation(const std::string& err =
+   Illegal_Transformation(const containers::string& err =
                           "Requested transformation is not possible") :
       Exception(err) {}
    };
@@ -5589,7 +5615,7 @@ struct BOTAN_DLL Illegal_Transformation : public Exception
 */
 struct BOTAN_DLL Illegal_Point : public Exception
    {
-   Illegal_Point(const std::string& err = "Malformed ECP point detected") :
+   Illegal_Point(const containers::string& err = "Malformed ECP point detected") :
       Exception(err) {}
    };
 
@@ -5768,13 +5794,13 @@ class BOTAN_DLL PointGFp
       * Point addition
       * @param workspace temp space, at least 11 elements
       */
-      void add(const PointGFp& other, std::vector<BigInt>& workspace);
+      void add(const PointGFp& other, containers::vector<BigInt>& workspace);
 
       /**
       * Point doubling
       * @param workspace temp space, at least 9 elements
       */
-      void mult2(std::vector<BigInt>& workspace);
+      void mult2(containers::vector<BigInt>& workspace);
 
       CurveGFp curve;
       BigInt coord_x, coord_y, coord_z;
@@ -5883,7 +5909,7 @@ class BOTAN_DLL EC_Group
       * or from an OID name (eg "secp160r1", or "1.3.132.0.8")
       * @param pem_or_oid PEM-encoded data, or an OID
       */
-      EC_Group(const std::string& pem_or_oid = "");
+      EC_Group(const containers::string& pem_or_oid = "");
 
       /**
       * Create the DER encoding of this domain
@@ -5896,7 +5922,7 @@ class BOTAN_DLL EC_Group
       * Return the PEM encoding (always in explicit form)
       * @return string containing PEM data
       */
-      std::string PEM_encode() const;
+      containers::string PEM_encode() const;
 
       /**
       * Return domain parameter curve
@@ -5928,7 +5954,7 @@ class BOTAN_DLL EC_Group
       * Return the OID of these domain parameters
       * @result the OID
       */
-      std::string get_oid() const { return oid; }
+      containers::string get_oid() const { return oid; }
 
       bool operator==(const EC_Group& other) const
          {
@@ -5942,7 +5968,7 @@ class BOTAN_DLL EC_Group
       CurveGFp curve;
       PointGFp base_point;
       BigInt order, cofactor;
-      std::string oid;
+      containers::string oid;
    };
 
 inline bool operator!=(const EC_Group& lhs,
@@ -5968,13 +5994,13 @@ class BOTAN_DLL User_Interface
    public:
       enum UI_Result { OK, CANCEL_ACTION };
 
-      virtual std::string get_passphrase(const std::string&,
-                                         const std::string&,
+      virtual containers::string get_passphrase(const containers::string&,
+                                         const containers::string&,
                                          UI_Result&) const;
-      User_Interface(const std::string& = "");
+      User_Interface(const containers::string& = "");
       virtual ~User_Interface() {}
    protected:
-      std::string preset_passphrase;
+      containers::string preset_passphrase;
       mutable bool first_try;
    };
 
@@ -5988,7 +6014,7 @@ namespace Botan {
 */
 struct BOTAN_DLL PKCS8_Exception : public Decoding_Error
    {
-   PKCS8_Exception(const std::string& error) :
+   PKCS8_Exception(const containers::string& error) :
       Decoding_Error("PKCS #8: " + error) {}
    };
 
@@ -6009,7 +6035,7 @@ BOTAN_DLL SecureVector<byte> BER_encode(const Private_Key& key);
 * @param key the key to encode
 * @return encoded key
 */
-BOTAN_DLL std::string PEM_encode(const Private_Key& key);
+BOTAN_DLL containers::string PEM_encode(const Private_Key& key);
 
 /**
 * Encrypt a key using PKCS #8 encryption
@@ -6023,8 +6049,8 @@ BOTAN_DLL std::string PEM_encode(const Private_Key& key);
 */
 BOTAN_DLL SecureVector<byte> BER_encode(const Private_Key& key,
                                         RandomNumberGenerator& rng,
-                                        const std::string& pass,
-                                        const std::string& pbe_algo = "");
+                                        const containers::string& pass,
+                                        const containers::string& pbe_algo = "");
 
 /**
 * Get a string containing a PEM encoded private key, encrypting it with a
@@ -6037,10 +6063,10 @@ BOTAN_DLL SecureVector<byte> BER_encode(const Private_Key& key,
          default will be chosen.
 * @return encrypted key in PEM form
 */
-BOTAN_DLL std::string PEM_encode(const Private_Key& key,
+BOTAN_DLL containers::string PEM_encode(const Private_Key& key,
                                  RandomNumberGenerator& rng,
-                                 const std::string& pass,
-                                 const std::string& pbe_algo = "");
+                                 const containers::string& pass,
+                                 const containers::string& pbe_algo = "");
 
 
 /**
@@ -6079,8 +6105,8 @@ BOTAN_DEPRECATED("Use PEM_encode or BER_encode")
 inline void encrypt_key(const Private_Key& key,
                         Pipe& pipe,
                         RandomNumberGenerator& rng,
-                        const std::string& pass,
-                        const std::string& pbe_algo = "",
+                        const containers::string& pass,
+                        const containers::string& pbe_algo = "",
                         X509_Encoding encoding = PEM)
    {
    if(encoding == PEM)
@@ -6109,7 +6135,7 @@ BOTAN_DLL Private_Key* load_key(DataSource& source,
 */
 BOTAN_DLL Private_Key* load_key(DataSource& source,
                                 RandomNumberGenerator& rng,
-                                const std::string& pass = "");
+                                const containers::string& pass = "");
 
 /**
 * Load a key from a file.
@@ -6118,7 +6144,7 @@ BOTAN_DLL Private_Key* load_key(DataSource& source,
 * @param ui the user interface to be used for passphrase dialog
 * @return loaded private key object
 */
-BOTAN_DLL Private_Key* load_key(const std::string& filename,
+BOTAN_DLL Private_Key* load_key(const containers::string& filename,
                                 RandomNumberGenerator& rng,
                                 const User_Interface& ui);
 
@@ -6129,9 +6155,9 @@ BOTAN_DLL Private_Key* load_key(const std::string& filename,
 * string if the key is not encoded.
 * @return loaded private key object
 */
-BOTAN_DLL Private_Key* load_key(const std::string& filename,
+BOTAN_DLL Private_Key* load_key(const containers::string& filename,
                                 RandomNumberGenerator& rng,
-                                const std::string& pass = "");
+                                const containers::string& pass = "");
 
 /**
 * Copy an existing encoded key object.
@@ -6276,7 +6302,7 @@ class BOTAN_DLL GOST_3410_PublicKey : public virtual EC_PublicKey
       * Get this keys algorithm name.
       * @result this keys algorithm name
       */
-      std::string algo_name() const { return "GOST-34.10"; }
+      containers::string algo_name() const { return "GOST-34.10"; }
 
       AlgorithmIdentifier algorithm_identifier() const;
 
@@ -6437,7 +6463,7 @@ namespace Botan {
 class BOTAN_DLL HAS_160 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "HAS-160"; }
+      containers::string name() const { return "HAS-160"; }
       size_t output_length() const { return 20; }
       HashFunction* clone() const { return new HAS_160; }
 
@@ -6470,7 +6496,7 @@ class BOTAN_DLL LibraryInitializer
       * Initialize the library
       * @param options a string listing initialization options
       */
-      static void initialize(const std::string& options = "");
+      static void initialize(const containers::string& options = "");
 
       /**
       * Shutdown the library
@@ -6481,7 +6507,7 @@ class BOTAN_DLL LibraryInitializer
       * Initialize the library
       * @param options a string listing initialization options
       */
-      LibraryInitializer(const std::string& options = "")
+      LibraryInitializer(const containers::string& options = "")
          { LibraryInitializer::initialize(options); }
 
       ~LibraryInitializer() { LibraryInitializer::deinitialize(); }
@@ -6594,14 +6620,14 @@ class BOTAN_DLL Algorithm_Factory
       * @param algo_spec the algorithm we are querying
       * @returns list of providers of this algorithm
       */
-      std::vector<std::string> providers_of(const std::string& algo_spec);
+      containers::vector<containers::string> providers_of(const containers::string& algo_spec);
 
       /**
       * @param algo_spec the algorithm we are setting a provider for
       * @param provider the provider we would like to use
       */
-      void set_preferred_provider(const std::string& algo_spec,
-                                  const std::string& provider);
+      void set_preferred_provider(const containers::string& algo_spec,
+                                  const containers::string& provider);
 
       /**
       * @param algo_spec the algorithm we want
@@ -6609,22 +6635,22 @@ class BOTAN_DLL Algorithm_Factory
       * @returns pointer to const prototype object, ready to clone(), or NULL
       */
       const BlockCipher*
-         prototype_block_cipher(const std::string& algo_spec,
-                                const std::string& provider = "");
+         prototype_block_cipher(const containers::string& algo_spec,
+                                const containers::string& provider = "");
 
       /**
       * @param algo_spec the algorithm we want
       * @param provider the provider we would like to use
       * @returns pointer to freshly created instance of the request algorithm
       */
-      BlockCipher* make_block_cipher(const std::string& algo_spec,
-                                     const std::string& provider = "");
+      BlockCipher* make_block_cipher(const containers::string& algo_spec,
+                                     const containers::string& provider = "");
 
       /**
       * @param algo the algorithm to add
       * @param provider the provider of this algorithm
       */
-      void add_block_cipher(BlockCipher* algo, const std::string& provider);
+      void add_block_cipher(BlockCipher* algo, const containers::string& provider);
 
       /**
       * @param algo_spec the algorithm we want
@@ -6632,22 +6658,22 @@ class BOTAN_DLL Algorithm_Factory
       * @returns pointer to const prototype object, ready to clone(), or NULL
       */
       const StreamCipher*
-         prototype_stream_cipher(const std::string& algo_spec,
-                                 const std::string& provider = "");
+         prototype_stream_cipher(const containers::string& algo_spec,
+                                 const containers::string& provider = "");
 
       /**
       * @param algo_spec the algorithm we want
       * @param provider the provider we would like to use
       * @returns pointer to freshly created instance of the request algorithm
       */
-      StreamCipher* make_stream_cipher(const std::string& algo_spec,
-                                       const std::string& provider = "");
+      StreamCipher* make_stream_cipher(const containers::string& algo_spec,
+                                       const containers::string& provider = "");
 
       /**
       * @param algo the algorithm to add
       * @param provider the provider of this algorithm
       */
-      void add_stream_cipher(StreamCipher* algo, const std::string& provider);
+      void add_stream_cipher(StreamCipher* algo, const containers::string& provider);
 
       /**
       * @param algo_spec the algorithm we want
@@ -6655,22 +6681,22 @@ class BOTAN_DLL Algorithm_Factory
       * @returns pointer to const prototype object, ready to clone(), or NULL
       */
       const HashFunction*
-         prototype_hash_function(const std::string& algo_spec,
-                                 const std::string& provider = "");
+         prototype_hash_function(const containers::string& algo_spec,
+                                 const containers::string& provider = "");
 
       /**
       * @param algo_spec the algorithm we want
       * @param provider the provider we would like to use
       * @returns pointer to freshly created instance of the request algorithm
       */
-      HashFunction* make_hash_function(const std::string& algo_spec,
-                                       const std::string& provider = "");
+      HashFunction* make_hash_function(const containers::string& algo_spec,
+                                       const containers::string& provider = "");
 
       /**
       * @param algo the algorithm to add
       * @param provider the provider of this algorithm
       */
-      void add_hash_function(HashFunction* algo, const std::string& provider);
+      void add_hash_function(HashFunction* algo, const containers::string& provider);
 
       /**
       * @param algo_spec the algorithm we want
@@ -6678,45 +6704,45 @@ class BOTAN_DLL Algorithm_Factory
       * @returns pointer to const prototype object, ready to clone(), or NULL
       */
       const MessageAuthenticationCode*
-         prototype_mac(const std::string& algo_spec,
-                       const std::string& provider = "");
+         prototype_mac(const containers::string& algo_spec,
+                       const containers::string& provider = "");
 
       /**
       * @param algo_spec the algorithm we want
       * @param provider the provider we would like to use
       * @returns pointer to freshly created instance of the request algorithm
       */
-      MessageAuthenticationCode* make_mac(const std::string& algo_spec,
-                                          const std::string& provider = "");
+      MessageAuthenticationCode* make_mac(const containers::string& algo_spec,
+                                          const containers::string& provider = "");
 
       /**
       * @param algo the algorithm to add
       * @param provider the provider of this algorithm
       */
       void add_mac(MessageAuthenticationCode* algo,
-                   const std::string& provider);
+                   const containers::string& provider);
 
       /**
       * @param algo_spec the algorithm we want
       * @param provider the provider we would like to use
       * @returns pointer to const prototype object, ready to clone(), or NULL
       */
-      const PBKDF* prototype_pbkdf(const std::string& algo_spec,
-                                   const std::string& provider = "");
+      const PBKDF* prototype_pbkdf(const containers::string& algo_spec,
+                                   const containers::string& provider = "");
 
       /**
       * @param algo_spec the algorithm we want
       * @param provider the provider we would like to use
       * @returns pointer to freshly created instance of the request algorithm
       */
-      PBKDF* make_pbkdf(const std::string& algo_spec,
-                        const std::string& provider = "");
+      PBKDF* make_pbkdf(const containers::string& algo_spec,
+                        const containers::string& provider = "");
 
       /**
       * @param algo the algorithm to add
       * @param provider the provider of this algorithm
       */
-      void add_pbkdf(PBKDF* algo, const std::string& provider);
+      void add_pbkdf(PBKDF* algo, const containers::string& provider);
 
       /**
       * An iterator for the engines in this factory
@@ -6748,7 +6774,7 @@ class BOTAN_DLL Algorithm_Factory
 
       Engine* get_engine_n(size_t n) const;
 
-      std::vector<Engine*> engines;
+      containers::vector<Engine*> engines;
 
       Algorithm_Cache<BlockCipher>* block_cipher_cache;
       Algorithm_Cache<StreamCipher>* stream_cipher_cache;
@@ -6793,7 +6819,7 @@ class BOTAN_DLL Library_State
       * @param name the name of the allocator
       * @return allocator matching this name, or NULL
       */
-      Allocator* get_allocator(const std::string& name = "") const;
+      Allocator* get_allocator(const containers::string& name = "") const;
 
       /**
       * Add a new allocator to the list of available ones
@@ -6805,16 +6831,16 @@ class BOTAN_DLL Library_State
       * Set the default allocator
       * @param name the name of the allocator to use as the default
       */
-      void set_default_allocator(const std::string& name);
+      void set_default_allocator(const containers::string& name);
 
       /**
-      * Get a parameter value as std::string.
+      * Get a parameter value as containers::string.
       * @param section the section of the desired key
       * @param key the desired keys name
       * @result the value of the parameter
       */
-      std::string get(const std::string& section,
-                      const std::string& key) const;
+      containers::string get(const containers::string& section,
+                      const containers::string& key) const;
 
       /**
       * Check whether a certain parameter is set or not.
@@ -6823,8 +6849,8 @@ class BOTAN_DLL Library_State
       * @result true if the parameters value is set,
       * false otherwise
       */
-      bool is_set(const std::string& section,
-                  const std::string& key) const;
+      bool is_set(const containers::string& section,
+                  const containers::string& key) const;
 
       /**
       * Set a configuration parameter.
@@ -6835,9 +6861,9 @@ class BOTAN_DLL Library_State
       * will be overwritten even if it is already set, otherwise
       * no existing values will be overwritten.
       */
-      void set(const std::string& section,
-               const std::string& key,
-               const std::string& value,
+      void set(const containers::string& section,
+               const containers::string& key,
+               const containers::string& value,
                bool overwrite = true);
 
       /**
@@ -6845,15 +6871,15 @@ class BOTAN_DLL Library_State
       * @param key the name of the parameter which shall have a new alias
       * @param value the new alias
       */
-      void add_alias(const std::string& key,
-                     const std::string& value);
+      void add_alias(const containers::string& key,
+                     const containers::string& value);
 
       /**
       * Resolve an alias.
       * @param alias the alias to resolve.
       * @return what the alias stands for
       */
-      std::string deref_alias(const std::string& alias) const;
+      containers::string deref_alias(const containers::string& alias) const;
 
       /**
       * @return newly created Mutex (free with delete)
@@ -6874,13 +6900,13 @@ class BOTAN_DLL Library_State
       RandomNumberGenerator* global_rng_ptr;
 
       Mutex* config_lock;
-      std::map<std::string, std::string> config;
+      containers::map<containers::string, containers::string> config;
 
       Mutex* allocator_lock;
-      std::string default_allocator_name;
-      std::map<std::string, Allocator*> alloc_factory;
+      containers::string default_allocator_name;
+      containers::map<containers::string, Allocator*> alloc_factory;
       mutable Allocator* cached_default_allocator;
-      std::vector<Allocator*> allocators;
+      containers::vector<Allocator*> allocators;
 
       Algorithm_Factory* m_algorithm_factory;
    };
@@ -6898,7 +6924,7 @@ struct BOTAN_DLL BitBucket : public Filter
    {
    void write(const byte[], size_t) {}
 
-   std::string name() const { return "BitBucket"; }
+   containers::string name() const { return "BitBucket"; }
    };
 
 /**
@@ -6912,7 +6938,7 @@ class BOTAN_DLL Chain : public Fanout_Filter
    public:
       void write(const byte input[], size_t length) { send(input, length); }
 
-      std::string name() const;
+      containers::string name() const;
 
       /**
       * Construct a chain of up to four filters. The filters are set
@@ -6939,7 +6965,7 @@ class BOTAN_DLL Fork : public Fanout_Filter
       void write(const byte input[], size_t length) { send(input, length); }
       void set_port(size_t n) { Fanout_Filter::set_port(n); }
 
-      std::string name() const;
+      containers::string name() const;
 
       /**
       * Construct a Fork filter with up to four forks.
@@ -7020,7 +7046,7 @@ class BOTAN_DLL DataSink : public Filter
 class BOTAN_DLL DataSink_Stream : public DataSink
    {
    public:
-      std::string name() const { return identifier; }
+      containers::string name() const { return identifier; }
 
       void write(const byte[], size_t);
 
@@ -7030,7 +7056,7 @@ class BOTAN_DLL DataSink_Stream : public DataSink
       * @param name identifier
       */
       DataSink_Stream(std::ostream& stream,
-                      const std::string& name = "<std::ostream>");
+                      const containers::string& name = "<std::ostream>");
 
       /**
       * Construct a DataSink_Stream from a stream.
@@ -7038,12 +7064,12 @@ class BOTAN_DLL DataSink_Stream : public DataSink
       * @param use_binary indicates whether to treat the file
       * as a binary file or not
       */
-      DataSink_Stream(const std::string& pathname,
+      DataSink_Stream(const containers::string& pathname,
                       bool use_binary = false);
 
       ~DataSink_Stream();
    private:
-      const std::string identifier;
+      const containers::string identifier;
 
       std::ostream* sink_p;
       std::ostream& sink;
@@ -7063,7 +7089,7 @@ namespace Botan {
 class BOTAN_DLL Base64_Encoder : public Filter
    {
    public:
-      std::string name() const { return "Base64_Encoder"; }
+      containers::string name() const { return "Base64_Encoder"; }
 
       /**
       * Input a part of a message to the encoder.
@@ -7102,7 +7128,7 @@ class BOTAN_DLL Base64_Encoder : public Filter
 class BOTAN_DLL Base64_Decoder : public Filter
    {
    public:
-      std::string name() const { return "Base64_Decoder"; }
+      containers::string name() const { return "Base64_Decoder"; }
 
       /**
       * Input a part of a message to the decoder.
@@ -7145,7 +7171,7 @@ class BOTAN_DLL Hex_Encoder : public Filter
       */
       enum Case { Uppercase, Lowercase };
 
-      std::string name() const { return "Hex_Encoder"; }
+      containers::string name() const { return "Hex_Encoder"; }
 
       void write(const byte in[], size_t length);
       void end_msg();
@@ -7180,7 +7206,7 @@ class BOTAN_DLL Hex_Encoder : public Filter
 class BOTAN_DLL Hex_Decoder : public Filter
    {
    public:
-      std::string name() const { return "Hex_Decoder"; }
+      containers::string name() const { return "Hex_Decoder"; }
 
       void write(const byte[], size_t);
       void end_msg();
@@ -7210,7 +7236,7 @@ class BOTAN_DLL StreamCipher_Filter : public Keyed_Filter
    {
    public:
 
-      std::string name() const { return cipher->name(); }
+      containers::string name() const { return cipher->name(); }
 
       /**
       * Write input data
@@ -7259,14 +7285,14 @@ class BOTAN_DLL StreamCipher_Filter : public Keyed_Filter
       * Construct a stream cipher filter.
       * @param cipher the name of the desired cipher
       */
-      StreamCipher_Filter(const std::string& cipher);
+      StreamCipher_Filter(const containers::string& cipher);
 
       /**
       * Construct a stream cipher filter.
       * @param cipher the name of the desired cipher
       * @param key the key to use inside this filter
       */
-      StreamCipher_Filter(const std::string& cipher, const SymmetricKey& key);
+      StreamCipher_Filter(const containers::string& cipher, const SymmetricKey& key);
 
       ~StreamCipher_Filter() { delete cipher; }
    private:
@@ -7283,7 +7309,7 @@ class BOTAN_DLL Hash_Filter : public Filter
       void write(const byte input[], size_t len) { hash->update(input, len); }
       void end_msg();
 
-      std::string name() const { return hash->name(); }
+      containers::string name() const { return hash->name(); }
 
       /**
       * Construct a hash filter.
@@ -7304,7 +7330,7 @@ class BOTAN_DLL Hash_Filter : public Filter
       * hash. Otherwise, specify a smaller value here so that the
       * output of the hash algorithm will be cut off.
       */
-      Hash_Filter(const std::string& request, size_t len = 0);
+      Hash_Filter(const containers::string& request, size_t len = 0);
 
       ~Hash_Filter() { delete hash; }
    private:
@@ -7321,7 +7347,7 @@ class BOTAN_DLL MAC_Filter : public Keyed_Filter
       void write(const byte input[], size_t len) { mac->update(input, len); }
       void end_msg();
 
-      std::string name() const { return mac->name(); }
+      containers::string name() const { return mac->name(); }
 
       /**
       * Set the key of this filter.
@@ -7376,7 +7402,7 @@ class BOTAN_DLL MAC_Filter : public Keyed_Filter
       * MAC. Otherwise, specify a smaller value here so that the
       * output of the MAC will be cut off.
       */
-      MAC_Filter(const std::string& mac, size_t len = 0);
+      MAC_Filter(const containers::string& mac, size_t len = 0);
 
       /**
       * Construct a MAC filter.
@@ -7387,7 +7413,7 @@ class BOTAN_DLL MAC_Filter : public Keyed_Filter
       * MAC. Otherwise, specify a smaller value here so that the
       * output of the MAC will be cut off.
       */
-      MAC_Filter(const std::string& mac, const SymmetricKey& key,
+      MAC_Filter(const containers::string& mac, const SymmetricKey& key,
                  size_t len = 0);
 
       ~MAC_Filter() { delete mac; }
@@ -7446,7 +7472,7 @@ class BOTAN_DLL BlockCipherModePaddingMethod
       /**
       * @return name of the mode
       */
-      virtual std::string name() const = 0;
+      virtual containers::string name() const = 0;
 
       /**
       * virtual destructor
@@ -7463,7 +7489,7 @@ class BOTAN_DLL PKCS7_Padding : public BlockCipherModePaddingMethod
       void pad(byte[], size_t, size_t) const;
       size_t unpad(const byte[], size_t) const;
       bool valid_blocksize(size_t) const;
-      std::string name() const { return "PKCS7"; }
+      containers::string name() const { return "PKCS7"; }
    };
 
 /**
@@ -7475,7 +7501,7 @@ class BOTAN_DLL ANSI_X923_Padding : public BlockCipherModePaddingMethod
       void pad(byte[], size_t, size_t) const;
       size_t unpad(const byte[], size_t) const;
       bool valid_blocksize(size_t) const;
-      std::string name() const { return "X9.23"; }
+      containers::string name() const { return "X9.23"; }
    };
 
 /**
@@ -7487,7 +7513,7 @@ class BOTAN_DLL OneAndZeros_Padding : public BlockCipherModePaddingMethod
       void pad(byte[], size_t, size_t) const;
       size_t unpad(const byte[], size_t) const;
       bool valid_blocksize(size_t) const;
-      std::string name() const { return "OneAndZeros"; }
+      containers::string name() const { return "OneAndZeros"; }
    };
 
 /**
@@ -7500,7 +7526,7 @@ class BOTAN_DLL Null_Padding : public BlockCipherModePaddingMethod
       size_t unpad(const byte[], size_t size) const { return size; }
       size_t pad_bytes(size_t, size_t) const { return 0; }
       bool valid_blocksize(size_t) const { return true; }
-      std::string name() const { return "NoPadding"; }
+      containers::string name() const { return "NoPadding"; }
    };
 
 }
@@ -7522,7 +7548,7 @@ class BOTAN_DLL KDF : public Algorithm
       */
       SecureVector<byte> derive_key(size_t key_len,
                                     const MemoryRegion<byte>& secret,
-                                    const std::string& salt = "") const;
+                                    const containers::string& salt = "") const;
 
       /**
       * Derive a key
@@ -7556,7 +7582,7 @@ class BOTAN_DLL KDF : public Algorithm
       SecureVector<byte> derive_key(size_t key_len,
                                     const byte secret[],
                                     size_t secret_len,
-                                    const std::string& salt = "") const;
+                                    const containers::string& salt = "") const;
 
       /**
       * Derive a key
@@ -7695,7 +7721,7 @@ namespace Botan {
           library retains ownership
 */
 inline const BlockCipher*
-retrieve_block_cipher(const std::string& algo_spec)
+retrieve_block_cipher(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.prototype_block_cipher(algo_spec);
@@ -7708,7 +7734,7 @@ retrieve_block_cipher(const std::string& algo_spec)
           library retains ownership
 */
 inline const StreamCipher*
-retrieve_stream_cipher(const std::string& algo_spec)
+retrieve_stream_cipher(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.prototype_stream_cipher(algo_spec);
@@ -7721,7 +7747,7 @@ retrieve_stream_cipher(const std::string& algo_spec)
           library retains ownership
 */
 inline const HashFunction*
-retrieve_hash(const std::string& algo_spec)
+retrieve_hash(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.prototype_hash_function(algo_spec);
@@ -7734,7 +7760,7 @@ retrieve_hash(const std::string& algo_spec)
           library retains ownership
 */
 inline const MessageAuthenticationCode*
-retrieve_mac(const std::string& algo_spec)
+retrieve_mac(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.prototype_mac(algo_spec);
@@ -7753,7 +7779,7 @@ retrieve_mac(const std::string& algo_spec)
 * @param algo_spec the name of the desired block cipher
 * @return pointer to the block cipher object
 */
-inline BlockCipher* get_block_cipher(const std::string& algo_spec)
+inline BlockCipher* get_block_cipher(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.make_block_cipher(algo_spec);
@@ -7766,7 +7792,7 @@ inline BlockCipher* get_block_cipher(const std::string& algo_spec)
 * @param algo_spec the name of the desired stream cipher
 * @return pointer to the stream cipher object
 */
-inline StreamCipher* get_stream_cipher(const std::string& algo_spec)
+inline StreamCipher* get_stream_cipher(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.make_stream_cipher(algo_spec);
@@ -7779,7 +7805,7 @@ inline StreamCipher* get_stream_cipher(const std::string& algo_spec)
 * @param algo_spec the name of the desired hash function
 * @return pointer to the hash function object
 */
-inline HashFunction* get_hash(const std::string& algo_spec)
+inline HashFunction* get_hash(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.make_hash_function(algo_spec);
@@ -7792,7 +7818,7 @@ inline HashFunction* get_hash(const std::string& algo_spec)
 * @param algo_spec the name of the desired MAC
 * @return pointer to the MAC object
 */
-inline MessageAuthenticationCode* get_mac(const std::string& algo_spec)
+inline MessageAuthenticationCode* get_mac(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return af.make_mac(algo_spec);
@@ -7803,14 +7829,14 @@ inline MessageAuthenticationCode* get_mac(const std::string& algo_spec)
 * @param algo_spec the name of the desired PBKDF algorithm
 * @return pointer to newly allocated object of that type
 */
-BOTAN_DLL PBKDF* get_pbkdf(const std::string& algo_spec);
+BOTAN_DLL PBKDF* get_pbkdf(const containers::string& algo_spec);
 
 /**
 * @deprecated Use get_pbkdf
 * @param algo_spec the name of the desired algorithm
 * @return pointer to newly allocated object of that type
 */
-inline PBKDF* get_s2k(const std::string& algo_spec)
+inline PBKDF* get_s2k(const containers::string& algo_spec)
    {
    return get_pbkdf(algo_spec);
    }
@@ -7826,7 +7852,7 @@ inline PBKDF* get_s2k(const std::string& algo_spec)
 * @param algo_spec the name of the EME to create
 * @return pointer to newly allocated object of that type
 */
-BOTAN_DLL EME*  get_eme(const std::string& algo_spec);
+BOTAN_DLL EME*  get_eme(const containers::string& algo_spec);
 
 /**
 * Factory method for EMSA (message-encoding methods for signatures
@@ -7834,14 +7860,14 @@ BOTAN_DLL EME*  get_eme(const std::string& algo_spec);
 * @param algo_spec the name of the EME to create
 * @return pointer to newly allocated object of that type
 */
-BOTAN_DLL EMSA* get_emsa(const std::string& algo_spec);
+BOTAN_DLL EMSA* get_emsa(const containers::string& algo_spec);
 
 /**
 * Factory method for KDF (key derivation function)
 * @param algo_spec the name of the KDF to create
 * @return pointer to newly allocated object of that type
 */
-BOTAN_DLL KDF*  get_kdf(const std::string& algo_spec);
+BOTAN_DLL KDF*  get_kdf(const containers::string& algo_spec);
 
 /*
 * Get a cipher object
@@ -7857,7 +7883,7 @@ BOTAN_DLL KDF*  get_kdf(const std::string& algo_spec);
 * or decrypting filter
 * @return pointer to newly allocated encryption or decryption filter
 */
-BOTAN_DLL Keyed_Filter* get_cipher(const std::string& algo_spec,
+BOTAN_DLL Keyed_Filter* get_cipher(const containers::string& algo_spec,
                                    const SymmetricKey& key,
                                    const InitializationVector& iv,
                                    Cipher_Dir direction);
@@ -7871,7 +7897,7 @@ BOTAN_DLL Keyed_Filter* get_cipher(const std::string& algo_spec,
 * or decrypting filter
 * @return pointer to the encryption or decryption filter
 */
-BOTAN_DLL Keyed_Filter* get_cipher(const std::string& algo_spec,
+BOTAN_DLL Keyed_Filter* get_cipher(const containers::string& algo_spec,
                                    const SymmetricKey& key,
                                    Cipher_Dir direction);
 
@@ -7884,7 +7910,7 @@ BOTAN_DLL Keyed_Filter* get_cipher(const std::string& algo_spec,
 * decrypting filter
 * @return pointer to the encryption or decryption filter
 */
-BOTAN_DLL Keyed_Filter* get_cipher(const std::string& algo_spec,
+BOTAN_DLL Keyed_Filter* get_cipher(const containers::string& algo_spec,
                                    Cipher_Dir direction);
 
 /**
@@ -7892,7 +7918,7 @@ BOTAN_DLL Keyed_Filter* get_cipher(const std::string& algo_spec,
 * @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
-BOTAN_DLL bool have_algorithm(const std::string& algo_spec);
+BOTAN_DLL bool have_algorithm(const containers::string& algo_spec);
 
 /**
 * Check if a block cipher algorithm exists.
@@ -7901,7 +7927,7 @@ BOTAN_DLL bool have_algorithm(const std::string& algo_spec);
 * @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
-inline bool have_block_cipher(const std::string& algo_spec)
+inline bool have_block_cipher(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return (af.prototype_block_cipher(algo_spec) != 0);
@@ -7914,7 +7940,7 @@ inline bool have_block_cipher(const std::string& algo_spec)
 * @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
-inline bool have_stream_cipher(const std::string& algo_spec)
+inline bool have_stream_cipher(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return (af.prototype_stream_cipher(algo_spec) != 0);
@@ -7927,7 +7953,7 @@ inline bool have_stream_cipher(const std::string& algo_spec)
 * @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
-inline bool have_hash(const std::string& algo_spec)
+inline bool have_hash(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return (af.prototype_hash_function(algo_spec) != 0);
@@ -7940,7 +7966,7 @@ inline bool have_hash(const std::string& algo_spec)
 * @param algo_spec the name of the algorithm to check for
 * @return true if the algorithm exists, false otherwise
 */
-inline bool have_mac(const std::string& algo_spec)
+inline bool have_mac(const containers::string& algo_spec)
    {
    Algorithm_Factory& af = global_state().algorithm_factory();
    return (af.prototype_mac(algo_spec) != 0);
@@ -7957,7 +7983,7 @@ inline bool have_mac(const std::string& algo_spec)
 * @param algo_spec the name of the algorithm
 * @return block size of the specified algorithm
 */
-BOTAN_DLL size_t block_size_of(const std::string& algo_spec);
+BOTAN_DLL size_t block_size_of(const containers::string& algo_spec);
 
 /**
 * Find out the output length of a certain symmetric algorithm.
@@ -7966,7 +7992,7 @@ BOTAN_DLL size_t block_size_of(const std::string& algo_spec);
 * @param algo_spec the name of the algorithm
 * @return output length of the specified algorithm
 */
-BOTAN_DLL size_t output_length_of(const std::string& algo_spec);
+BOTAN_DLL size_t output_length_of(const containers::string& algo_spec);
 
 /**
 * Find out the minimum key size of a certain symmetric algorithm.
@@ -7976,7 +8002,7 @@ BOTAN_DLL size_t output_length_of(const std::string& algo_spec);
 * @return minimum key length of the specified algorithm
 */
 BOTAN_DEPRECATED("Retrieve object you want and then call key_spec")
-BOTAN_DLL size_t min_keylength_of(const std::string& algo_spec);
+BOTAN_DLL size_t min_keylength_of(const containers::string& algo_spec);
 
 /**
 * Find out the maximum key size of a certain symmetric algorithm.
@@ -7986,7 +8012,7 @@ BOTAN_DLL size_t min_keylength_of(const std::string& algo_spec);
 * @return maximum key length of the specified algorithm
 */
 BOTAN_DEPRECATED("Retrieve object you want and then call key_spec")
-BOTAN_DLL size_t max_keylength_of(const std::string& algo_spec);
+BOTAN_DLL size_t max_keylength_of(const containers::string& algo_spec);
 
 /**
 * Find out the size any valid key is a multiple of for a certain algorithm.
@@ -7996,7 +8022,7 @@ BOTAN_DLL size_t max_keylength_of(const std::string& algo_spec);
 * @return size any valid key is a multiple of
 */
 BOTAN_DEPRECATED("Retrieve object you want and then call key_spec")
-BOTAN_DLL size_t keylength_multiple_of(const std::string& algo_spec);
+BOTAN_DLL size_t keylength_multiple_of(const containers::string& algo_spec);
 
 }
 
@@ -8012,7 +8038,7 @@ namespace Botan {
 * No particular format should be assumed.
 * @return version string
 */
-BOTAN_DLL std::string version_string();
+BOTAN_DLL containers::string version_string();
 
 /**
 * Return the date this version of botan was released, in an integer of
@@ -8078,7 +8104,7 @@ class BOTAN_DLL AutoSeeded_RNG : public RandomNumberGenerator
 
       void clear() { rng->clear(); }
 
-      std::string name() const { return rng->name(); }
+      containers::string name() const { return rng->name(); }
 
       void reseed(size_t poll_bits = 256) { rng->reseed(poll_bits); }
 
@@ -8141,7 +8167,7 @@ class BOTAN_DLL PKCS10_Request : public X509_Object
       * Get the extendend key constraints (if any).
       * @return extended key constraints
       */
-      std::vector<OID> ex_constraints() const;
+      containers::vector<OID> ex_constraints() const;
 
       /**
       * Find out whether this is a CA request.
@@ -8160,7 +8186,7 @@ class BOTAN_DLL PKCS10_Request : public X509_Object
       * Get the challenge password for this request
       * @return challenge password for this request
       */
-      std::string challenge_password() const;
+      containers::string challenge_password() const;
 
       /**
       * Create a PKCS#10 Request from a data source.
@@ -8173,7 +8199,7 @@ class BOTAN_DLL PKCS10_Request : public X509_Object
       * @param filename the name of the file containing the DER or PEM
       * encoded request file
       */
-      PKCS10_Request(const std::string& filename);
+      PKCS10_Request(const containers::string& filename);
    private:
       void force_decode();
       void handle_attribute(const Attribute&);
@@ -8195,67 +8221,67 @@ class BOTAN_DLL X509_Cert_Options
       /**
       * the subject common name
       */
-      std::string common_name;
+      containers::string common_name;
 
       /**
       * the subject counry
       */
-      std::string country;
+      containers::string country;
 
       /**
       * the subject organization
       */
-      std::string organization;
+      containers::string organization;
 
       /**
       * the subject organizational unit
       */
-      std::string org_unit;
+      containers::string org_unit;
 
       /**
       * the subject locality
       */
-      std::string locality;
+      containers::string locality;
 
       /**
       * the subject state
       */
-      std::string state;
+      containers::string state;
 
       /**
       * the subject serial number
       */
-      std::string serial_number;
+      containers::string serial_number;
 
       /**
       * the subject email adress
       */
-      std::string email;
+      containers::string email;
 
       /**
       * the subject URI
       */
-      std::string uri;
+      containers::string uri;
 
       /**
       * the subject IPv4 address
       */
-      std::string ip;
+      containers::string ip;
 
       /**
       * the subject DNS
       */
-      std::string dns;
+      containers::string dns;
 
       /**
       * the subject XMPP
       */
-      std::string xmpp;
+      containers::string xmpp;
 
       /**
       * the subject challenge password
       */
-      std::string challenge;
+      containers::string challenge;
 
       /**
       * the subject notBefore
@@ -8284,7 +8310,7 @@ class BOTAN_DLL X509_Cert_Options
       /**
       * The key extended constraints for the subject public key
       */
-      std::vector<OID> ex_constraints;
+      containers::vector<OID> ex_constraints;
 
       /**
       * Check the options set in this object for validity.
@@ -8301,13 +8327,13 @@ class BOTAN_DLL X509_Cert_Options
       * Set the notBefore of the certificate.
       * @param time the notBefore value of the certificate
       */
-      void not_before(const std::string& time);
+      void not_before(const containers::string& time);
 
       /**
       * Set the notAfter of the certificate.
       * @param time the notAfter value of the certificate
       */
-      void not_after(const std::string& time);
+      void not_after(const containers::string& time);
 
       /**
       * Add the key constraints of the KeyUsage extension.
@@ -8325,7 +8351,7 @@ class BOTAN_DLL X509_Cert_Options
       * Add constraints to the ExtendedKeyUsage extension.
       * @param name the name to look up the oid to add
       */
-      void add_ex_constraint(const std::string& name);
+      void add_ex_constraint(const containers::string& name);
 
       /**
       * Construct a new options object
@@ -8333,7 +8359,7 @@ class BOTAN_DLL X509_Cert_Options
       * parameter would be "common_name/country/organization/organizational_unit".
       * @param expire_time the expiration time (from the current clock in seconds)
       */
-      X509_Cert_Options(const std::string& opts = "",
+      X509_Cert_Options(const containers::string& opts = "",
                         u32bit expire_time = 365 * 24 * 60 * 60);
    };
 
@@ -8351,7 +8377,7 @@ namespace X509 {
 BOTAN_DLL X509_Certificate
 create_self_signed_cert(const X509_Cert_Options& opts,
                         const Private_Key& key,
-                        const std::string& hash_fn,
+                        const containers::string& hash_fn,
                         RandomNumberGenerator& rng);
 
 /**
@@ -8364,7 +8390,7 @@ create_self_signed_cert(const X509_Cert_Options& opts,
 */
 BOTAN_DLL PKCS10_Request create_cert_req(const X509_Cert_Options& opts,
                                          const Private_Key& key,
-                                         const std::string& hash_fn,
+                                         const containers::string& hash_fn,
                                          RandomNumberGenerator& rng);
 
 }
@@ -8433,7 +8459,7 @@ class BOTAN_DLL DER_Encoder
          }
 
       template<typename T>
-      DER_Encoder& encode_list(const std::vector<T>& values)
+      DER_Encoder& encode_list(const containers::vector<T>& values)
          {
          for(size_t i = 0; i != values.size(); ++i)
             encode(values[i]);
@@ -8450,7 +8476,7 @@ class BOTAN_DLL DER_Encoder
                               const MemoryRegion<byte>& rep);
 
       DER_Encoder& add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
-                              const std::string& str);
+                              const containers::string& str);
 
       DER_Encoder& add_object(ASN1_Tag type_tag, ASN1_Tag class_tag,
                               byte val);
@@ -8466,11 +8492,11 @@ class BOTAN_DLL DER_Encoder
          private:
             ASN1_Tag type_tag, class_tag;
             SecureVector<byte> contents;
-            std::vector< SecureVector<byte> > set_contents;
+            containers::vector< SecureVector<byte> > set_contents;
          };
 
       SecureVector<byte> contents;
-      std::vector<DER_Sequence> subsequences;
+      containers::vector<DER_Sequence> subsequences;
    };
 
 }
@@ -8490,7 +8516,7 @@ class BOTAN_DLL EME1 : public EME
       * @param hash object to use for hashing (takes ownership)
       * @param P an optional label. Normally empty.
       */
-      EME1(HashFunction* hash, const std::string& P = "");
+      EME1(HashFunction* hash, const containers::string& P = "");
 
       ~EME1() { delete mgf; }
    private:
@@ -8674,7 +8700,7 @@ class BOTAN_DLL PK_Signer
       * @param prot says if fault protection should be enabled
       */
       PK_Signer(const Private_Key& key,
-                const std::string& emsa,
+                const containers::string& emsa,
                 Signature_Format format = IEEE_1363,
                 Fault_Protection prot = ENABLE_FAULT_PROTECTION);
 
@@ -8779,7 +8805,7 @@ class BOTAN_DLL PK_Verifier
       * @param format the signature format to use
       */
       PK_Verifier(const Public_Key& pub_key,
-                  const std::string& emsa,
+                  const containers::string& emsa,
                   Signature_Format format = IEEE_1363);
 
       ~PK_Verifier() { delete op; delete emsa; }
@@ -8842,7 +8868,7 @@ class BOTAN_DLL PK_Key_Agreement
       */
       SymmetricKey derive_key(size_t key_len,
                               const byte in[], size_t in_len,
-                              const std::string& params = "") const
+                              const containers::string& params = "") const
          {
          return derive_key(key_len, in, in_len,
                            reinterpret_cast<const byte*>(params.data()),
@@ -8857,7 +8883,7 @@ class BOTAN_DLL PK_Key_Agreement
       */
       SymmetricKey derive_key(size_t key_len,
                               const MemoryRegion<byte>& in,
-                              const std::string& params = "") const
+                              const containers::string& params = "") const
          {
          return derive_key(key_len, &in[0], in.size(),
                            reinterpret_cast<const byte*>(params.data()),
@@ -8870,7 +8896,7 @@ class BOTAN_DLL PK_Key_Agreement
       * @param kdf name of the KDF to use (or 'Raw' for no KDF)
       */
       PK_Key_Agreement(const PK_Key_Agreement_Key& key,
-                       const std::string& kdf);
+                       const containers::string& kdf);
 
       ~PK_Key_Agreement() { delete op; delete kdf; }
    private:
@@ -8895,7 +8921,7 @@ class BOTAN_DLL PK_Encryptor_EME : public PK_Encryptor
       * @param eme the EME to use
       */
       PK_Encryptor_EME(const Public_Key& key,
-                       const std::string& eme);
+                       const containers::string& eme);
 
       ~PK_Encryptor_EME() { delete op; delete eme; }
    private:
@@ -8918,7 +8944,7 @@ class BOTAN_DLL PK_Decryptor_EME : public PK_Decryptor
       * @param eme the EME to use
       */
       PK_Decryptor_EME(const Private_Key& key,
-                       const std::string& eme);
+                       const containers::string& eme);
 
       ~PK_Decryptor_EME() { delete op; delete eme; }
    private:
@@ -8949,7 +8975,7 @@ class BOTAN_DLL DES : public Block_Cipher_Fixed_Params<8, 8>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(round_key); }
-      std::string name() const { return "DES"; }
+      containers::string name() const { return "DES"; }
       BlockCipher* clone() const { return new DES; }
 
       DES() : round_key(32) {}
@@ -8969,7 +8995,7 @@ class BOTAN_DLL TripleDES : public Block_Cipher_Fixed_Params<8, 16, 24, 8>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(round_key); }
-      std::string name() const { return "TripleDES"; }
+      containers::string name() const { return "TripleDES"; }
       BlockCipher* clone() const { return new TripleDES; }
 
       TripleDES() : round_key(96) {}
@@ -9011,7 +9037,7 @@ class BOTAN_DLL DESX : public Block_Cipher_Fixed_Params<8, 24>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { des.clear(); zeroise(K1); zeroise(K2); }
-      std::string name() const { return "DESX"; }
+      containers::string name() const { return "DESX"; }
       BlockCipher* clone() const { return new DESX; }
 
       DESX() : K1(8), K2(8) {}
@@ -9045,7 +9071,7 @@ class BOTAN_DLL GOST_28147_89_Params
       /**
       * @return name of this parameter set
       */
-      std::string param_name() const { return name; }
+      containers::string param_name() const { return name; }
 
       /**
       * Default GOST parameters are the ones given in GOST R 34.11 for
@@ -9054,10 +9080,10 @@ class BOTAN_DLL GOST_28147_89_Params
       * Federation
       * @param name of the parameter set
       */
-      GOST_28147_89_Params(const std::string& name = "R3411_94_TestParam");
+      GOST_28147_89_Params(const containers::string& name = "R3411_94_TestParam");
    private:
       const byte* sboxes;
-      std::string name;
+      containers::string name;
    };
 
 /**
@@ -9071,7 +9097,7 @@ class BOTAN_DLL GOST_28147_89 : public Block_Cipher_Fixed_Params<8, 32>
 
       void clear() { zeroise(EK); }
 
-      std::string name() const;
+      containers::string name() const;
       BlockCipher* clone() const { return new GOST_28147_89(SBOX); }
 
       /**
@@ -9099,7 +9125,7 @@ namespace Botan {
 class BOTAN_DLL GOST_34_11 : public HashFunction
    {
    public:
-      std::string name() const { return "GOST-R-34.11-94" ; }
+      containers::string name() const { return "GOST-R-34.11-94" ; }
       size_t output_length() const { return 32; }
       size_t hash_block_size() const { return 32; }
       HashFunction* clone() const { return new GOST_34_11; }
@@ -9130,7 +9156,7 @@ namespace Botan {
 class BOTAN_DLL SHA_384 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "SHA-384"; }
+      containers::string name() const { return "SHA-384"; }
       size_t output_length() const { return 48; }
       HashFunction* clone() const { return new SHA_384; }
 
@@ -9151,7 +9177,7 @@ class BOTAN_DLL SHA_384 : public MDx_HashFunction
 class BOTAN_DLL SHA_512 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "SHA-512"; }
+      containers::string name() const { return "SHA-512"; }
       size_t output_length() const { return 64; }
       HashFunction* clone() const { return new SHA_512; }
 
@@ -9181,7 +9207,7 @@ class BOTAN_DLL PBE : public Filter
       * Set this filter's key.
       * @param pw the password to be used for the encryption
       */
-      virtual void set_key(const std::string& pw) = 0;
+      virtual void set_key(const containers::string& pw) = 0;
 
       /**
       * Create a new random salt value and set the default iterations value.
@@ -9223,7 +9249,7 @@ class BOTAN_DLL KDF1 : public KDF
                                 const byte secret[], size_t secret_len,
                                 const byte P[], size_t P_len) const;
 
-      std::string name() const { return "KDF1(" + hash->name() + ")"; }
+      containers::string name() const { return "KDF1(" + hash->name() + ")"; }
       KDF* clone() const { return new KDF1(hash->clone()); }
 
       KDF1(HashFunction* h) : hash(h) {}
@@ -9249,7 +9275,7 @@ class BOTAN_DLL MISTY1 : public Block_Cipher_Fixed_Params<8, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(EK); zeroise(DK); }
-      std::string name() const { return "MISTY1"; }
+      containers::string name() const { return "MISTY1"; }
       BlockCipher* clone() const { return new MISTY1; }
 
       /**
@@ -9274,7 +9300,7 @@ namespace Botan {
 class BOTAN_DLL CRC32 : public HashFunction
    {
    public:
-      std::string name() const { return "CRC32"; }
+      containers::string name() const { return "CRC32"; }
       size_t output_length() const { return 4; }
       HashFunction* clone() const { return new CRC32; }
 
@@ -9298,15 +9324,15 @@ namespace PEM_Code {
 /*
 * PEM Encoding/Decoding
 */
-BOTAN_DLL std::string encode(const byte[], size_t,
-                             const std::string&, size_t = 64);
-BOTAN_DLL std::string encode(const MemoryRegion<byte>&,
-                             const std::string&, size_t = 64);
+BOTAN_DLL containers::string encode(const byte[], size_t,
+                             const containers::string&, size_t = 64);
+BOTAN_DLL containers::string encode(const MemoryRegion<byte>&,
+                             const containers::string&, size_t = 64);
 
-BOTAN_DLL SecureVector<byte> decode(DataSource&, std::string&);
+BOTAN_DLL SecureVector<byte> decode(DataSource&, containers::string&);
 BOTAN_DLL SecureVector<byte> decode_check_label(DataSource&,
-                                                const std::string&);
-BOTAN_DLL bool matches(DataSource&, const std::string& = "",
+                                                const containers::string&);
+BOTAN_DLL bool matches(DataSource&, const containers::string& = "",
                        size_t search_range = 4096);
 
 }
@@ -9326,7 +9352,7 @@ class BOTAN_DLL XTEA : public Block_Cipher_Fixed_Params<8, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(EK); }
-      std::string name() const { return "XTEA"; }
+      containers::string name() const { return "XTEA"; }
       BlockCipher* clone() const { return new XTEA; }
 
       XTEA() : EK(64) {}
@@ -9356,7 +9382,7 @@ class BOTAN_DLL KASUMI : public Block_Cipher_Fixed_Params<8, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(EK); }
-      std::string name() const { return "KASUMI"; }
+      containers::string name() const { return "KASUMI"; }
       BlockCipher* clone() const { return new KASUMI; }
 
       KASUMI() : EK(64) {}
@@ -9428,7 +9454,7 @@ class BOTAN_DLL DL_Group
       * @param format the encoding format
       * @return string holding the PEM encoded group
       */
-      std::string PEM_encode(Format format) const;
+      containers::string PEM_encode(Format format) const;
 
       /**
       * Encode this group into a string using DER encoding.
@@ -9464,7 +9490,7 @@ class BOTAN_DLL DL_Group
       * the default values from the file policy.cpp will be used. For instance,
       * use "modp/ietf/768" as name.
       */
-      DL_Group(const std::string& name);
+      DL_Group(const containers::string& name);
 
       /**
       * Create a new group randomly.
@@ -9708,7 +9734,7 @@ namespace Botan {
 class BOTAN_DLL DH_PublicKey : public virtual DL_Scheme_PublicKey
    {
    public:
-      std::string algo_name() const { return "DH"; }
+      containers::string algo_name() const { return "DH"; }
 
       MemoryVector<byte> public_value() const;
       size_t max_input_bits() const { return group_p().bits(); }
@@ -9790,7 +9816,7 @@ class BOTAN_DLL CAST_256 : public Block_Cipher_Fixed_Params<16, 4, 32, 4>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(MK); zeroise(RK); }
-      std::string name() const { return "CAST-256"; }
+      containers::string name() const { return "CAST-256"; }
       BlockCipher* clone() const { return new CAST_256; }
 
       CAST_256() : MK(48), RK(48) {}
@@ -9820,7 +9846,7 @@ namespace Botan {
 class BOTAN_DLL MD2 : public HashFunction
    {
    public:
-      std::string name() const { return "MD2"; }
+      containers::string name() const { return "MD2"; }
       size_t output_length() const { return 16; }
       size_t hash_block_size() const { return 16; }
       HashFunction* clone() const { return new MD2; }
@@ -9853,7 +9879,7 @@ class BOTAN_DLL RC6 : public Block_Cipher_Fixed_Params<16, 1, 32>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(S); }
-      std::string name() const { return "RC6"; }
+      containers::string name() const { return "RC6"; }
       BlockCipher* clone() const { return new RC6; }
 
       RC6() : S(44) {}
@@ -9889,7 +9915,7 @@ class BOTAN_DLL WiderWake_41_BE : public StreamCipher
          }
 
       void clear();
-      std::string name() const { return "WiderWake4+1-BE"; }
+      containers::string name() const { return "WiderWake4+1-BE"; }
       StreamCipher* clone() const { return new WiderWake_41_BE; }
 
       WiderWake_41_BE() : T(256), state(5), t_key(4),
@@ -9919,7 +9945,7 @@ namespace Botan {
 class BOTAN_DLL ElGamal_PublicKey : public virtual DL_Scheme_PublicKey
    {
    public:
-      std::string algo_name() const { return "ElGamal"; }
+      containers::string algo_name() const { return "ElGamal"; }
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_42; }
 
       size_t max_input_bits() const { return (group_p().bits() - 1); }
@@ -10008,7 +10034,7 @@ class BOTAN_DLL HMAC_RNG : public RandomNumberGenerator
       void randomize(byte buf[], size_t len);
       bool is_seeded() const { return seeded; }
       void clear();
-      std::string name() const;
+      containers::string name() const;
 
       void reseed(size_t poll_bits);
       void add_entropy_source(EntropySource* es);
@@ -10026,7 +10052,7 @@ class BOTAN_DLL HMAC_RNG : public RandomNumberGenerator
       MessageAuthenticationCode* extractor;
       MessageAuthenticationCode* prf;
 
-      std::vector<EntropySource*> entropy_sources;
+      containers::vector<EntropySource*> entropy_sources;
       bool seeded;
 
       SecureVector<byte> K, io_buffer;
@@ -10045,7 +10071,7 @@ namespace Botan {
 class BOTAN_DLL SSL3_MAC : public MessageAuthenticationCode
    {
    public:
-      std::string name() const;
+      containers::string name() const;
       size_t output_length() const { return hash->output_length(); }
       MessageAuthenticationCode* clone() const;
 
@@ -10107,7 +10133,7 @@ class BOTAN_DLL Serpent : public Block_Cipher_Fixed_Params<16, 16, 32, 8>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(round_key); }
-      std::string name() const { return "Serpent"; }
+      containers::string name() const { return "Serpent"; }
       BlockCipher* clone() const { return new Serpent; }
 
       Serpent() : round_key(132) {}
@@ -10144,7 +10170,7 @@ namespace Botan {
 class BOTAN_DLL SHA_160 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "SHA-160"; }
+      containers::string name() const { return "SHA-160"; }
       size_t output_length() const { return 20; }
       HashFunction* clone() const { return new SHA_160; }
 
@@ -10195,7 +10221,7 @@ class BOTAN_DLL ANSI_X931_RNG : public RandomNumberGenerator
       void randomize(byte[], size_t);
       bool is_seeded() const;
       void clear();
-      std::string name() const;
+      containers::string name() const;
 
       void reseed(size_t poll_bits);
       void add_entropy_source(EntropySource*);
@@ -10248,7 +10274,7 @@ class BOTAN_DLL ECDSA_PublicKey : public virtual EC_PublicKey
       * Get this keys algorithm name.
       * @result this keys algorithm name ("ECDSA")
       */
-      std::string algo_name() const { return "ECDSA"; }
+      containers::string algo_name() const { return "ECDSA"; }
 
       /**
       * Get the maximum number of bits allowed to be fed to this key.
@@ -10373,7 +10399,7 @@ class BOTAN_DLL Square : public Block_Cipher_Fixed_Params<16, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear();
-      std::string name() const { return "Square"; }
+      containers::string name() const { return "Square"; }
       BlockCipher* clone() const { return new Square; }
 
       Square() : EK(28), DK(28), ME(32), MD(32) {}
@@ -10424,7 +10450,7 @@ void BOTAN_DLL hex_encode(char output[],
 * @param uppercase should output be upper or lower case?
 * @return hexadecimal representation of input
 */
-std::string BOTAN_DLL hex_encode(const byte input[],
+containers::string BOTAN_DLL hex_encode(const byte input[],
                                  size_t input_length,
                                  bool uppercase = true);
 
@@ -10434,7 +10460,7 @@ std::string BOTAN_DLL hex_encode(const byte input[],
 * @param uppercase should output be upper or lower case?
 * @return hexadecimal representation of input
 */
-std::string BOTAN_DLL hex_encode(const MemoryRegion<byte>& input,
+containers::string BOTAN_DLL hex_encode(const MemoryRegion<byte>& input,
                                  bool uppercase = true);
 
 /**
@@ -10479,7 +10505,7 @@ size_t BOTAN_DLL hex_decode(byte output[],
 * @return number of bytes written to output
 */
 size_t BOTAN_DLL hex_decode(byte output[],
-                            const std::string& input,
+                            const containers::string& input,
                             bool ignore_ws = true);
 
 /**
@@ -10501,7 +10527,7 @@ SecureVector<byte> BOTAN_DLL hex_decode(const char input[],
                    exception if whitespace is encountered
 * @return decoded hex output
 */
-SecureVector<byte> BOTAN_DLL hex_decode(const std::string& input,
+SecureVector<byte> BOTAN_DLL hex_decode(const containers::string& input,
                                         bool ignore_ws = true);
 
 }
@@ -10527,7 +10553,7 @@ class BOTAN_DLL Cascade_Cipher : public BlockCipher
          }
 
       void clear();
-      std::string name() const;
+      containers::string name() const;
       BlockCipher* clone() const;
 
       /**
@@ -10725,7 +10751,7 @@ namespace Botan {
 class BOTAN_DLL MD5 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "MD5"; }
+      containers::string name() const { return "MD5"; }
       size_t output_length() const { return 16; }
       HashFunction* clone() const { return new MD5; }
 
@@ -10835,7 +10861,7 @@ class BOTAN_DLL ECB_Encryption : public Keyed_Filter,
                                  private Buffered_Filter
    {
    public:
-      std::string name() const;
+      containers::string name() const;
 
       void set_key(const SymmetricKey& key) { cipher->set_key(key); }
 
@@ -10869,7 +10895,7 @@ class BOTAN_DLL ECB_Decryption : public Keyed_Filter,
                                  public Buffered_Filter
    {
    public:
-      std::string name() const;
+      containers::string name() const;
 
       void set_key(const SymmetricKey& key) { cipher->set_key(key); }
 
@@ -10916,7 +10942,7 @@ namespace Charset {
 /*
 * Character Set Handling
 */
-std::string BOTAN_DLL transcode(const std::string& str,
+containers::string BOTAN_DLL transcode(const containers::string& str,
                                 Character_Set to,
                                 Character_Set from);
 
@@ -11032,7 +11058,7 @@ namespace Botan {
 class BOTAN_DLL RSA_PublicKey : public virtual IF_Scheme_PublicKey
    {
    public:
-      std::string algo_name() const { return "RSA"; }
+      containers::string algo_name() const { return "RSA"; }
 
       RSA_PublicKey(const AlgorithmIdentifier& alg_id,
                     const MemoryRegion<byte>& key_bits) :
@@ -11171,7 +11197,7 @@ namespace Botan {
 class BOTAN_DLL RIPEMD_160 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "RIPEMD-160"; }
+      containers::string name() const { return "RIPEMD-160"; }
       size_t output_length() const { return 20; }
       HashFunction* clone() const { return new RIPEMD_160; }
 
@@ -11197,7 +11223,7 @@ namespace Botan {
 class BOTAN_DLL Whirlpool : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "Whirlpool"; }
+      containers::string name() const { return "Whirlpool"; }
       size_t output_length() const { return 64; }
       HashFunction* clone() const { return new Whirlpool; }
 
@@ -11232,7 +11258,7 @@ namespace Botan {
 class BOTAN_DLL Tiger : public MDx_HashFunction
    {
    public:
-      std::string name() const;
+      containers::string name() const;
       size_t output_length() const { return hash_len; }
 
       HashFunction* clone() const
@@ -11279,7 +11305,7 @@ class BOTAN_DLL SEED : public Block_Cipher_Fixed_Params<16, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(K); }
-      std::string name() const { return "SEED"; }
+      containers::string name() const { return "SEED"; }
       BlockCipher* clone() const { return new SEED; }
 
       SEED() : K(32) {}
@@ -11367,7 +11393,7 @@ class BOTAN_DLL Twofish : public Block_Cipher_Fixed_Params<16, 16, 32, 8>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear();
-      std::string name() const { return "Twofish"; }
+      containers::string name() const { return "Twofish"; }
       BlockCipher* clone() const { return new Twofish; }
 
       Twofish() : SB(1024), RK(40) {}
@@ -11405,7 +11431,7 @@ namespace Botan {
 *        2 is CMAC(Blowfish)
 *        all other values are currently undefined
 */
-std::string BOTAN_DLL generate_passhash9(const std::string& password,
+containers::string BOTAN_DLL generate_passhash9(const containers::string& password,
                                          RandomNumberGenerator& rng,
                                          u16bit work_factor = 10,
                                          byte alg_id = 0);
@@ -11415,8 +11441,8 @@ std::string BOTAN_DLL generate_passhash9(const std::string& password,
 * @param password the password to check against
 * @param hash the stored hash to check against
 */
-bool BOTAN_DLL check_passhash9(const std::string& password,
-                               const std::string& hash);
+bool BOTAN_DLL check_passhash9(const containers::string& password,
+                               const containers::string& hash);
 
 }
 
@@ -11429,7 +11455,7 @@ namespace Botan {
 class BOTAN_DLL SHA_224 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "SHA-224"; }
+      containers::string name() const { return "SHA-224"; }
       size_t output_length() const { return 28; }
       HashFunction* clone() const { return new SHA_224; }
 
@@ -11450,7 +11476,7 @@ class BOTAN_DLL SHA_224 : public MDx_HashFunction
 class BOTAN_DLL SHA_256 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "SHA-256"; }
+      containers::string name() const { return "SHA-256"; }
       size_t output_length() const { return 32; }
       HashFunction* clone() const { return new SHA_256; }
 
@@ -11476,7 +11502,7 @@ namespace Botan {
 class BOTAN_DLL BMW_512 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "BMW512"; }
+      containers::string name() const { return "BMW512"; }
       size_t output_length() const { return 64; }
       HashFunction* clone() const { return new BMW_512; }
 
@@ -11502,21 +11528,21 @@ namespace Botan {
 * @param label the human-readable label
 * @param headers a set of key/value pairs included in the header
 */
-BOTAN_DLL std::string PGP_encode(
+BOTAN_DLL containers::string PGP_encode(
    const byte input[],
    size_t length,
-   const std::string& label,
-   const std::map<std::string, std::string>& headers);
+   const containers::string& label,
+   const containers::map<containers::string, containers::string>& headers);
 
 /**
 * @param input the input data
 * @param length length of input in bytes
 * @param label the human-readable label
 */
-BOTAN_DLL std::string PGP_encode(
+BOTAN_DLL containers::string PGP_encode(
    const byte input[],
    size_t length,
-   const std::string& label);
+   const containers::string& label);
 
 /**
 * @param source the input source
@@ -11526,8 +11552,8 @@ BOTAN_DLL std::string PGP_encode(
 */
 BOTAN_DLL SecureVector<byte> PGP_decode(
    DataSource& source,
-   std::string& label,
-   std::map<std::string, std::string>& headers);
+   containers::string& label,
+   containers::map<containers::string, containers::string>& headers);
 
 /**
 * @param source the input source
@@ -11536,7 +11562,7 @@ BOTAN_DLL SecureVector<byte> PGP_decode(
 */
 BOTAN_DLL SecureVector<byte> PGP_decode(
    DataSource& source,
-   std::string& label);
+   containers::string& label);
 
 }
 
@@ -11566,7 +11592,7 @@ class BOTAN_DLL Certificate_Store
       /**
       * Subject DN and (optionally) key identifier
       */
-      virtual std::vector<X509_Certificate>
+      virtual containers::vector<X509_Certificate>
          find_cert_by_subject_and_key_id(
             const X509_DN& subject_dn,
             const MemoryRegion<byte>& key_id) const = 0;
@@ -11574,7 +11600,7 @@ class BOTAN_DLL Certificate_Store
       /**
       * Find CRLs by the DN and key id of the issuer
       */
-      virtual std::vector<X509_CRL>
+      virtual containers::vector<X509_CRL>
          find_crl_by_subject_and_key_id(
             const X509_DN& issuer_dn,
             const MemoryRegion<byte>& key_id) const = 0;
@@ -11592,19 +11618,19 @@ class BOTAN_DLL Certificate_Store_Memory : public Certificate_Store
 
       void add_crl(const X509_CRL& crl);
 
-      std::vector<X509_Certificate> find_cert_by_subject_and_key_id(
+      containers::vector<X509_Certificate> find_cert_by_subject_and_key_id(
          const X509_DN& subject_dn,
          const MemoryRegion<byte>& key_id) const;
 
-      std::vector<X509_CRL> find_crl_by_subject_and_key_id(
+      containers::vector<X509_CRL> find_crl_by_subject_and_key_id(
          const X509_DN& issuer_dn,
          const MemoryRegion<byte>& key_id) const;
 
       Certificate_Store_Memory() {}
    private:
       // TODO: Add indexing on the DN and key id to avoid linear search?
-      std::vector<X509_Certificate> certs;
-      std::vector<X509_CRL> crls;
+      containers::vector<X509_Certificate> certs;
+      containers::vector<X509_CRL> crls;
    };
 
 // TODO: file-backed store
@@ -11623,7 +11649,7 @@ class BOTAN_DLL KDF2 : public KDF
       SecureVector<byte> derive(size_t, const byte[], size_t,
                                 const byte[], size_t) const;
 
-      std::string name() const { return "KDF2(" + hash->name() + ")"; }
+      containers::string name() const { return "KDF2(" + hash->name() + ")"; }
       KDF* clone() const { return new KDF2(hash->clone()); }
 
       KDF2(HashFunction* h) : hash(h) {}
@@ -11651,7 +11677,7 @@ namespace KeyPair {
 BOTAN_DLL bool
 encryption_consistency_check(RandomNumberGenerator& rng,
                              const Private_Key& key,
-                             const std::string& padding);
+                             const containers::string& padding);
 
 /**
 * Tests whether the key is consistent for signatures; whether a
@@ -11664,7 +11690,7 @@ encryption_consistency_check(RandomNumberGenerator& rng,
 BOTAN_DLL bool
 signature_consistency_check(RandomNumberGenerator& rng,
                             const Private_Key& key,
-                            const std::string& padding);
+                            const containers::string& padding);
 
 }
 
@@ -11685,8 +11711,8 @@ namespace CryptoBox {
 * @param passphrase the passphrase used to encrypt the message
 * @param rng a ref to a random number generator, such as AutoSeeded_RNG
 */
-BOTAN_DLL std::string encrypt(const byte input[], size_t input_len,
-                              const std::string& passphrase,
+BOTAN_DLL containers::string encrypt(const byte input[], size_t input_len,
+                              const containers::string& passphrase,
                               RandomNumberGenerator& rng);
 
 /**
@@ -11695,16 +11721,16 @@ BOTAN_DLL std::string encrypt(const byte input[], size_t input_len,
 * @param input_len the length of input in bytes
 * @param passphrase the passphrase used to encrypt the message
 */
-BOTAN_DLL std::string decrypt(const byte input[], size_t input_len,
-                              const std::string& passphrase);
+BOTAN_DLL containers::string decrypt(const byte input[], size_t input_len,
+                              const containers::string& passphrase);
 
 /**
 * Decrypt a message encrypted with CryptoBox::encrypt
 * @param input the input data
 * @param passphrase the passphrase used to encrypt the message
 */
-BOTAN_DLL std::string decrypt(const std::string& input,
-                              const std::string& passphrase);
+BOTAN_DLL containers::string decrypt(const containers::string& input,
+                              const containers::string& passphrase);
 
 }
 
@@ -11759,8 +11785,8 @@ class BOTAN_DLL X509_Store
 
       X509_Code validate_cert(const X509_Certificate&, Cert_Usage = ANY);
 
-      std::vector<X509_Certificate> get_cert_chain(const X509_Certificate&);
-      std::string PEM_encode() const;
+      containers::vector<X509_Certificate> get_cert_chain(const X509_Certificate&);
+      containers::string PEM_encode() const;
 
       X509_Code add_crl(const X509_CRL&);
       void add_cert(const X509_Certificate&, bool = false);
@@ -11812,15 +11838,15 @@ class BOTAN_DLL X509_Store
 
       void do_add_certs(DataSource&, bool);
       X509_Code construct_cert_chain(const X509_Certificate&,
-                                     std::vector<size_t>&, bool = false);
+                                     containers::vector<size_t>&, bool = false);
 
       size_t find_parent_of(const X509_Certificate&);
       bool is_revoked(const X509_Certificate&) const;
 
       static const size_t NO_CERT_FOUND = 0xFFFFFFFF;
-      std::vector<Cert_Info> certs;
-      std::vector<CRL_Data> revoked;
-      std::vector<Certificate_Store*> stores;
+      containers::vector<Cert_Info> certs;
+      containers::vector<CRL_Data> revoked;
+      containers::vector<Certificate_Store*> stores;
       u32bit time_slack, validation_cache_timeout;
       mutable bool revoked_info_valid;
    };
@@ -11840,7 +11866,7 @@ class BOTAN_DLL Noekeon : public Block_Cipher_Fixed_Params<16, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear();
-      std::string name() const { return "Noekeon"; }
+      containers::string name() const { return "Noekeon"; }
       BlockCipher* clone() const { return new Noekeon; }
 
       Noekeon() : EK(4), DK(4) {}
@@ -11878,7 +11904,7 @@ namespace Botan {
 *
 * @see http://www.usenix.org/events/usenix99/provos/provos_html/
 */
-std::string BOTAN_DLL generate_bcrypt(const std::string& password,
+containers::string BOTAN_DLL generate_bcrypt(const containers::string& password,
                                       RandomNumberGenerator& rng,
                                       u16bit work_factor = 10);
 
@@ -11887,8 +11913,8 @@ std::string BOTAN_DLL generate_bcrypt(const std::string& password,
 * @param password the password to check against
 * @param hash the stored hash to check against
 */
-bool BOTAN_DLL check_bcrypt(const std::string& password,
-                            const std::string& hash);
+bool BOTAN_DLL check_bcrypt(const containers::string& password,
+                            const containers::string& hash);
 
 }
 
@@ -11901,7 +11927,7 @@ namespace Botan {
 class BOTAN_DLL CFB_Encryption : public Keyed_Filter
    {
    public:
-      std::string name() const { return cipher->name() + "/CFB"; }
+      containers::string name() const { return cipher->name() + "/CFB"; }
 
       void set_iv(const InitializationVector&);
 
@@ -11935,7 +11961,7 @@ class BOTAN_DLL CFB_Encryption : public Keyed_Filter
 class BOTAN_DLL CFB_Decryption : public Keyed_Filter
    {
    public:
-      std::string name() const { return cipher->name() + "/CFB"; }
+      containers::string name() const { return cipher->name() + "/CFB"; }
 
       void set_iv(const InitializationVector&);
 
@@ -11997,12 +12023,12 @@ class BOTAN_DLL Certificate_Extension
       /*
       * @return short readable name
       */
-      virtual std::string config_id() const = 0;
+      virtual containers::string config_id() const = 0;
 
       /*
       * @return specific OID name
       */
-      virtual std::string oid_name() const = 0;
+      virtual containers::string oid_name() const = 0;
 
       virtual ~Certificate_Extension() {}
    protected:
@@ -12033,7 +12059,7 @@ class BOTAN_DLL Extensions : public ASN1_Object
    private:
       static Certificate_Extension* get_extension(const OID&);
 
-      std::vector<std::pair<Certificate_Extension*, bool> > extensions;
+      containers::vector<std::pair<Certificate_Extension*, bool> > extensions;
       bool should_throw;
    };
 
@@ -12056,8 +12082,8 @@ class BOTAN_DLL Basic_Constraints : public Certificate_Extension
       bool get_is_ca() const { return is_ca; }
       size_t get_path_limit() const;
    private:
-      std::string config_id() const { return "basic_constraints"; }
-      std::string oid_name() const { return "X509v3.BasicConstraints"; }
+      containers::string config_id() const { return "basic_constraints"; }
+      containers::string oid_name() const { return "X509v3.BasicConstraints"; }
 
       MemoryVector<byte> encode_inner() const;
       void decode_inner(const MemoryRegion<byte>&);
@@ -12079,8 +12105,8 @@ class BOTAN_DLL Key_Usage : public Certificate_Extension
 
       Key_Constraints get_constraints() const { return constraints; }
    private:
-      std::string config_id() const { return "key_usage"; }
-      std::string oid_name() const { return "X509v3.KeyUsage"; }
+      containers::string config_id() const { return "key_usage"; }
+      containers::string oid_name() const { return "X509v3.KeyUsage"; }
 
       bool should_encode() const { return (constraints != NO_CONSTRAINTS); }
       MemoryVector<byte> encode_inner() const;
@@ -12103,8 +12129,8 @@ class BOTAN_DLL Subject_Key_ID : public Certificate_Extension
 
       MemoryVector<byte> get_key_id() const { return key_id; }
    private:
-      std::string config_id() const { return "subject_key_id"; }
-      std::string oid_name() const { return "X509v3.SubjectKeyIdentifier"; }
+      containers::string config_id() const { return "subject_key_id"; }
+      containers::string oid_name() const { return "X509v3.SubjectKeyIdentifier"; }
 
       bool should_encode() const { return (key_id.size() > 0); }
       MemoryVector<byte> encode_inner() const;
@@ -12127,8 +12153,8 @@ class BOTAN_DLL Authority_Key_ID : public Certificate_Extension
 
       MemoryVector<byte> get_key_id() const { return key_id; }
    private:
-      std::string config_id() const { return "authority_key_id"; }
-      std::string oid_name() const { return "X509v3.AuthorityKeyIdentifier"; }
+      containers::string config_id() const { return "authority_key_id"; }
+      containers::string oid_name() const { return "X509v3.AuthorityKeyIdentifier"; }
 
       bool should_encode() const { return (key_id.size() > 0); }
       MemoryVector<byte> encode_inner() const;
@@ -12148,19 +12174,19 @@ class BOTAN_DLL Alternative_Name : public Certificate_Extension
 
    protected:
       Alternative_Name(const AlternativeName&,
-                       const std::string&, const std::string&);
+                       const containers::string&, const containers::string&);
 
-      Alternative_Name(const std::string&, const std::string&);
+      Alternative_Name(const containers::string&, const containers::string&);
    private:
-      std::string config_id() const { return config_name_str; }
-      std::string oid_name() const { return oid_name_str; }
+      containers::string config_id() const { return config_name_str; }
+      containers::string oid_name() const { return oid_name_str; }
 
       bool should_encode() const { return alt_name.has_items(); }
       MemoryVector<byte> encode_inner() const;
       void decode_inner(const MemoryRegion<byte>&);
       void contents_to(Data_Store&, Data_Store&) const;
 
-      std::string config_name_str, oid_name_str;
+      containers::string config_name_str, oid_name_str;
       AlternativeName alt_name;
    };
 
@@ -12197,19 +12223,19 @@ class BOTAN_DLL Extended_Key_Usage : public Certificate_Extension
       Extended_Key_Usage* copy() const { return new Extended_Key_Usage(oids); }
 
       Extended_Key_Usage() {}
-      Extended_Key_Usage(const std::vector<OID>& o) : oids(o) {}
+      Extended_Key_Usage(const containers::vector<OID>& o) : oids(o) {}
 
-      std::vector<OID> get_oids() const { return oids; }
+      containers::vector<OID> get_oids() const { return oids; }
    private:
-      std::string config_id() const { return "extended_key_usage"; }
-      std::string oid_name() const { return "X509v3.ExtendedKeyUsage"; }
+      containers::string config_id() const { return "extended_key_usage"; }
+      containers::string oid_name() const { return "X509v3.ExtendedKeyUsage"; }
 
       bool should_encode() const { return (oids.size() > 0); }
       MemoryVector<byte> encode_inner() const;
       void decode_inner(const MemoryRegion<byte>&);
       void contents_to(Data_Store&, Data_Store&) const;
 
-      std::vector<OID> oids;
+      containers::vector<OID> oids;
    };
 
 /**
@@ -12222,19 +12248,19 @@ class BOTAN_DLL Certificate_Policies : public Certificate_Extension
          { return new Certificate_Policies(oids); }
 
       Certificate_Policies() {}
-      Certificate_Policies(const std::vector<OID>& o) : oids(o) {}
+      Certificate_Policies(const containers::vector<OID>& o) : oids(o) {}
 
-      std::vector<OID> get_oids() const { return oids; }
+      containers::vector<OID> get_oids() const { return oids; }
    private:
-      std::string config_id() const { return "policy_info"; }
-      std::string oid_name() const { return "X509v3.CertificatePolicies"; }
+      containers::string config_id() const { return "policy_info"; }
+      containers::string oid_name() const { return "X509v3.CertificatePolicies"; }
 
       bool should_encode() const { return (oids.size() > 0); }
       MemoryVector<byte> encode_inner() const;
       void decode_inner(const MemoryRegion<byte>&);
       void contents_to(Data_Store&, Data_Store&) const;
 
-      std::vector<OID> oids;
+      containers::vector<OID> oids;
    };
 
 /**
@@ -12250,8 +12276,8 @@ class BOTAN_DLL CRL_Number : public Certificate_Extension
 
       size_t get_crl_number() const;
    private:
-      std::string config_id() const { return "crl_number"; }
-      std::string oid_name() const { return "X509v3.CRLNumber"; }
+      containers::string config_id() const { return "crl_number"; }
+      containers::string oid_name() const { return "X509v3.CRLNumber"; }
 
       bool should_encode() const { return has_value; }
       MemoryVector<byte> encode_inner() const;
@@ -12274,8 +12300,8 @@ class BOTAN_DLL CRL_ReasonCode : public Certificate_Extension
 
       CRL_Code get_reason() const { return reason; }
    private:
-      std::string config_id() const { return "crl_reason"; }
-      std::string oid_name() const { return "X509v3.ReasonCode"; }
+      containers::string config_id() const { return "crl_reason"; }
+      containers::string oid_name() const { return "X509v3.ReasonCode"; }
 
       bool should_encode() const { return (reason != UNSPECIFIED); }
       MemoryVector<byte> encode_inner() const;
@@ -12298,7 +12324,7 @@ namespace Botan {
 class BOTAN_DLL DSA_PublicKey : public virtual DL_Scheme_PublicKey
    {
    public:
-      std::string algo_name() const { return "DSA"; }
+      containers::string algo_name() const { return "DSA"; }
 
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_57; }
       size_t message_parts() const { return 2; }
@@ -12393,12 +12419,12 @@ class BOTAN_DLL X942_PRF : public KDF
       SecureVector<byte> derive(size_t, const byte[], size_t,
                                 const byte[], size_t) const;
 
-      std::string name() const { return "X942_PRF(" + key_wrap_oid + ")"; }
+      containers::string name() const { return "X942_PRF(" + key_wrap_oid + ")"; }
       KDF* clone() const { return new X942_PRF(key_wrap_oid); }
 
-      X942_PRF(const std::string& oid);
+      X942_PRF(const containers::string& oid);
    private:
-      std::string key_wrap_oid;
+      containers::string key_wrap_oid;
    };
 
 }
@@ -12416,7 +12442,7 @@ class BOTAN_DLL TEA : public Block_Cipher_Fixed_Params<8, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(K); }
-      std::string name() const { return "TEA"; }
+      containers::string name() const { return "TEA"; }
       BlockCipher* clone() const { return new TEA; }
 
       TEA() : K(4) {}
@@ -12436,7 +12462,7 @@ namespace Botan {
 class BOTAN_DLL NR_PublicKey : public virtual DL_Scheme_PublicKey
    {
    public:
-      std::string algo_name() const { return "NR"; }
+      containers::string algo_name() const { return "NR"; }
 
       DL_Group::Format group_format() const { return DL_Group::ANSI_X9_57; }
 
@@ -12528,7 +12554,7 @@ class BOTAN_DLL ARC4 : public StreamCipher
       void cipher(const byte in[], byte out[], size_t length);
 
       void clear();
-      std::string name() const;
+      containers::string name() const;
 
       StreamCipher* clone() const { return new ARC4(SKIP); }
 
@@ -12567,7 +12593,7 @@ namespace Botan {
 class BOTAN_DLL RW_PublicKey : public virtual IF_Scheme_PublicKey
    {
    public:
-      std::string algo_name() const { return "RW"; }
+      containers::string algo_name() const { return "RW"; }
 
       RW_PublicKey(const AlgorithmIdentifier& alg_id,
                    const MemoryRegion<byte>& key_bits) :
@@ -13271,7 +13297,7 @@ class BOTAN_DLL CBC_Encryption : public Keyed_Filter,
                                  private Buffered_Filter
    {
    public:
-      std::string name() const;
+      containers::string name() const;
 
       void set_iv(const InitializationVector& iv);
 
@@ -13311,7 +13337,7 @@ class BOTAN_DLL CBC_Decryption : public Keyed_Filter,
                                  private Buffered_Filter
    {
    public:
-      std::string name() const;
+      containers::string name() const;
 
       void set_iv(const InitializationVector& iv);
 
@@ -13579,7 +13605,7 @@ namespace Botan {
 class BOTAN_DLL SecureQueue : public Fanout_Filter, public DataSource
    {
    public:
-      std::string name() const { return "Queue"; }
+      containers::string name() const { return "Queue"; }
 
       void write(const byte[], size_t);
 
@@ -13631,7 +13657,7 @@ class BOTAN_DLL HMAC : public MessageAuthenticationCode
    {
    public:
       void clear();
-      std::string name() const;
+      containers::string name() const;
       MessageAuthenticationCode* clone() const;
 
       size_t output_length() const { return hash->output_length(); }
@@ -13673,7 +13699,7 @@ class BOTAN_DLL OpenPGP_S2K : public PBKDF
 
       ~OpenPGP_S2K() { delete hash; }
 
-      std::string name() const
+      containers::string name() const
          {
          return "OpenPGP-S2K(" + hash->name() + ")";
          }
@@ -13684,7 +13710,7 @@ class BOTAN_DLL OpenPGP_S2K : public PBKDF
          }
 
       OctetString derive_key(size_t output_len,
-                             const std::string& passphrase,
+                             const containers::string& passphrase,
                              const byte salt[], size_t salt_len,
                              size_t iterations) const;
    private:
@@ -13718,7 +13744,7 @@ class BOTAN_DLL Lion : public BlockCipher
          }
 
       void clear();
-      std::string name() const;
+      containers::string name() const;
       BlockCipher* clone() const;
 
       /**
@@ -13756,7 +13782,7 @@ class BOTAN_DLL Skipjack : public Block_Cipher_Fixed_Params<8, 10>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear();
-      std::string name() const { return "Skipjack"; }
+      containers::string name() const { return "Skipjack"; }
       BlockCipher* clone() const { return new Skipjack; }
 
       Skipjack() : FTAB(2560) {}
@@ -13826,7 +13852,7 @@ class BOTAN_DLL ECDH_PublicKey : public virtual EC_PublicKey
       * Get this keys algorithm name.
       * @return this keys algorithm name
       */
-      std::string algo_name() const { return "ECDH"; }
+      containers::string algo_name() const { return "ECDH"; }
 
       /**
       * Get the maximum number of bits allowed to be fed to this key.
@@ -13907,7 +13933,7 @@ class BOTAN_DLL AES_128 : public Block_Cipher_Fixed_Params<16, 16>
 
       void clear();
 
-      std::string name() const { return "AES-128"; }
+      containers::string name() const { return "AES-128"; }
       BlockCipher* clone() const { return new AES_128; }
    private:
       void key_schedule(const byte key[], size_t length);
@@ -13929,7 +13955,7 @@ class BOTAN_DLL AES_192 : public Block_Cipher_Fixed_Params<16, 24>
 
       void clear();
 
-      std::string name() const { return "AES-192"; }
+      containers::string name() const { return "AES-192"; }
       BlockCipher* clone() const { return new AES_192; }
    private:
       void key_schedule(const byte key[], size_t length);
@@ -13951,7 +13977,7 @@ class BOTAN_DLL AES_256 : public Block_Cipher_Fixed_Params<16, 32>
 
       void clear();
 
-      std::string name() const { return "AES-256"; }
+      containers::string name() const { return "AES-256"; }
       BlockCipher* clone() const { return new AES_256; }
    private:
       void key_schedule(const byte key[], size_t length);
@@ -14023,7 +14049,7 @@ class BOTAN_DLL Comb4P : public HashFunction
          return new Comb4P(hash1->clone(), hash2->clone());
          }
 
-      std::string name() const
+      containers::string name() const
          {
          return "Comb4P(" + hash1->name() + "," + hash2->name() + ")";
          }
@@ -14056,7 +14082,7 @@ class BOTAN_DLL RTSS_Share
       * @param identifier the 16 byte share identifier
       * @param rng the random number generator to use
       */
-      static std::vector<RTSS_Share>
+      static containers::vector<RTSS_Share>
          split(byte M, byte N,
                const byte secret[], u16bit secret_len,
                const byte identifier[16],
@@ -14066,19 +14092,19 @@ class BOTAN_DLL RTSS_Share
       * @param shares the list of shares
       */
       static SecureVector<byte>
-        reconstruct(const std::vector<RTSS_Share>& shares);
+        reconstruct(const containers::vector<RTSS_Share>& shares);
 
       RTSS_Share() {}
 
       /**
       * @param hex_input the share encoded in hexadecimal
       */
-      RTSS_Share(const std::string& hex_input);
+      RTSS_Share(const containers::string& hex_input);
 
       /**
       * @return hex representation
       */
-      std::string to_string() const;
+      containers::string to_string() const;
 
       /**
       * @return share identifier
@@ -14120,7 +14146,7 @@ class BOTAN_DLL RC2 : public Block_Cipher_Fixed_Params<8, 1, 32>
       static byte EKB_code(size_t bits);
 
       void clear() { zeroise(K); }
-      std::string name() const { return "RC2"; }
+      containers::string name() const { return "RC2"; }
       BlockCipher* clone() const { return new RC2; }
 
       RC2() : K(64) {}
@@ -14154,7 +14180,7 @@ class BOTAN_DLL Salsa20 : public StreamCipher
          }
 
       void clear();
-      std::string name() const;
+      containers::string name() const;
       StreamCipher* clone() const { return new Salsa20; }
 
       Salsa20() : state(16), buffer(64), position(0) {}
@@ -14177,7 +14203,7 @@ namespace Botan {
 class BOTAN_DLL RIPEMD_128 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "RIPEMD-128"; }
+      containers::string name() const { return "RIPEMD-128"; }
       size_t output_length() const { return 16; }
       HashFunction* clone() const { return new RIPEMD_128; }
 
@@ -14203,7 +14229,7 @@ namespace Botan {
 class BOTAN_DLL CRC24 : public HashFunction
    {
    public:
-      std::string name() const { return "CRC24"; }
+      containers::string name() const { return "CRC24"; }
       size_t output_length() const { return 3; }
       HashFunction* clone() const { return new CRC24; }
 
@@ -14245,7 +14271,7 @@ class BOTAN_DLL PKCS5_PBKDF1 : public PBKDF
 
       ~PKCS5_PBKDF1() { delete hash; }
 
-      std::string name() const
+      containers::string name() const
          {
          return "PBKDF1(" + hash->name() + ")";
          }
@@ -14256,7 +14282,7 @@ class BOTAN_DLL PKCS5_PBKDF1 : public PBKDF
          }
 
       OctetString derive_key(size_t output_len,
-                             const std::string& passphrase,
+                             const containers::string& passphrase,
                              const byte salt[], size_t salt_len,
                              size_t iterations) const;
    private:
@@ -14313,7 +14339,7 @@ class BOTAN_DLL X509_CA
       * as the offset from the current time
       */
       X509_CRL update_crl(const X509_CRL& last_crl,
-                          const std::vector<CRL_Entry>& new_entries,
+                          const containers::vector<CRL_Entry>& new_entries,
                           RandomNumberGenerator& rng,
                           u32bit next_update = 0) const;
 
@@ -14348,14 +14374,14 @@ class BOTAN_DLL X509_CA
       */
       X509_CA(const X509_Certificate& ca_certificate,
               const Private_Key& key,
-              const std::string& hash_fn);
+              const containers::string& hash_fn);
 
       ~X509_CA();
    private:
       X509_CA(const X509_CA&) {}
       X509_CA& operator=(const X509_CA&) { return (*this); }
 
-      X509_CRL make_crl(const std::vector<CRL_Entry>& entries,
+      X509_CRL make_crl(const containers::vector<CRL_Entry>& entries,
                         u32bit crl_number, u32bit next_update,
                         RandomNumberGenerator& rng) const;
 
@@ -14373,7 +14399,7 @@ class BOTAN_DLL X509_CA
 * @return A PK_Signer object for generating signatures
 */
 BOTAN_DLL PK_Signer* choose_sig_format(const Private_Key& key,
-                                       const std::string& hash_fn,
+                                       const containers::string& hash_fn,
                                        AlgorithmIdentifier& alg_id);
 
 }
@@ -14388,21 +14414,21 @@ namespace OIDS {
 * @param oid the oid to register
 * @param name the name to be associated with the oid
 */
-BOTAN_DLL void add_oid(const OID& oid, const std::string& name);
+BOTAN_DLL void add_oid(const OID& oid, const containers::string& name);
 
 /**
 * See if an OID exists in the internal table.
 * @param oid the oid to check for
 * @return true if the oid is registered
 */
-BOTAN_DLL bool have_oid(const std::string& oid);
+BOTAN_DLL bool have_oid(const containers::string& oid);
 
 /**
 * Resolve an OID
 * @param oid the OID to look up
 * @return name associated with this OID
 */
-BOTAN_DLL std::string lookup(const OID& oid);
+BOTAN_DLL containers::string lookup(const OID& oid);
 
 /**
 * Find the OID to a name. The lookup will be performed in the
@@ -14410,7 +14436,7 @@ BOTAN_DLL std::string lookup(const OID& oid);
 * @param name the name to resolve
 * @return OID associated with the specified name
 */
-BOTAN_DLL OID lookup(const std::string& name);
+BOTAN_DLL OID lookup(const containers::string& name);
 
 /**
 * Tests whether the specified OID stands for the specified name.
@@ -14418,7 +14444,7 @@ BOTAN_DLL OID lookup(const std::string& name);
 * @param name the name to check
 * @return true if the specified OID stands for the specified name
 */
-BOTAN_DLL bool name_of(const OID& oid, const std::string& name);
+BOTAN_DLL bool name_of(const OID& oid, const containers::string& name);
 
 }
 
@@ -14447,7 +14473,7 @@ class BOTAN_DLL EAX_Base : public Keyed_Filter
       /**
       * @return name of this mode
       */
-      std::string name() const;
+      containers::string name() const;
 
       bool valid_keylength(size_t key_len) const;
 
@@ -14478,7 +14504,7 @@ class BOTAN_DLL EAX_Base : public Keyed_Filter
       /**
       * The name of the cipher
       */
-      std::string cipher_name;
+      containers::string cipher_name;
 
       /**
       * The stream cipher (CTR mode)
@@ -14578,7 +14604,7 @@ namespace Botan {
 class BOTAN_DLL CMAC : public MessageAuthenticationCode
    {
    public:
-      std::string name() const;
+      containers::string name() const;
       size_t output_length() const { return e->block_size(); }
       MessageAuthenticationCode* clone() const;
 
@@ -14630,19 +14656,19 @@ class BOTAN_DLL Skein_512 : public HashFunction
       * hash output
       */
       Skein_512(size_t output_bits = 512,
-                const std::string& personalization = "");
+                const containers::string& personalization = "");
 
       size_t hash_block_size() const { return 64; }
       size_t output_length() const { return output_bits / 8; }
 
       HashFunction* clone() const;
-      std::string name() const;
+      containers::string name() const;
       void clear();
    private:
       void add_data(const byte input[], size_t length);
       void final_result(byte out[]);
 
-      std::string personalization;
+      containers::string personalization;
       size_t output_bits;
 
       SecureVector<u64bit> H;
@@ -14662,7 +14688,7 @@ namespace Botan {
 class BOTAN_DLL CTS_Encryption : public Keyed_Filter
    {
    public:
-      std::string name() const { return cipher->name() + "/CTS"; }
+      containers::string name() const { return cipher->name() + "/CTS"; }
 
       void set_iv(const InitializationVector&);
 
@@ -14697,7 +14723,7 @@ class BOTAN_DLL CTS_Encryption : public Keyed_Filter
 class BOTAN_DLL CTS_Decryption : public Keyed_Filter
    {
    public:
-      std::string name() const { return cipher->name() + "/CTS"; }
+      containers::string name() const { return cipher->name() + "/CTS"; }
 
       void set_iv(const InitializationVector&);
 
@@ -14736,7 +14762,7 @@ namespace Botan {
 * @param algo_spec the name of the PBE algorithm to retrieve
 * @return pointer to a PBE with randomly created parameters
 */
-BOTAN_DLL PBE* get_pbe(const std::string& algo_spec);
+BOTAN_DLL PBE* get_pbe(const containers::string& algo_spec);
 
 /**
 * Factory function for PBEs.
@@ -14762,7 +14788,7 @@ namespace Botan {
 */
 BOTAN_DEPRECATED("Instantiate object directly")
 inline PK_Encryptor* get_pk_encryptor(const Public_Key& key,
-                                      const std::string& eme)
+                                      const containers::string& eme)
    {
    return new PK_Encryptor_EME(key, eme);
    }
@@ -14777,7 +14803,7 @@ inline PK_Encryptor* get_pk_encryptor(const Public_Key& key,
 */
 BOTAN_DEPRECATED("Instantiate object directly")
 inline PK_Decryptor* get_pk_decryptor(const Private_Key& key,
-                                      const std::string& eme)
+                                      const containers::string& eme)
    {
    return new PK_Decryptor_EME(key, eme);
    }
@@ -14793,7 +14819,7 @@ inline PK_Decryptor* get_pk_decryptor(const Private_Key& key,
 */
 BOTAN_DEPRECATED("Instantiate object directly")
 inline PK_Signer* get_pk_signer(const Private_Key& key,
-                                const std::string& emsa,
+                                const containers::string& emsa,
                                 Signature_Format sig_format = IEEE_1363)
    {
    return new PK_Signer(key, emsa, sig_format);
@@ -14810,7 +14836,7 @@ inline PK_Signer* get_pk_signer(const Private_Key& key,
 */
 BOTAN_DEPRECATED("Instantiate object directly")
 inline PK_Verifier* get_pk_verifier(const Public_Key& key,
-                                    const std::string& emsa,
+                                    const containers::string& emsa,
                                     Signature_Format sig_format = IEEE_1363)
    {
    return new PK_Verifier(key, emsa, sig_format);
@@ -14826,7 +14852,7 @@ inline PK_Verifier* get_pk_verifier(const Public_Key& key,
 */
 BOTAN_DEPRECATED("Instantiate object directly")
 inline PK_Key_Agreement* get_pk_kas(const PK_Key_Agreement_Key& key,
-                                    const std::string& kdf)
+                                    const containers::string& kdf)
    {
    return new PK_Key_Agreement(key, kdf);
    }
@@ -14846,7 +14872,7 @@ class BOTAN_DLL IDEA : public Block_Cipher_Fixed_Params<8, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(EK); zeroise(DK); }
-      std::string name() const { return "IDEA"; }
+      containers::string name() const { return "IDEA"; }
       BlockCipher* clone() const { return new IDEA; }
 
       IDEA() : EK(52), DK(52) {}
@@ -14878,14 +14904,14 @@ namespace Botan {
 * @return byte sequence identifying the hash
 * @throw Invalid_Argument if the hash has no known PKCS #1 hash id
 */
-BOTAN_DLL MemoryVector<byte> pkcs_hash_id(const std::string& hash_name);
+BOTAN_DLL MemoryVector<byte> pkcs_hash_id(const containers::string& hash_name);
 
 /**
 * Return the IEEE 1363 hash identifier
 * @param hash_name the name of the hash function
 * @return byte code identifying the hash, or 0 if not known
 */
-BOTAN_DLL byte ieee1363_hash_id(const std::string& hash_name);
+BOTAN_DLL byte ieee1363_hash_id(const containers::string& hash_name);
 
 }
 
@@ -14931,7 +14957,7 @@ class BOTAN_DLL XTS_Encryption : public Keyed_Filter,
       bool valid_iv_length(size_t iv_len) const
          { return (iv_len == cipher->block_size()); }
 
-      std::string name() const;
+      containers::string name() const;
 
       XTS_Encryption(BlockCipher* ciph);
 
@@ -14968,7 +14994,7 @@ class BOTAN_DLL XTS_Decryption : public Keyed_Filter,
       bool valid_iv_length(size_t iv_len) const
          { return (iv_len == cipher->block_size()); }
 
-      std::string name() const;
+      containers::string name() const;
 
       XTS_Decryption(BlockCipher* ciph);
 
@@ -15101,7 +15127,7 @@ size_t BOTAN_DLL base64_encode(char output[],
 * @param input_length length of input in bytes
 * @return base64adecimal representation of input
 */
-std::string BOTAN_DLL base64_encode(const byte input[],
+containers::string BOTAN_DLL base64_encode(const byte input[],
                                     size_t input_length);
 
 /**
@@ -15109,7 +15135,7 @@ std::string BOTAN_DLL base64_encode(const byte input[],
 * @param input some input
 * @return base64adecimal representation of input
 */
-std::string BOTAN_DLL base64_encode(const MemoryRegion<byte>& input);
+containers::string BOTAN_DLL base64_encode(const MemoryRegion<byte>& input);
 
 /**
 * Perform base64 decoding
@@ -15156,7 +15182,7 @@ size_t BOTAN_DLL base64_decode(byte output[],
 * @return number of bytes written to output
 */
 size_t BOTAN_DLL base64_decode(byte output[],
-                               const std::string& input,
+                               const containers::string& input,
                                bool ignore_ws = true);
 
 /**
@@ -15178,7 +15204,7 @@ SecureVector<byte> BOTAN_DLL base64_decode(const char input[],
                    exception if whitespace is encountered
 * @return decoded base64 output
 */
-SecureVector<byte> BOTAN_DLL base64_decode(const std::string& input,
+SecureVector<byte> BOTAN_DLL base64_decode(const containers::string& input,
                                            bool ignore_ws = true);
 
 }
@@ -15196,7 +15222,7 @@ class BOTAN_DLL TLS_PRF : public KDF
                                 const byte secret[], size_t secret_len,
                                 const byte seed[], size_t seed_len) const;
 
-      std::string name() const { return "TLS-PRF"; }
+      containers::string name() const { return "TLS-PRF"; }
       KDF* clone() const { return new TLS_PRF; }
 
       TLS_PRF();
@@ -15216,7 +15242,7 @@ class BOTAN_DLL TLS_12_PRF : public KDF
                                 const byte secret[], size_t secret_len,
                                 const byte seed[], size_t seed_len) const;
 
-      std::string name() const { return "TLSv12-PRF(" + hmac->name() + ")"; }
+      containers::string name() const { return "TLSv12-PRF(" + hmac->name() + ")"; }
       KDF* clone() const { return new TLS_12_PRF(hmac->clone()); }
 
       TLS_12_PRF(MessageAuthenticationCode* hmac);
@@ -15277,7 +15303,7 @@ class BOTAN_DLL Camellia_128 : public Block_Cipher_Fixed_Params<16, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { SK.clear(); }
-      std::string name() const { return "Camellia-128"; }
+      containers::string name() const { return "Camellia-128"; }
       BlockCipher* clone() const { return new Camellia_128; }
    private:
       void key_schedule(const byte key[], size_t length);
@@ -15295,7 +15321,7 @@ class BOTAN_DLL Camellia_192 : public Block_Cipher_Fixed_Params<16, 24>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { SK.clear(); }
-      std::string name() const { return "Camellia-192"; }
+      containers::string name() const { return "Camellia-192"; }
       BlockCipher* clone() const { return new Camellia_192; }
    private:
       void key_schedule(const byte key[], size_t length);
@@ -15313,7 +15339,7 @@ class BOTAN_DLL Camellia_256 : public Block_Cipher_Fixed_Params<16, 32>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { SK.clear(); }
-      std::string name() const { return "Camellia-256"; }
+      containers::string name() const { return "Camellia-256"; }
       BlockCipher* clone() const { return new Camellia_256; }
    private:
       void key_schedule(const byte key[], size_t length);
@@ -15332,7 +15358,7 @@ namespace Botan {
 class BOTAN_DLL MD4 : public MDx_HashFunction
    {
    public:
-      std::string name() const { return "MD4"; }
+      containers::string name() const { return "MD4"; }
       size_t output_length() const { return 16; }
       HashFunction* clone() const { return new MD4; }
 
@@ -15378,7 +15404,7 @@ class BOTAN_DLL Turing : public StreamCipher
          }
 
       void clear();
-      std::string name() const { return "Turing"; }
+      containers::string name() const { return "Turing"; }
       StreamCipher* clone() const { return new Turing; }
 
       Turing() : S0(256), S1(256), S2(256), S3(256),
@@ -15418,10 +15444,10 @@ namespace Botan {
 * @return (A,K) the client public key and the shared secret key
 */
 std::pair<BigInt,SymmetricKey>
-BOTAN_DLL srp6_client_agree(const std::string& username,
-                            const std::string& password,
-                            const std::string& group_id,
-                            const std::string& hash_id,
+BOTAN_DLL srp6_client_agree(const containers::string& username,
+                            const containers::string& password,
+                            const containers::string& group_id,
+                            const containers::string& hash_id,
                             const MemoryRegion<byte>& salt,
                             const BigInt& B,
                             RandomNumberGenerator& rng);
@@ -15432,17 +15458,17 @@ BOTAN_DLL srp6_client_agree(const std::string& username,
 * @param password the secret used to authenticate user
 * @param salt a randomly chosen value, at least 128 bits long
 */
-BigInt BOTAN_DLL generate_srp6_verifier(const std::string& identifier,
-                                        const std::string& password,
+BigInt BOTAN_DLL generate_srp6_verifier(const containers::string& identifier,
+                                        const containers::string& password,
                                         const MemoryRegion<byte>& salt,
-                                        const std::string& group_id,
-                                        const std::string& hash_id);
+                                        const containers::string& group_id,
+                                        const containers::string& hash_id);
 
 /**
 * Return the group id for this SRP param set, or else thrown an
 * exception
 */
-std::string BOTAN_DLL srp6_group_identifier(const BigInt& N, const BigInt& g);
+containers::string BOTAN_DLL srp6_group_identifier(const BigInt& N, const BigInt& g);
 
 /**
 * Represents a SRP-6a server session
@@ -15455,14 +15481,14 @@ class BOTAN_DLL SRP6_Server_Session
       * @param v the verification value saved from client registration
       */
       BigInt step1(const BigInt& v,
-                   const std::string& group_id,
-                   const std::string& hash_id,
+                   const containers::string& group_id,
+                   const containers::string& hash_id,
                    RandomNumberGenerator& rng);
 
       SymmetricKey step2(const BigInt& A);
 
    private:
-      std::string hash_id;
+      containers::string hash_id;
       BigInt B, b, v, S, p;
       size_t p_bytes;
    };
@@ -15482,7 +15508,7 @@ class BOTAN_DLL SAFER_SK : public Block_Cipher_Fixed_Params<8, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(EK); }
-      std::string name() const;
+      containers::string name() const;
       BlockCipher* clone() const;
 
       /**
@@ -15512,7 +15538,7 @@ class BOTAN_DLL CAST_128 : public Block_Cipher_Fixed_Params<8, 11, 16>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(MK); zeroise(RK); }
-      std::string name() const { return "CAST-128"; }
+      containers::string name() const { return "CAST-128"; }
       BlockCipher* clone() const { return new CAST_128; }
 
       CAST_128() : MK(16), RK(16) {}
@@ -15550,9 +15576,9 @@ class BOTAN_DLL PBE_PKCS5v20 : public PBE
       * @param cipher names a block cipher
       * @return true iff PKCS #5 knows how to use this cipher
       */
-      static bool known_cipher(const std::string& cipher);
+      static bool known_cipher(const containers::string& cipher);
 
-      std::string name() const;
+      containers::string name() const;
 
       void write(const byte[], size_t);
       void start_msg();
@@ -15572,7 +15598,7 @@ class BOTAN_DLL PBE_PKCS5v20 : public PBE
 
       ~PBE_PKCS5v20();
    private:
-      void set_key(const std::string&);
+      void set_key(const containers::string&);
       void new_params(RandomNumberGenerator& rng);
       MemoryVector<byte> encode_params() const;
       void decode_params(DataSource&);
@@ -15602,8 +15628,8 @@ namespace Botan {
 * @param buf_size size of buffer to benchmark against, in KiB
 * @return results a map from provider to speed in mebibytes per second
 */
-std::map<std::string, double>
-BOTAN_DLL algorithm_benchmark(const std::string& name,
+containers::map<containers::string, double>
+BOTAN_DLL algorithm_benchmark(const containers::string& name,
                               Algorithm_Factory& af,
                               RandomNumberGenerator& rng,
                               u32bit milliseconds,
@@ -15620,7 +15646,7 @@ namespace Botan {
 class BOTAN_DLL CBC_MAC : public MessageAuthenticationCode
    {
    public:
-      std::string name() const;
+      containers::string name() const;
       MessageAuthenticationCode* clone() const;
       size_t output_length() const { return e->block_size(); }
       void clear();
@@ -15660,7 +15686,7 @@ class BOTAN_DLL MARS : public Block_Cipher_Fixed_Params<16, 16, 32, 4>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(EK); }
-      std::string name() const { return "MARS"; }
+      containers::string name() const { return "MARS"; }
       BlockCipher* clone() const { return new MARS; }
 
       MARS() : EK(40) {}
@@ -15681,7 +15707,7 @@ namespace Botan {
 class BOTAN_DLL PKCS5_PBKDF2 : public PBKDF
    {
    public:
-      std::string name() const
+      containers::string name() const
          {
          return "PBKDF2(" + mac->name() + ")";
          }
@@ -15692,7 +15718,7 @@ class BOTAN_DLL PKCS5_PBKDF2 : public PBKDF
          }
 
       OctetString derive_key(size_t output_len,
-                             const std::string& passphrase,
+                             const containers::string& passphrase,
                              const byte salt[], size_t salt_len,
                              size_t iterations) const;
 
@@ -15822,7 +15848,7 @@ class BOTAN_DLL OFB : public StreamCipher
          return permutation->key_spec();
          }
 
-      std::string name() const;
+      containers::string name() const;
 
       OFB* clone() const
          { return new OFB(permutation->clone()); }
@@ -15863,7 +15889,7 @@ class BOTAN_DLL Blowfish : public Block_Cipher_Fixed_Params<8, 1, 56>
                             const byte salt[16], size_t workfactor);
 
       void clear();
-      std::string name() const { return "Blowfish"; }
+      containers::string name() const { return "Blowfish"; }
       BlockCipher* clone() const { return new Blowfish; }
 
       Blowfish() : S(1024), P(18) {}
@@ -15897,7 +15923,7 @@ namespace Botan {
 class BOTAN_DLL Adler32 : public HashFunction
    {
    public:
-      std::string name() const { return "Adler32"; }
+      containers::string name() const { return "Adler32"; }
       size_t output_length() const { return 4; }
       HashFunction* clone() const { return new Adler32; }
 
@@ -15923,7 +15949,7 @@ class BOTAN_DLL Parallel : public HashFunction
    {
    public:
       void clear();
-      std::string name() const;
+      containers::string name() const;
       HashFunction* clone() const;
 
       size_t output_length() const;
@@ -15931,12 +15957,12 @@ class BOTAN_DLL Parallel : public HashFunction
       /**
       * @param hashes a set of hashes to compute in parallel
       */
-      Parallel(const std::vector<HashFunction*>& hashes);
+      Parallel(const containers::vector<HashFunction*>& hashes);
       ~Parallel();
    private:
       void add_data(const byte[], size_t);
       void final_result(byte[]);
-      std::vector<HashFunction*> hashes;
+      containers::vector<HashFunction*> hashes;
    };
 
 }
@@ -15954,7 +15980,7 @@ class BOTAN_DLL RC5 : public Block_Cipher_Fixed_Params<8, 1, 32>
       void decrypt_n(const byte in[], byte out[], size_t blocks) const;
 
       void clear() { zeroise(S); }
-      std::string name() const;
+      containers::string name() const;
       BlockCipher* clone() const { return new RC5(get_rounds()); }
 
       /**
@@ -15997,9 +16023,9 @@ BOTAN_DLL bool passes_self_tests(Algorithm_Factory& af);
 * @param af an algorithm factory
 * @returns map from provider name to test result for that provider
 */
-BOTAN_DLL std::map<std::string, bool>
+BOTAN_DLL containers::map<containers::string, bool>
 algorithm_kat(const SCAN_Name& algo_name,
-              const std::map<std::string, std::string>& vars,
+              const containers::map<containers::string, containers::string>& vars,
               Algorithm_Factory& af);
 
 }
@@ -16032,7 +16058,7 @@ namespace Botan {
 class BOTAN_DLL PBE_PKCS5v15 : public PBE
    {
    public:
-      std::string name() const;
+      containers::string name() const;
 
       void write(const byte[], size_t);
       void start_msg();
@@ -16049,7 +16075,7 @@ class BOTAN_DLL PBE_PKCS5v15 : public PBE
 
       ~PBE_PKCS5v15();
    private:
-      void set_key(const std::string&);
+      void set_key(const containers::string&);
       void new_params(RandomNumberGenerator& rng);
       MemoryVector<byte> encode_params() const;
       void decode_params(DataSource&);
@@ -16089,7 +16115,7 @@ class BOTAN_DLL CTR_BE : public StreamCipher
          return permutation->key_spec();
          }
 
-      std::string name() const;
+      containers::string name() const;
 
       CTR_BE* clone() const
          { return new CTR_BE(permutation->clone()); }
@@ -16124,7 +16150,7 @@ class BOTAN_DLL Randpool : public RandomNumberGenerator
       void randomize(byte[], size_t);
       bool is_seeded() const { return seeded; }
       void clear();
-      std::string name() const;
+      containers::string name() const;
 
       void reseed(size_t bits_to_collect);
       void add_entropy_source(EntropySource* es);
@@ -16151,7 +16177,7 @@ class BOTAN_DLL Randpool : public RandomNumberGenerator
       BlockCipher* cipher;
       MessageAuthenticationCode* mac;
 
-      std::vector<EntropySource*> entropy_sources;
+      containers::vector<EntropySource*> entropy_sources;
       SecureVector<byte> pool, buffer, counter;
       bool seeded;
    };
@@ -16170,7 +16196,7 @@ class BOTAN_DLL SSL3_PRF : public KDF
       SecureVector<byte> derive(size_t, const byte[], size_t,
                                 const byte[], size_t) const;
 
-      std::string name() const { return "SSL3-PRF"; }
+      containers::string name() const { return "SSL3-PRF"; }
       KDF* clone() const { return new SSL3_PRF; }
    };
 
@@ -16186,7 +16212,7 @@ class BOTAN_DLL ANSI_X919_MAC : public MessageAuthenticationCode
    {
    public:
       void clear();
-      std::string name() const;
+      containers::string name() const;
       size_t output_length() const { return e->block_size(); }
       MessageAuthenticationCode* clone() const;
 

@@ -1,5 +1,6 @@
 INCLUDEPATH *= $$PWD/..
-HEADERS += $$PWD/botan.h
+HEADERS += $$PWD/botan.h \
+    $$PWD/botan_exception.hpp
 
 equals(USE_SYSTEM_BOTAN, 1) {
     DEFINES += USE_SYSTEM_BOTAN
@@ -8,6 +9,8 @@ equals(USE_SYSTEM_BOTAN, 1) {
 } else {
 
 SOURCES += $$PWD/botan.cpp
+SOURCES += \
+    $$PWD/botan_exception.cpp
 
 CONFIG += exceptions
 
@@ -62,3 +65,5 @@ win32{
 }
 
 }
+
+
