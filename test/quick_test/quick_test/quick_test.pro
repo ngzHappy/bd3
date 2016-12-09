@@ -5,6 +5,7 @@ QT += widgets
 TARGET = quick_test
 TEMPLATE = app
 
+CONFIG += console
 
 SOURCES += main.cpp\
         MainWindow.cpp \

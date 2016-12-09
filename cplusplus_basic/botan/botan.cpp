@@ -3647,7 +3647,7 @@ namespace {
 */
 void* do_malloc(size_t n, bool do_lock)
    {
-   void* ptr = std::malloc(n);
+   void* ptr = memory::malloc(n);
 
    if(!ptr)
       return 0;
@@ -3671,7 +3671,7 @@ void do_free(void* ptr, size_t n, bool do_lock)
    if(do_lock)
       unlock_mem(ptr, n);
 
-   std::free(ptr);
+   memory::free(ptr);
    }
 
 }
