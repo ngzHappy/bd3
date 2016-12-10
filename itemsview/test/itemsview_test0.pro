@@ -14,10 +14,12 @@ DEFINES +=
 
 SOURCES += \
     main.cpp \
-    TestWidget.cpp
+    TestWidget.cpp \
+    TestTreeView.cpp
 
 HEADERS += \
-    TestWidget.hpp
+    TestWidget.hpp \
+    TestTreeView.hpp
 
 
 include($$PWD/../../this_project.pri)
