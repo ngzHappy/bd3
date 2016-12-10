@@ -10,9 +10,9 @@
 namespace {
 
 class TreeModel :public QAbstractItemModel {
-    constexpr static int deepth(void *arg){return (char *)arg-(char *)deepth_0()-1;}
-    constexpr static void * deepth_1(int arg){return 1+arg+(char *)(deepth_0());}
-    constexpr static void * deepth_0(){ return (char *)1; }
+    static int deepth(void *arg){return (char *)arg-(char *)deepth_0()-1;}
+    static void * deepth_1(int arg){return 1+arg+(char *)(deepth_0());}
+    static void * deepth_0(){ return (char *)1; }
 public:
     TreeModel(QObject *s):QAbstractItemModel(s){}
 
