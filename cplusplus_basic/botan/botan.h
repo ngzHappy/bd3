@@ -2351,8 +2351,8 @@ public:
      * DivideByZero Exception
      */
     class DivideByZero : public Exception {
-    CPLUSPLUS_OBJECT(DivideByZero)
-private:
+        CPLUSPLUS_OBJECT(DivideByZero)
+    private:
     public:
         DivideByZero(): Exception("BigInt divide by zero") {}
     };
@@ -4104,8 +4104,8 @@ public:
       * read, remaining, etc
       */
     class Invalid_Message_Number : public Invalid_Argument {
-    CPLUSPLUS_OBJECT(Invalid_Message_Number)
-private:
+        CPLUSPLUS_OBJECT(Invalid_Message_Number)
+    private:
     public:
         /**
          * @param where the error occured
@@ -4815,8 +4815,8 @@ public:
       * A search function
       */
     class BOTAN_DLL Matcher {
-    CPLUSPLUS_OBJECT(Matcher)
-private:
+        CPLUSPLUS_OBJECT(Matcher)
+    private:
     public:
         virtual bool operator()(const containers::string&,
                                 const containers::string&) const=0;
@@ -5103,8 +5103,8 @@ public:
       * This class represents CRL related errors.
       */
     class X509_CRL_Error : public Exception {
-    CPLUSPLUS_OBJECT(X509_CRL_Error)
-private:
+        CPLUSPLUS_OBJECT(X509_CRL_Error)
+    private:
     public:
         X509_CRL_Error(const containers::string& error):
             Exception("X509_CRL: "+error) {}
@@ -6751,8 +6751,8 @@ public:
       * @deprecated Avoid in new code
       */
     class BOTAN_DLL Engine_Iterator {
-    CPLUSPLUS_OBJECT(Engine_Iterator)
-private:
+        CPLUSPLUS_OBJECT(Engine_Iterator)
+    private:
     public:
         /**
             * @return next engine in the sequence
@@ -8488,8 +8488,8 @@ public:
 
 private:
     class DER_Sequence {
-    CPLUSPLUS_OBJECT(DER_Sequence)
-private:
+        CPLUSPLUS_OBJECT(DER_Sequence)
+    private:
     public:
         ASN1_Tag tag_of() const;
         SecureVector<byte> get_contents();
@@ -11351,8 +11351,8 @@ private:
     void key_schedule(const byte[],size_t);
 
     class G_FUNC {
-    CPLUSPLUS_OBJECT(G_FUNC)
-private:
+        CPLUSPLUS_OBJECT(G_FUNC)
+    private:
     public:
         u32bit operator()(u32bit) const;
     private:
@@ -11850,8 +11850,8 @@ private:
     X509_Store& operator=(const X509_Store&) { return (*this); }
 
     class BOTAN_DLL CRL_Data {
-    CPLUSPLUS_OBJECT(CRL_Data)
-private:
+        CPLUSPLUS_OBJECT(CRL_Data)
+    private:
     public:
         X509_DN issuer;
         MemoryVector<byte> serial,auth_key_id;
@@ -11861,8 +11861,8 @@ private:
     };
 
     class BOTAN_DLL Cert_Info {
-    CPLUSPLUS_OBJECT(Cert_Info)
-private:
+        CPLUSPLUS_OBJECT(Cert_Info)
+    private:
     public:
         bool is_verified(u32bit timeout) const;
         bool is_trusted() const;
@@ -12645,7 +12645,7 @@ private:
 
     SecureVector<byte> buffer;
     size_t position;
-};
+    };
 
 }
 
