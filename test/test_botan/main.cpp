@@ -23,6 +23,7 @@ int main(int argc, char *argv[])try{
     gcTimer.start(512);
 
     MainWindow window;
+    window.test();
     window.show();
 
     {

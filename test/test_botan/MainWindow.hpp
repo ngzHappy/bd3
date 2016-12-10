@@ -18,6 +18,8 @@ public:
     ~MainWindow();
 
     void test();
+    void test_assert(bool,const char *);
+    void testMD5();
 
 private:
     Ui::MainWindow *ui;
