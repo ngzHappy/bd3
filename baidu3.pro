@@ -51,3 +51,8 @@ tool_set_get.file=$$PWD/tool/tool_set_get/tool_set_get.pro
 tool_set_get.depends+=library_cplusplus_basic
 tool_set_get.depends+=qt_basic_library
 SUBDIRS += tool_set_get
+
+test_botan.file=$$PWD/test/test_botan/test_botan.pro
+test_botan.depends+=library_cplusplus_basic
+test_botan.depends+=qt_basic_library
+SUBDIRS += test_botan
