@@ -14,6 +14,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::test() try {
     testMD5();
+    testRSAPublicKeyEncode();
 }
 catch (...) {
     CPLUSPLUS_EXCEPTION(false);
@@ -28,15 +29,15 @@ void MainWindow::test_assert(bool arg,const char * ans) {
 #include <iostream>
 #include <botan/botan.h>
 void MainWindow::testMD5() {
-/*
-https://botan.randombit.net/doxygen/
-Hash Functions
-Blake2b, GOST 34.11, Keccak,
-MD4, MD5, RIPEMD-160,
-SHA-1, SHA-224, SHA-256,
-SHA-384, SHA-512, Skein-512,
-Tiger, Whirlpool
-*/
+    /*
+    https://botan.randombit.net/doxygen/
+    Hash Functions
+    Blake2b, GOST 34.11, Keccak,
+    MD4, MD5, RIPEMD-160,
+    SHA-1, SHA-224, SHA-256,
+    SHA-384, SHA-512, Skein-512,
+    Tiger, Whirlpool
+    */
     using Botan::byte;
     using Botan::HashFunction;
     {
@@ -73,5 +74,26 @@ Tiger, Whirlpool
     }
 }
 
-
+void MainWindow::testRSAPublicKeyEncode() {
+    using Botan::byte;
+    using Botan::Public_Key;
+    using Botan::PK_Encryptor_EME;
+    constexpr byte pemData[]=u8R"///(-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDoUaLxcCvcgWzS1ukXC56F9YWx
+PlmuwHa9zPFR4+tinzhtG8PRSgPB7UOAzaFu4hKimPOcOrQaRUof/PhSNGxZAhad
+d+/kot0I8y7pwzeza9EAEwpQIki7RextKlWDRLRvaQGLjnW7SUrF2k62zJCdtow0
+KcfR+Hx1+7Z4wYYFHwIDAQAB
+-----END PUBLIC KEY-----
+)///";
+    Botan::MemoryVector<byte> pem(pemData,sizeof(pemData)-1);
+    std::unique_ptr<Public_Key> publicKey{ Botan::X509::load_key(pem) };
+    Botan::AutoSeeded_RNG rng;
+    PK_Encryptor_EME en(*publicKey,"EME-PKCS1-v1_5");
+    auto ans=en.encrypt((const byte*)"12345",5,rng);
+    std::cout<<"encode rsa is : ";
+    for (const auto varI:ans) {
+        std::cout<<std::hex<<int(varI);
+    }
+    std::cout<<std::endl;
+}
 

@@ -20,6 +20,7 @@ public:
     void test();
     void test_assert(bool,const char *);
     void testMD5();
+    void testRSAPublicKeyEncode();
 
 private:
     Ui::MainWindow *ui;

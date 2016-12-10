@@ -18,7 +18,12 @@ include($$PWD/gumbo/gumbo.pri)
 include($$PWD/../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
 
-
+CONFIG += precompile_header
+win32-msvc*{
+PRECOMPILED_HEADER  += $$PWD/private/_msvc_core_utility_prebuild.hpp
+}else{
+PRECOMPILED_HEADER  += $$PWD/private/_core_utility_prebuild.hpp
+}
 
 
 
