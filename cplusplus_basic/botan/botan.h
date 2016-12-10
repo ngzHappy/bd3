@@ -4934,7 +4934,8 @@ public:
     /**
       * This class represents CRL related errors.
       */
-    struct X509_CRL_Error : public Exception {
+    class X509_CRL_Error : public Exception {
+    public:
         X509_CRL_Error(const containers::string& error):
             Exception("X509_CRL: "+error) {}
     };
@@ -5426,7 +5427,8 @@ namespace Botan {
 * Exception thrown if you try to convert a zero point to an affine
 * coordinate
 */
-struct Illegal_Transformation : public Exception {
+class Illegal_Transformation : public Exception {
+public:
     Illegal_Transformation(const containers::string& err=
             "Requested transformation is not possible"):
         Exception(err) {
@@ -5436,7 +5438,8 @@ struct Illegal_Transformation : public Exception {
 /**
 * Exception thrown if some form of illegal point is decoded
 */
-struct Illegal_Point : public Exception {
+class Illegal_Point : public Exception {
+public:
     Illegal_Point(const containers::string& err="Malformed ECP point detected"):
         Exception(err) {}
 };
@@ -5818,7 +5821,8 @@ namespace Botan {
 /**
 * PKCS #8 General Exception
 */
-struct PKCS8_Exception : public Decoding_Error {
+class PKCS8_Exception : public Decoding_Error {
+public:
     PKCS8_Exception(const containers::string& error):
         Decoding_Error("PKCS #8: "+error) {}
 };
@@ -6707,7 +6711,8 @@ namespace Botan {
 /**
 * BitBucket is a filter which simply discards all inputs
 */
-struct BOTAN_DLL BitBucket : public Filter {
+class BOTAN_DLL BitBucket : public Filter {
+public:
     void write(const byte[],size_t) {}
 
     containers::string name() const { return "BitBucket"; }
@@ -14499,7 +14504,8 @@ namespace Botan {
 /**
 * Struct representing a particular date and time
 */
-struct BOTAN_DLL calendar_point {
+class BOTAN_DLL calendar_point {
+public:
     /** The year */
     u32bit year;
 
