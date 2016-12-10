@@ -93,6 +93,7 @@ QVector<QModelIndex> TestTreeView::_p_getAllVisibleItems(){
 
     int firstVisibleItemOffset = 0;
     const auto firstVisibleItem = varPrivate->firstVisibleItem(&firstVisibleItemOffset);
+    if (firstVisibleItem<0) { return{}; }
     const auto lastVisibleItem = varPrivate->lastVisibleItem(firstVisibleItem,firstVisibleItemOffset);
 
     QVector<QModelIndex> varAns;
