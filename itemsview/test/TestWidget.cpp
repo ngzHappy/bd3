@@ -7,10 +7,10 @@
 #include <QStringListModel>
 #include <private/qlistview_p.h>
 
-TestWidget::TestWidget(){
+TestWidget::TestWidget() {
     std::unique_ptr<QObject> varOldModel{ model() };
-    auto varModel = new QStringListModel(this);
-    varModel->setStringList({QString("a"),
+    auto varModel=new QStringListModel(this);
+    varModel->setStringList({ QString("a"),
                              QString("b"),
                              QString("c"),
                              QString("d"),
@@ -24,28 +24,28 @@ TestWidget::TestWidget(){
                              QString("l"),
                              QString("m"),
                              QString("n"),
-                             QString("o")});
+                             QString("o") });
     this->setModel(varModel);
 }
 
-QVector<QModelIndex> TestWidget::_p_getAllVisibleItems(){
+QVector<QModelIndex> TestWidget::_p_getAllVisibleItems() {
     QListViewPrivate* varPrivate=d_func();
-    QRect area = this->rect()
-            .translated(horizontalOffset(), verticalOffset());
-    QRect a = (this->isRightToLeft() ?
-                   varPrivate->flipX(area.normalized()) :
+    QRect area=this->rect()
+        .translated(horizontalOffset(),verticalOffset());
+    QRect a=(this->isRightToLeft()?
+                   varPrivate->flipX(area.normalized()):
                    area.normalized());
     return varPrivate->commonListView->intersectingSet(a);
 }
 
-void TestWidget::paintEvent(QPaintEvent *e){
+void TestWidget::paintEvent(QPaintEvent *e) {
     _Super::paintEvent(e);
-    auto v = _p_getAllVisibleItems();
+    auto v=_p_getAllVisibleItems();
     QVector<QString> vtmp;
-   for( const QModelIndex & i : qAsConst( v )  ){
-       vtmp.push_back( i.data().toString() );
-   }
-   qDebug()<<vtmp;
+    for (const QModelIndex & i:qAsConst(v)) {
+        vtmp.push_back(i.data().toString());
+    }
+    qDebug()<<vtmp;
 }
 
 

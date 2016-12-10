@@ -3,8 +3,7 @@
 
 #include <QtWidgets/qlistview.h>
 
-class TestWidget : public QListView
-{
+class TestWidget : public QListView {
     Q_OBJECT
 private:
     using _Super=QListView;

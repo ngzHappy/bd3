@@ -3,8 +3,7 @@
 
 #include <QtWidgets/qtreeview.h>
 
-class TestTreeView : public QTreeView
-{
+class TestTreeView : public QTreeView {
     using _Super=QTreeView;
 public:
     TestTreeView();
