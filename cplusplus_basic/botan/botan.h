@@ -101,11 +101,11 @@
 #define BOTAN_TARGET_CPU_HAS_KNOWN_ENDIANNESS
 #endif
 
-//#if defined(_MSC_VER)
+#if defined(_MSC_VER)
 // 4250: inherits via dominance (diamond inheritence issue)
 // 4251: needs DLL interface (STL DLL exports)
-//#pragma warning(disable: 4250 4251)
-//#endif
+#pragma warning(disable: 4250 4251)
+#endif
 
 /*
 * Compile-time deprecatation warnings

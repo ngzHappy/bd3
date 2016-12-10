@@ -14,3 +14,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+#include <botan/botan.h>
+void MainWindow::test() {
+
+
+}
+
