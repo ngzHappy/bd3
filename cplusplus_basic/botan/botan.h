@@ -359,6 +359,8 @@ namespace Botan {
 * Allocator Interface
 */
 class BOTAN_DLL Allocator {
+    CPLUSPLUS_OBJECT(Allocator)
+private:
 public:
     /**
       * Acquire a pointer to an allocator
@@ -467,6 +469,8 @@ namespace Botan {
 */
 template<typename T>
 class MemoryRegion {
+    CPLUSPLUS_OBJECT(MemoryRegion)
+private:
 public:
     /**
       * Find out the size of the buffer, i.e. how many objects of type T it
@@ -695,6 +699,8 @@ void MemoryRegion<T>::swap(MemoryRegion<T>& x) {
 */
 template<typename T>
 class MemoryVector : public MemoryRegion<T> {
+    CPLUSPLUS_OBJECT(MemoryVector)
+private:
 public:
     /**
       * Copy the contents of another buffer into this buffer.
@@ -745,6 +751,8 @@ public:
 */
 template<typename T>
 class SecureVector : public MemoryRegion<T> {
+    CPLUSPLUS_OBJECT(SecureVector)
+private:
 public:
     /**
       * Copy the contents of another buffer into this buffer.
@@ -868,6 +876,8 @@ namespace Botan {
 * state, such as hash functions or MACs
 */
 class BOTAN_DLL Buffered_Computation {
+    CPLUSPLUS_OBJECT(Buffered_Computation)
+private:
 public:
     /**
       * @return length of the output of this function in bytes
@@ -994,6 +1004,8 @@ namespace Botan {
 * Class used to accumulate the poll results of EntropySources
 */
 class BOTAN_DLL Entropy_Accumulator {
+    CPLUSPLUS_OBJECT(Entropy_Accumulator)
+private:
 public:
     /**
       * Initialize an Entropy_Accumulator
@@ -1067,6 +1079,8 @@ private:
 */
 class BOTAN_DLL Entropy_Accumulator_BufferedComputation :
     public Entropy_Accumulator {
+    CPLUSPLUS_OBJECT(Entropy_Accumulator_BufferedComputation)
+private:
 public:
     /**
       * @param sink the hash or MAC we are feeding the poll data into
@@ -1089,6 +1103,8 @@ private:
 * Abstract interface to a source of (hopefully unpredictable) system entropy
 */
 class BOTAN_DLL EntropySource {
+    CPLUSPLUS_OBJECT(EntropySource)
+private:
 public:
     /**
       * @return name identifying this entropy source
@@ -1183,6 +1199,8 @@ BOTAN_DLL containers::string ipv4_to_string(u32bit ip_addr);
 namespace Botan {
 
 class Exception : public std::runtime_error {
+    CPLUSPLUS_OBJECT(Exception)
+private:
     using _Super=std::runtime_error;
     std::shared_ptr<void> _pm_data;
 public:
@@ -1194,6 +1212,8 @@ public:
 };
 
 class  Invalid_Argument : public std::invalid_argument {
+    CPLUSPLUS_OBJECT(Invalid_Argument)
+private:
     using _Super=std::invalid_argument;
     std::shared_ptr<void> _pm_data;
 public:
@@ -1214,6 +1234,8 @@ namespace Botan {
 * Invalid_State Exception
 */
 class Invalid_State : public Exception {
+    CPLUSPLUS_OBJECT(Invalid_State)
+private:
 public:
     Invalid_State(const containers::string& err):
         Exception(err) {
@@ -1224,6 +1246,8 @@ public:
 * Lookup_Error Exception
 */
 class Lookup_Error : public Exception {
+    CPLUSPLUS_OBJECT(Lookup_Error)
+private:
 public:
     Lookup_Error(const containers::string& err):
         Exception(err) {
@@ -1234,6 +1258,8 @@ public:
 * Internal_Error Exception
 */
 class Internal_Error : public Exception {
+    CPLUSPLUS_OBJECT(Internal_Error)
+private:
 public:
     Internal_Error(const containers::string& err):
         Exception("Internal error: "+err) {
@@ -1244,6 +1270,8 @@ public:
 * Invalid_Key_Length Exception
 */
 class Invalid_Key_Length : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Invalid_Key_Length)
+private:
 public:
     Invalid_Key_Length(const containers::string& name,size_t length):
         Invalid_Argument(name+" cannot accept a key of length "+
@@ -1255,6 +1283,8 @@ public:
 * Invalid_Block_Size Exception
 */
 class Invalid_Block_Size : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Invalid_Block_Size)
+private:
 public:
     Invalid_Block_Size(const containers::string& mode,
                        const containers::string& pad):
@@ -1267,6 +1297,8 @@ public:
 * Invalid_IV_Length Exception
 */
 class Invalid_IV_Length : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Invalid_IV_Length)
+private:
 public:
     Invalid_IV_Length(const containers::string& mode,size_t bad_len):
         Invalid_Argument("IV length "+to_string(bad_len)+
@@ -1278,6 +1310,8 @@ public:
 * PRNG_Unseeded Exception
 */
 class PRNG_Unseeded : public Invalid_State {
+    CPLUSPLUS_OBJECT(PRNG_Unseeded)
+private:
 public:
     PRNG_Unseeded(const containers::string& algo):
         Invalid_State("PRNG not seeded: "+algo) {
@@ -1288,6 +1322,8 @@ public:
 * Policy_Violation Exception
 */
 class Policy_Violation : public Invalid_State {
+    CPLUSPLUS_OBJECT(Policy_Violation)
+private:
 public:
     Policy_Violation(const containers::string& err):
         Invalid_State("Policy violation: "+err) {
@@ -1298,6 +1334,8 @@ public:
 * Algorithm_Not_Found Exception
 */
 class Algorithm_Not_Found : public Lookup_Error {
+    CPLUSPLUS_OBJECT(Algorithm_Not_Found)
+private:
 public:
     Algorithm_Not_Found(const containers::string& name):
         Lookup_Error("Could not find any algorithm named \""+name+"\"") {
@@ -1308,6 +1346,8 @@ public:
 * Invalid_Algorithm_Name Exception
 */
 class Invalid_Algorithm_Name : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Invalid_Algorithm_Name)
+private:
 public:
     Invalid_Algorithm_Name(const containers::string& name):
         Invalid_Argument("Invalid algorithm name: "+name) {
@@ -1318,6 +1358,8 @@ public:
 * Encoding_Error Exception
 */
 class Encoding_Error : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Encoding_Error)
+private:
 public:
     Encoding_Error(const containers::string& name):
         Invalid_Argument("Encoding error: "+name) {}
@@ -1327,6 +1369,8 @@ public:
 * Decoding_Error Exception
 */
 class Decoding_Error : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Decoding_Error)
+private:
 public:
     Decoding_Error(const containers::string& name):
         Invalid_Argument("Decoding error: "+name) {}
@@ -1336,6 +1380,8 @@ public:
 * Integrity_Failure Exception
 */
 class Integrity_Failure : public Exception {
+    CPLUSPLUS_OBJECT(Integrity_Failure)
+private:
 public:
     Integrity_Failure(const containers::string& msg):
         Exception("Integrity failure: "+msg) {}
@@ -1345,6 +1391,8 @@ public:
 * Invalid_OID Exception
 */
 class Invalid_OID : public Decoding_Error {
+    CPLUSPLUS_OBJECT(Invalid_OID)
+private:
 public:
     Invalid_OID(const containers::string& oid):
         Decoding_Error("Invalid ASN.1 OID: "+oid) {}
@@ -1354,6 +1402,8 @@ public:
 * Stream_IO_Error Exception
 */
 class Stream_IO_Error : public Exception {
+    CPLUSPLUS_OBJECT(Stream_IO_Error)
+private:
 public:
     Stream_IO_Error(const containers::string& err):
         Exception("I/O error: "+err) {
@@ -1364,6 +1414,8 @@ public:
 * Self Test Failure Exception
 */
 class Self_Test_Failure : public Internal_Error {
+    CPLUSPLUS_OBJECT(Self_Test_Failure)
+private:
 public:
     Self_Test_Failure(const containers::string& err):
         Internal_Error("Self test failed: "+err) {
@@ -1374,6 +1426,8 @@ public:
 * Memory Allocation Exception
 */
 class Memory_Exhaustion : public std::bad_alloc {
+    CPLUSPLUS_OBJECT(Memory_Exhaustion)
+private:
 public:
     const char* what() const noexcept(true) { return "Ran out of memory, allocation failed"; }
 };
@@ -1389,6 +1443,8 @@ namespace Botan {
 * This class represents a random number (RNG) generator object.
 */
 class BOTAN_DLL RandomNumberGenerator {
+    CPLUSPLUS_OBJECT(RandomNumberGenerator)
+private:
 public:
     /**
       * Create a seeded and active RNG object for general application use
@@ -1466,6 +1522,8 @@ private:
 * Null/stub RNG - fails if you try to use it for anything
 */
 class BOTAN_DLL Null_RNG : public RandomNumberGenerator {
+    CPLUSPLUS_OBJECT(Null_RNG)
+private:
 public:
     void randomize(byte[],size_t) { throw PRNG_Unseeded("Null_RNG"); }
     void clear() {}
@@ -1486,6 +1544,8 @@ namespace Botan {
 * Encoding Method for Signatures, Appendix
 */
 class BOTAN_DLL EMSA {
+    CPLUSPLUS_OBJECT(EMSA)
+private:
 public:
     /**
       * Add more data to the signature computation
@@ -1532,6 +1592,8 @@ namespace Botan {
 * This class represents an algorithm of some kind
 */
 class BOTAN_DLL Algorithm {
+    CPLUSPLUS_OBJECT(Algorithm)
+private:
 public:
 
     /**
@@ -1561,6 +1623,8 @@ namespace Botan {
 */
 class BOTAN_DLL HashFunction : public Buffered_Computation,
     public Algorithm {
+    CPLUSPLUS_OBJECT(HashFunction)
+private:
 public:
     /**
       * Get a new object representing the same algorithm as *this
@@ -1583,6 +1647,8 @@ namespace Botan {
 * Essentially, sign the hash directly
 */
 class BOTAN_DLL EMSA1 : public EMSA {
+    CPLUSPLUS_OBJECT(EMSA1)
+private:
 public:
     /**
       * @param h the hash object to use
@@ -1616,6 +1682,8 @@ namespace Botan {
 * Keccak[1600], a SHA-3 candidate
 */
 class BOTAN_DLL Keccak_1600 : public HashFunction {
+    CPLUSPLUS_OBJECT(Keccak_1600)
+private:
 public:
 
     /**
@@ -1649,6 +1717,8 @@ A class encapsulating a SCAN name (similar to JCE conventions)
 http://www.users.zetnet.co.uk/hopwood/crypto/scan/
 */
 class BOTAN_DLL SCAN_Name {
+    CPLUSPLUS_OBJECT(SCAN_Name)
+private:
 public:
     /**
       * @param algo_spec A SCAN-format name
@@ -1728,6 +1798,8 @@ namespace Botan {
 * Represents the length requirements on an algorithm key
 */
 class BOTAN_DLL Key_Length_Specification {
+    CPLUSPLUS_OBJECT(Key_Length_Specification)
+private:
 public:
     /**
       * Constructor for fixed length keys
@@ -1797,6 +1869,8 @@ namespace Botan {
 * Octet String
 */
 class BOTAN_DLL OctetString {
+    CPLUSPLUS_OBJECT(OctetString)
+private:
 public:
     /**
       * @return size of this octet string in bytes
@@ -1939,6 +2013,8 @@ namespace Botan {
 * This class represents a symmetric algorithm object.
 */
 class BOTAN_DLL SymmetricAlgorithm : public Algorithm {
+    CPLUSPLUS_OBJECT(SymmetricAlgorithm)
+private:
 public:
     /**
       * @return object describing limits on key size
@@ -2008,6 +2084,8 @@ namespace Botan {
 * This class represents a block cipher object.
 */
 class BOTAN_DLL BlockCipher : public SymmetricAlgorithm {
+    CPLUSPLUS_OBJECT(BlockCipher)
+private:
 public:
 
     /**
@@ -2090,6 +2168,8 @@ public:
 */
 template<size_t BS,size_t KMIN,size_t KMAX=0,size_t KMOD=1>
 class Block_Cipher_Fixed_Params : public BlockCipher {
+    CPLUSPLUS_OBJECT(Block_Cipher_Fixed_Params)
+private:
 public:
     enum { BLOCK_SIZE=BS };
     size_t block_size() const { return BS; }
@@ -2108,6 +2188,8 @@ namespace Botan {
 * Base class for all stream ciphers
 */
 class BOTAN_DLL StreamCipher : public SymmetricAlgorithm {
+    CPLUSPLUS_OBJECT(StreamCipher)
+private:
 public:
     /**
       * Encrypt or decrypt a message
@@ -2153,6 +2235,8 @@ namespace Botan {
 */
 class BOTAN_DLL MessageAuthenticationCode : public Buffered_Computation,
     public SymmetricAlgorithm {
+    CPLUSPLUS_OBJECT(MessageAuthenticationCode)
+private:
 public:
     /**
       * Verify a MAC.
@@ -2185,6 +2269,8 @@ namespace Botan {
 * and iterated hashing to make brute force attacks harder.
 */
 class BOTAN_DLL PBKDF : public Algorithm {
+    CPLUSPLUS_OBJECT(PBKDF)
+private:
 public:
 
     /**
@@ -2243,6 +2329,8 @@ namespace Botan {
 * Arbitrary precision integer
 */
 class BOTAN_DLL BigInt {
+    CPLUSPLUS_OBJECT(BigInt)
+private:
 public:
     /**
      * Base enumerator for encoding and decoding
@@ -2263,6 +2351,8 @@ public:
      * DivideByZero Exception
      */
     class DivideByZero : public Exception {
+    CPLUSPLUS_OBJECT(DivideByZero)
+private:
     public:
         DivideByZero(): Exception("BigInt divide by zero") {}
     };
@@ -2771,6 +2861,8 @@ namespace Botan {
 * Modular Exponentiator Interface
 */
 class BOTAN_DLL Modular_Exponentiator {
+    CPLUSPLUS_OBJECT(Modular_Exponentiator)
+private:
 public:
     virtual void set_base(const BigInt&)=0;
     virtual void set_exponent(const BigInt&)=0;
@@ -2783,6 +2875,8 @@ public:
 * Modular Exponentiator Proxy
 */
 class BOTAN_DLL Power_Mod {
+    CPLUSPLUS_OBJECT(Power_Mod)
+private:
 public:
 
     enum Usage_Hints {
@@ -2824,6 +2918,8 @@ private:
 * Fixed Exponent Modular Exponentiator Proxy
 */
 class BOTAN_DLL Fixed_Exponent_Power_Mod : public Power_Mod {
+    CPLUSPLUS_OBJECT(Fixed_Exponent_Power_Mod)
+private:
 public:
     BigInt operator()(const BigInt& b) const { set_base(b); return execute(); }
 
@@ -2836,6 +2932,8 @@ public:
 * Fixed Base Modular Exponentiator Proxy
 */
 class BOTAN_DLL Fixed_Base_Power_Mod : public Power_Mod {
+    CPLUSPLUS_OBJECT(Fixed_Base_Power_Mod)
+private:
 public:
     BigInt operator()(const BigInt& e) const { set_exponent(e); return execute(); }
 
@@ -2890,6 +2988,8 @@ enum ASN1_Tag {
 * Basic ASN.1 Object Interface
 */
 class BOTAN_DLL ASN1_Object {
+    CPLUSPLUS_OBJECT(ASN1_Object)
+private:
 public:
     /**
       * Encode whatever this object is into to
@@ -2910,6 +3010,8 @@ public:
 * BER Encoded Object
 */
 class BOTAN_DLL BER_Object {
+    CPLUSPLUS_OBJECT(BER_Object)
+private:
 public:
     void assert_is_a(ASN1_Tag,ASN1_Tag);
 
@@ -2939,6 +3041,8 @@ bool maybe_BER(DataSource& src);
 * General BER Decoding Error Exception
 */
 class BER_Decoding_Error : public Decoding_Error {
+    CPLUSPLUS_OBJECT(BER_Decoding_Error)
+private:
 public:
     BER_Decoding_Error(const containers::string&);
 };
@@ -2947,6 +3051,8 @@ public:
 * Exception For Incorrect BER Taggings
 */
 class BER_Bad_Tag : public BER_Decoding_Error {
+    CPLUSPLUS_OBJECT(BER_Bad_Tag)
+private:
 public:
     BER_Bad_Tag(const containers::string& msg,ASN1_Tag tag);
     BER_Bad_Tag(const containers::string& msg,ASN1_Tag tag1,ASN1_Tag tag2);
@@ -2961,6 +3067,8 @@ namespace Botan {
 * This class represents ASN.1 object identifiers.
 */
 class BOTAN_DLL OID : public ASN1_Object {
+    CPLUSPLUS_OBJECT(OID)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -3042,6 +3150,8 @@ namespace Botan {
 * Algorithm Identifier
 */
 class BOTAN_DLL AlgorithmIdentifier : public ASN1_Object {
+    CPLUSPLUS_OBJECT(AlgorithmIdentifier)
+private:
 public:
     enum Encoding_Option { USE_NULL_PARAM };
 
@@ -3076,6 +3186,8 @@ namespace Botan {
 * Public Key Base Class.
 */
 class BOTAN_DLL Public_Key {
+    CPLUSPLUS_OBJECT(Public_Key)
+private:
 public:
     /**
       * Get the name of the underlying public key scheme.
@@ -3140,6 +3252,8 @@ protected:
 * Private Key Base Class
 */
 class BOTAN_DLL Private_Key : public virtual Public_Key {
+    CPLUSPLUS_OBJECT(Private_Key)
+private:
 public:
     /**
       * @return PKCS #8 private key encoding for this key object
@@ -3170,6 +3284,8 @@ protected:
 * PK Secret Value Derivation Key
 */
 class BOTAN_DLL PK_Key_Agreement_Key : public virtual Private_Key {
+    CPLUSPLUS_OBJECT(PK_Key_Agreement_Key)
+private:
 public:
     /*
       * @return public component of this key
@@ -3197,6 +3313,8 @@ namespace PK_Ops {
 * Public key encryption interface
 */
 class BOTAN_DLL Encryption {
+    CPLUSPLUS_OBJECT(Encryption)
+private:
 public:
     virtual size_t max_input_bits() const=0;
 
@@ -3210,6 +3328,8 @@ public:
 * Public key decryption interface
 */
 class BOTAN_DLL Decryption {
+    CPLUSPLUS_OBJECT(Decryption)
+private:
 public:
     virtual size_t max_input_bits() const=0;
 
@@ -3223,6 +3343,8 @@ public:
 * Public key signature creation interface
 */
 class BOTAN_DLL Signature {
+    CPLUSPLUS_OBJECT(Signature)
+private:
 public:
     /**
       * Find out the number of message parts supported by this scheme.
@@ -3258,6 +3380,8 @@ public:
 * Public key signature verification interface
 */
 class BOTAN_DLL Verification {
+    CPLUSPLUS_OBJECT(Verification)
+private:
 public:
     /**
       * Get the maximum message size in bits supported by this public key.
@@ -3315,6 +3439,8 @@ public:
 * A generic key agreement Operation (eg DH or ECDH)
 */
 class BOTAN_DLL Key_Agreement {
+    CPLUSPLUS_OBJECT(Key_Agreement)
+private:
 public:
     /*
       * Perform a key agreement operation
@@ -3344,6 +3470,8 @@ class Keyed_Filter;
 * they want to hook in a particular type.
 */
 class BOTAN_DLL Engine {
+    CPLUSPLUS_OBJECT(Engine)
+private:
 public:
     virtual ~Engine() {}
 
@@ -3467,6 +3595,8 @@ namespace Botan {
 * Engine object, and handles load/unload details
 */
 class BOTAN_DLL Dynamically_Loaded_Engine : public Engine {
+    CPLUSPLUS_OBJECT(Dynamically_Loaded_Engine)
+private:
 public:
     /**
       * @param lib_path full pathname to DLL to load
@@ -3552,6 +3682,8 @@ namespace Botan {
 * Simple String
 */
 class BOTAN_DLL ASN1_String : public ASN1_Object {
+    CPLUSPLUS_OBJECT(ASN1_String)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -3577,6 +3709,8 @@ namespace Botan {
 * Attribute
 */
 class BOTAN_DLL Attribute : public ASN1_Object {
+    CPLUSPLUS_OBJECT(Attribute)
+private:
 public:
     void encode_into(class DER_Encoder& to) const;
     void decode_from(class BER_Decoder& from);
@@ -3593,6 +3727,8 @@ public:
 * X.509 Time
 */
 class BOTAN_DLL X509_Time : public ASN1_Object {
+    CPLUSPLUS_OBJECT(X509_Time)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -3619,6 +3755,8 @@ private:
 * Alternative Name
 */
 class BOTAN_DLL AlternativeName : public ASN1_Object {
+    CPLUSPLUS_OBJECT(AlternativeName)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -3659,6 +3797,8 @@ namespace Botan {
 * This class represents an abstract data source object.
 */
 class BOTAN_DLL DataSource {
+    CPLUSPLUS_OBJECT(DataSource)
+private:
 public:
     /**
       * Read from the source. Moves the internal offset so that every
@@ -3730,6 +3870,8 @@ private:
 * This class represents a Memory-Based DataSource
 */
 class BOTAN_DLL DataSource_Memory : public DataSource {
+    CPLUSPLUS_OBJECT(DataSource_Memory)
+private:
 public:
     size_t read(byte[],size_t);
     size_t peek(byte[],size_t,size_t) const;
@@ -3762,6 +3904,8 @@ private:
 * This class represents a Stream-Based DataSource.
 */
 class BOTAN_DLL DataSource_Stream : public DataSource {
+    CPLUSPLUS_OBJECT(DataSource_Stream)
+private:
 public:
     size_t read(byte[],size_t);
     size_t peek(byte[],size_t,size_t) const;
@@ -3796,6 +3940,8 @@ namespace Botan {
 * This class represents general abstract filter objects.
 */
 class BOTAN_DLL Filter {
+    CPLUSPLUS_OBJECT(Filter)
+private:
 public:
     /**
       * @return descriptive name for this filter
@@ -3909,6 +4055,8 @@ private:
 * This is the abstract Fanout_Filter base class.
 **/
 class BOTAN_DLL Fanout_Filter : public Filter {
+    CPLUSPLUS_OBJECT(Fanout_Filter)
+private:
 protected:
     /**
       * Increment the number of filters past us that we own
@@ -3943,6 +4091,8 @@ namespace Botan {
 * environment, this design will sound quite familiar.
 */
 class BOTAN_DLL Pipe : public DataSource {
+    CPLUSPLUS_OBJECT(Pipe)
+private:
 public:
     /**
       * An opaque type that identifies a message in this Pipe
@@ -3954,6 +4104,8 @@ public:
       * read, remaining, etc
       */
     class Invalid_Message_Number : public Invalid_Argument {
+    CPLUSPLUS_OBJECT(Invalid_Message_Number)
+private:
     public:
         /**
          * @param where the error occured
@@ -4254,6 +4406,8 @@ namespace Botan {
 * BER Decoding Object
 */
 class BOTAN_DLL BER_Decoder {
+    CPLUSPLUS_OBJECT(BER_Decoder)
+private:
 public:
     BER_Object get_next_object();
     void push_back(const BER_Object&);
@@ -4434,6 +4588,8 @@ namespace Botan {
 * in the X.500 SIGNED macro
 */
 class BOTAN_DLL X509_Object {
+    CPLUSPLUS_OBJECT(X509_Object)
+private:
 public:
     /**
       * The underlying data that is to be or was signed
@@ -4529,6 +4685,8 @@ namespace Botan {
 * Distinguished Name
 */
 class BOTAN_DLL X509_DN : public ASN1_Object {
+    CPLUSPLUS_OBJECT(X509_DN)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -4650,11 +4808,15 @@ namespace Botan {
 * Data Store
 */
 class BOTAN_DLL Data_Store {
+    CPLUSPLUS_OBJECT(Data_Store)
+private:
 public:
     /**
       * A search function
       */
     class BOTAN_DLL Matcher {
+    CPLUSPLUS_OBJECT(Matcher)
+private:
     public:
         virtual bool operator()(const containers::string&,
                                 const containers::string&) const=0;
@@ -4696,6 +4858,8 @@ namespace Botan {
 * This class represents X.509 Certificate
 */
 class BOTAN_DLL X509_Certificate : public X509_Object {
+    CPLUSPLUS_OBJECT(X509_Certificate)
+private:
 public:
     /**
      * Get the public key associated with this certificate.
@@ -4869,6 +5033,8 @@ namespace Botan {
 * This class represents CRL entries
 */
 class BOTAN_DLL CRL_Entry : public ASN1_Object {
+    CPLUSPLUS_OBJECT(CRL_Entry)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -4930,11 +5096,15 @@ namespace Botan {
 * This class represents X.509 Certificate Revocation Lists (CRLs).
 */
 class BOTAN_DLL X509_CRL : public X509_Object {
+    CPLUSPLUS_OBJECT(X509_CRL)
+private:
 public:
     /**
       * This class represents CRL related errors.
       */
     class X509_CRL_Error : public Exception {
+    CPLUSPLUS_OBJECT(X509_CRL_Error)
+private:
     public:
         X509_CRL_Error(const containers::string& error):
             Exception("X509_CRL: "+error) {}
@@ -5009,6 +5179,8 @@ namespace Botan {
 * Luby-Rackoff block cipher construction
 */
 class BOTAN_DLL LubyRackoff : public BlockCipher {
+    CPLUSPLUS_OBJECT(LubyRackoff)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -5045,6 +5217,8 @@ namespace Botan {
 * Useful for Rabin-Williams
 */
 class BOTAN_DLL EMSA2 : public EMSA {
+    CPLUSPLUS_OBJECT(EMSA2)
+private:
 public:
     /**
       * @param hash the hash object to use
@@ -5287,6 +5461,8 @@ namespace Botan {
 * This class represents an elliptic curve over GF(p)
 */
 class BOTAN_DLL CurveGFp {
+    CPLUSPLUS_OBJECT(CurveGFp)
+private:
 public:
 
     /**
@@ -5428,6 +5604,8 @@ namespace Botan {
 * coordinate
 */
 class Illegal_Transformation : public Exception {
+    CPLUSPLUS_OBJECT(Illegal_Transformation)
+private:
 public:
     Illegal_Transformation(const containers::string& err=
             "Requested transformation is not possible"):
@@ -5439,6 +5617,8 @@ public:
 * Exception thrown if some form of illegal point is decoded
 */
 class Illegal_Point : public Exception {
+    CPLUSPLUS_OBJECT(Illegal_Point)
+private:
 public:
     Illegal_Point(const containers::string& err="Malformed ECP point detected"):
         Exception(err) {}
@@ -5448,6 +5628,8 @@ public:
 * This class represents one point on a curve of GF(p)
 */
 class BOTAN_DLL PointGFp {
+    CPLUSPLUS_OBJECT(PointGFp)
+private:
 public:
     enum Compression_Type {
         UNCOMPRESSED=0,
@@ -5684,6 +5866,8 @@ enum EC_Group_Encoding {
 * Class representing an elliptic curve
 */
 class BOTAN_DLL EC_Group {
+    CPLUSPLUS_OBJECT(EC_Group)
+private:
 public:
 
     /**
@@ -5800,6 +5984,8 @@ namespace Botan {
 * Only really used for callbacks for PKCS #8 decryption
 */
 class BOTAN_DLL User_Interface {
+    CPLUSPLUS_OBJECT(User_Interface)
+private:
 public:
     enum UI_Result { OK,CANCEL_ACTION };
 
@@ -5822,6 +6008,8 @@ namespace Botan {
 * PKCS #8 General Exception
 */
 class PKCS8_Exception : public Decoding_Error {
+    CPLUSPLUS_OBJECT(PKCS8_Exception)
+private:
 public:
     PKCS8_Exception(const containers::string& error):
         Decoding_Error("PKCS #8: "+error) {}
@@ -5993,6 +6181,8 @@ namespace Botan {
 * by calling the corresponding member function.
 */
 class BOTAN_DLL EC_PublicKey : public virtual Public_Key {
+    CPLUSPLUS_OBJECT(EC_PublicKey)
+private:
 public:
     EC_PublicKey(const EC_Group& dom_par,
                  const PointGFp& pub_point);
@@ -6053,6 +6243,8 @@ protected:
 */
 class BOTAN_DLL EC_PrivateKey : public virtual EC_PublicKey,
     public virtual Private_Key {
+    CPLUSPLUS_OBJECT(EC_PrivateKey)
+private:
 public:
     EC_PrivateKey(RandomNumberGenerator& rng,
                   const EC_Group& domain,
@@ -6083,6 +6275,8 @@ namespace Botan {
 * GOST-34.10 Public Key
 */
 class BOTAN_DLL GOST_3410_PublicKey : public virtual EC_PublicKey {
+    CPLUSPLUS_OBJECT(GOST_3410_PublicKey)
+private:
 public:
 
     /**
@@ -6132,6 +6326,8 @@ protected:
 */
 class BOTAN_DLL GOST_3410_PrivateKey : public GOST_3410_PublicKey,
     public EC_PrivateKey {
+    CPLUSPLUS_OBJECT(GOST_3410_PrivateKey)
+private:
 public:
 
     GOST_3410_PrivateKey(const AlgorithmIdentifier& alg_id,
@@ -6158,6 +6354,8 @@ public:
 * GOST-34.10 signature operation
 */
 class BOTAN_DLL GOST_3410_Signature_Operation : public PK_Ops::Signature {
+    CPLUSPLUS_OBJECT(GOST_3410_Signature_Operation)
+private:
 public:
     GOST_3410_Signature_Operation(const GOST_3410_PrivateKey& gost_3410);
 
@@ -6178,6 +6376,8 @@ private:
 * GOST-34.10 verification operation
 */
 class BOTAN_DLL GOST_3410_Verification_Operation : public PK_Ops::Verification {
+    CPLUSPLUS_OBJECT(GOST_3410_Verification_Operation)
+private:
 public:
     GOST_3410_Verification_Operation(const GOST_3410_PublicKey& gost);
 
@@ -6204,6 +6404,8 @@ namespace Botan {
 * MDx Hash Function Base Class
 */
 class BOTAN_DLL MDx_HashFunction : public HashFunction {
+    CPLUSPLUS_OBJECT(MDx_HashFunction)
+private:
 public:
     /**
       * @param block_length is the number of bytes per block
@@ -6260,6 +6462,8 @@ namespace Botan {
 * TTAS.KO-12.0011/R1. Used in conjuction with KCDSA
 */
 class BOTAN_DLL HAS_160 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(HAS_160)
+private:
 public:
     containers::string name() const { return "HAS-160"; }
     size_t output_length() const { return 20; }
@@ -6287,6 +6491,8 @@ namespace Botan {
 * LibraryInitializer in the RAII style.
 */
 class BOTAN_DLL LibraryInitializer {
+    CPLUSPLUS_OBJECT(LibraryInitializer)
+private:
 public:
     /**
       * Initialize the library
@@ -6388,6 +6594,8 @@ class Mutex_Factory;
 * Algorithm Factory
 */
 class BOTAN_DLL Algorithm_Factory {
+    CPLUSPLUS_OBJECT(Algorithm_Factory)
+private:
 public:
     /**
       * Constructor
@@ -6543,6 +6751,8 @@ public:
       * @deprecated Avoid in new code
       */
     class BOTAN_DLL Engine_Iterator {
+    CPLUSPLUS_OBJECT(Engine_Iterator)
+private:
     public:
         /**
             * @return next engine in the sequence
@@ -6587,6 +6797,8 @@ class Mutex;
 * Global state container aka the buritto at the center of it all
 */
 class BOTAN_DLL Library_State {
+    CPLUSPLUS_OBJECT(Library_State)
+private:
 public:
     Library_State();
     ~Library_State();
@@ -6712,6 +6924,8 @@ namespace Botan {
 * BitBucket is a filter which simply discards all inputs
 */
 class BOTAN_DLL BitBucket : public Filter {
+    CPLUSPLUS_OBJECT(BitBucket)
+private:
 public:
     void write(const byte[],size_t) {}
 
@@ -6725,6 +6939,8 @@ public:
 */
 
 class BOTAN_DLL Chain : public Fanout_Filter {
+    CPLUSPLUS_OBJECT(Chain)
+private:
 public:
     void write(const byte input[],size_t length) { send(input,length); }
 
@@ -6750,6 +6966,8 @@ public:
 * the end of the filter, where n is the number of forks.
 */
 class BOTAN_DLL Fork : public Fanout_Filter {
+    CPLUSPLUS_OBJECT(Fork)
+private:
 public:
     void write(const byte input[],size_t length) { send(input,length); }
     void set_port(size_t n) { Fanout_Filter::set_port(n); }
@@ -6779,6 +6997,8 @@ namespace Botan {
 * fed with a key in order to function.
 */
 class BOTAN_DLL Keyed_Filter : public Filter {
+    CPLUSPLUS_OBJECT(Keyed_Filter)
+private:
 public:
     /**
       * Set the key of this filter
@@ -6817,6 +7037,8 @@ namespace Botan {
 * This class represents abstract data sink objects.
 */
 class BOTAN_DLL DataSink : public Filter {
+    CPLUSPLUS_OBJECT(DataSink)
+private:
 public:
     bool attachable() { return false; }
     DataSink() {}
@@ -6830,6 +7052,8 @@ private:
 * This class represents a data sink which writes its output to a stream.
 */
 class BOTAN_DLL DataSink_Stream : public DataSink {
+    CPLUSPLUS_OBJECT(DataSink_Stream)
+private:
 public:
     containers::string name() const { return identifier; }
 
@@ -6872,6 +7096,8 @@ namespace Botan {
 * This class represents a Base64 encoder.
 */
 class BOTAN_DLL Base64_Encoder : public Filter {
+    CPLUSPLUS_OBJECT(Base64_Encoder)
+private:
 public:
     containers::string name() const { return "Base64_Encoder"; }
 
@@ -6910,6 +7136,8 @@ private:
 * This object represents a Base64 decoder.
 */
 class BOTAN_DLL Base64_Decoder : public Filter {
+    CPLUSPLUS_OBJECT(Base64_Decoder)
+private:
 public:
     containers::string name() const { return "Base64_Decoder"; }
 
@@ -6947,6 +7175,8 @@ namespace Botan {
 * newlines inserted
 */
 class BOTAN_DLL Hex_Encoder : public Filter {
+    CPLUSPLUS_OBJECT(Hex_Encoder)
+private:
 public:
     /**
       * Whether to use uppercase or lowercase letters for the encoded string.
@@ -6986,6 +7216,8 @@ private:
 * Converts hex strings to bytes
 */
 class BOTAN_DLL Hex_Decoder : public Filter {
+    CPLUSPLUS_OBJECT(Hex_Decoder)
+private:
 public:
     containers::string name() const { return "Hex_Decoder"; }
 
@@ -7014,6 +7246,8 @@ namespace Botan {
 * Stream Cipher Filter.
 */
 class BOTAN_DLL StreamCipher_Filter : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(StreamCipher_Filter)
+private:
 public:
 
     containers::string name() const { return cipher->name(); }
@@ -7082,6 +7316,8 @@ private:
 * Hash Filter.
 */
 class BOTAN_DLL Hash_Filter : public Filter {
+    CPLUSPLUS_OBJECT(Hash_Filter)
+private:
 public:
     void write(const byte input[],size_t len) { hash->update(input,len); }
     void end_msg();
@@ -7119,6 +7355,8 @@ private:
 * MessageAuthenticationCode Filter.
 */
 class BOTAN_DLL MAC_Filter : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(MAC_Filter)
+private:
 public:
     void write(const byte input[],size_t len) { mac->update(input,len); }
     void end_msg();
@@ -7210,6 +7448,8 @@ namespace Botan {
 * two block (and requires use of the block cipher).
 */
 class BOTAN_DLL BlockCipherModePaddingMethod {
+    CPLUSPLUS_OBJECT(BlockCipherModePaddingMethod)
+private:
 public:
     /**
       * @param block output buffer
@@ -7256,6 +7496,8 @@ public:
 * PKCS#7 Padding
 */
 class BOTAN_DLL PKCS7_Padding : public BlockCipherModePaddingMethod {
+    CPLUSPLUS_OBJECT(PKCS7_Padding)
+private:
 public:
     void pad(byte[],size_t,size_t) const;
     size_t unpad(const byte[],size_t) const;
@@ -7267,6 +7509,8 @@ public:
 * ANSI X9.23 Padding
 */
 class BOTAN_DLL ANSI_X923_Padding : public BlockCipherModePaddingMethod {
+    CPLUSPLUS_OBJECT(ANSI_X923_Padding)
+private:
 public:
     void pad(byte[],size_t,size_t) const;
     size_t unpad(const byte[],size_t) const;
@@ -7278,6 +7522,8 @@ public:
 * One And Zeros Padding
 */
 class BOTAN_DLL OneAndZeros_Padding : public BlockCipherModePaddingMethod {
+    CPLUSPLUS_OBJECT(OneAndZeros_Padding)
+private:
 public:
     void pad(byte[],size_t,size_t) const;
     size_t unpad(const byte[],size_t) const;
@@ -7289,6 +7535,8 @@ public:
 * Null Padding
 */
 class BOTAN_DLL Null_Padding : public BlockCipherModePaddingMethod {
+    CPLUSPLUS_OBJECT(Null_Padding)
+private:
 public:
     void pad(byte[],size_t,size_t) const { return; }
     size_t unpad(const byte[],size_t size) const { return size; }
@@ -7306,6 +7554,8 @@ namespace Botan {
 * Key Derivation Function
 */
 class BOTAN_DLL KDF : public Algorithm {
+    CPLUSPLUS_OBJECT(KDF)
+private:
 public:
     /**
       * Derive a key
@@ -7379,6 +7629,8 @@ private:
 * Mask Generation Function
 */
 class BOTAN_DLL MGF {
+    CPLUSPLUS_OBJECT(MGF)
+private:
 public:
     virtual void mask(const byte in[],size_t in_len,
                       byte out[],size_t out_len) const=0;
@@ -7395,6 +7647,8 @@ namespace Botan {
 * Encoding Method for Encryption
 */
 class BOTAN_DLL EME {
+    CPLUSPLUS_OBJECT(EME)
+private:
 public:
     /**
       * Return the maximum input size in bytes we can support
@@ -7847,6 +8101,8 @@ namespace Botan {
 * An automatically seeded PRNG
 */
 class BOTAN_DLL AutoSeeded_RNG : public RandomNumberGenerator {
+    CPLUSPLUS_OBJECT(AutoSeeded_RNG)
+private:
 public:
     void randomize(byte out[],size_t len) { rng->randomize(out,len); }
 
@@ -7878,6 +8134,8 @@ namespace Botan {
 * PKCS #10 Certificate Request.
 */
 class BOTAN_DLL PKCS10_Request : public X509_Object {
+    CPLUSPLUS_OBJECT(PKCS10_Request)
+private:
 public:
     /**
       * Get the subject public key.
@@ -7963,6 +8221,8 @@ namespace Botan {
 * Options for X.509 certificates.
 */
 class BOTAN_DLL X509_Cert_Options {
+    CPLUSPLUS_OBJECT(X509_Cert_Options)
+private:
 public:
     /**
       * the subject common name
@@ -8153,6 +8413,8 @@ class ASN1_Object;
 * General DER Encoding Object
 */
 class BOTAN_DLL DER_Encoder {
+    CPLUSPLUS_OBJECT(DER_Encoder)
+private:
 public:
     SecureVector<byte> get_contents();
 
@@ -8226,6 +8488,8 @@ public:
 
 private:
     class DER_Sequence {
+    CPLUSPLUS_OBJECT(DER_Sequence)
+private:
     public:
         ASN1_Tag tag_of() const;
         SecureVector<byte> get_contents();
@@ -8250,6 +8514,8 @@ namespace Botan {
 * EME1, aka OAEP
 */
 class BOTAN_DLL EME1 : public EME {
+    CPLUSPLUS_OBJECT(EME1)
+private:
 public:
     size_t maximum_input_size(size_t) const;
 
@@ -8291,6 +8557,8 @@ enum Fault_Protection {
 * Public Key Encryptor
 */
 class BOTAN_DLL PK_Encryptor {
+    CPLUSPLUS_OBJECT(PK_Encryptor)
+private:
 public:
 
     /**
@@ -8336,6 +8604,8 @@ private:
 * Public Key Decryptor
 */
 class BOTAN_DLL PK_Decryptor {
+    CPLUSPLUS_OBJECT(PK_Decryptor)
+private:
 public:
     /**
       * Decrypt a ciphertext.
@@ -8371,6 +8641,8 @@ private:
 * generate the signature by finally calling signature().
 */
 class BOTAN_DLL PK_Signer {
+    CPLUSPLUS_OBJECT(PK_Signer)
+private:
 public:
     /**
       * Sign a message.
@@ -8459,6 +8731,8 @@ private:
 * verify the signature by finally calling check_signature().
 */
 class BOTAN_DLL PK_Verifier {
+    CPLUSPLUS_OBJECT(PK_Verifier)
+private:
 public:
     /**
       * Verify a signature.
@@ -8556,6 +8830,8 @@ private:
 * Key used for key agreement
 */
 class BOTAN_DLL PK_Key_Agreement {
+    CPLUSPLUS_OBJECT(PK_Key_Agreement)
+private:
 public:
 
     /*
@@ -8638,6 +8914,8 @@ private:
 * Encryption with an MR algorithm and an EME.
 */
 class BOTAN_DLL PK_Encryptor_EME : public PK_Encryptor {
+    CPLUSPLUS_OBJECT(PK_Encryptor_EME)
+private:
 public:
     size_t maximum_input_size() const;
 
@@ -8662,6 +8940,8 @@ private:
 * Decryption with an MR algorithm and an EME.
 */
 class BOTAN_DLL PK_Decryptor_EME : public PK_Decryptor {
+    CPLUSPLUS_OBJECT(PK_Decryptor_EME)
+private:
 public:
     /**
       * Construct an instance.
@@ -8694,6 +8974,8 @@ namespace Botan {
 * DES
 */
 class BOTAN_DLL DES : public Block_Cipher_Fixed_Params<8,8> {
+    CPLUSPLUS_OBJECT(DES)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -8713,6 +8995,8 @@ private:
 * Triple DES
 */
 class BOTAN_DLL TripleDES : public Block_Cipher_Fixed_Params<8,16,24,8> {
+    CPLUSPLUS_OBJECT(TripleDES)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -8754,6 +9038,8 @@ namespace Botan {
 * DESX
 */
 class BOTAN_DLL DESX : public Block_Cipher_Fixed_Params<8,24> {
+    CPLUSPLUS_OBJECT(DESX)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -8781,6 +9067,8 @@ namespace Botan {
 * used.
 */
 class BOTAN_DLL GOST_28147_89_Params {
+    CPLUSPLUS_OBJECT(GOST_28147_89_Params)
+private:
 public:
     /**
       * @param row the row
@@ -8811,6 +9099,8 @@ private:
 * GOST 28147-89
 */
 class BOTAN_DLL GOST_28147_89 : public Block_Cipher_Fixed_Params<8,32> {
+    CPLUSPLUS_OBJECT(GOST_28147_89)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -8843,6 +9133,8 @@ namespace Botan {
 * GOST 34.11
 */
 class BOTAN_DLL GOST_34_11 : public HashFunction {
+    CPLUSPLUS_OBJECT(GOST_34_11)
+private:
 public:
     containers::string name() const { return "GOST-R-34.11-94"; }
     size_t output_length() const { return 32; }
@@ -8873,6 +9165,8 @@ namespace Botan {
 * SHA-384
 */
 class BOTAN_DLL SHA_384 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(SHA_384)
+private:
 public:
     containers::string name() const { return "SHA-384"; }
     size_t output_length() const { return 48; }
@@ -8892,6 +9186,8 @@ private:
 * SHA-512
 */
 class BOTAN_DLL SHA_512 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(SHA_512)
+private:
 public:
     containers::string name() const { return "SHA-512"; }
     size_t output_length() const { return 64; }
@@ -8916,6 +9212,8 @@ namespace Botan {
 * Password Based Encryption (PBE) Filter.
 */
 class BOTAN_DLL PBE : public Filter {
+    CPLUSPLUS_OBJECT(PBE)
+private:
 public:
     /**
       * Set this filter's key.
@@ -8957,6 +9255,8 @@ namespace Botan {
 * KDF1, from IEEE 1363
 */
 class BOTAN_DLL KDF1 : public KDF {
+    CPLUSPLUS_OBJECT(KDF1)
+private:
 public:
     SecureVector<byte> derive(size_t,
                               const byte secret[],size_t secret_len,
@@ -8982,6 +9282,8 @@ namespace Botan {
 * MISTY1
 */
 class BOTAN_DLL MISTY1 : public Block_Cipher_Fixed_Params<8,16> {
+    CPLUSPLUS_OBJECT(MISTY1)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -9010,6 +9312,8 @@ namespace Botan {
 * 32-bit cyclic redundancy check
 */
 class BOTAN_DLL CRC32 : public HashFunction {
+    CPLUSPLUS_OBJECT(CRC32)
+private:
 public:
     containers::string name() const { return "CRC32"; }
     size_t output_length() const { return 4; }
@@ -9057,6 +9361,8 @@ namespace Botan {
 * XTEA
 */
 class BOTAN_DLL XTEA : public Block_Cipher_Fixed_Params<8,16> {
+    CPLUSPLUS_OBJECT(XTEA)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -9086,6 +9392,8 @@ namespace Botan {
 * KASUMI, the block cipher used in 3G telephony
 */
 class BOTAN_DLL KASUMI : public Block_Cipher_Fixed_Params<8,16> {
+    CPLUSPLUS_OBJECT(KASUMI)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -9111,6 +9419,8 @@ namespace Botan {
 * a prime q = (p-1)/2 and g = x^((p-1)/q) mod p.
 */
 class BOTAN_DLL DL_Group {
+    CPLUSPLUS_OBJECT(DL_Group)
+private:
 public:
     /**
       * Get the prime p.
@@ -9258,6 +9568,8 @@ namespace Botan {
 * This class represents discrete logarithm (DL) public keys.
 */
 class BOTAN_DLL DL_Scheme_PublicKey : public virtual Public_Key {
+    CPLUSPLUS_OBJECT(DL_Scheme_PublicKey)
+private:
 public:
     bool check_key(RandomNumberGenerator& rng,bool) const;
 
@@ -9323,6 +9635,8 @@ protected:
 */
 class BOTAN_DLL DL_Scheme_PrivateKey : public virtual DL_Scheme_PublicKey,
     public virtual Private_Key {
+    CPLUSPLUS_OBJECT(DL_Scheme_PrivateKey)
+private:
 public:
     bool check_key(RandomNumberGenerator& rng,bool) const;
 
@@ -9356,6 +9670,8 @@ namespace Botan {
 * Modular Reducer (using Barrett's technique)
 */
 class BOTAN_DLL Modular_Reducer {
+    CPLUSPLUS_OBJECT(Modular_Reducer)
+private:
 public:
     const BigInt& get_modulus() const { return modulus; }
 
@@ -9401,6 +9717,8 @@ namespace Botan {
 * Blinding Function Object
 */
 class BOTAN_DLL Blinder {
+    CPLUSPLUS_OBJECT(Blinder)
+private:
 public:
     BigInt blind(const BigInt& x) const;
     BigInt unblind(const BigInt& x) const;
@@ -9433,6 +9751,8 @@ namespace Botan {
 * This class represents Diffie-Hellman public keys.
 */
 class BOTAN_DLL DH_PublicKey : public virtual DL_Scheme_PublicKey {
+    CPLUSPLUS_OBJECT(DH_PublicKey)
+private:
 public:
     containers::string algo_name() const { return "DH"; }
 
@@ -9462,6 +9782,8 @@ protected:
 class BOTAN_DLL DH_PrivateKey : public DH_PublicKey,
     public PK_Key_Agreement_Key,
     public virtual DL_Scheme_PrivateKey {
+    CPLUSPLUS_OBJECT(DH_PrivateKey)
+private:
 public:
     MemoryVector<byte> public_value() const;
 
@@ -9489,6 +9811,8 @@ public:
 * DH operation
 */
 class BOTAN_DLL DH_KA_Operation : public PK_Ops::Key_Agreement {
+    CPLUSPLUS_OBJECT(DH_KA_Operation)
+private:
 public:
     DH_KA_Operation(const DH_PrivateKey& key);
 
@@ -9509,6 +9833,8 @@ namespace Botan {
 * CAST-256
 */
 class BOTAN_DLL CAST_256 : public Block_Cipher_Fixed_Params<16,4,32,4> {
+    CPLUSPLUS_OBJECT(CAST_256)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -9542,6 +9868,8 @@ namespace Botan {
 * MD2
 */
 class BOTAN_DLL MD2 : public HashFunction {
+    CPLUSPLUS_OBJECT(MD2)
+private:
 public:
     containers::string name() const { return "MD2"; }
     size_t output_length() const { return 16; }
@@ -9569,6 +9897,8 @@ namespace Botan {
 * RC6, Ron Rivest's AES candidate
 */
 class BOTAN_DLL RC6 : public Block_Cipher_Fixed_Params<16,1,32> {
+    CPLUSPLUS_OBJECT(RC6)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -9596,6 +9926,8 @@ namespace Botan {
 * cipher in counter mode.
 */
 class BOTAN_DLL WiderWake_41_BE : public StreamCipher {
+    CPLUSPLUS_OBJECT(WiderWake_41_BE)
+private:
 public:
     void cipher(const byte[],byte[],size_t);
     void set_iv(const byte[],size_t);
@@ -9635,6 +9967,8 @@ namespace Botan {
 * ElGamal Public Key
 */
 class BOTAN_DLL ElGamal_PublicKey : public virtual DL_Scheme_PublicKey {
+    CPLUSPLUS_OBJECT(ElGamal_PublicKey)
+private:
 public:
     containers::string algo_name() const { return "ElGamal"; }
     DL_Group::Format group_format() const { return DL_Group::ANSI_X9_42; }
@@ -9656,6 +9990,8 @@ protected:
 */
 class BOTAN_DLL ElGamal_PrivateKey : public ElGamal_PublicKey,
     public virtual DL_Scheme_PrivateKey {
+    CPLUSPLUS_OBJECT(ElGamal_PrivateKey)
+private:
 public:
     bool check_key(RandomNumberGenerator& rng,bool) const;
 
@@ -9672,6 +10008,8 @@ public:
 * ElGamal encryption operation
 */
 class BOTAN_DLL ElGamal_Encryption_Operation : public PK_Ops::Encryption {
+    CPLUSPLUS_OBJECT(ElGamal_Encryption_Operation)
+private:
 public:
     size_t max_input_bits() const { return mod_p.get_modulus().bits()-1; }
 
@@ -9689,6 +10027,8 @@ private:
 * ElGamal decryption operation
 */
 class BOTAN_DLL ElGamal_Decryption_Operation : public PK_Ops::Decryption {
+    CPLUSPLUS_OBJECT(ElGamal_Decryption_Operation)
+private:
 public:
     size_t max_input_bits() const { return mod_p.get_modulus().bits()-1; }
 
@@ -9717,6 +10057,8 @@ paper), for instance one could use HMAC(SHA-512) as the extractor
 and CMAC(AES-256) as the PRF.
 */
 class BOTAN_DLL HMAC_RNG : public RandomNumberGenerator {
+    CPLUSPLUS_OBJECT(HMAC_RNG)
+private:
 public:
     void randomize(byte buf[],size_t len);
     bool is_seeded() const { return seeded; }
@@ -9756,6 +10098,8 @@ namespace Botan {
 * A MAC only used in SSLv3. Do not use elsewhere! Use HMAC instead.
 */
 class BOTAN_DLL SSL3_MAC : public MessageAuthenticationCode {
+    CPLUSPLUS_OBJECT(SSL3_MAC)
+private:
 public:
     containers::string name() const;
     size_t output_length() const { return hash->output_length(); }
@@ -9792,6 +10136,8 @@ hash values which are less or equal than the maximum key length. The
 implementation comes from InSiTo
 */
 class BOTAN_DLL EMSA1_BSI : public EMSA1 {
+    CPLUSPLUS_OBJECT(EMSA1_BSI)
+private:
 public:
     /**
       * @param hash the hash object to use
@@ -9811,6 +10157,8 @@ namespace Botan {
 * Serpent, an AES finalist
 */
 class BOTAN_DLL Serpent : public Block_Cipher_Fixed_Params<16,16,32,8> {
+    CPLUSPLUS_OBJECT(Serpent)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -9849,6 +10197,8 @@ namespace Botan {
 * NIST's SHA-160
 */
 class BOTAN_DLL SHA_160 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(SHA_160)
+private:
 public:
     containers::string name() const { return "SHA-160"; }
     size_t output_length() const { return 20; }
@@ -9894,6 +10244,8 @@ namespace Botan {
 * ANSI X9.31 RNG
 */
 class BOTAN_DLL ANSI_X931_RNG : public RandomNumberGenerator {
+    CPLUSPLUS_OBJECT(ANSI_X931_RNG)
+private:
 public:
     void randomize(byte[],size_t);
     bool is_seeded() const;
@@ -9931,6 +10283,8 @@ namespace Botan {
 * This class represents ECDSA Public Keys.
 */
 class BOTAN_DLL ECDSA_PublicKey : public virtual EC_PublicKey {
+    CPLUSPLUS_OBJECT(ECDSA_PublicKey)
+private:
 public:
 
     /**
@@ -9974,6 +10328,8 @@ protected:
 */
 class BOTAN_DLL ECDSA_PrivateKey : public ECDSA_PublicKey,
     public EC_PrivateKey {
+    CPLUSPLUS_OBJECT(ECDSA_PrivateKey)
+private:
 public:
 
     /**
@@ -10005,6 +10361,8 @@ public:
 * ECDSA signature operation
 */
 class BOTAN_DLL ECDSA_Signature_Operation : public PK_Ops::Signature {
+    CPLUSPLUS_OBJECT(ECDSA_Signature_Operation)
+private:
 public:
     ECDSA_Signature_Operation(const ECDSA_PrivateKey& ecdsa);
 
@@ -10026,6 +10384,8 @@ private:
 * ECDSA verification operation
 */
 class BOTAN_DLL ECDSA_Verification_Operation : public PK_Ops::Verification {
+    CPLUSPLUS_OBJECT(ECDSA_Verification_Operation)
+private:
 public:
     ECDSA_Verification_Operation(const ECDSA_PublicKey& ecdsa);
 
@@ -10069,6 +10429,8 @@ namespace Botan {
 * Square
 */
 class BOTAN_DLL Square : public Block_Cipher_Fixed_Params<16,16> {
+    CPLUSPLUS_OBJECT(Square)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -10214,6 +10576,8 @@ namespace Botan {
 * Block Cipher Cascade
 */
 class BOTAN_DLL Cascade_Cipher : public BlockCipher {
+    CPLUSPLUS_OBJECT(Cascade_Cipher)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -10255,6 +10619,8 @@ namespace Botan {
 * EME from PKCS #1 v1.5
 */
 class BOTAN_DLL EME_PKCS1v15 : public EME {
+    CPLUSPLUS_OBJECT(EME_PKCS1v15)
+private:
 public:
     size_t maximum_input_size(size_t) const;
 private:
@@ -10414,6 +10780,8 @@ namespace Botan {
 * MD5
 */
 class BOTAN_DLL MD5 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(MD5)
+private:
 public:
     containers::string name() const { return "MD5"; }
     size_t output_length() const { return 16; }
@@ -10447,6 +10815,8 @@ namespace Botan {
 * cipher modes
 */
 class BOTAN_DLL Buffered_Filter {
+    CPLUSPLUS_OBJECT(Buffered_Filter)
+private:
 public:
     /**
       * Write bytes into the buffered filter, which will them emit them
@@ -10521,6 +10891,8 @@ namespace Botan {
 */
 class BOTAN_DLL ECB_Encryption : public Keyed_Filter,
     private Buffered_Filter {
+    CPLUSPLUS_OBJECT(ECB_Encryption)
+private:
 public:
     containers::string name() const;
 
@@ -10553,6 +10925,8 @@ private:
 */
 class BOTAN_DLL ECB_Decryption : public Keyed_Filter,
     public Buffered_Filter {
+    CPLUSPLUS_OBJECT(ECB_Decryption)
+private:
 public:
     containers::string name() const;
 
@@ -10623,6 +10997,8 @@ namespace Botan {
 * of integer factorization based (IF) public key schemes.
 */
 class BOTAN_DLL IF_Scheme_PublicKey : public virtual Public_Key {
+    CPLUSPLUS_OBJECT(IF_Scheme_PublicKey)
+private:
 public:
     IF_Scheme_PublicKey(const AlgorithmIdentifier& alg_id,
                         const MemoryRegion<byte>& key_bits);
@@ -10660,6 +11036,8 @@ protected:
 */
 class BOTAN_DLL IF_Scheme_PrivateKey : public virtual IF_Scheme_PublicKey,
     public virtual Private_Key {
+    CPLUSPLUS_OBJECT(IF_Scheme_PrivateKey)
+private:
 public:
 
     IF_Scheme_PrivateKey(RandomNumberGenerator& rng,
@@ -10712,6 +11090,8 @@ namespace Botan {
 * RSA Public Key
 */
 class BOTAN_DLL RSA_PublicKey : public virtual IF_Scheme_PublicKey {
+    CPLUSPLUS_OBJECT(RSA_PublicKey)
+private:
 public:
     containers::string algo_name() const { return "RSA"; }
 
@@ -10738,6 +11118,8 @@ protected:
 */
 class BOTAN_DLL RSA_PrivateKey : public RSA_PublicKey,
     public IF_Scheme_PrivateKey {
+    CPLUSPLUS_OBJECT(RSA_PrivateKey)
+private:
 public:
     bool check_key(RandomNumberGenerator& rng,bool) const;
 
@@ -10781,6 +11163,8 @@ public:
 */
 class BOTAN_DLL RSA_Private_Operation : public PK_Ops::Signature,
     public PK_Ops::Decryption {
+    CPLUSPLUS_OBJECT(RSA_Private_Operation)
+private:
 public:
     RSA_Private_Operation(const RSA_PrivateKey& rsa);
 
@@ -10807,6 +11191,8 @@ private:
 */
 class BOTAN_DLL RSA_Public_Operation : public PK_Ops::Verification,
     public PK_Ops::Encryption {
+    CPLUSPLUS_OBJECT(RSA_Public_Operation)
+private:
 public:
     RSA_Public_Operation(const RSA_PublicKey& rsa):
         n(rsa.get_n()),powermod_e_n(rsa.get_e(),rsa.get_n()) {
@@ -10846,6 +11232,8 @@ namespace Botan {
 * RIPEMD-160
 */
 class BOTAN_DLL RIPEMD_160 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(RIPEMD_160)
+private:
 public:
     containers::string name() const { return "RIPEMD-160"; }
     size_t output_length() const { return 20; }
@@ -10870,6 +11258,8 @@ namespace Botan {
 * Whirlpool
 */
 class BOTAN_DLL Whirlpool : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(Whirlpool)
+private:
 public:
     containers::string name() const { return "Whirlpool"; }
     size_t output_length() const { return 64; }
@@ -10903,6 +11293,8 @@ namespace Botan {
 * Tiger
 */
 class BOTAN_DLL Tiger : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(Tiger)
+private:
 public:
     containers::string name() const;
     size_t output_length() const { return hash_len; }
@@ -10944,6 +11336,8 @@ namespace Botan {
 * SEED, a Korean block cipher
 */
 class BOTAN_DLL SEED : public Block_Cipher_Fixed_Params<16,16> {
+    CPLUSPLUS_OBJECT(SEED)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -10957,6 +11351,8 @@ private:
     void key_schedule(const byte[],size_t);
 
     class G_FUNC {
+    CPLUSPLUS_OBJECT(G_FUNC)
+private:
     public:
         u32bit operator()(u32bit) const;
     private:
@@ -10977,6 +11373,8 @@ namespace Botan {
 * aka PKCS #1 block type 1
 */
 class BOTAN_DLL EMSA3 : public EMSA {
+    CPLUSPLUS_OBJECT(EMSA3)
+private:
 public:
     /**
       * @param hash the hash object to use
@@ -11004,6 +11402,8 @@ private:
 * mechanism", something I have not confirmed)
 */
 class BOTAN_DLL EMSA3_Raw : public EMSA {
+    CPLUSPLUS_OBJECT(EMSA3_Raw)
+private:
 public:
     void update(const byte[],size_t);
 
@@ -11028,6 +11428,8 @@ namespace Botan {
 * Twofish, an AES finalist
 */
 class BOTAN_DLL Twofish : public Block_Cipher_Fixed_Params<16,16,32,8> {
+    CPLUSPLUS_OBJECT(Twofish)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -11093,6 +11495,8 @@ namespace Botan {
 * SHA-224
 */
 class BOTAN_DLL SHA_224 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(SHA_224)
+private:
 public:
     containers::string name() const { return "SHA-224"; }
     size_t output_length() const { return 28; }
@@ -11112,6 +11516,8 @@ private:
 * SHA-256
 */
 class BOTAN_DLL SHA_256 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(SHA_256)
+private:
 public:
     containers::string name() const { return "SHA-256"; }
     size_t output_length() const { return 32; }
@@ -11136,6 +11542,8 @@ namespace Botan {
 * Blue Midnight Wish 512 (Round 2 tweaked version)
 */
 class BOTAN_DLL BMW_512 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(BMW_512)
+private:
 public:
     containers::string name() const { return "BMW512"; }
     size_t output_length() const { return 64; }
@@ -11207,6 +11615,8 @@ namespace Botan {
 * Certificate Store Interface
 */
 class BOTAN_DLL Certificate_Store {
+    CPLUSPLUS_OBJECT(Certificate_Store)
+private:
 public:
     virtual ~Certificate_Store() {}
 
@@ -11243,6 +11653,8 @@ public:
 * In Memory Certificate Store
 */
 class BOTAN_DLL Certificate_Store_Memory : public Certificate_Store {
+    CPLUSPLUS_OBJECT(Certificate_Store_Memory)
+private:
 public:
     Certificate_Store* clone() const;
 
@@ -11276,6 +11688,8 @@ namespace Botan {
 * KDF2, from IEEE 1363
 */
 class BOTAN_DLL KDF2 : public KDF {
+    CPLUSPLUS_OBJECT(KDF2)
+private:
 public:
     SecureVector<byte> derive(size_t,const byte[],size_t,
                               const byte[],size_t) const;
@@ -11402,6 +11816,8 @@ enum X509_Code {
 * X.509 Certificate Store
 */
 class BOTAN_DLL X509_Store {
+    CPLUSPLUS_OBJECT(X509_Store)
+private:
 public:
     enum Cert_Usage {
         ANY=0x00,
@@ -11434,6 +11850,8 @@ private:
     X509_Store& operator=(const X509_Store&) { return (*this); }
 
     class BOTAN_DLL CRL_Data {
+    CPLUSPLUS_OBJECT(CRL_Data)
+private:
     public:
         X509_DN issuer;
         MemoryVector<byte> serial,auth_key_id;
@@ -11443,6 +11861,8 @@ private:
     };
 
     class BOTAN_DLL Cert_Info {
+    CPLUSPLUS_OBJECT(Cert_Info)
+private:
     public:
         bool is_verified(u32bit timeout) const;
         bool is_trusted() const;
@@ -11488,6 +11908,8 @@ namespace Botan {
 * Noekeon
 */
 class BOTAN_DLL Noekeon : public Block_Cipher_Fixed_Params<16,16> {
+    CPLUSPLUS_OBJECT(Noekeon)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -11552,6 +11974,8 @@ namespace Botan {
 * CFB Encryption
 */
 class BOTAN_DLL CFB_Encryption : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(CFB_Encryption)
+private:
 public:
     containers::string name() const { return cipher->name()+"/CFB"; }
 
@@ -11583,6 +12007,8 @@ private:
 * CFB Decryption
 */
 class BOTAN_DLL CFB_Decryption : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(CFB_Decryption)
+private:
 public:
     containers::string name() const { return cipher->name()+"/CFB"; }
 
@@ -11619,6 +12045,8 @@ namespace Botan {
 * X.509 Certificate Extension
 */
 class BOTAN_DLL Certificate_Extension {
+    CPLUSPLUS_OBJECT(Certificate_Extension)
+private:
 public:
     /**
       * @return OID representing this extension
@@ -11662,6 +12090,8 @@ protected:
 * X.509 Certificate Extension List
 */
 class BOTAN_DLL Extensions : public ASN1_Object {
+    CPLUSPLUS_OBJECT(Extensions)
+private:
 public:
     void encode_into(class DER_Encoder&) const;
     void decode_from(class BER_Decoder&);
@@ -11690,6 +12120,8 @@ static const size_t NO_CERT_PATH_LIMIT=0xFFFFFFF0;
 * Basic Constraints Extension
 */
 class BOTAN_DLL Basic_Constraints : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Basic_Constraints)
+private:
 public:
     Basic_Constraints* copy() const { return new Basic_Constraints(is_ca,path_limit); }
 
@@ -11714,6 +12146,8 @@ private:
 * Key Usage Constraints Extension
 */
 class BOTAN_DLL Key_Usage : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Key_Usage)
+private:
 public:
     Key_Usage* copy() const { return new Key_Usage(constraints); }
 
@@ -11736,6 +12170,8 @@ private:
 * Subject Key Identifier Extension
 */
 class BOTAN_DLL Subject_Key_ID : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Subject_Key_ID)
+private:
 public:
     Subject_Key_ID* copy() const { return new Subject_Key_ID(key_id); }
 
@@ -11759,6 +12195,8 @@ private:
 * Authority Key Identifier Extension
 */
 class BOTAN_DLL Authority_Key_ID : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Authority_Key_ID)
+private:
 public:
     Authority_Key_ID* copy() const { return new Authority_Key_ID(key_id); }
 
@@ -11782,6 +12220,8 @@ private:
 * Alternative Name Extension Base Class
 */
 class BOTAN_DLL Alternative_Name : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Alternative_Name)
+private:
 public:
     AlternativeName get_alt_name() const { return alt_name; }
 
@@ -11807,6 +12247,8 @@ private:
 * Subject Alternative Name Extension
 */
 class BOTAN_DLL Subject_Alternative_Name : public Alternative_Name {
+    CPLUSPLUS_OBJECT(Subject_Alternative_Name)
+private:
 public:
     Subject_Alternative_Name* copy() const { return new Subject_Alternative_Name(get_alt_name()); }
 
@@ -11817,6 +12259,8 @@ public:
 * Issuer Alternative Name Extension
 */
 class BOTAN_DLL Issuer_Alternative_Name : public Alternative_Name {
+    CPLUSPLUS_OBJECT(Issuer_Alternative_Name)
+private:
 public:
     Issuer_Alternative_Name* copy() const { return new Issuer_Alternative_Name(get_alt_name()); }
 
@@ -11827,6 +12271,8 @@ public:
 * Extended Key Usage Extension
 */
 class BOTAN_DLL Extended_Key_Usage : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Extended_Key_Usage)
+private:
 public:
     Extended_Key_Usage* copy() const { return new Extended_Key_Usage(oids); }
 
@@ -11850,6 +12296,8 @@ private:
 * Certificate Policies Extension
 */
 class BOTAN_DLL Certificate_Policies : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(Certificate_Policies)
+private:
 public:
     Certificate_Policies* copy() const { return new Certificate_Policies(oids); }
 
@@ -11873,6 +12321,8 @@ private:
 * CRL Number Extension
 */
 class BOTAN_DLL CRL_Number : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(CRL_Number)
+private:
 public:
     CRL_Number* copy() const;
 
@@ -11897,6 +12347,8 @@ private:
 * CRL Entry Reason Code Extension
 */
 class BOTAN_DLL CRL_ReasonCode : public Certificate_Extension {
+    CPLUSPLUS_OBJECT(CRL_ReasonCode)
+private:
 public:
     CRL_ReasonCode* copy() const { return new CRL_ReasonCode(reason); }
 
@@ -11926,6 +12378,8 @@ namespace Botan {
 * DSA Public Key
 */
 class BOTAN_DLL DSA_PublicKey : public virtual DL_Scheme_PublicKey {
+    CPLUSPLUS_OBJECT(DSA_PublicKey)
+private:
 public:
     containers::string algo_name() const { return "DSA"; }
 
@@ -11949,6 +12403,8 @@ protected:
 */
 class BOTAN_DLL DSA_PrivateKey : public DSA_PublicKey,
     public virtual DL_Scheme_PrivateKey {
+    CPLUSPLUS_OBJECT(DSA_PrivateKey)
+private:
 public:
     DSA_PrivateKey(const AlgorithmIdentifier& alg_id,
                    const MemoryRegion<byte>& key_bits,
@@ -11965,6 +12421,8 @@ public:
 * Object that can create a DSA signature
 */
 class BOTAN_DLL DSA_Signature_Operation : public PK_Ops::Signature {
+    CPLUSPLUS_OBJECT(DSA_Signature_Operation)
+private:
 public:
     DSA_Signature_Operation(const DSA_PrivateKey& dsa);
 
@@ -11985,6 +12443,8 @@ private:
 * Object that can verify a DSA signature
 */
 class BOTAN_DLL DSA_Verification_Operation : public PK_Ops::Verification {
+    CPLUSPLUS_OBJECT(DSA_Verification_Operation)
+private:
 public:
     DSA_Verification_Operation(const DSA_PublicKey& dsa);
 
@@ -12013,6 +12473,8 @@ namespace Botan {
 * PRF from ANSI X9.42
 */
 class BOTAN_DLL X942_PRF : public KDF {
+    CPLUSPLUS_OBJECT(X942_PRF)
+private:
 public:
     SecureVector<byte> derive(size_t,const byte[],size_t,
                               const byte[],size_t) const;
@@ -12034,6 +12496,8 @@ namespace Botan {
 * TEA
 */
 class BOTAN_DLL TEA : public Block_Cipher_Fixed_Params<8,16> {
+    CPLUSPLUS_OBJECT(TEA)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -12057,6 +12521,8 @@ namespace Botan {
 * Nyberg-Rueppel Public Key
 */
 class BOTAN_DLL NR_PublicKey : public virtual DL_Scheme_PublicKey {
+    CPLUSPLUS_OBJECT(NR_PublicKey)
+private:
 public:
     containers::string algo_name() const { return "NR"; }
 
@@ -12079,6 +12545,8 @@ protected:
 */
 class BOTAN_DLL NR_PrivateKey : public NR_PublicKey,
     public virtual DL_Scheme_PrivateKey {
+    CPLUSPLUS_OBJECT(NR_PrivateKey)
+private:
 public:
     bool check_key(RandomNumberGenerator& rng,bool strong) const;
 
@@ -12095,6 +12563,8 @@ public:
 * Nyberg-Rueppel signature operation
 */
 class BOTAN_DLL NR_Signature_Operation : public PK_Ops::Signature {
+    CPLUSPLUS_OBJECT(NR_Signature_Operation)
+private:
 public:
     NR_Signature_Operation(const NR_PrivateKey& nr);
 
@@ -12115,6 +12585,8 @@ private:
 * Nyberg-Rueppel verification operation
 */
 class BOTAN_DLL NR_Verification_Operation : public PK_Ops::Verification {
+    CPLUSPLUS_OBJECT(NR_Verification_Operation)
+private:
 public:
     NR_Verification_Operation(const NR_PublicKey& nr);
 
@@ -12142,6 +12614,8 @@ namespace Botan {
 * Alleged RC4
 */
 class BOTAN_DLL ARC4 : public StreamCipher {
+    CPLUSPLUS_OBJECT(ARC4)
+private:
 public:
     void cipher(const byte in[],byte out[],size_t length);
 
@@ -12182,6 +12656,8 @@ namespace Botan {
 * Rabin-Williams Public Key
 */
 class BOTAN_DLL RW_PublicKey : public virtual IF_Scheme_PublicKey {
+    CPLUSPLUS_OBJECT(RW_PublicKey)
+private:
 public:
     containers::string algo_name() const { return "RW"; }
 
@@ -12203,6 +12679,8 @@ protected:
 */
 class BOTAN_DLL RW_PrivateKey : public RW_PublicKey,
     public IF_Scheme_PrivateKey {
+    CPLUSPLUS_OBJECT(RW_PrivateKey)
+private:
 public:
     RW_PrivateKey(const AlgorithmIdentifier& alg_id,
                   const MemoryRegion<byte>& key_bits,
@@ -12226,6 +12704,8 @@ public:
 * Rabin-Williams Signature Operation
 */
 class BOTAN_DLL RW_Signature_Operation : public PK_Ops::Signature {
+    CPLUSPLUS_OBJECT(RW_Signature_Operation)
+private:
 public:
     RW_Signature_Operation(const RW_PrivateKey& rw);
 
@@ -12248,6 +12728,8 @@ private:
 * Rabin-Williams Verification Operation
 */
 class BOTAN_DLL RW_Verification_Operation : public PK_Ops::Verification {
+    CPLUSPLUS_OBJECT(RW_Verification_Operation)
+private:
 public:
     RW_Verification_Operation(const RW_PublicKey& rw):
         n(rw.get_n()),powermod_e_n(rw.get_e(),rw.get_n()) {
@@ -12853,6 +13335,8 @@ namespace Botan {
 */
 class BOTAN_DLL CBC_Encryption : public Keyed_Filter,
     private Buffered_Filter {
+    CPLUSPLUS_OBJECT(CBC_Encryption)
+private:
 public:
     containers::string name() const;
 
@@ -12890,6 +13374,8 @@ private:
 */
 class BOTAN_DLL CBC_Decryption : public Keyed_Filter,
     private Buffered_Filter {
+    CPLUSPLUS_OBJECT(CBC_Decryption)
+private:
 public:
     containers::string name() const;
 
@@ -12931,6 +13417,8 @@ namespace Botan {
 * A class handling runtime CPU feature detection
 */
 class BOTAN_DLL CPUID {
+    CPLUSPLUS_OBJECT(CPUID)
+private:
 public:
     /**
       * Probe the CPU and see what extensions are supported
@@ -13028,6 +13516,8 @@ namespace Botan {
 * Serpent implementation using SIMD
 */
 class BOTAN_DLL Serpent_SIMD : public Serpent {
+    CPLUSPLUS_OBJECT(Serpent_SIMD)
+private:
 public:
     size_t parallelism() const { return 4; }
 
@@ -13046,6 +13536,8 @@ namespace Botan {
 * PK_Encryptor Filter
 */
 class BOTAN_DLL PK_Encryptor_Filter : public Filter {
+    CPLUSPLUS_OBJECT(PK_Encryptor_Filter)
+private:
 public:
     void write(const byte[],size_t);
     void end_msg();
@@ -13064,6 +13556,8 @@ private:
 * PK_Decryptor Filter
 */
 class BOTAN_DLL PK_Decryptor_Filter : public Filter {
+    CPLUSPLUS_OBJECT(PK_Decryptor_Filter)
+private:
 public:
     void write(const byte[],size_t);
     void end_msg();
@@ -13078,6 +13572,8 @@ private:
 * PK_Signer Filter
 */
 class BOTAN_DLL PK_Signer_Filter : public Filter {
+    CPLUSPLUS_OBJECT(PK_Signer_Filter)
+private:
 public:
     void write(const byte[],size_t);
     void end_msg();
@@ -13097,6 +13593,8 @@ private:
 * PK_Verifier Filter
 */
 class BOTAN_DLL PK_Verifier_Filter : public Filter {
+    CPLUSPLUS_OBJECT(PK_Verifier_Filter)
+private:
 public:
     void write(const byte[],size_t);
     void end_msg();
@@ -13122,6 +13620,8 @@ namespace Botan {
 * XTEA implemented using SIMD operations
 */
 class BOTAN_DLL XTEA_SIMD : public XTEA {
+    CPLUSPLUS_OBJECT(XTEA_SIMD)
+private:
 public:
     size_t parallelism() const { return 8; }
 
@@ -13139,6 +13639,8 @@ namespace Botan {
 * A queue that knows how to zeroize itself
 */
 class BOTAN_DLL SecureQueue : public Fanout_Filter,public DataSource {
+    CPLUSPLUS_OBJECT(SecureQueue)
+private:
 public:
     containers::string name() const { return "Queue"; }
 
@@ -13189,6 +13691,8 @@ namespace Botan {
 * HMAC
 */
 class BOTAN_DLL HMAC : public MessageAuthenticationCode {
+    CPLUSPLUS_OBJECT(HMAC)
+private:
 public:
     void clear();
     containers::string name() const;
@@ -13223,6 +13727,8 @@ namespace Botan {
 * OpenPGP's S2K
 */
 class BOTAN_DLL OpenPGP_S2K : public PBKDF {
+    CPLUSPLUS_OBJECT(OpenPGP_S2K)
+private:
 public:
     /**
       * @param hash_in the hash function to use
@@ -13261,6 +13767,8 @@ namespace Botan {
 * http://www.cl.cam.ac.uk/~rja14/Papers/bear-lion.pdf
 */
 class BOTAN_DLL Lion : public BlockCipher {
+    CPLUSPLUS_OBJECT(Lion)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -13304,6 +13812,8 @@ namespace Botan {
 * Skipjack, a NSA designed cipher used in Fortezza
 */
 class BOTAN_DLL Skipjack : public Block_Cipher_Fixed_Params<8,10> {
+    CPLUSPLUS_OBJECT(Skipjack)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -13359,6 +13869,8 @@ namespace Botan {
 * This class represents ECDH Public Keys.
 */
 class BOTAN_DLL ECDH_PublicKey : public virtual EC_PublicKey {
+    CPLUSPLUS_OBJECT(ECDH_PublicKey)
+private:
 public:
 
     ECDH_PublicKey(const AlgorithmIdentifier& alg_id,
@@ -13405,6 +13917,8 @@ protected:
 class BOTAN_DLL ECDH_PrivateKey : public ECDH_PublicKey,
     public EC_PrivateKey,
     public PK_Key_Agreement_Key {
+    CPLUSPLUS_OBJECT(ECDH_PrivateKey)
+private:
 public:
 
     ECDH_PrivateKey(const AlgorithmIdentifier& alg_id,
@@ -13431,6 +13945,8 @@ public:
 * ECDH operation
 */
 class BOTAN_DLL ECDH_KA_Operation : public PK_Ops::Key_Agreement {
+    CPLUSPLUS_OBJECT(ECDH_KA_Operation)
+private:
 public:
     ECDH_KA_Operation(const ECDH_PrivateKey& key);
 
@@ -13450,6 +13966,8 @@ namespace Botan {
 * AES-128
 */
 class BOTAN_DLL AES_128 : public Block_Cipher_Fixed_Params<16,16> {
+    CPLUSPLUS_OBJECT(AES_128)
+private:
 public:
     AES_128(): EK(40),DK(40),ME(16),MD(16) {}
 
@@ -13471,6 +13989,8 @@ private:
 * AES-192
 */
 class BOTAN_DLL AES_192 : public Block_Cipher_Fixed_Params<16,24> {
+    CPLUSPLUS_OBJECT(AES_192)
+private:
 public:
     AES_192(): EK(48),DK(48),ME(16),MD(16) {}
 
@@ -13492,6 +14012,8 @@ private:
 * AES-256
 */
 class BOTAN_DLL AES_256 : public Block_Cipher_Fixed_Params<16,32> {
+    CPLUSPLUS_OBJECT(AES_256)
+private:
 public:
     AES_256(): EK(56),DK(56),ME(16),MD(16) {}
 
@@ -13550,6 +14072,8 @@ namespace Botan {
 * "On the Security of Hash Function Combiners", Anja Lehmann
 */
 class BOTAN_DLL Comb4P : public HashFunction {
+    CPLUSPLUS_OBJECT(Comb4P)
+private:
 public:
     /**
       * @param h1 the first hash
@@ -13591,6 +14115,8 @@ namespace Botan {
 * A split secret, using the format from draft-mcgrew-tss-03
 */
 class BOTAN_DLL RTSS_Share {
+    CPLUSPLUS_OBJECT(RTSS_Share)
+private:
 public:
     /**
       * @param M the number of shares needed to reconstruct
@@ -13651,6 +14177,8 @@ namespace Botan {
 * RC2
 */
 class BOTAN_DLL RC2 : public Block_Cipher_Fixed_Params<8,1,32> {
+    CPLUSPLUS_OBJECT(RC2)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -13682,6 +14210,8 @@ namespace Botan {
 * DJB's Salsa20 (and XSalsa20)
 */
 class BOTAN_DLL Salsa20 : public StreamCipher {
+    CPLUSPLUS_OBJECT(Salsa20)
+private:
 public:
     void cipher(const byte in[],byte out[],size_t length);
 
@@ -13715,6 +14245,8 @@ namespace Botan {
 * RIPEMD-128
 */
 class BOTAN_DLL RIPEMD_128 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(RIPEMD_128)
+private:
 public:
     containers::string name() const { return "RIPEMD-128"; }
     size_t output_length() const { return 16; }
@@ -13739,6 +14271,8 @@ namespace Botan {
 * 24-bit cyclic redundancy check
 */
 class BOTAN_DLL CRC24 : public HashFunction {
+    CPLUSPLUS_OBJECT(CRC24)
+private:
 public:
     containers::string name() const { return "CRC24"; }
     size_t output_length() const { return 3; }
@@ -13765,6 +14299,8 @@ namespace Botan {
 * Unless needed for backwards compatability, use PKCS5_PBKDF2
 */
 class BOTAN_DLL PKCS5_PBKDF1 : public PBKDF {
+    CPLUSPLUS_OBJECT(PKCS5_PBKDF1)
+private:
 public:
     /**
       * Create a PKCS #5 instance using the specified hash function.
@@ -13806,6 +14342,8 @@ namespace Botan {
 * This class represents X.509 Certificate Authorities (CAs).
 */
 class BOTAN_DLL X509_CA {
+    CPLUSPLUS_OBJECT(X509_CA)
+private:
 public:
 
     /**
@@ -13964,6 +14502,8 @@ namespace Botan {
 * EAX Base Class
 */
 class BOTAN_DLL EAX_Base : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(EAX_Base)
+private:
 public:
     void set_key(const SymmetricKey& key);
     void set_iv(const InitializationVector& iv);
@@ -14042,6 +14582,8 @@ protected:
 * EAX Encryption
 */
 class BOTAN_DLL EAX_Encryption : public EAX_Base {
+    CPLUSPLUS_OBJECT(EAX_Encryption)
+private:
 public:
     /**
       * @param ciph the cipher to use
@@ -14071,6 +14613,8 @@ private:
 * EAX Decryption
 */
 class BOTAN_DLL EAX_Decryption : public EAX_Base {
+    CPLUSPLUS_OBJECT(EAX_Decryption)
+private:
 public:
     /**
       * @param ciph the cipher to use
@@ -14105,6 +14649,8 @@ namespace Botan {
 * CMAC, also known as OMAC1
 */
 class BOTAN_DLL CMAC : public MessageAuthenticationCode {
+    CPLUSPLUS_OBJECT(CMAC)
+private:
 public:
     containers::string name() const;
     size_t output_length() const { return e->block_size(); }
@@ -14149,6 +14695,8 @@ namespace Botan {
 * Skein-512, a SHA-3 candidate
 */
 class BOTAN_DLL Skein_512 : public HashFunction {
+    CPLUSPLUS_OBJECT(Skein_512)
+private:
 public:
     /**
       * @param output_bits the output size of Skein in bits
@@ -14186,6 +14734,8 @@ namespace Botan {
 * CBC encryption with ciphertext stealing
 */
 class BOTAN_DLL CTS_Encryption : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(CTS_Encryption)
+private:
 public:
     containers::string name() const { return cipher->name()+"/CTS"; }
 
@@ -14218,6 +14768,8 @@ private:
 * CBC decryption with ciphertext stealing
 */
 class BOTAN_DLL CTS_Decryption : public Keyed_Filter {
+    CPLUSPLUS_OBJECT(CTS_Decryption)
+private:
 public:
     containers::string name() const { return cipher->name()+"/CTS"; }
 
@@ -14355,6 +14907,8 @@ namespace Botan {
 * IDEA
 */
 class BOTAN_DLL IDEA : public Block_Cipher_Fixed_Params<8,16> {
+    CPLUSPLUS_OBJECT(IDEA)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -14410,6 +14964,8 @@ namespace Botan {
 * MGF1 from PKCS #1 v2.0
 */
 class BOTAN_DLL MGF1 : public MGF {
+    CPLUSPLUS_OBJECT(MGF1)
+private:
 public:
     void mask(const byte[],size_t,byte[],size_t) const;
 
@@ -14433,6 +14989,8 @@ namespace Botan {
 */
 class BOTAN_DLL XTS_Encryption : public Keyed_Filter,
     private Buffered_Filter {
+    CPLUSPLUS_OBJECT(XTS_Encryption)
+private:
 public:
     void set_key(const SymmetricKey& key);
     void set_iv(const InitializationVector& iv);
@@ -14467,6 +15025,8 @@ private:
 */
 class BOTAN_DLL XTS_Decryption : public Keyed_Filter,
     private Buffered_Filter {
+    CPLUSPLUS_OBJECT(XTS_Decryption)
+private:
 public:
     void set_key(const SymmetricKey& key);
     void set_iv(const InitializationVector& iv);
@@ -14505,6 +15065,8 @@ namespace Botan {
 * Struct representing a particular date and time
 */
 class BOTAN_DLL calendar_point {
+    CPLUSPLUS_OBJECT(calendar_point)
+private:
 public:
     /** The year */
     u32bit year;
@@ -14565,6 +15127,8 @@ namespace Botan {
 * Don't use this unless you know what you are doing.
 */
 class BOTAN_DLL EMSA_Raw : public EMSA {
+    CPLUSPLUS_OBJECT(EMSA_Raw)
+private:
 private:
     void update(const byte[],size_t);
     SecureVector<byte> raw_data();
@@ -14696,6 +15260,8 @@ namespace Botan {
 * PRF used in TLS 1.0/1.1
 */
 class BOTAN_DLL TLS_PRF : public KDF {
+    CPLUSPLUS_OBJECT(TLS_PRF)
+private:
 public:
     SecureVector<byte> derive(size_t key_len,
                               const byte secret[],size_t secret_len,
@@ -14715,6 +15281,8 @@ private:
 * PRF used in TLS 1.2
 */
 class BOTAN_DLL TLS_12_PRF : public KDF {
+    CPLUSPLUS_OBJECT(TLS_12_PRF)
+private:
 public:
     SecureVector<byte> derive(size_t key_len,
                               const byte secret[],size_t secret_len,
@@ -14738,6 +15306,8 @@ namespace Botan {
 * EMSA4 aka PSS-R
 */
 class BOTAN_DLL EMSA4 : public EMSA {
+    CPLUSPLUS_OBJECT(EMSA4)
+private:
 public:
     /**
       * @param hash the hash object to use
@@ -14774,6 +15344,8 @@ namespace Botan {
 * Camellia-128
 */
 class BOTAN_DLL Camellia_128 : public Block_Cipher_Fixed_Params<16,16> {
+    CPLUSPLUS_OBJECT(Camellia_128)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -14791,6 +15363,8 @@ private:
 * Camellia-192
 */
 class BOTAN_DLL Camellia_192 : public Block_Cipher_Fixed_Params<16,24> {
+    CPLUSPLUS_OBJECT(Camellia_192)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -14808,6 +15382,8 @@ private:
 * Camellia-256
 */
 class BOTAN_DLL Camellia_256 : public Block_Cipher_Fixed_Params<16,32> {
+    CPLUSPLUS_OBJECT(Camellia_256)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -14830,6 +15406,8 @@ namespace Botan {
 * MD4
 */
 class BOTAN_DLL MD4 : public MDx_HashFunction {
+    CPLUSPLUS_OBJECT(MD4)
+private:
 public:
     containers::string name() const { return "MD4"; }
     size_t output_length() const { return 16; }
@@ -14862,6 +15440,8 @@ namespace Botan {
 * Turing
 */
 class BOTAN_DLL Turing : public StreamCipher {
+    CPLUSPLUS_OBJECT(Turing)
+private:
 public:
     void cipher(const byte in[],byte out[],size_t length);
     void set_iv(const byte iv[],size_t iv_length);
@@ -14943,6 +15523,8 @@ containers::string BOTAN_DLL srp6_group_identifier(const BigInt& N,const BigInt&
 * Represents a SRP-6a server session
 */
 class BOTAN_DLL SRP6_Server_Session {
+    CPLUSPLUS_OBJECT(SRP6_Server_Session)
+private:
 public:
     /**
       * Server side step 1
@@ -14970,6 +15552,8 @@ namespace Botan {
 * SAFER-SK
 */
 class BOTAN_DLL SAFER_SK : public Block_Cipher_Fixed_Params<8,16> {
+    CPLUSPLUS_OBJECT(SAFER_SK)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -14999,6 +15583,8 @@ namespace Botan {
 * CAST-128
 */
 class BOTAN_DLL CAST_128 : public Block_Cipher_Fixed_Params<8,11,16> {
+    CPLUSPLUS_OBJECT(CAST_128)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -15036,6 +15622,8 @@ namespace Botan {
 * PKCS #5 v2.0 PBE
 */
 class BOTAN_DLL PBE_PKCS5v20 : public PBE {
+    CPLUSPLUS_OBJECT(PBE_PKCS5v20)
+private:
 public:
     /**
       * @param cipher names a block cipher
@@ -15109,6 +15697,8 @@ namespace Botan {
 * CBC-MAC
 */
 class BOTAN_DLL CBC_MAC : public MessageAuthenticationCode {
+    CPLUSPLUS_OBJECT(CBC_MAC)
+private:
 public:
     containers::string name() const;
     MessageAuthenticationCode* clone() const;
@@ -15143,6 +15733,8 @@ namespace Botan {
 * MARS, IBM's candidate for AES
 */
 class BOTAN_DLL MARS : public Block_Cipher_Fixed_Params<16,16,32,4> {
+    CPLUSPLUS_OBJECT(MARS)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -15167,6 +15759,8 @@ namespace Botan {
 * PKCS #5 PBKDF2
 */
 class BOTAN_DLL PKCS5_PBKDF2 : public PBKDF {
+    CPLUSPLUS_OBJECT(PKCS5_PBKDF2)
+private:
 public:
     containers::string name() const {
         return "PBKDF2("+mac->name()+")";
@@ -15237,6 +15831,8 @@ namespace Botan {
 * DLIES Encryption
 */
 class BOTAN_DLL DLIES_Encryptor : public PK_Encryptor {
+    CPLUSPLUS_OBJECT(DLIES_Encryptor)
+private:
 public:
     DLIES_Encryptor(const PK_Key_Agreement_Key&,
                     KDF* kdf,
@@ -15263,6 +15859,8 @@ private:
 * DLIES Decryption
 */
 class BOTAN_DLL DLIES_Decryptor : public PK_Decryptor {
+    CPLUSPLUS_OBJECT(DLIES_Decryptor)
+private:
 public:
     DLIES_Decryptor(const PK_Key_Agreement_Key&,
                     KDF* kdf,
@@ -15291,6 +15889,8 @@ namespace Botan {
 * Output Feedback Mode
 */
 class BOTAN_DLL OFB : public StreamCipher {
+    CPLUSPLUS_OBJECT(OFB)
+private:
 public:
     void cipher(const byte in[],byte out[],size_t length);
 
@@ -15330,6 +15930,8 @@ namespace Botan {
 * Blowfish
 */
 class BOTAN_DLL Blowfish : public Block_Cipher_Fixed_Params<8,1,56> {
+    CPLUSPLUS_OBJECT(Blowfish)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -15373,6 +15975,8 @@ namespace Botan {
 * The Adler32 checksum, used in zlib
 */
 class BOTAN_DLL Adler32 : public HashFunction {
+    CPLUSPLUS_OBJECT(Adler32)
+private:
 public:
     containers::string name() const { return "Adler32"; }
     size_t output_length() const { return 4; }
@@ -15397,6 +16001,8 @@ namespace Botan {
 * Parallel Hashes
 */
 class BOTAN_DLL Parallel : public HashFunction {
+    CPLUSPLUS_OBJECT(Parallel)
+private:
 public:
     void clear();
     containers::string name() const;
@@ -15424,6 +16030,8 @@ namespace Botan {
 * RC5
 */
 class BOTAN_DLL RC5 : public Block_Cipher_Fixed_Params<8,1,32> {
+    CPLUSPLUS_OBJECT(RC5)
+private:
 public:
     void encrypt_n(const byte in[],byte out[],size_t blocks) const;
     void decrypt_n(const byte in[],byte out[],size_t blocks) const;
@@ -15486,6 +16094,8 @@ namespace Botan {
 * Noekeon implementation using SIMD operations
 */
 class BOTAN_DLL Noekeon_SIMD : public Noekeon {
+    CPLUSPLUS_OBJECT(Noekeon_SIMD)
+private:
 public:
     size_t parallelism() const { return 4; }
 
@@ -15504,6 +16114,8 @@ namespace Botan {
 * PKCS #5 v1.5 PBE
 */
 class BOTAN_DLL PBE_PKCS5v15 : public PBE {
+    CPLUSPLUS_OBJECT(PBE_PKCS5v15)
+private:
 public:
     containers::string name() const;
 
@@ -15548,6 +16160,8 @@ namespace Botan {
 * CTR-BE (Counter mode, big-endian)
 */
 class BOTAN_DLL CTR_BE : public StreamCipher {
+    CPLUSPLUS_OBJECT(CTR_BE)
+private:
 public:
     void cipher(const byte in[],byte out[],size_t length);
 
@@ -15588,6 +16202,8 @@ namespace Botan {
 * Randpool
 */
 class BOTAN_DLL Randpool : public RandomNumberGenerator {
+    CPLUSPLUS_OBJECT(Randpool)
+private:
 public:
     void randomize(byte[],size_t);
     bool is_seeded() const { return seeded; }
@@ -15633,6 +16249,8 @@ namespace Botan {
 * PRF used in SSLv3
 */
 class BOTAN_DLL SSL3_PRF : public KDF {
+    CPLUSPLUS_OBJECT(SSL3_PRF)
+private:
 public:
     SecureVector<byte> derive(size_t,const byte[],size_t,
                               const byte[],size_t) const;
@@ -15650,6 +16268,8 @@ namespace Botan {
 * DES/3DES-based MAC from ANSI X9.19
 */
 class BOTAN_DLL ANSI_X919_MAC : public MessageAuthenticationCode {
+    CPLUSPLUS_OBJECT(ANSI_X919_MAC)
+private:
 public:
     void clear();
     containers::string name() const;
