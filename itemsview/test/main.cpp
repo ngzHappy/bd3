@@ -4,6 +4,7 @@
 #include <QtWidgets>
 #include "TestWidget.hpp"
 #include "TestTreeView.hpp"
+#include "TableView.hpp"
 
 int main(int argc,char **argv) {
 
@@ -12,9 +13,11 @@ int main(int argc,char **argv) {
     //TestWidget widget ;
     //widget.show();
 
-    TestTreeView widget;
-    widget.show();
+    //TestTreeView widget;
+    //widget.show();
 
+    TableView widget;
+    widget.show();
 
     return app.exec();
 }

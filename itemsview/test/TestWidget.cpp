@@ -3,8 +3,11 @@
 
 #include <memory>
 #include <QtCore>
+#include <cassert>
+#include <algorithm>
 #include "TestWidget.hpp"
 #include <QStringListModel>
+//############################
 #include <private/qlistview_p.h>
 
 TestWidget::TestWidget() {
@@ -35,7 +38,14 @@ QVector<QModelIndex> TestWidget::_p_getAllVisibleItems() {
     QRect a=(this->isRightToLeft()?
                    varPrivate->flipX(area.normalized()):
                    area.normalized());
-    return varPrivate->commonListView->intersectingSet(a);
+    auto varAns = varPrivate->commonListView->intersectingSet(a);
+    if(varAns.isEmpty()){return{};}
+
+    std::sort( varAns.begin(),varAns.end() );
+    assert( (std::unique(varAns.begin(),varAns.end())==varAns.end())
+            &&"is there a qt bug???" );
+
+    return std::move(varAns);
 }
 
 void TestWidget::paintEvent(QPaintEvent *e) {

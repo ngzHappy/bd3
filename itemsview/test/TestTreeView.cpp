@@ -2,10 +2,12 @@
 
 #include <memory>
 #include <QtCore>
-#include <private/qtreeview_p.h>
+#include <cassert>
+#include <algorithm>
 #include <QtWidgets/qheaderview.h>
+//############################
+#include <private/qtreeview_p.h>
 
-#include <vector>
 
 namespace {
 
@@ -88,24 +90,30 @@ QVector<QModelIndex> TestTreeView::_p_getAllVisibleItems() {
     QTreeViewPrivate *varPrivate=d_func();
     const QVector<QTreeViewItem> viewItems=varPrivate->viewItems;
 
-    if (viewItems.count()==0  /*rows==0*/
-            ||varPrivate->header->count()==0 /*cols==0*/
+    if (viewItems.count()==0/*rows==0*/
+            ||varPrivate->header->count()==0/*cols==0*/
             ||!varPrivate->itemDelegate/*draw function is null*/) {
         return{};
     }
 
     int firstVisibleItemOffset=0;
     const auto firstVisibleItem=varPrivate->firstVisibleItem(&firstVisibleItemOffset);
-    if (firstVisibleItem<0) { return{}; }
+    if (firstVisibleItem<0) { /*all can not be see*/ return{}; }
     const auto lastVisibleItem=varPrivate->lastVisibleItem(firstVisibleItem,firstVisibleItemOffset);
+    if(lastVisibleItem<firstVisibleItem){ /*is threre a qt bug???*/ return{};}
 
     QVector<QModelIndex> varAns;
+    varAns.reserve( lastVisibleItem-firstVisibleItem+1 );
 
     for (firstVisibleItemOffset=firstVisibleItem;
-        firstVisibleItemOffset<=lastVisibleItem;
+         firstVisibleItemOffset<=lastVisibleItem;
         ++firstVisibleItemOffset) {
         varAns.push_back(viewItems[firstVisibleItemOffset].index);
     }
+
+    std::sort( varAns.begin(),varAns.end() );
+    assert( (std::unique(varAns.begin(),varAns.end())==varAns.end())
+            &&"is there a qt bug???" );
 
     return std::move(varAns);
 }
