@@ -25,7 +25,8 @@ HEADERS  += BasicTreeView.hpp \
     TreeViewItemModel.hpp \
     TreeViewItemData.hpp \
     TreeViewItemDataList.hpp \
-    TreeViewItemWidget.hpp
+    TreeViewItemWidget.hpp \
+    TreeViewItemDelegate.hpp
 
 
 

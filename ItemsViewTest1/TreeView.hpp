@@ -2,6 +2,7 @@
 #define TREEVIEW_HPP
 
 class TreeViewItemModel;
+class TreeViewItemDelegate;
 #include "BasicTreeView.hpp"
 
 class TreeView :public BasicTreeView {
@@ -22,6 +23,7 @@ protected:
 private:
     class _PrivateTreeView;
     _PrivateTreeView * $m$this;
+    friend class TreeViewItemDelegate;
 private:
     CPLUSPLUS_OBJECT(TreeView)
 };

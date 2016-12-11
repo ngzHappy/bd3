@@ -21,6 +21,17 @@ public:
     virtual QModelIndex parent(const QModelIndex &) const override ;
     virtual int rowCount(const QModelIndex &) const;
 public:
+
+    enum {
+        Role_Type=Qt::UserRole+1,
+    };
+
+    enum ItemType : int{
+        GroupHeader=17,
+        TreeItem,
+    };
+
+public:
     TreeViewItemDataList * createList(const QString &/*title*/);
     TreeViewItemDataList * getList(const QString &/*title*/) const;
     void addListData(const QString &/*title*/,TreeViewItemData::type);

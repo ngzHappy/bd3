@@ -73,8 +73,7 @@ public:
 
         auto varData = varList->getData(  varRow );
         if(role == Qt::DisplayRole){
-            //return QVariant::fromValue( std::move(varData) );
-            return "xxxx";
+            return QVariant::fromValue( std::move(varData) );
         }
 
         return {};
@@ -105,8 +104,14 @@ QVariant TreeViewItemModel::data(
 
     auto * varThisData = &( $m$this->$m$Data );
     if( argIndex.internalPointer() == varThisData ){
+        if(role == Role_Type){
+            return static_cast<int>(ItemType::GroupHeader);
+        }
         return $m$this->treeData( argIndex,role );
     }else{
+        if(role == Role_Type){
+            return static_cast<int>(ItemType::TreeItem);
+        }
         return $m$this->listData( argIndex,role );
     }
 

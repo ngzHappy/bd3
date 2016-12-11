@@ -2,6 +2,7 @@
 #include "TreeView.hpp"
 #include "TreeViewItemModel.hpp"
 #include "TreeViewItemWidget.hpp"
+#include "TreeViewItemDelegate.hpp"
 
 class TreeView::_PrivateTreeView {
 public:
@@ -22,11 +23,23 @@ private:
 
 TreeView::TreeView(QWidget *parent):
     BasicTreeView(parent){
-    $m$this=new _PrivateTreeView;
-    $m$this->super=this;
-    std::unique_ptr<QObject> varOldModel{ this->model() };
-    this->setModel( new TreeViewItemModel(this) );
-    this->setIndentation( 0 );
+
+    {/*初始化私有数据*/
+        $m$this=new _PrivateTreeView;
+        $m$this->super=this;
+    }
+
+    {/*初始化model*/
+        std::unique_ptr<QObject> varOldModel{ this->model() };
+        this->setModel( new TreeViewItemModel(this) );
+        this->setIndentation( 0 );
+    }
+
+    {/*初始化代理*/
+        std::unique_ptr<QObject> varOldDelegate{ this->itemDelegate() };
+        this->setItemDelegate( new TreeViewItemDelegate(this) );
+    }
+
 }
 
 TreeView::~TreeView(){
@@ -89,4 +102,79 @@ void TreeView::paintEvent(QPaintEvent * argEvent){
     gcEvent();
 }
 
+/****************************************************************************/
+/****************************************************************************/
+/****************************************************************************/
 
+class TreeViewItemDelegate::_PrivateTreeViewItemDelegate{
+public:
+    TreeView * superWidget;
+    TreeViewItemDelegate * super;
+private:
+    CPLUSPLUS_OBJECT(_PrivateTreeViewItemDelegate)
+};
+
+TreeViewItemDelegate::TreeViewItemDelegate(TreeView *arg):_Super(arg){
+    $m$this=new _PrivateTreeViewItemDelegate;
+    $m$this->superWidget=arg;
+    $m$this->super=this;
+}
+
+TreeViewItemDelegate::~TreeViewItemDelegate(){
+    delete $m$this;
+}
+
+void TreeViewItemDelegate::paint(
+        QPainter * painter,
+        const QStyleOptionViewItem & styleOption,
+        const QModelIndex & index) const {
+
+    if( index.isValid() ){
+          auto super = $m$this->superWidget;
+          super->openPersistentEditor( index );
+          return;
+    }
+
+    return _Super::paint(painter,styleOption,index);
+
+}
+
+QWidget *TreeViewItemDelegate::createEditor(
+        QWidget * parent,
+        const QStyleOptionViewItem & option,
+        const QModelIndex & index) const {
+
+    if( index.isValid() ){
+
+        auto varType = index.data( TreeViewItemModel::Role_Type ).toInt();
+
+        if( varType == TreeViewItemModel::GroupHeader ){
+            auto varAns = new TreeViewItemWidget(parent);
+            varAns->setModelIndex( index );
+            auto super = $m$this->superWidget;
+            super->$m$this->$m$OpendWidgets.push_back( varAns );
+            return varAns;
+        }else if( varType == TreeViewItemModel::TreeItem ){
+            auto varAns = new TreeViewItemWidget(parent);
+            varAns->setModelIndex( index );
+            auto super = $m$this->superWidget;
+            super->$m$this->$m$OpendWidgets.push_back( varAns );
+            return varAns;
+        }
+
+    }
+    return _Super::createEditor(parent,option,index);
+}
+
+void TreeViewItemDelegate::destroyEditor(
+        QWidget * argWidget,
+        const QModelIndex & argIndex) const {
+    return _Super::destroyEditor(argWidget,argIndex);
+}
+
+void TreeViewItemDelegate::updateEditorGeometry(
+        QWidget * widget,
+        const QStyleOptionViewItem & option,
+        const QModelIndex & index) const{
+    return _Super::updateEditorGeometry(widget,option,index);
+}
