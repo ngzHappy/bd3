@@ -4,31 +4,31 @@
 #include "TreeViewItemData.hpp"
 #include "TreeViewItemModel.hpp"
 #include "TreeViewItemDataList.hpp"
-
-class TreeViewItemModel::_PrivateTreeViewItemModel{
+#include <QtCore/qdebug.h>
+class TreeViewItemModel::_PrivateTreeViewItemModel {
 public:
     template<typename _$m$T>using vector=std::vector<_$m$T>;
-    template<typename _$m$T,typename _$m$U,typename _$m$C =std::less<void> >using map=std::map<_$m$T,_$m$U,_$m$C>;
-    using DataType = vector< std::unique_ptr< TreeViewItemDataList > >;
+    template<typename _$m$T,typename _$m$U,typename _$m$C=std::less<void> >using map=std::map<_$m$T,_$m$U,_$m$C>;
+    using DataType=vector< std::unique_ptr< TreeViewItemDataList > >;
 
-    class CompareTreeViewItemDataListPointer{
+    class CompareTreeViewItemDataListPointer {
         using _utp=std::unique_ptr< TreeViewItemDataList >;
     public:
-        class is_transparent{};
-        bool operator()(const _utp & l,const _utp & r) const { return l.get() < r.get(); }
-        bool operator()(const _utp & l,const void * r) const { return l.get() < r; }
-        bool operator()(const void * l,const _utp & r) const { return l < r.get(); }
-        bool operator()(const void * l,const void * r) const { return l < r;}
+        class is_transparent {};
+        bool operator()(const _utp & l,const _utp & r) const { return l.get()<r.get(); }
+        bool operator()(const _utp & l,const void * r) const { return l.get()<r; }
+        bool operator()(const void * l,const _utp & r) const { return l<r.get(); }
+        bool operator()(const void * l,const void * r) const { return l<r; }
     };
 
-    class CompareTreeViewItemDataListQString{
+    class CompareTreeViewItemDataListQString {
         using _utp=std::unique_ptr< TreeViewItemDataList >;
     public:
-        class is_transparent{};
-        bool operator()(const QString & l,const QString & r) const { return l < r ; }
-        bool operator()(const _utp & l,const _utp & r) const { return l.get() < r.get();}
-        bool operator()(const QString & l,const _utp r) const { return l  < r ->getTitle() ; }
-        bool operator()(const _utp & l,const QString & r) const { return l->getTitle() < r ; }
+        class is_transparent {};
+        bool operator()(const QString & l,const QString & r) const { return l<r; }
+        bool operator()(const _utp & l,const _utp & r) const { return l.get()<r.get(); }
+        bool operator()(const QString & l,const _utp r) const { return l<r->getTitle(); }
+        bool operator()(const _utp & l,const QString & r) const { return l->getTitle()<r; }
 
     };
 
@@ -38,45 +38,54 @@ public:
     map<QString,int,CompareTreeViewItemDataListQString> $m$DataQStringIndex;
 
     int listIndex(void * pointer) const {
-        auto varPos = $m$DataPointerIndex.find(pointer);
-        if( varPos == $m$DataPointerIndex.end() ){ return -1; }
+        auto varPos=$m$DataPointerIndex.find(pointer);
+        if (varPos==$m$DataPointerIndex.end()) { return -1; }
         return varPos->second;
     }
 
     QVariant treeData(
             const QModelIndex & argIndex,
-            int role) const{
-        auto varRow = argIndex.row();
-        if( varRow >= static_cast<decltype(varRow)>( $m$Data.size() ) ){ return {}; }
+            int role) const {
+        auto varRow=argIndex.row();
+        if (varRow>=static_cast<decltype(varRow)>($m$Data.size())) { return{}; }
 
-        const auto & varItem = $m$Data[varRow];
-        if(role == Qt::DisplayRole){
+        const auto & varItem=$m$Data[varRow];
+        if (role==Qt::DisplayRole) {
             return varItem->getTitle();
         }
 
-        return {};
+        return{};
     }
 
     QVariant listData(
             const QModelIndex & argIndex,
-            int role) const{
-        auto varRow = argIndex.row();
+            int role) const {
+        auto varRow=argIndex.row();
 
-        if(listIndex(argIndex.internalPointer())<0){
-            return {};
+        if (listIndex(argIndex.internalPointer())<0) {
+            return{};
         }
 
-        auto varList= reinterpret_cast<TreeViewItemDataList*>(argIndex.internalPointer());
-        if( varRow >= varList->size() ){
-            return {};
+        auto varList=reinterpret_cast<TreeViewItemDataList*>(argIndex.internalPointer());
+        if (varRow>=varList->size()) {
+            return{};
         }
 
-        auto varData = varList->getData(  varRow );
-        if(role == Qt::DisplayRole){
-            return QVariant::fromValue( std::move(varData) );
+        auto varData=varList->getData(varRow);
+        if (role==Qt::DisplayRole) {
+            return QVariant::fromValue(std::move(varData));
         }
 
-        return {};
+        return{};
+    }
+
+
+    static QModelIndex createIndex(const TreeViewItemModel *t,int a,int b,TreeViewItemDataList*c) {
+        return t->createIndex(a,b,c);
+    }
+
+    static QModelIndex createIndex(const TreeViewItemModel *t,int a,int b,DataType *c) {
+        return t->createIndex(a,b,c);
     }
 
 private:
@@ -84,11 +93,11 @@ private:
 };
 
 TreeViewItemModel::TreeViewItemModel(QObject * varParent):
-    _Super(varParent){
+    _Super(varParent) {
     $m$this=new _PrivateTreeViewItemModel;
 }
 
-TreeViewItemModel::~TreeViewItemModel(){
+TreeViewItemModel::~TreeViewItemModel() {
     delete $m$this;
 }
 
@@ -96,23 +105,24 @@ QVariant TreeViewItemModel::data(
         const QModelIndex & argIndex,
         int role) const {
 
-    if(false == argIndex.isValid()){
+    if (false==argIndex.isValid()) {
         return{};
     }
 
-    if( argIndex.row() < 0 ){return {};}
+    if (argIndex.row()<0) { return{}; }
 
-    auto * varThisData = &( $m$this->$m$Data );
-    if( argIndex.internalPointer() == varThisData ){
-        if(role == Role_Type){
+    auto * varThisData=&($m$this->$m$Data);
+    if (argIndex.internalPointer()==varThisData) {
+        if (role==Role_Type) {
             return static_cast<int>(ItemType::GroupHeader);
         }
-        return $m$this->treeData( argIndex,role );
-    }else{
-        if(role == Role_Type){
+        return $m$this->treeData(argIndex,role);
+    }
+    else {
+        if (role==Role_Type) {
             return static_cast<int>(ItemType::TreeItem);
         }
-        return $m$this->listData( argIndex,role );
+        return $m$this->listData(argIndex,role);
     }
 
     return{};
@@ -123,104 +133,110 @@ QModelIndex TreeViewItemModel::index(
         int argColumn,
         const QModelIndex &argParent) const {
 
-    if(argRow<0){return {};}
-    if(argColumn!=0){return {};}
+    if (argRow<0) { return{}; }
+    if (argColumn!=0) { return{}; }
 
-    auto * varThisData = &( $m$this->$m$Data );
-    if( argParent.internalPointer() == nullptr ){
-        return this->createIndex(argRow,argColumn,static_cast<void *>(varThisData));
-    }else if( argParent.internalPointer() == varThisData ){
-        auto varParentRow = argParent.row();
-        if( varParentRow < 0 ){ return {}; }
-        if( varParentRow < static_cast<decltype(varParentRow)>( varThisData->size() ) ){
-            auto & varCurrentList = (*varThisData)[varParentRow];
-            return this->createIndex( argRow,argColumn,static_cast<void *>(varCurrentList.get()) );
-        }else{
-            return {};
+    auto * varThisData=&($m$this->$m$Data);
+    if (argParent.internalPointer()==nullptr) {
+        return _PrivateTreeViewItemModel::createIndex(this,argRow,argColumn,varThisData);
+    }
+    else if (argParent.internalPointer()==varThisData) {
+        auto varParentRow=argParent.row();
+        if (varParentRow<0) { return{}; }
+        if (varParentRow<static_cast<decltype(varParentRow)>(varThisData->size())) {
+            auto & varCurrentList=(*varThisData)[varParentRow];
+            return _PrivateTreeViewItemModel::createIndex(this,argRow,argColumn,varCurrentList.get());
+        }
+        else {
+            return{};
         }
     }
-    return {};
+    return{};
 
 }
 
 QModelIndex TreeViewItemModel::parent(const QModelIndex & argIndex) const {
-    auto * varThisData = &( $m$this->$m$Data );
-    if( argIndex.internalPointer() == nullptr ){ return {}; }
-    else if( argIndex.internalPointer() == varThisData ){ return {}; }
+    auto * varThisData=&($m$this->$m$Data);
+    if (argIndex.internalPointer()==nullptr) { return{}; }
+    else if (argIndex.internalPointer()==varThisData) { return{}; }
     else {
-        auto varParentPointer = argIndex.internalPointer();
-        auto varParentIndex = $m$this->listIndex( varParentPointer );
-        if( varParentIndex < 0 ){ return {}; }
-        if( varParentIndex > static_cast<decltype(varParentIndex)>(varThisData->size()) ){ return {}; }
-        return this->createIndex(varParentIndex,0, static_cast<void*>(varThisData) );
+        auto varParentPointer=argIndex.internalPointer();
+        auto varParentIndex=$m$this->listIndex(varParentPointer);
+        if (varParentIndex<0) { return{}; }
+        if (varParentIndex>static_cast<decltype(varParentIndex)>(varThisData->size())) { return{}; }
+        return _PrivateTreeViewItemModel::createIndex(this,varParentIndex,0,varThisData);
     }
-    return {};
+    return{};
 }
 
-int TreeViewItemModel::rowCount(const QModelIndex & argParent) const{
-    auto * varThisData = &( $m$this->$m$Data );
-    if( argParent.internalPointer() == nullptr ){
-        return static_cast<int>( varThisData->size() );
-    }else if( argParent.internalPointer() == varThisData ){
-        auto varRow = argParent.row();
-        if( varRow < static_cast<decltype(varRow)>( varThisData->size() ) ){
-            const auto & varList = (*varThisData)[varRow];
+int TreeViewItemModel::rowCount(const QModelIndex & argParent) const {
+    auto * varThisData=&($m$this->$m$Data);
+    if (argParent.internalPointer()==nullptr) {
+        return static_cast<int>(varThisData->size());
+    }
+    else if (argParent.internalPointer()==varThisData) {
+        auto varRow=argParent.row();
+        if (varRow<static_cast<decltype(varRow)>(varThisData->size())) {
+            const auto & varList=(*varThisData)[varRow];
             return varList->size();
-        }else{
+        }
+        else {
             return 0;
         }
     }
     return 0;
 }
 
-TreeViewItemDataList * TreeViewItemModel::createList(const QString & argTitle){
-    if( argTitle.isEmpty() ){ return nullptr; }
-    auto varPos = $m$this->$m$DataQStringIndex.find( argTitle );
-    if( varPos == $m$this->$m$DataQStringIndex.end() ){
+TreeViewItemDataList * TreeViewItemModel::createList(const QString & argTitle) {
+    if (argTitle.isEmpty()) { return nullptr; }
+    auto varPos=$m$this->$m$DataQStringIndex.find(argTitle);
+    if (varPos==$m$this->$m$DataQStringIndex.end()) {
         /*创建新表*/
         std::unique_ptr< TreeViewItemDataList > varData{ new TreeViewItemDataList };
-        varData->setTitle( argTitle );
-        TreeViewItemDataList * varDataPointer = varData.get();
+        varData->setTitle(argTitle);
+        TreeViewItemDataList * varDataPointer=varData.get();
 
-        auto varKey=static_cast<int>( this->$m$this->$m$Data.size() );
+        auto varKey=static_cast<int>(this->$m$this->$m$Data.size());
         /*change the tree*/
-        this->rowsAboutToBeInserted( QModelIndex{},varKey,varKey,{} );
+        this->beginInsertRows(QModelIndex{},varKey,varKey);
         this->$m$this->$m$Data.push_back(std::move(varData));
         this->$m$this->$m$DataPointerIndex.emplace(varDataPointer,varKey);
         this->$m$this->$m$DataQStringIndex.emplace(argTitle,varKey);
-        this->rowsInserted( QModelIndex{},varKey,varKey,{} );
+        this->endInsertRows();
 
         return varDataPointer;
 
-    }else{
+    }
+    else {
         /*返回旧表*/
-        return $m$this->$m$Data[ varPos->second ].get();
+        return $m$this->$m$Data[varPos->second].get();
     }
 }
 
-void TreeViewItemModel::addListData(const QString & argTitle,TreeViewItemData::type arg){
+void TreeViewItemModel::addListData(const QString & argTitle,TreeViewItemData::type arg) {
 
-    TreeViewItemDataList * varList = createList(argTitle);
-    if( varList == nullptr ){ return; }
+    TreeViewItemDataList * varList=createList(argTitle);
+    if (varList==nullptr) { return; }
 
-    auto varNewPos = static_cast<int>( varList->size() );
-    auto varPos = this->$m$this->$m$DataPointerIndex.find( varList );
-    assert( varPos!=this->$m$this->$m$DataPointerIndex.end() );
-    auto varParent = this->createIndex( varPos->second,0,&( this->$m$this ) );
+    auto varNewPos=static_cast<int>(varList->size());
+    auto varPos=this->$m$this->$m$DataPointerIndex.find(varList);
+    assert(varPos!=this->$m$this->$m$DataPointerIndex.end());
+    auto varParent=_PrivateTreeViewItemModel::createIndex(this,varPos->second,0,&($m$this->$m$Data));
 
     /*change the tree*/
-    this->rowsAboutToBeInserted( varParent ,varNewPos,varNewPos ,{});
-    varList->addData( std::move(arg) );
-    this->rowsInserted( varParent ,varNewPos,varNewPos ,{} );
+    this->beginInsertRows(varParent,varNewPos,varNewPos);
+    varList->addData(std::move(arg));
+    this->endInsertRows();
+
 
 }
 
-TreeViewItemDataList * TreeViewItemModel::getList(const QString & argTitle) const{
-    auto varPos = $m$this->$m$DataQStringIndex.find( argTitle );
-    if( varPos == $m$this->$m$DataQStringIndex.end() ){
+TreeViewItemDataList * TreeViewItemModel::getList(const QString & argTitle) const {
+    auto varPos=$m$this->$m$DataQStringIndex.find(argTitle);
+    if (varPos==$m$this->$m$DataQStringIndex.end()) {
         return nullptr;
     }
-    return $m$this->$m$Data[ varPos->second ].get();
+    return $m$this->$m$Data[varPos->second].get();
 }
 
 
