@@ -19,7 +19,10 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *) override;
+    void timerEvent(QTimerEvent *event) override;
+    void verticalScrollbarValueChanged(int) override;
     void gcEvent();
+    Q_SIGNAL void verticalScrollbarValueChangeFinished();
 private:
     class _PrivateTreeView;
     _PrivateTreeView * $m$this;

@@ -18,6 +18,7 @@ protected:
     QWidget *createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const override;
     void destroyEditor(QWidget *, const QModelIndex &) const override;
     void updateEditorGeometry(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const override;
+    void setEditorData(QWidget *editor,const QModelIndex &index) const override;
 
 private:
     class _PrivateTreeViewItemDelegate;
