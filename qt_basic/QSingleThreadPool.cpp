@@ -3,6 +3,7 @@
 #include <QtCore/qtimer.h>
 #include <QtCore/qthread.h>
 #include "cplusplus_basic.hpp"
+#include <QtCore/qeventloop.h>
 #include "QSingleThreadPool.hpp"
 #include <QtCore/qcoreapplication.h>
 

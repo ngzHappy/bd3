@@ -159,6 +159,11 @@ std::shared_ptr<QEventLoopLocker> getMainLocker(){
 
 }/*namespace*/
 
+void QObjectsWatcher::setQApplicationWatcher(){
+    if( isQApplicationWatched() ){return;}
+    this->_pm_qt_app_lock=getMainLocker();
+}
+
 std::shared_ptr<QObjectsWatcher>
 QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&arg){
     if( isQAppQuited() ){ return {}; }

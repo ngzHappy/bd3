@@ -28,6 +28,9 @@ public:
     Q_SLOT void add(QObject *)/*thread safe*/;
     Q_SLOT void remove(QObject *)/*thread safe*/;
     Q_SIGNAL void finished();
+    void clearQApplicationWatcher(){ _pm_qt_app_lock.reset();}
+    bool isQApplicationWatched()const {return _pm_qt_app_lock;}
+    void setQApplicationWatcher();
 protected:
     Q_SLOT void quit()/*thread safe*/;
     bool isOnFinishedDelete()const;
