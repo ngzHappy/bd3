@@ -10,12 +10,14 @@ DEFINES += QT_BASIC_LIBRARY
 
 SOURCES += QtBasicLibrary.cpp \
     QtBasicLibraryStart.cpp \
-    QObjectsWatcher.cpp
+    QObjectsWatcher.cpp \
+    QSingleThreadPool.cpp
 
 HEADERS += QtBasicLibrary.hpp\
         qt_basic_global.hpp \
     QObjectsWatcher.hpp \
-    _PrivateQObjectsWatcher.hpp
+    _PrivateQObjectsWatcher.hpp \
+    QSingleThreadPool.hpp
 
 include($$PWD/private_qt3rd_base_library/zlib.pri)
 include($$PWD/quazip/quazip.pri)

@@ -18,7 +18,7 @@ void TreeViewItemWidget::paintEvent(QPaintEvent *event) {
 
     painter.setPen(QPen(QColor(0,0,0),2));
     painter.drawText(10,10,
-        QString::number($m$ModelIndexWhenOpened.row()));
+        QString::number( reinterpret_cast<std::uintptr_t>( this )) );
 
     return;
     (void)event;
