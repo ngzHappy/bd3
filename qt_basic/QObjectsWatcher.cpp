@@ -1,5 +1,9 @@
-﻿#include <cassert>
+﻿#include <mutex>
+#include <cassert>
+#include <type_traits>
+#include <QtCore/qthread.h>
 #include "QObjectsWatcher.hpp"
+#include <QtCore/qcoreapplication.h>
 #include "_PrivateQObjectsWatcher.hpp"
 
 QObjectsWatcher::QObjectsWatcher(QObject *arg):QObject(arg) {
@@ -68,7 +72,7 @@ void _PrivateQObjectsWatcher::add(QObject *arg) {
 
     if (objectItems.count(arg)>0) { return; }
     objectItems.emplace(arg,connect(arg,&QObject::destroyed,
-        this,&_PrivateQObjectsWatcher::remove));
+                                    this,&_PrivateQObjectsWatcher::remove));
 
 }
 
@@ -107,18 +111,86 @@ void QObjectsWatcher::setOnFinishedDelete(bool arg) {
     pData()->isDeleteOnFinished=arg;
 }
 
+bool QObjectsWatcher::isQAppQuited(){
+    if( QCoreApplication::closingDown() ){ return true;}
+    if( QCoreApplication::startingUp() ){ return false;}
+    return QCoreApplication::instance();
+}
+
+namespace  {
+
+class MainQObjectsWatcher{
+public:
+    std::mutex mutex;
+    std::weak_ptr<QEventLoopLocker> mainWatcher;
+};
+
+using StaticMainQObjectsWatcher = std::aligned_storage_t<
+sizeof(MainQObjectsWatcher),
+alignof(MainQObjectsWatcher)>;
+StaticMainQObjectsWatcher staticMainQObjectsWatcher;
+
+static MainQObjectsWatcher *getMainQObjectsWatcher(){
+    /*never delete*/
+    auto ans=::new (&staticMainQObjectsWatcher) MainQObjectsWatcher;
+    return ans;
+}
+
+std::shared_ptr<QEventLoopLocker> getMainLocker(){
+    if( QObjectsWatcher::isQAppQuited() ){
+        return {};
+    }
+
+    using EventLoopLocker = QEventLoopLocker ;
+    auto varMain = getMainQObjectsWatcher();
+    auto mainWatcher = varMain->mainWatcher.lock();
+    if(mainWatcher){
+        return std::move(mainWatcher);
+    }
+    std::unique_lock<std::mutex> varLock{ varMain->mutex };
+    mainWatcher = varMain->mainWatcher.lock();
+    if(false==bool(mainWatcher)){
+        mainWatcher=memory::make_shared<EventLoopLocker>();
+        varMain->mainWatcher=mainWatcher;
+    }
+
+    return std::move(mainWatcher);
+}
+
+}/*namespace*/
+
 std::shared_ptr<QObjectsWatcher>
-QObjectsWatcher::instance() {
+QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&arg){
+    if( isQAppQuited() ){ return {}; }
+    return arg.lock();
+}
+
+std::shared_ptr<QObjectsWatcher>
+QObjectsWatcher::instance(bool isLockQApp) {
+    auto varAns = _p_instance();
+
+    if(isLockQApp){
+        varAns->_pm_qt_app_lock=getMainLocker();
+    }
+
+    return std::move(varAns);
+}
+
+std::shared_ptr<QObjectsWatcher>
+QObjectsWatcher::_p_instance() {
     using _T_=QObjectsWatcher;
     using _m_T_=QObjectsWatcher;
 
     try {
         memory::Allocator< std::shared_ptr<_m_T_> > _m_alloc_{};
+
         auto * varAns=new _T_;
-        auto var=std::shared_ptr<_m_T_>(varAns,
-            [](_m_T_ * arg) {  arg->quit(); },
-            std::move(_m_alloc_)
-            );
+
+        auto var=std::shared_ptr<_m_T_>(
+                    varAns,
+                    [](_m_T_ * arg) {  arg->quit(); },
+                    std::move(_m_alloc_));
+
         varAns->_pm_this=var;
         return std::move(var);
     }

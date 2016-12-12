@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <QtCore/qobject.h>
+#include <QtCore/qeventloop.h>
 #include "qt_basic_global.hpp"
 
 class _PrivateQObjectsWatcher;
@@ -14,7 +15,9 @@ protected:
     QObjectsWatcher(QObject * /**/=nullptr);
     ~QObjectsWatcher();
 public:
-    static std::shared_ptr<QObjectsWatcher> instance();
+    static bool isQAppQuited();
+    static std::shared_ptr<QObjectsWatcher> instance(bool isLockQApp=false);
+    static std::shared_ptr<QObjectsWatcher> lock(std::weak_ptr<QObjectsWatcher>&);
 public:
     QObjectsWatcher(QObjectsWatcher &&)=delete;
     QObjectsWatcher(const QObjectsWatcher &)=delete;
@@ -31,10 +34,12 @@ protected:
     void setOnFinishedDelete(bool=true);
 protected:
     std::weak_ptr<QObjectsWatcher> _pm_this;
+    std::shared_ptr<QEventLoopLocker> _pm_qt_app_lock;
     _PrivateQObjectsWatcher * _pm_data;
     _PrivateQObjectsWatcher * pData() { return _pm_data; }
     const _PrivateQObjectsWatcher * pData()const { return _pm_data; }
     friend class _PrivateQObjectsWatcher;
+    static std::shared_ptr<QObjectsWatcher> _p_instance();
 private:
     CPLUSPLUS_OBJECT(QObjectsWatcher)
 };
