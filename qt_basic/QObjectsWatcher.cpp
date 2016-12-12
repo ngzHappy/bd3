@@ -164,10 +164,54 @@ void QObjectsWatcher::setQApplicationWatcher(){
     this->_pm_qt_app_lock=getMainLocker();
 }
 
-std::shared_ptr<QObjectsWatcher>
+QObjectsWatcher::LockType::LockType(LockType&&arg):
+    _data(std::move(arg._data)),
+    _is_old_main_lock(arg._is_old_main_lock){
+}
+
+QObjectsWatcher::LockType&
+QObjectsWatcher::LockType::operator=(LockType&&arg){
+    if(this==&arg){return *this;}
+    _data=std::move(arg._data);
+    _is_old_main_lock=arg._is_old_main_lock;
+    return *this;
+}
+
+QObjectsWatcher::LockType::~LockType(){
+    if(bool(_data)==false){return;}
+    if(_is_old_main_lock){return;}
+    _data->clearQApplicationWatcher();
+}
+
+QObjectsWatcher::LockType::LockType(std::shared_ptr<QObjectsWatcher> &&arg):
+    _data(std::move(arg)){
+    if(bool(_data)==false){return;}
+    auto varMainLocker=getMainLocker();
+    if( isQAppQuited() ){  _data.reset();return; }
+    _is_old_main_lock=_data->isQApplicationWatched();
+    _data->_pm_qt_app_lock=std::move(varMainLocker);
+}
+
+QObjectsWatcher::LockType
 QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&arg){
     if( isQAppQuited() ){ return {}; }
     return arg.lock();
+}
+
+QObjectsWatcher::LockType QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&&arg){
+      if( isQAppQuited() ){ return {}; }
+      return arg.lock();
+}
+
+QObjectsWatcher::LockType QObjectsWatcher::lock(const std::shared_ptr<QObjectsWatcher>&arg){
+      if( isQAppQuited() ){ return {}; }
+      auto var=arg;
+      return std::move(var);
+}
+
+QObjectsWatcher::LockType QObjectsWatcher::lock(std::shared_ptr<QObjectsWatcher>&&arg){
+      if( isQAppQuited() ){ return {}; }
+      return std::move(arg);
 }
 
 std::shared_ptr<QObjectsWatcher>
@@ -194,7 +238,7 @@ QObjectsWatcher::_p_instance() {
         auto var=std::shared_ptr<_m_T_>(
                     varAns,
                     [](_m_T_ * arg) {  arg->quit(); },
-                    std::move(_m_alloc_));
+                std::move(_m_alloc_));
 
         varAns->_pm_this=var;
         return std::move(var);
