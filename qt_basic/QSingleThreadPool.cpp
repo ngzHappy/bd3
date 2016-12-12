@@ -14,24 +14,15 @@ static auto eventType(){
     return ans;
 }
 
-class _RunableEvent :
-        public QEvent,
-        public QSingleThreadPool::Runable {
-public:
+}/*namespace*/
 
-    _RunableEvent():QEvent( eventType() ){}
+QEvent::Type QSingleThreadPool::eventID(){
+    return eventType();
+}
 
-    void run(){
-        try{
-            do_run();
-        }catch(...){
-            CPLUSPLUS_EXCEPTION(false);
-        }
-    }
+namespace {
 
-private:
-    CPLUSPLUS_OBJECT(_RunableEvent)
-};
+using _RunableEvent = QSingleThreadPool::RunableEvent;
 
 class _ThreadObjectRunableEvent : public QObject {
 public:
@@ -231,7 +222,9 @@ void QSingleThreadPool::removeWatcher(QObject *arg){
     watcher_->remove(arg);
 }
 
-
+void QSingleThreadPool::_p_run(RunableEvent *arg){
+    QCoreApplication::postEvent(thread_object_,arg);
+}
 
 
 
