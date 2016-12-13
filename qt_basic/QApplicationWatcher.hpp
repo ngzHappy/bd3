@@ -6,11 +6,11 @@
 #include "qt_basic_global.hpp"
 
 namespace std {
-class mutex;
+class shared_timed_mutex;
 }
 
 namespace qappwatcher{
-QT_BASICSHARED_EXPORT std::mutex * getMutex();
+QT_BASICSHARED_EXPORT std::shared_timed_mutex * getMutex();
 QT_BASICSHARED_EXPORT void beginConstructQApplication();
 QT_BASICSHARED_EXPORT void endConstructQApplication();
 QT_BASICSHARED_EXPORT void beginDestructQApplication();

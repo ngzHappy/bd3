@@ -1,8 +1,10 @@
 ﻿#include <mutex>
 #include <cassert>
 #include <type_traits>
+#include <shared_mutex>
 #include <QtCore/qthread.h>
 #include "QObjectsWatcher.hpp"
+#include "QApplicationWatcher.hpp"
 #include <QtCore/qcoreapplication.h>
 #include "_PrivateQObjectsWatcher.hpp"
 
@@ -112,6 +114,7 @@ void QObjectsWatcher::setOnFinishedDelete(bool arg) {
 }
 
 bool QObjectsWatcher::isQAppQuited(){
+     std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
     if( QCoreApplication::closingDown() ){ return true;}
     if( QCoreApplication::startingUp() ){ return false;}
     return QCoreApplication::instance();
@@ -119,42 +122,13 @@ bool QObjectsWatcher::isQAppQuited(){
 
 namespace  {
 
-class MainQObjectsWatcher{
-public:
-    std::mutex mutex;
-    std::weak_ptr<QEventLoopLocker> mainWatcher;
-};
-
-using StaticMainQObjectsWatcher = std::aligned_storage_t<
-sizeof(MainQObjectsWatcher),
-alignof(MainQObjectsWatcher)>;
-StaticMainQObjectsWatcher staticMainQObjectsWatcher;
-
-static MainQObjectsWatcher *getMainQObjectsWatcher(){
-    /*never delete*/
-    auto ans=::new (&staticMainQObjectsWatcher) MainQObjectsWatcher;
-    return ans;
-}
-
 std::shared_ptr<QEventLoopLocker> getMainLocker(){
+     std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
     if( QObjectsWatcher::isQAppQuited() ){
         return {};
     }
 
-    using EventLoopLocker = QEventLoopLocker ;
-    auto varMain = getMainQObjectsWatcher();
-    auto mainWatcher = varMain->mainWatcher.lock();
-    if(mainWatcher){
-        return std::move(mainWatcher);
-    }
-    std::unique_lock<std::mutex> varLock{ varMain->mutex };
-    mainWatcher = varMain->mainWatcher.lock();
-    if(false==bool(mainWatcher)){
-        mainWatcher=memory::make_shared<EventLoopLocker>();
-        varMain->mainWatcher=mainWatcher;
-    }
-
-    return std::move(mainWatcher);
+    return memory::make_shared<QEventLoopLocker>();
 }
 
 }/*namespace*/
