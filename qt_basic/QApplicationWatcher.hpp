@@ -5,12 +5,7 @@
 #include <type_traits>
 #include "qt_basic_global.hpp"
 
-namespace std {
-class shared_timed_mutex;
-}
-
 namespace qappwatcher{
-QT_BASICSHARED_EXPORT std::shared_timed_mutex * getMutex();
 QT_BASICSHARED_EXPORT void beginConstructQApplication();
 QT_BASICSHARED_EXPORT void endConstructQApplication();
 QT_BASICSHARED_EXPORT void beginDestructQApplication();
@@ -33,6 +28,8 @@ public:
 
     _T_ & operator*(){ return *_p_application; }
     const _T_ & operator*() const { return *_p_application; }
+private:
+    CPLUSPLUS_OBJECT(QApplicationWatcher)
 };
 
 template<typename _T_>

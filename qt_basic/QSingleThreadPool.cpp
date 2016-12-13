@@ -13,10 +13,19 @@
 #include "QApplicationWatcher.hpp"
 #include <QtCore/qcoreapplication.h>
 
-namespace  {
+//#define THREAD_DEBUG
+#if defined(THREAD_DEBUG)
+#include <QtCore/qdebug.h>
+#endif
+
+namespace qappwatcher {
+extern std::shared_timed_mutex * getMutex();
+}
+
+namespace {
 namespace _current_threads {
 
-class Data{
+class Data {
 public:
     std::shared_timed_mutex mutex;
     std::map<std::thread::id,std::weak_ptr<QSingleThreadPool>> threads;
@@ -24,59 +33,59 @@ private:
     CPLUSPLUS_OBJECT(Data)
 };
 
-Data * getData(){
+Data * getData() {
     static Data * data_=new Data;
     return data_;
 }
 
-void add(std::thread::id a,std::weak_ptr<QSingleThreadPool> b){
+void add(std::thread::id a,std::weak_ptr<QSingleThreadPool> b) {
     auto data=getData();
     std::unique_lock<std::shared_timed_mutex> _lock_{ data->mutex };
     data->threads[a]=std::move(b);
 }
 
 
-void remove(std::thread::id a){
+void remove(std::thread::id a) {
     auto data=getData();
     std::unique_lock<std::shared_timed_mutex> _lock_{ data->mutex };
     data->threads.erase(a);
 }
 
-std::weak_ptr<QSingleThreadPool> find(std::thread::id a){
-    if( QObjectsWatcher::isQAppQuited() ){return {};}
+std::weak_ptr<QSingleThreadPool> find(std::thread::id a) {
+    if (QObjectsWatcher::isQAppQuited()) { return{}; }
     auto data=getData();
     std::shared_lock<std::shared_timed_mutex> _lock_{ data->mutex };
-    auto var = data->threads.find(a);
-    if(var==data->threads.end()){return {};}
+    auto var=data->threads.find(a);
+    if (var==data->threads.end()) { return{}; }
     return var->second;
 }
 
 }
 }
 
-namespace  {
+namespace {
 
-static auto eventType(){
-    static auto ans= static_cast<QEvent::Type>(
+static auto eventType() {
+    static auto ans=static_cast<QEvent::Type>(
                 QEvent::registerEventType());
     return ans;
 }
 
 }/*namespace*/
 
-QEvent::Type QSingleThreadPool::eventID(){
+QEvent::Type QSingleThreadPool::eventID() {
     return eventType();
 }
 
 namespace {
 
-using _RunableEvent = QSingleThreadPool::RunableEvent;
+using _RunableEvent=QSingleThreadPool::RunableEvent;
 
 class _ThreadObjectRunableEvent : public QObject {
 public:
-    bool event(QEvent *e) override{
-        if( e->type() == eventType() ){
-            static_cast< _RunableEvent * >( e )->run();
+    bool event(QEvent *e) override {
+        if (e->type()==eventType()) {
+            static_cast<_RunableEvent *>(e)->run();
             return true;
         }
         return QObject::event(e);
@@ -86,8 +95,8 @@ private:
 };
 
 using _p_thread_data_t=std::tuple<
-_ThreadObjectRunableEvent *,
-std::thread::id
+    _ThreadObjectRunableEvent *,
+    std::thread::id
 >;
 
 }/*namespace*/
@@ -98,21 +107,24 @@ public:
     std::promise<_p_thread_data_t> * promise_;
 
     _Thread(std::promise<_p_thread_data_t> *arg)
-        :promise_(arg){}
+        :promise_(arg) {}
 
-    void run(){
-        try{
+    void run() {
+        try {
             _ThreadObjectRunableEvent _eventDispatcher;
-
+#if defined(THREAD_DEBUG)
+            qDebug()<<"create a thread"<<QThread::currentThread();
+#endif
             /**/
-            promise_->set_value( std::make_tuple(
-                                     &_eventDispatcher,
-                                     std::this_thread::get_id() ) );
+            promise_->set_value(std::make_tuple(
+                &_eventDispatcher,
+                std::this_thread::get_id()));
             promise_=nullptr;
             /**/
 
             this->exec();
-        }catch(...){}
+        }
+        catch (...) {}
 
     }
 private:
@@ -120,18 +132,18 @@ private:
 };
 
 
-namespace  {
+namespace {
 
-std::atomic< QObject * > staticDelateLaterObject  ;
+std::atomic< QObject * > staticDelateLaterObject;
 
 }/*namespace*/
 
-namespace  {
+namespace {
 
 /*QThread delete before main may be a bug*/
-static void toDeleteQThread(QThread *arg){
+static void toDeleteQThread(QThread *arg) {
 
-    if( staticDelateLaterObject.load()==nullptr ){
+    if (staticDelateLaterObject.load()==nullptr) {
         return arg->deleteLater();
     }
 
@@ -139,7 +151,7 @@ static void toDeleteQThread(QThread *arg){
         void(*_fun)(QThread*);
         QThread * _data;
     public:
-        Event(void(*f)(QThread*),QThread*d):_fun(f),_data(d){}
+        Event(void(*f)(QThread*),QThread*d):_fun(f),_data(d) {}
         void do_run() override { _fun(_data); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -148,27 +160,32 @@ static void toDeleteQThread(QThread *arg){
     /*move to main thread and delete it*/
     QCoreApplication::postEvent(
                 staticDelateLaterObject.load(),
-                new Event([](QThread *arg){
-                    QTimer::singleShot(10,staticDelateLaterObject.load(),
-                    [arg](){delete arg;});
-                },arg));
+                new Event([](QThread *arg) {
+        QTimer::singleShot(10,staticDelateLaterObject.load(),
+        [arg]() {
+#if defined(THREAD_DEBUG)
+            qDebug()<<"destroy a thread"<<arg;
+#endif
+            delete arg;
+        });
+    },arg));
 
 }
 
 }/*namespace*/
 
-QSingleThreadPool::QSingleThreadPool(const private_construct &){
+QSingleThreadPool::QSingleThreadPool(const private_construct &) {
 
 }
 
-QSingleThreadPool::QSingleThreadPool(QObject *p):QObject(p){
+QSingleThreadPool::QSingleThreadPool(QObject *p):QObject(p) {
     watcher_=QObjectsWatcher::instance();
 
     std::promise< _p_thread_data_t > varPromise;
-    auto varThread = new _Thread(   &varPromise );
+    auto varThread=new _Thread(&varPromise);
 
     connect(varThread,&QThread::finished,
-            [varThread](){toDeleteQThread(varThread);});
+            [varThread]() {toDeleteQThread(varThread); });
 
     varThread->start();
 
@@ -186,23 +203,23 @@ QSingleThreadPool::QSingleThreadPool(QObject *p):QObject(p){
     connect(watcher_.get(),
             &QObjectsWatcher::finished,
             varThread,
-            [varThread,varThreadID](){
-        _current_threads::remove( varThreadID );
+            [varThread,varThreadID]() {
+        _current_threads::remove(varThreadID);
         varThread->quit();
     });
 
 }
 
-QSingleThreadPool::~QSingleThreadPool(){
+QSingleThreadPool::~QSingleThreadPool() {
 
 }
 
-void QSingleThreadPool::run(void(*f)(void)){
-    if(f==nullptr){return;}
+void QSingleThreadPool::run(void(*f)(void)) {
+    if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(void);
     public:
-        Event(void(*f)(void)):_fun(f){}
+        Event(void(*f)(void)):_fun(f) {}
         void do_run() override { _fun(); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -210,13 +227,13 @@ void QSingleThreadPool::run(void(*f)(void)){
     QCoreApplication::postEvent(thread_object_,new Event(f));
 }
 
-void QSingleThreadPool::run(void(*f)(void*),void *d){
-    if(f==nullptr){return;}
+void QSingleThreadPool::run(void(*f)(void*),void *d) {
+    if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(void*);
         void * _data;
     public:
-        Event(void(*f)(void*),void*d):_fun(f),_data(d){}
+        Event(void(*f)(void*),void*d):_fun(f),_data(d) {}
         void do_run() override { _fun(_data); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -224,13 +241,13 @@ void QSingleThreadPool::run(void(*f)(void*),void *d){
     QCoreApplication::postEvent(thread_object_,new Event(f,d));
 }
 
-void QSingleThreadPool::run(void(*f)(const void*),const void *d){
-    if(f==nullptr){return;}
+void QSingleThreadPool::run(void(*f)(const void*),const void *d) {
+    if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const void*);
         const void * _data;
     public:
-        Event(void(*f)(const void*),const void*d):_fun(f),_data(d){}
+        Event(void(*f)(const void*),const void*d):_fun(f),_data(d) {}
         void do_run() override { _fun(_data); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -240,15 +257,16 @@ void QSingleThreadPool::run(void(*f)(const void*),const void *d){
 
 void QSingleThreadPool::run(
         void(*f)(const std::shared_ptr<void> &),
-        std::shared_ptr<void> d){
-    if(f==nullptr){return;}
+        std::shared_ptr<void> d) {
+    if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const std::shared_ptr<void> &);
         std::shared_ptr<void> _data;
     public:
         Event(void(*f)(const std::shared_ptr<void>&),std::shared_ptr<void>&&d):
             _fun(f),
-            _data(std::move(d)){}
+            _data(std::move(d)) {
+        }
         void do_run() override { _fun(_data); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -258,15 +276,16 @@ void QSingleThreadPool::run(
 
 void QSingleThreadPool::run(
         void(*f)(const std::shared_ptr<const void> &),
-        std::shared_ptr<const void> d){
-    if(f==nullptr){return;}
+        std::shared_ptr<const void> d) {
+    if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const std::shared_ptr<const void> &);
         std::shared_ptr<const void> _data;
     public:
         Event(void(*f)(const std::shared_ptr<const void>&),std::shared_ptr<const void>&&d):
             _fun(f),
-            _data(std::move(d)){}
+            _data(std::move(d)) {
+        }
         void do_run() override { _fun(_data); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -275,11 +294,11 @@ void QSingleThreadPool::run(
 }
 
 void QSingleThreadPool::runStdFunction(std::function<void(void)> f) {
-    if(bool(f)==false){return;}
+    if (bool(f)==false) { return; }
     class Event :public _RunableEvent {
         std::function<void(void)> _fun;
     public:
-        Event(std::function<void(void)>&&f):_fun(std::move(f)){}
+        Event(std::function<void(void)>&&f):_fun(std::move(f)) {}
         void do_run() override { _fun(); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -287,52 +306,75 @@ void QSingleThreadPool::runStdFunction(std::function<void(void)> f) {
     QCoreApplication::postEvent(thread_object_,new Event(std::move(f)));
 }
 
-void QSingleThreadPool::addWatcher(QObject *arg){
+void QSingleThreadPool::addWatcher(QObject *arg) {
     watcher_->add(arg);
 }
 
-void QSingleThreadPool::removeWatcher(QObject *arg){
+void QSingleThreadPool::removeWatcher(QObject *arg) {
     watcher_->remove(arg);
 }
 
-void QSingleThreadPool::_p_run(RunableEvent *arg){
+void QSingleThreadPool::_p_run(RunableEvent *arg) {
     QCoreApplication::postEvent(thread_object_,arg);
 }
 
 
-namespace qappwatcher{
+namespace qappwatcher {
 
+namespace {
 _ThreadObjectRunableEvent * qapp_events_loop;
 std::shared_ptr<QSingleThreadPool> qapp_thread_pool;
+}/*namespace*/
 
-void beginConstructQApplication(){
-    staticDelateLaterObject.store( new _ThreadObjectRunableEvent );
+void beginConstructQApplication() {
+    staticDelateLaterObject.store(new _ThreadObjectRunableEvent);
     getMutex()->lock();
     assert(qapp_events_loop==nullptr);
     qapp_events_loop=new _ThreadObjectRunableEvent;
     qapp_thread_pool=
-            memory::make_shared<QSingleThreadPool>(QSingleThreadPool::private_construct{});
+        memory::make_shared<QSingleThreadPool>(QSingleThreadPool::private_construct{});
     qapp_thread_pool->thread_object_=qapp_events_loop;
-    qapp_thread_pool->watcher_=QObjectsWatcher::instance(false);
+    qapp_thread_pool->watcher_=QObjectsWatcher::instance();
     _current_threads::add(std::this_thread::get_id(),qapp_thread_pool);
 }
 
-void endConstructQApplication(){
+void endConstructQApplication() {
     getMutex()->unlock();
 }
 
-void beginDestructQApplication(){
+void beginDestructQApplication() {
     getMutex()->lock();
     qapp_thread_pool.reset();
     _current_threads::remove(std::this_thread::get_id());
 }
 
-void endDestructQApplication(){
+void endDestructQApplication() {
     getMutex()->unlock();
 }
 
 }/*qappwatcher*/
 
-std::weak_ptr<QSingleThreadPool> QSingleThreadPool::currentQSingleThreadPool(){
+std::weak_ptr<QSingleThreadPool> QSingleThreadPool::currentQSingleThreadPool() {
     return _current_threads::find(std::this_thread::get_id());
 }
+
+std::shared_ptr<QSingleThreadPool> QSingleThreadPool::qAppQSingleThreadPool() {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    auto app=qApp;
+    if (app&&(app->closingDown()==false)) {
+        return qappwatcher::qapp_thread_pool;
+    }
+    return{};
+}
+
+
+
+
+
+
+
+
+
+
+
+

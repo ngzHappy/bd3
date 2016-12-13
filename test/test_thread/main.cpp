@@ -6,6 +6,10 @@
 #include <cplusplus_basic.hpp>
 #include <QtWidgets/QApplication>
 
+#include <QtCore/qdebug.h>
+#include <QtCore/qthread.h>
+#include "TestSingleThreadPool.hpp"
+
 int main(int argc, char *argv[])try{
     /*init new handler*/
     std::set_new_handler( memory::get_memory_not_enough() );
@@ -23,8 +27,12 @@ int main(int argc, char *argv[])try{
     gcTimer.start(512);
 
     MainWindow window;
-    window.test();
     window.show();
+
+    qDebug()<<QThread::currentThread()<<"main thread";
+    TestSingleThreadPool testSingleThreadPool;
+    testSingleThreadPool.test1();
+    testSingleThreadPool.test2();
 
     {
         auto ans = app->exec();

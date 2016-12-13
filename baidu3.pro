@@ -56,3 +56,8 @@ test_botan.file=$$PWD/test/test_botan/test_botan.pro
 test_botan.depends+=library_cplusplus_basic
 test_botan.depends+=qt_basic_library
 SUBDIRS += test_botan
+
+test_thread.file=$$PWD/test/test_thread/test_thread.pro
+test_thread.depends+=library_cplusplus_basic
+test_thread.depends+=qt_basic_library
+SUBDIRS += test_thread

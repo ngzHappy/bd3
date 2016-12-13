@@ -72,7 +72,7 @@ int main(int argc, char *argv[])try{
     /*init qt basic library*/
     QtBasicLibrary qtBasicLibrary;
 
-    QApplication app(argc, argv);
+    QApplicationWatcher<QApplication> app(argc, argv);
 
     /*每隔一段时间清理内存*/
     QTimer gcTimer;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])try{
     window.show();
 
     {
-        auto ans = app.exec();
+        auto ans = app->exec();
         mapp.quit();
         return ans;
     }

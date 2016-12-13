@@ -8,6 +8,10 @@
 #include <QtCore/qcoreapplication.h>
 #include "_PrivateQObjectsWatcher.hpp"
 
+namespace qappwatcher {
+extern std::shared_timed_mutex * getMutex();
+}
+
 QObjectsWatcher::QObjectsWatcher(QObject *arg):QObject(arg) {
     _pm_data=new _PrivateQObjectsWatcher(this);
 }
@@ -74,7 +78,7 @@ void _PrivateQObjectsWatcher::add(QObject *arg) {
 
     if (objectItems.count(arg)>0) { return; }
     objectItems.emplace(arg,connect(arg,&QObject::destroyed,
-                                    this,&_PrivateQObjectsWatcher::remove));
+        this,&_PrivateQObjectsWatcher::remove));
 
 }
 
@@ -113,90 +117,107 @@ void QObjectsWatcher::setOnFinishedDelete(bool arg) {
     pData()->isDeleteOnFinished=arg;
 }
 
-bool QObjectsWatcher::isQAppQuited(){
-     std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
-    if( QCoreApplication::closingDown() ){ return true;}
-    if( QCoreApplication::startingUp() ){ return false;}
-    return QCoreApplication::instance();
+namespace {
+bool _p_isQAppQuited() {
+    if (QCoreApplication::closingDown()) { return true; }
+    if (QCoreApplication::startingUp()) { return false; }
+    return QCoreApplication::instance()==nullptr;
+}
 }
 
-namespace  {
+bool QObjectsWatcher::isQAppQuited() {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    return _p_isQAppQuited();
+}
 
-std::shared_ptr<QEventLoopLocker> getMainLocker(){
-     std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
-    if( QObjectsWatcher::isQAppQuited() ){
-        return {};
+namespace {
+
+std::shared_ptr<QEventLoopLocker> getMainLocker() {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) {
+        return{};
     }
-
     return memory::make_shared<QEventLoopLocker>();
 }
 
 }/*namespace*/
 
-void QObjectsWatcher::setQApplicationWatcher(){
-    if( isQApplicationWatched() ){return;}
-    this->_pm_qt_app_lock=getMainLocker();
-}
-
-QObjectsWatcher::LockType::LockType(LockType&&arg):
-    _data(std::move(arg._data)),
-    _is_old_main_lock(arg._is_old_main_lock){
-}
-
-QObjectsWatcher::LockType&
-QObjectsWatcher::LockType::operator=(LockType&&arg){
-    if(this==&arg){return *this;}
-    _data=std::move(arg._data);
-    _is_old_main_lock=arg._is_old_main_lock;
-    return *this;
-}
-
-QObjectsWatcher::LockType::~LockType(){
-    if(bool(_data)==false){return;}
-    if(_is_old_main_lock){return;}
-    _data->clearQApplicationWatcher();
+QObjectsWatcher::LockType::LockType(
+    std::shared_ptr<QObjectsWatcher> && arg,
+    std::shared_ptr<QEventLoopLocker> && b):
+    _data(std::move(arg)) {
+    if (bool(_data)==false) { return; }
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { _data.reset(); return; }
+    _qapp_data=std::move(b);
 }
 
 QObjectsWatcher::LockType::LockType(std::shared_ptr<QObjectsWatcher> &&arg):
-    _data(std::move(arg)){
-    if(bool(_data)==false){return;}
-    auto varMainLocker=getMainLocker();
-    if( isQAppQuited() ){  _data.reset();return; }
-    _is_old_main_lock=_data->isQApplicationWatched();
-    _data->_pm_qt_app_lock=std::move(varMainLocker);
+    _data(std::move(arg)) {
+    if (bool(_data)==false) { return; }
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { _data.reset(); return; }
+    if (_qapp_data) {
+        return;
+    }
+    _qapp_data=getMainLocker();
 }
 
 QObjectsWatcher::LockType
-QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&arg){
-    if( isQAppQuited() ){ return {}; }
+QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&arg,std::shared_ptr<QEventLoopLocker> b) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    return{ arg.lock() ,std::move(b) };
+}
+
+QObjectsWatcher::LockType QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&&arg,std::shared_ptr<QEventLoopLocker>b) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    return{ arg.lock() ,std::move(b) };
+}
+
+QObjectsWatcher::LockType QObjectsWatcher::lock(const std::shared_ptr<QObjectsWatcher>&arg,std::shared_ptr<QEventLoopLocker>b) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    auto var=arg;
+    return{ std::move(var) ,std::move(b) };
+}
+
+QObjectsWatcher::LockType QObjectsWatcher::lock(std::shared_ptr<QObjectsWatcher>&&arg,std::shared_ptr<QEventLoopLocker>b) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    return{ std::move(arg),std::move(b) };
+}
+
+QObjectsWatcher::LockType
+QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&arg) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
     return arg.lock();
 }
 
-QObjectsWatcher::LockType QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&&arg){
-      if( isQAppQuited() ){ return {}; }
-      return arg.lock();
+QObjectsWatcher::LockType QObjectsWatcher::lock(std::weak_ptr<QObjectsWatcher>&&arg) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    return arg.lock();
 }
 
-QObjectsWatcher::LockType QObjectsWatcher::lock(const std::shared_ptr<QObjectsWatcher>&arg){
-      if( isQAppQuited() ){ return {}; }
-      auto var=arg;
-      return std::move(var);
+QObjectsWatcher::LockType QObjectsWatcher::lock(const std::shared_ptr<QObjectsWatcher>&arg) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    auto var=arg;
+    return std::move(var);
 }
 
-QObjectsWatcher::LockType QObjectsWatcher::lock(std::shared_ptr<QObjectsWatcher>&&arg){
-      if( isQAppQuited() ){ return {}; }
-      return std::move(arg);
+QObjectsWatcher::LockType QObjectsWatcher::lock(std::shared_ptr<QObjectsWatcher>&&arg) {
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return{}; }
+    return std::move(arg);
 }
 
 std::shared_ptr<QObjectsWatcher>
-QObjectsWatcher::instance(bool isLockQApp) {
-    auto varAns = _p_instance();
-
-    if(isLockQApp){
-        varAns->_pm_qt_app_lock=getMainLocker();
-    }
-
-    return std::move(varAns);
+QObjectsWatcher::instance() {
+    return _p_instance();
 }
 
 std::shared_ptr<QObjectsWatcher>
@@ -222,6 +243,23 @@ QObjectsWatcher::_p_instance() {
     }
 
     return{};
+}
+
+#include "QSingleThreadPool.hpp"
+QSingleThreadPool::LockType::LockType(std::shared_ptr<QSingleThreadPool>&&arg) {
+    if (false==bool(arg)) { return; }
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return; }
+    _data_pool=std::move(arg);
+    _data_qapp=memory::make_shared<QEventLoopLocker>();
+}
+
+QSingleThreadPool::LockType::LockType(std::shared_ptr<QSingleThreadPool>&&arg,std::shared_ptr<QEventLoopLocker>&&b) {
+    if (false==bool(arg)) { return; }
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    if (_p_isQAppQuited()) { return; }
+    _data_pool=std::move(arg);
+    _data_qapp=std::move(b);
 }
 
 /*End Of The File.*/

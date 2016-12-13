@@ -8,27 +8,32 @@
 
 class _PrivateQObjectsWatcher;
 class QT_BASICSHARED_EXPORT QObjectsWatcher final:
+#ifdef QT_BASIC_LIBRARY
+public QObject,
+#else
 protected QObject,
-public std::enable_shared_from_this<QObjectsWatcher>{
+#endif // QT_BASIC_LIBRARY
+    public std::enable_shared_from_this<QObjectsWatcher>{
 Q_OBJECT
 protected:
     QObjectsWatcher(QObject * /**/=nullptr);
     ~QObjectsWatcher();
 public:
     static bool isQAppQuited();
-    static std::shared_ptr<QObjectsWatcher> instance(bool isLockQApp=false);
+    static std::shared_ptr<QObjectsWatcher> instance();
     class QT_BASICSHARED_EXPORT LockType{
         std::shared_ptr<QObjectsWatcher> _data;
-        bool _is_old_main_lock;
+        std::shared_ptr<QEventLoopLocker> _qapp_data;
         LockType()=default;
         friend class QObjectsWatcher;
     public:
-        ~LockType();
+        ~LockType()=default;
         LockType(std::shared_ptr<QObjectsWatcher> &&);
-        LockType(LockType&&);
-        LockType&operator=(LockType&&);
-        LockType(const LockType&)=delete;
-        LockType&operator=(const LockType&)=delete;
+        LockType(std::shared_ptr<QObjectsWatcher> &&,std::shared_ptr<QEventLoopLocker>&&);
+        LockType(LockType&&)=default;
+        LockType&operator=(LockType&&)=default;
+        LockType(const LockType&)=default;
+        LockType&operator=(const LockType&)=default;
         operator bool()const{ return bool( _data ); }
     private:
         CPLUSPLUS_OBJECT(LockType)
@@ -37,6 +42,11 @@ public:
     static LockType lock(std::weak_ptr<QObjectsWatcher>&&);
     static LockType lock(const std::shared_ptr<QObjectsWatcher>&);
     static LockType lock(std::shared_ptr<QObjectsWatcher>&&);
+
+    static LockType lock(std::weak_ptr<QObjectsWatcher>&,std::shared_ptr<QEventLoopLocker>);
+    static LockType lock(std::weak_ptr<QObjectsWatcher>&&,std::shared_ptr<QEventLoopLocker>);
+    static LockType lock(const std::shared_ptr<QObjectsWatcher>&,std::shared_ptr<QEventLoopLocker>);
+    static LockType lock(std::shared_ptr<QObjectsWatcher>&&,std::shared_ptr<QEventLoopLocker>);
 public:
     QObjectsWatcher(QObjectsWatcher &&)=delete;
     QObjectsWatcher(const QObjectsWatcher &)=delete;
@@ -47,16 +57,12 @@ public:
     Q_SLOT void add(QObject *)/*thread safe*/;
     Q_SLOT void remove(QObject *)/*thread safe*/;
     Q_SIGNAL void finished();
-    void clearQApplicationWatcher(){ _pm_qt_app_lock.reset();}
-    bool isQApplicationWatched()const {return bool(_pm_qt_app_lock);}
-    void setQApplicationWatcher();
 protected:
     Q_SLOT void quit()/*thread safe*/;
     bool isOnFinishedDelete()const;
     void setOnFinishedDelete(bool=true);
 protected:
     std::weak_ptr<QObjectsWatcher> _pm_this;
-    std::shared_ptr<QEventLoopLocker> _pm_qt_app_lock;
     _PrivateQObjectsWatcher * _pm_data;
     _PrivateQObjectsWatcher * pData() { return _pm_data; }
     const _PrivateQObjectsWatcher * pData()const { return _pm_data; }
