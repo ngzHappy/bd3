@@ -6,12 +6,19 @@
 #include <QtCore/QEvent>
 #include <QtCore/qobject.h>
 #include "QObjectsWatcher.hpp"
+#include "QApplicationWatcher.hpp"
 
-class QT_BASICSHARED_EXPORT QSingleThreadPool :public QObject {
+class QT_BASICSHARED_EXPORT QSingleThreadPool:public QObject{
 Q_OBJECT
 private:
     static QEvent::Type eventID();
+    class private_construct{};
+    friend void qappwatcher::beginConstructQApplication();
+    friend void qappwatcher::endConstructQApplication();
+    friend void qappwatcher::beginDestructQApplication();
+    friend void qappwatcher::endDestructQApplication();
 public:
+    QSingleThreadPool(const private_construct &);
     QSingleThreadPool(QObject *);
     ~QSingleThreadPool();
 
@@ -45,8 +52,10 @@ public:
     void removeWatcher(QObject *);
     std::shared_ptr<QObjectsWatcher> getWatcher()const{ return watcher_; }
 
+    static std::weak_ptr<QSingleThreadPool> currentQSingleThreadPool();
 private:
     std::shared_ptr<QObjectsWatcher> watcher_;
+    std::shared_ptr<QSingleThreadPool> children_;
     QObject * thread_object_;
     class _Thread;
     void _p_run(RunableEvent *);
