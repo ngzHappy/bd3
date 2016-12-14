@@ -2,16 +2,17 @@
 #define QObjectsWatcher_HPP_0x99811
 
 #include <set>
-#include <mutex>
 #include <atomic>
 #include <memory>
 #include <QtCore/qobject.h>
 #include "qt_basic_global.hpp"
+#include <thread/SpinMutex.hpp>
 
 class QObjectsWatcher;
 class _PrivateQObjectsWatcher : public QObject {
     Q_OBJECT
 public:
+    using light_mutex=thread::SpinMutex;
     _PrivateQObjectsWatcher(QObjectsWatcher *);
     virtual ~_PrivateQObjectsWatcher();
     class ObjectItem {
@@ -45,12 +46,12 @@ public:
     std::atomic<bool> isDeleteOnFinished{ true };
     QObjectsWatcher * super;
     std::set<ObjectItem,ObjectItem::Less,memory::Allocator<ObjectItem>> objectItems;
-    std::shared_ptr<std::mutex> objectItemsMutex;
+    std::shared_ptr<light_mutex> objectItemsMutex;
     class LockerType {
-        std::shared_ptr<std::mutex> _data;
-        std::unique_lock<std::mutex> _lock_data;
+        std::shared_ptr<light_mutex> _data;
+        std::unique_lock<light_mutex> _lock_data;
     public:
-        LockerType(const std::shared_ptr<std::mutex> & arg):_data(arg),
+        LockerType(const std::shared_ptr<light_mutex> & arg):_data(arg),
             _lock_data(*arg) {
         }
     };

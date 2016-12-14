@@ -21,7 +21,7 @@ QObjectsWatcher::~QObjectsWatcher() {
 }
 
 _PrivateQObjectsWatcher::_PrivateQObjectsWatcher(QObjectsWatcher *s):super(s) {
-    objectItemsMutex=memory::make_shared<std::mutex>();
+    objectItemsMutex=memory::make_shared<light_mutex>();
     this->add(super);
 }
 
