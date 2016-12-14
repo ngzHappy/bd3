@@ -21,8 +21,20 @@ inline _string_t operator""_s(const char *arg,std::size_t argl) {
     return _string_t(arg,argl);
 }
 
+class light_recursive_mutex :std::recursive_mutex {
+private:
+    using _Super=std::recursive_mutex;
+public:
+    light_recursive_mutex()=default;
+    using _Super::try_lock;
+    using _Super::unlock;
+    void lock(){
+        while(false==try_lock()){}
+    }
+};
+
 class _ExceptionHandle final :public exception::ExceptionHandle {
-    typedef std::recursive_mutex _mutex_t;
+    typedef light_recursive_mutex _mutex_t;
     typedef std::unique_lock<_mutex_t> _lock_t;
     using _sstream_t=std::basic_stringstream<char,std::char_traits<char>,memory::Allocator<char>>;
     static char _psm_mutex[sizeof(_mutex_t)];
