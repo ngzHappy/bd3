@@ -71,7 +71,6 @@ inline void make(
     {/*write header*/
         ofs<<u8R"___(/*std::*/
 extern void __memory_clean_thread_function(void(*)(void *),void *);
-#include <mutex>
      #include <memory>
      #include <atomic>
      #include <thread>
@@ -85,6 +84,26 @@ extern void __memory_clean_thread_function(void(*)(void *),void *);
      /*boost::pool*/
      #include <Qt/boost/pool/pool.hpp>
 
+             namespace{
+             namespace _pm_file {
+             //_pm_file::spin_mutex
+             class spin_mutex {
+               std::atomic_flag flag = ATOMIC_FLAG_INIT;
+             public:
+               spin_mutex() = default;
+               spin_mutex(const spin_mutex&) = delete;
+               spin_mutex& operator= (const spin_mutex&) = delete;
+               void lock() {
+                 while(flag.test_and_set()){}
+               }
+               void unlock() {
+                 flag.clear();
+               }
+             };
+
+             }/*_pm_file*/
+             }/*namespace*/
+
      namespace  {
      namespace  _p_file{
 
@@ -95,7 +114,7 @@ extern void __memory_clean_thread_function(void(*)(void *),void *);
           /*boost::pool*/
     class pool_t {
         typedef boost::pool<boost::default_user_allocator_malloc_free> _pool_t;
-        typedef std::mutex _mutex_t;
+        typedef _pm_file::spin_mutex _mutex_t;
         typedef std::unique_lock<_mutex_t> _mlock_t;
         _pool_t _pm_data;
         _mutex_t _pm_mutex;
@@ -291,7 +310,7 @@ public:
     void clean(){
         if( false == _pm_is_free_memroy_not_used.load() ){
             _pm_is_free_memroy_not_used.store(true);
-            
+
             /*__memory_clean_thread_function*/
             __memory_clean_thread_function(
                 [](void * arg) {
