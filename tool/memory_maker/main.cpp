@@ -84,25 +84,8 @@ extern void __memory_clean_thread_function(void(*)(void *),void *);
      /*boost::pool*/
      #include <Qt/boost/pool/pool.hpp>
 
-             namespace{
-             namespace _pm_file {
-             //_pm_file::spin_mutex
-             class spin_mutex {
-               std::atomic_flag flag = ATOMIC_FLAG_INIT;
-             public:
-               spin_mutex() = default;
-               spin_mutex(const spin_mutex&) = delete;
-               spin_mutex& operator= (const spin_mutex&) = delete;
-               void lock() {
-                 while(flag.test_and_set()){}
-               }
-               void unlock() {
-                 flag.clear();
-               }
-             };
-
-             }/*_pm_file*/
-             }/*namespace*/
+/*spin mutex*/
+#include "SpinMutex.hpp"
 
      namespace  {
      namespace  _p_file{
