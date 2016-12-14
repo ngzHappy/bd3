@@ -14,14 +14,14 @@ namespace {
 class MainState {
     memory::Application * _v_memory_application=nullptr;
     QtBasicLibrary * _v_qtbasiclibrary=nullptr;
-    Application * _v_application=nullptr;
+    QApplicationWatcher<Application> * _v_application=nullptr;
     QTimer * _v_gctimer=nullptr;
 public:
     inline MainState(int,char **);
     inline int exec();
     inline ~MainState();
 
-    Application * app() const { return _v_application; }
+    Application * app() const { return _v_application->get(); }
 public:
     MainState(const MainState&)=delete;
     MainState(MainState&&)=delete;
@@ -45,7 +45,7 @@ inline MainState::MainState(int argc,char **argv) {
     /*init qt basic library*/
     _v_qtbasiclibrary=new QtBasicLibrary;
     /*init opencv application*/
-    _v_application=new Application(argc,argv);
+    _v_application=new QApplicationWatcher<Application>(argc,argv);
     /*init gctimer*/
     _v_gctimer=new QTimer;
     _v_gctimer->connect(_v_gctimer,&QTimer::timeout,[]() {memory::clean(); });
@@ -54,7 +54,7 @@ inline MainState::MainState(int argc,char **argv) {
 
 /*执行*/
 inline int MainState::exec() {
-    return _v_application->exec();
+    return app()->exec();
 }
 
 /*重定义析构顺序*/

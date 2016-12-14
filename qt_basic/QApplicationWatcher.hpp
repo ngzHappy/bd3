@@ -28,6 +28,9 @@ public:
 
     _T_ & operator*(){ return *_p_application; }
     const _T_ & operator*() const { return *_p_application; }
+
+    _T_ * get() { return _p_application; }
+    const _T_ * get() const { return _p_application; }
 private:
     CPLUSPLUS_OBJECT(QApplicationWatcher)
 };
