@@ -7,7 +7,6 @@
 //#include <iostream>
 //static int test = 0;
 
-namespace{
 namespace _pm_file {
 
 class spin_mutex {
@@ -16,18 +15,19 @@ public:
     spin_mutex() = default;
     spin_mutex(const spin_mutex&) = delete;
     spin_mutex& operator= (const spin_mutex&) = delete;
-    void lock() {
+    void lock() noexcept(true){
         while(flag.test_and_set()){
             //std::cout<<"."<<++test;
         }
     }
-    void unlock() {
+    void unlock() noexcept(true){
         flag.clear();
+    }
+    bool try_lock() noexcept(true){
+        return (flag.test_and_set()==false);
     }
 };
 
 }/*_pm_file*/
-}/*namespace*/
-
 
 #endif
