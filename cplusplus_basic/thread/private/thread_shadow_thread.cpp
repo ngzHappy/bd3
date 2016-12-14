@@ -1,11 +1,11 @@
 ﻿#include <list>
-#include <mutex>
 #include <atomic>
 #include <chrono>
 #include <cassert>
 #include <cinttypes>
 #include <condition_variable>
 #include "thread_shadow_thread.hpp"
+#include "../../private/SpinMutex.hpp"
 
 namespace thread {
 
@@ -35,26 +35,30 @@ private:
 class  ShadowThread::_PrivateShadowThread :
     public std::enable_shared_from_this<_PrivateShadowThread> {
 public:
-
+    using light_mutex=_pm_file::spin_mutex;
     std::thread __m_thread;
-    std::mutex __m_mutex;
+    light_mutex __m_mutex;
     std::atomic<bool> __m_quit_{ false };
-    std::condition_variable __m_cv_functions;
+    std::condition_variable_any __m_cv_functions;
     std::atomic<std::size_t> __m_functions_count{ 0 };
     using _t_pvsf=___ShadowThread::List<std::pair<TypePlainVoidStarFunction,void*>>;
     using _t_pcvsf=___ShadowThread::List<std::pair<TypePlainConstVoidStarFunction,const void*>>;
-    std::mutex _m_m_plain_voidstar_functions;
+    
+    light_mutex _m_m_plain_voidstar_functions;
     _t_pvsf __m_plain_voidstar_functions;
-    std::mutex _m_m_plain_constvoidstar_functions;
+    
+    light_mutex _m_m_plain_constvoidstar_functions;
     _t_pcvsf __m_plain_constvoidstar_functions;
-    std::mutex _m_m_stdfunctions;
+    
+    light_mutex _m_m_stdfunctions;
     ___ShadowThread::List<TypeStdFunction> __m_stdfunctions;
-    std::mutex _m_m_plainfunctions;
+    
+    light_mutex _m_m_plainfunctions;
     ___ShadowThread::List<TypePlainFunction> __m_plainfunctions;
 
     void quit() {
         {
-            std::unique_lock<std::mutex> _{ __m_mutex };
+            std::unique_lock<light_mutex> _{ __m_mutex };
             if (__m_quit_) { return; }
             __m_quit_=true;
         }
@@ -69,7 +73,7 @@ public:
             for (;;) {
 
                 {/*读临界区*/
-                    std::unique_lock<std::mutex> varLock{ thisp->__m_mutex };
+                    std::unique_lock<light_mutex> varLock{ thisp->__m_mutex };
 
                     while ((thisp->__m_functions_count)<1) {
                         if (thisp->__m_quit_) { return; }
@@ -96,7 +100,7 @@ public:
 
         {
             /*获得资源锁*/
-            std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_stdfunctions };
+            std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_stdfunctions };
             if (__m_stdfunctions.empty()) {
                 return;
             }
@@ -107,7 +111,7 @@ public:
 
         {
             /*写临界区*/
-            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            std::unique_lock<light_mutex> varLock{ __m_mutex };
             __m_functions_count-=varFunctions.size();
         }
 
@@ -128,7 +132,7 @@ public:
         ___ShadowThread::List<TypePlainFunction> varFunctions;
 
         {
-            std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_plainfunctions };
+            std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_plainfunctions };
             if (__m_plainfunctions.empty()) {
                 return;
             }
@@ -138,7 +142,7 @@ public:
         }
 
         {
-            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            std::unique_lock<light_mutex> varLock{ __m_mutex };
             __m_functions_count-=varFunctions.size();
         }
 
@@ -160,7 +164,7 @@ public:
 
 
         {
-            std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_plain_constvoidstar_functions };
+            std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_plain_constvoidstar_functions };
 
             if (__m_plain_constvoidstar_functions.empty()) {
                 return;
@@ -171,7 +175,7 @@ public:
         }
 
         {
-            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            std::unique_lock<light_mutex> varLock{ __m_mutex };
             __m_functions_count-=varFunctions.size();
         }
 
@@ -192,7 +196,7 @@ public:
         _t_pvsf varFunctions;
 
         {
-            std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_plain_voidstar_functions };
+            std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_plain_voidstar_functions };
 
             if (__m_plain_voidstar_functions.empty()) {
                 return;
@@ -203,7 +207,7 @@ public:
         }
 
         {
-            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            std::unique_lock<light_mutex> varLock{ __m_mutex };
             __m_functions_count-=varFunctions.size();
         }
 
@@ -220,13 +224,13 @@ public:
 
     void run_plain_function(TypePlainFunction arg) {
         {
-            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            std::unique_lock<light_mutex> varLock{ __m_mutex };
             if (__m_quit_) { return; }
             ++__m_functions_count;
         }
 
         {
-            std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_plainfunctions };
+            std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_plainfunctions };
             __m_plainfunctions.push_back(arg);
         }
         __m_cv_functions.notify_all();
@@ -234,13 +238,13 @@ public:
 
     void _p_run_std_function(TypeStdFunction && arg) {
         {
-            std::unique_lock<std::mutex> varLock{ __m_mutex };
+            std::unique_lock<light_mutex> varLock{ __m_mutex };
             if (__m_quit_) { return; }
             ++__m_functions_count;
         }
 
         {
-            std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_stdfunctions };
+            std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_stdfunctions };
             __m_stdfunctions.push_back(std::move(arg));
         }
         __m_cv_functions.notify_all();
@@ -249,13 +253,13 @@ public:
     void _p_run_plain_constvoidstar_function(TypePlainConstVoidStarFunction arg,
         const void * argData) {
             {
-                std::unique_lock<std::mutex> varLock{ __m_mutex };
+                std::unique_lock<light_mutex> varLock{ __m_mutex };
                 if (__m_quit_) { return; }
                 ++__m_functions_count;
             }
 
             {
-                std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_plain_constvoidstar_functions };
+                std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_plain_constvoidstar_functions };
                 __m_plain_constvoidstar_functions.emplace_back(arg,argData);
             }
             __m_cv_functions.notify_all();
@@ -264,13 +268,13 @@ public:
     void _p_run_plain_voidstar_function(TypePlainVoidStarFunction arg,
         void * argData) {
             {
-                std::unique_lock<std::mutex> varLock{ __m_mutex };
+                std::unique_lock<light_mutex> varLock{ __m_mutex };
                 if (__m_quit_) { return; }
                 ++__m_functions_count;
             }
 
             {
-                std::unique_lock<std::mutex> /*Ⓛ*/\u24c1{ _m_m_plain_voidstar_functions };
+                std::unique_lock<light_mutex> /*Ⓛ*/\u24c1{ _m_m_plain_voidstar_functions };
                 __m_plain_voidstar_functions.emplace_back(arg,argData);
             }
             __m_cv_functions.notify_all();
