@@ -1,6 +1,9 @@
 
-#include <iostream>
-static int test = 0;
+#ifndef _SPIN_BOX_HPP__0x0098
+#define _SPIN_BOX_HPP__0x0098
+
+//#include <iostream>
+//static int test = 0;
 
 namespace{
 namespace _pm_file {
@@ -12,7 +15,9 @@ public:
     spin_mutex(const spin_mutex&) = delete;
     spin_mutex& operator= (const spin_mutex&) = delete;
     void lock() {
-        while(flag.test_and_set()){ std::cout<<"."<<++test; }
+        while(flag.test_and_set()){ 
+            //std::cout<<"."<<++test; 
+        }
     }
     void unlock() {
         flag.clear();
@@ -21,3 +26,6 @@ public:
 
 }/*_pm_file*/
 }/*namespace*/
+
+
+#endif
