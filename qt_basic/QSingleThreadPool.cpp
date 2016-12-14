@@ -324,6 +324,7 @@ namespace qappwatcher {
 namespace {
 _ThreadObjectRunableEvent * qapp_events_loop;
 std::shared_ptr<QSingleThreadPool> qapp_thread_pool;
+std::weak_ptr<QSingleThreadPool> qapp_thread_pool_watcher;
 }/*namespace*/
 
 void beginConstructQApplication() {
@@ -335,6 +336,7 @@ void beginConstructQApplication() {
         memory::make_shared<QSingleThreadPool>(QSingleThreadPool::private_construct{});
     qapp_thread_pool->thread_object_=qapp_events_loop;
     qapp_thread_pool->watcher_=QObjectsWatcher::instance();
+    qapp_thread_pool_watcher=qapp_thread_pool;
     _current_threads::add(std::this_thread::get_id(),qapp_thread_pool);
 }
 
@@ -368,7 +370,14 @@ std::shared_ptr<QSingleThreadPool> QSingleThreadPool::qAppQSingleThreadPool() {
 }
 
 
-
+std::weak_ptr<QSingleThreadPool> qAppQSingleThreadPoolWatcher(){
+    std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
+    auto app=qApp;
+    if (app&&(app->closingDown()==false)) {
+        return qappwatcher::qapp_thread_pool_watcher;
+    }
+    return{};
+}
 
 
 

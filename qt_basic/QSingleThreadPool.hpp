@@ -59,6 +59,7 @@ public:
 
     static std::weak_ptr<QSingleThreadPool> currentQSingleThreadPool();
     static std::shared_ptr<QSingleThreadPool> qAppQSingleThreadPool();
+    static std::weak_ptr<QSingleThreadPool> qAppQSingleThreadPoolWatcher();
 
     class QT_BASICSHARED_EXPORT LockType {
         friend class QSingleThreadPool;
