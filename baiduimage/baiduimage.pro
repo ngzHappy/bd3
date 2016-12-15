@@ -9,9 +9,13 @@ TARGET = baiduimage
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        MainWindow.cpp
+        MainWindow.cpp \
+    BaiduUser.cpp \
+    _PrivateBaiduUser.cpp
 
-HEADERS  += MainWindow.hpp
+HEADERS  += MainWindow.hpp \
+    BaiduUser.hpp \
+    _PrivateBaiduUser.hpp
 
 FORMS    += MainWindow.ui
 
