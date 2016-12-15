@@ -79,6 +79,7 @@ public:
     QSingleThreadPool * $m$singleThreadPool=nullptr ;
     std::weak_ptr<BaiduPrivateBasic> $m$superPrivate/*回调结构的观察者*/;
 
+    inline std::shared_ptr<_PrivateBaiduUser> lock();
     inline void finished_success();
     inline void finished_error();
     inline void create_networkaccessmanager();
@@ -102,29 +103,37 @@ public:
     class StateMachine{
         Login *$m$thisp;
     public:
-         StateMachine(Login * arg,State s):$m$thisp(arg){
-             arg->$m$state=s;
-             arg->$m$nextState=state_error;
-         }
+        StateMachine(Login * arg,State s):$m$thisp(arg){
+            arg->$m$state=s;
+            arg->$m$nextState=state_error;
+        }
 
-         void normal_return(State s){
-             $m$thisp->$m$nextState=s;
-         }
+        void normal_return(State s){
+            $m$thisp->$m$nextState=s;
+        }
 
-         void error_return(const QString &e){
-             $m$thisp->$m$errorString=e;
-             $m$thisp->$m$nextState=state_error;
-         }
+        void error_return(const QString &e){
+            $m$thisp->$m$errorString=e;
+            $m$thisp->$m$nextState=state_error;
+        }
 
-         ~StateMachine(){
-             $m$thisp->do_next();
-         }
+        ~StateMachine(){
+            $m$thisp->do_next();
+        }
     };
 
 private:
     CPLUSPLUS_OBJECT(Login)
 };
 
+inline std::shared_ptr<_PrivateBaiduUser> Login::lock(){
+    if( QObjectsWatcher::isQAppQuited() ){return{};}
+    auto ans = $m$superPrivate.lock();
+    if( ans ){
+        return std::static_pointer_cast<_PrivateBaiduUser>(std::move(ans));
+    }
+    return{};
+}
 
 inline void Login::finished_success(){
     $m$isFinishedCalled=true;
@@ -138,7 +147,7 @@ inline void Login::finished_error(){
     this->finished(false,$m$errorString);
 }
 
-inline void Login::do_next(){
+inline void Login::do_next() try {
     auto varPrivateData = $m$superPrivate.lock();
     if(varPrivateData){
         switch( $m$nextState ){
@@ -147,26 +156,35 @@ inline void Login::do_next(){
         case state_waiting:break;
         case state_error:finished_error();break;
         case state_success:finished_success();break;
+        }
     }
-}
+
+}catch(...){
+CPLUSPLUS_EXCEPTION(false);
 }
 
-inline void Login::create_networkaccessmanager(){
+inline void Login::create_networkaccessmanager()try{
     StateMachine varStateMachine{this,state_create_networkaccessmanager};
     auto varPrivateData = $m$superPrivate.lock();
     if(varPrivateData){
         assert($m$singleThreadPool->thread()==QThread::currentThread());
         $m$singleThreadPool->runLambda([var=this->shared_from_this()](){
             StateMachine varStateMachine{var.get(),state_create_networkaccessmanager};
-            auto varPrivateData = var->$m$superPrivate.lock();
-            if(varPrivateData){
-                auto varP = static_cast<_PrivateBaiduUser *>(varPrivateData.get());
-                varP->createNetworkAccessManager();
-                return varStateMachine.normal_return(state_waiting);
+            try{
+                auto varPrivateData = var->lock();
+                if(varPrivateData){
+                    varPrivateData->createNetworkAccessManager();
+                    return varStateMachine.normal_return(state_waiting);
+                }
+            }catch(...){
+                CPLUSPLUS_EXCEPTION(false);
             }
         });
         return varStateMachine.normal_return(state_waiting);
     }
+}
+catch(...){
+CPLUSPLUS_EXCEPTION(false);
 }
 
 }/**/
