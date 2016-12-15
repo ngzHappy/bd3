@@ -319,4 +319,43 @@ void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
     varLogin->do_next();
 }
 
+QByteArray BaiduUser::gid() {
+    QByteArray ans{ 35,Qt::Uninitialized };
+
+    constexpr const static char toHex0[]={
+        '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F',
+    };
+
+    constexpr const static char toHex1[]={
+        '8','9','A','B','C','D','E','F','8','9','A','B','C','D','E','F',
+    };
+
+    class Array {
+        char data[35];
+    public:
+        Array():data{
+            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            toHex0[std::rand()&15], '-',toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            '-','4',toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15], '-',
+            toHex1[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            toHex0[std::rand()&15],'-',toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+            toHex0[std::rand()&15],toHex0[std::rand()&15]
+        } {
+        }
+    };
+
+    ::new(ans.data()) Array;
+
+    return std::move(ans);
+}
+
 }/*baidu*/
+
+
+

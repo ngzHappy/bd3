@@ -38,6 +38,8 @@ public:
    BaiduUserState getState()const;
    void setState(BaiduUserState);
 
+   static QByteArray gid();
+
 public:
     Q_SIGNAL void stateChanged(int);
     Q_SIGNAL void loginFinished(bool,const QString &);
