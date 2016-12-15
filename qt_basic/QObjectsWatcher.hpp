@@ -8,11 +8,7 @@
 
 class _PrivateQObjectsWatcher;
 class QT_BASICSHARED_EXPORT QObjectsWatcher final:
-#ifdef QT_BASIC_LIBRARY
-public QObject,
-#else
-protected QObject,
-#endif // QT_BASIC_LIBRARY
+    public QObject,
     public std::enable_shared_from_this<QObjectsWatcher>{
 Q_OBJECT
 protected:

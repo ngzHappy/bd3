@@ -11,11 +11,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         MainWindow.cpp \
     BaiduUser.cpp \
-    _PrivateBaiduUser.cpp
+    _PrivateBaiduUser.cpp \
+    _PrivateBaiduStaticData.cpp
 
 HEADERS  += MainWindow.hpp \
     BaiduUser.hpp \
-    _PrivateBaiduUser.hpp
+    _PrivateBaiduUser.hpp \
+    _PrivateBaiduStaticData.hpp
 
 FORMS    += MainWindow.ui
 

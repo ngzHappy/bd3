@@ -104,6 +104,10 @@ private:
     QObject * thread_object_;
     class _Thread;
     void _p_run(RunableEvent *,int);
+    using QObject::thread;
+    using QObject::moveToThread;
+    using QObject::parent;
+    using QObject::setParent;
 private:
     CPLUSPLUS_OBJECT(QSingleThreadPool)
 };

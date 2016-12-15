@@ -3,6 +3,8 @@
 #include <QtBasicLibrary.hpp>
 #include <QtWidgets/QApplication>
 
+#include "BaiduUser.hpp"
+
 int main(int argc, char *argv[])try{
 
     /*init memory*/
@@ -10,13 +12,16 @@ int main(int argc, char *argv[])try{
     /*init qt basic library*/
     QtBasicLibrary qtBasicLibrary;
 
-    QApplication app(argc, argv);
+    QApplicationWatcher<QApplication> app(argc, argv);
 
     MainWindow window;
     window.show();
 
+    baidu::BaiduUser user( memory::make_shared<QSingleThreadPool>() );
+    user.login("abc","def");
+
     {
-        auto ans = app.exec();
+        auto ans = app->exec();
         mapp.quit();
         return ans;
     }
