@@ -6,6 +6,7 @@
 #include <shared_mutex>
 #include <QtCore/QEvent>
 #include <QtCore/qtimer.h>
+#include <QtCore/qdebug.h>
 #include <QtCore/qthread.h>
 #include "cplusplus_basic.hpp"
 #include <QtCore/qeventloop.h>
@@ -83,13 +84,17 @@ using _RunableEvent=QSingleThreadPool::RunableEvent;
 
 class _ThreadObjectRunableEvent : public QObject {
 public:
+
     bool event(QEvent *e) override {
+
         if (e->type()==eventType()) {
             static_cast<_RunableEvent *>(e)->run();
             return true;
         }
+
         return QObject::event(e);
     }
+
 private:
     CPLUSPLUS_OBJECT(_RunableEvent)
 };
@@ -139,6 +144,40 @@ std::atomic< QObject * > staticDelateLaterObject;
 }/*namespace*/
 
 namespace {
+
+/*quit in the same thread*/
+static void toQuitQThread(_ThreadObjectRunableEvent * obj,QThread *arg) {
+
+    class Event :public _RunableEvent {
+        void(*_fun)(_ThreadObjectRunableEvent *,QThread*);
+        _ThreadObjectRunableEvent * _obj;
+        QThread * _data;
+    public:
+        Event(void(*f)(_ThreadObjectRunableEvent *,QThread*),
+              _ThreadObjectRunableEvent*a,QThread*d):
+            _fun(f),
+            _obj(a),
+            _data(d) {}
+        void do_run() override { _fun(_obj,_data); }
+    private:
+        CPLUSPLUS_OBJECT(Event)
+    };
+
+    /*move to it's thread and quit it*/
+    QCoreApplication::postEvent(
+                obj,
+                new Event([](_ThreadObjectRunableEvent * obj,QThread *arg) {
+        assert(arg==QThread::currentThread());
+        QTimer::singleShot(64,obj,
+        [arg]() {
+#if defined(THREAD_DEBUG)
+            qDebug()<<"quit a thread"<<arg;
+#endif
+            arg->quit();
+        });
+    },obj,arg));
+
+}
 
 /*QThread delete before main may be a bug*/
 static void toDeleteQThread(QThread *arg) {
@@ -191,8 +230,9 @@ QSingleThreadPool::QSingleThreadPool(QObject *p):QObject(p) {
 
     /*get thread data*/
     auto varThreadData=varPromise.get_future().get();
-    this->thread_object_=std::get<0>(varThreadData);
+    auto varObject=std::get<0>(varThreadData);
     auto varThreadID=std::get<1>(varThreadData);
+    this->thread_object_=varObject;
 
     this->children_=memory::make_shared<QSingleThreadPool>(private_construct{});
     this->children_->watcher_=this->watcher_;
@@ -203,9 +243,11 @@ QSingleThreadPool::QSingleThreadPool(QObject *p):QObject(p) {
     connect(watcher_.get(),
             &QObjectsWatcher::finished,
             varThread,
-            [varThread,varThreadID]() {
+            [varThread,varThreadID,varObject]() {
+        /*删除观察者*/
         _current_threads::remove(varThreadID);
-        varThread->quit();
+        /*延迟quit，以消除某些deleteLater的bug*/
+        toQuitQThread(varObject,varThread);
     });
 
 }
@@ -214,7 +256,7 @@ QSingleThreadPool::~QSingleThreadPool() {
 
 }
 
-void QSingleThreadPool::run(void(*f)(void)) {
+void QSingleThreadPool::run(void(*f)(void), int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(void);
@@ -224,10 +266,10 @@ void QSingleThreadPool::run(void(*f)(void)) {
     private:
         CPLUSPLUS_OBJECT(Event)
     };
-    QCoreApplication::postEvent(thread_object_,new Event(f));
+    _p_run(new Event(f),p);
 }
 
-void QSingleThreadPool::run(void(*f)(void*),void *d) {
+void QSingleThreadPool::run(void(*f)(void*),void *d, int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(void*);
@@ -238,10 +280,10 @@ void QSingleThreadPool::run(void(*f)(void*),void *d) {
     private:
         CPLUSPLUS_OBJECT(Event)
     };
-    QCoreApplication::postEvent(thread_object_,new Event(f,d));
+    _p_run(new Event(f,d),p);
 }
 
-void QSingleThreadPool::run(void(*f)(const void*),const void *d) {
+void QSingleThreadPool::run(void(*f)(const void*),const void *d, int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const void*);
@@ -252,12 +294,12 @@ void QSingleThreadPool::run(void(*f)(const void*),const void *d) {
     private:
         CPLUSPLUS_OBJECT(Event)
     };
-    QCoreApplication::postEvent(thread_object_,new Event(f,d));
+    _p_run(new Event(f,d),p);
 }
 
 void QSingleThreadPool::run(
         void(*f)(const std::shared_ptr<void> &),
-        std::shared_ptr<void> d) {
+        std::shared_ptr<void> d, int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const std::shared_ptr<void> &);
@@ -271,12 +313,12 @@ void QSingleThreadPool::run(
     private:
         CPLUSPLUS_OBJECT(Event)
     };
-    QCoreApplication::postEvent(thread_object_,new Event(f,std::move(d)));
+    _p_run(new Event(f,std::move(d)),p);
 }
 
 void QSingleThreadPool::run(
         void(*f)(const std::shared_ptr<const void> &),
-        std::shared_ptr<const void> d) {
+        std::shared_ptr<const void> d, int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const std::shared_ptr<const void> &);
@@ -290,10 +332,10 @@ void QSingleThreadPool::run(
     private:
         CPLUSPLUS_OBJECT(Event)
     };
-    QCoreApplication::postEvent(thread_object_,new Event(f,std::move(d)));
+    _p_run(new Event(f,std::move(d)),p);
 }
 
-void QSingleThreadPool::runStdFunction(std::function<void(void)> f) {
+void QSingleThreadPool::runStdFunction(std::function<void(void)> f, int p) {
     if (bool(f)==false) { return; }
     class Event :public _RunableEvent {
         std::function<void(void)> _fun;
@@ -303,7 +345,7 @@ void QSingleThreadPool::runStdFunction(std::function<void(void)> f) {
     private:
         CPLUSPLUS_OBJECT(Event)
     };
-    QCoreApplication::postEvent(thread_object_,new Event(std::move(f)));
+    _p_run(new Event(std::move(f)),p);
 }
 
 void QSingleThreadPool::addWatcher(QObject *arg) {
@@ -314,10 +356,9 @@ void QSingleThreadPool::removeWatcher(QObject *arg) {
     watcher_->remove(arg);
 }
 
-void QSingleThreadPool::_p_run(RunableEvent *arg) {
-    QCoreApplication::postEvent(thread_object_,arg);
+void QSingleThreadPool::_p_run(RunableEvent *arg, int p) {
+    QCoreApplication::postEvent(thread_object_,arg,p);
 }
-
 
 namespace qappwatcher {
 
