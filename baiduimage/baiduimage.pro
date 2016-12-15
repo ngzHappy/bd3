@@ -30,4 +30,10 @@ LIBS+=-L$$THIS_PROJECT_DESTDIR -lcplusplus_basic_library
 include($$PWD/../qt_basic/qt_basic.pri)
 LIBS+=-L$$THIS_PROJECT_DESTDIR -lqt_basic_library
 
+CONFIG += precompile_header
+win32-msvc*{
+PRECOMPILED_HEADER  += $$PWD/private/_msvc_core_utility_prebuild.hpp
+}else{
+PRECOMPILED_HEADER  += $$PWD/private/_core_utility_prebuild.hpp
+}
 
