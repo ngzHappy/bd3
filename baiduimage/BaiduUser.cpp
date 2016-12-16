@@ -94,6 +94,7 @@ public:
         QByteArray $m$token;
         QByteArray $m$rsaPublikKey;
         QByteArray $m$rsaKeyIndex;
+        QByteArray $m$passWord;
     };
     std::shared_ptr<ExternAns> $m$externAns;
     /*input*/
@@ -112,6 +113,7 @@ public:
     inline void get_baidu_login_cookie();
     inline void get_baidu_token();
     inline void get_rsa_key();
+    inline void encrypt_RSA();
 
     inline void do_next();
 
@@ -124,6 +126,7 @@ public:
         state_getbaidu_login_cookie,
         state_get_baidu_token,
         state_get_rsa_key,
+        state_encrypt_RSA,
     };
     State $m$state=state_create_networkaccessmanager;
     State $m$nextState=state_create_networkaccessmanager;
@@ -159,6 +162,41 @@ public:
 private:
     CPLUSPLUS_OBJECT(Login)
 };
+
+inline void Login::encrypt_RSA() try {
+    StateMachine varStateMachine{ this,state_encrypt_RSA };
+
+    using Botan::byte;
+    using Botan::Public_Key;
+    using Botan::PK_Encryptor_EME;
+
+    const auto & pemData=this->$m$externAns->$m$rsaPublikKey;
+    auto varSTD=getBaiduStaticData();
+
+    Botan::MemoryVector<byte> pem((const byte *)pemData.data(),pemData.size());
+    std::unique_ptr<Public_Key> publicKey{ Botan::X509::load_key(pem) };
+    Botan::AutoSeeded_RNG rng;
+    PK_Encryptor_EME en(*publicKey,varSTD->EME_PKCS1_v1_5);
+    const auto varPassWord=this->$m$passWordRaw.toUtf8();
+    auto ans=en.encrypt((const byte*)varPassWord.data(),
+        varPassWord.size(),rng);
+
+    if (ans.size()<1) {
+        return varStateMachine.error_return(u8R"///(encrypt is null)///"_qls);
+    }
+
+    auto & passWord=this->$m$externAns->$m$passWord;
+    passWord=QByteArray((char *)ans.begin(),static_cast<int>(ans.size()));
+
+    passWord=passWord.toBase64();
+    passWord=passWord.toPercentEncoding();
+
+    return varStateMachine.normal_return(state_waiting);
+
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
+}
 
 inline void Login::get_rsa_key() try {
     StateMachine varStateMachine{ this,state_get_rsa_key };
@@ -255,7 +293,7 @@ inline void Login::get_rsa_key() try {
                 }
 
                 if (error.toString()==varSTD->zero) {
-                    auto & vpubkey = var->$m$externAns->$m$rsaPublikKey;
+                    auto & vpubkey=var->$m$externAns->$m$rsaPublikKey;
                     auto & vkey=var->$m$externAns->$m$rsaKeyIndex;
 
                     vpubkey=pubkey.toString().toUtf8();
@@ -272,7 +310,7 @@ inline void Login::get_rsa_key() try {
 
             }
 
-            return varStateMachine.normal_return(state_waiting);
+            return varStateMachine.normal_return(state_encrypt_RSA);
 
         }
         catch (...) {
@@ -506,6 +544,8 @@ inline void Login::do_next() try {
                 [var=this->shared_from_this()](){var->get_baidu_token(); });
             case state_get_rsa_key:return $m$singleThreadPool->runLambda(
                 [var=this->shared_from_this()](){var->get_rsa_key(); });
+            case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
+                [var=this->shared_from_this()](){var->encrypt_RSA(); });
         }
     }
 

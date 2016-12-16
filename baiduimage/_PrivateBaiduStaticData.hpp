@@ -83,6 +83,7 @@ class _PrivateBaiduStaticData {
 public:
     _PrivateBaiduStaticData();
 public:
+    const containers::string EME_PKCS1_v1_5="EME-PKCS1-v1_5";
     const QByteArray gzip_deflate="gzip, deflate"_qba;
     const QByteArray key_cccept_encoding=u8R"///(Accept-Encoding)///"_qba;
     const QByteArray baidu_rsa_url=u8R"///(https://passport.baidu.com/v2/getpublickey?token=)///"_qba;
