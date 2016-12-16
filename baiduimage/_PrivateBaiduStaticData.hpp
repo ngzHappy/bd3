@@ -4,6 +4,7 @@
 #ifdef __cplusplus
 
 #include <regex>
+#include <gumbo/gumbo.hpp>
 #include <QtCore/qstring.h>
 #include <QtCore/qbytearray.h>
 #include <cplusplus_basic.hpp>

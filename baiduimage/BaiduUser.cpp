@@ -118,7 +118,7 @@ public:
     inline void get_rsa_key();
     inline void encrypt_RSA();
     inline void post_login();
-    inline void post_login_finished(QNetworkReply *);
+    inline void post_login_finished(QNetworkReply *,const StaticData_postLogin*);
 
     inline void do_next();
 
@@ -213,7 +213,7 @@ public:
             { 500002    ,u8"您输入的验证码有误"_qstr},
             { 500018    ,u8"验证码已失效，请重试"_qstr},
         };
-        return ans;
+        return std::move(ans);
     }();
 public:
     StaticData_postLogin()
@@ -304,8 +304,9 @@ inline void Login::post_login() try {
     auto varReply=networkAM->post(req,varPostData);
 
     varReply->connect(varReply,&QNetworkReply::finished,
-        [var=this->shared_from_this(),varReply]() {
-        var->post_login_finished(varReply);
+        [var=this->shared_from_this(),varReply,
+        varPsd=varPsd.pointer()]() {
+        var->post_login_finished(varReply,varPsd);
     });
 
     return varStateMachine.normal_return(state_waiting);
@@ -314,9 +315,139 @@ catch (...) {
     CPLUSPLUS_EXCEPTION(false);
 }
 
-inline void Login::post_login_finished(QNetworkReply *varReply) try {
+class PostLoginJSParserAns {
+public:
+    bool isOk=false;
+    int errorCode=0;
+    QString errorString;
+    QByteArray VertifyCodeID;
+    QByteArray VertifyCodeUrl;
+    QByteArray vcodetype;
+};
+
+static void parserPostLoginJS(
+    const gumbo::string&varJS,
+    const StaticData_postLogin*varPSD,
+    PostLoginJSParserAns*varAns
+) {
+    int varErrorNO=0;
+    do {
+        std::cmatch error_no;
+        if (std::regex_search(
+            varJS.c_str(),varJS.c_str()+varJS.size(),
+            error_no,varPSD->error_no_regex)) {
+            varErrorNO=std::atoi(error_no[1].first);
+            varAns->errorCode=varErrorNO;
+            if (varErrorNO!=0) {
+
+                if (varErrorNO==257) {
+                    /*https://passport.baidu.com/cgi-bin/genimage?*/
+                    /*codeString=([^&]+)*/
+                    std::cmatch code_string;
+                    if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
+                        code_string,varPSD->code_string_regex)) {
+                        varAns->VertifyCodeID=QByteArray(code_string[1].first,
+                            static_cast<int>(code_string[1].length()));
+                        varAns->VertifyCodeUrl=varPSD->code_string_url
+                            +varAns->VertifyCodeID;
+                        if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
+                            code_string,varPSD->vcodetype_regex)) {
+                            auto varTmp=QByteArray(code_string[1].first,
+                                static_cast<int>(code_string[1].length()));
+#ifndef NDEBUG
+                            QJSEngine test_eng;
+                            auto check_test=test_eng.evaluate(u8R"(")"+varTmp+u8R"(")").toString();
+#endif
+
+                            varAns->vcodetype=varTmp.replace(u8R"(\/)",2,u8R"(/)",1)
+                                .toPercentEncoding();
+#ifndef NDEBUG
+                            assert(check_test.toUtf8().toPercentEncoding()
+                                ==varAns->vcodetype);
+#endif
+                        }
+                        varAns->errorString=u8"请输入验证码"_qstr;
+                        return;
+                    }
+                }
+
+                if (varErrorNO==18) {
+                    varAns->isOk=true/*要求手机验证码*/;
+                    break;
+                }
+
+                auto it=varPSD->error_code.find(varErrorNO);
+                if (it==varPSD->error_code.end()) {
+
+                }
+                else {
+                    varAns->errorString=it->second;
+                    return;
+                }
+
+            }
+            else {
+                varAns->isOk=true;
+            }
+        }
+        else {
+            varAns->errorString="can not find err_no="_qls;
+            return;
+        }
+    } while (false);
+
+}
+
+inline void Login::post_login_finished(QNetworkReply *varReply,
+    const StaticData_postLogin*varPsd) try {
     varReply->deleteLater();
     StateMachine varStateMachine{ this,state_encrypt_RSA };
+
+    auto varUserPrivate=this->lock();
+    if (!varUserPrivate) { return; }
+
+    auto varReplyData=varReply->readAll();
+
+    {/*获得json*/
+        if (varReplyData.isEmpty()) {
+            return varStateMachine.error_return(varReply->errorString());
+        }
+
+        /*解压gzip*/
+        if (qAsConst(varReplyData)[0]==char(0x001F)) {
+            varReplyData=text::ungzip(varReplyData.cbegin(),varReplyData.cend());
+        }
+
+        clear_data(varReply);
+    }
+
+    auto varTmpJson=
+        gumbo::getAllJavaScript(varReplyData.cbegin(),varReplyData.cend());
+
+    if (varTmpJson.empty()) {
+        return varStateMachine.error_return(u8R"///(can not find json)///"_qls);
+    }
+
+    const auto &varJS=*varTmpJson.begin();
+    PostLoginJSParserAns varAns;
+    parserPostLoginJS(varJS,varPsd,&varAns);
+
+
+    if (varAns.VertifyCodeUrl.isEmpty()==false) {
+        /*this->_m_vertifycodeurl=std::move(varAns.VertifyCodeUrl);
+        this->_m_codestring=std::move(varAns.VertifyCodeID);
+        this->_m_vcodetype=std::move(varAns.vcodetype);
+        this->loginStepNext=s_error;
+        errorString=std::move(varAns.errorString);
+        break;*/
+    }
+    else {
+        if (varAns.isOk==false) {
+             return varStateMachine.error_return(varAns.errorString);
+        }
+    }
+    
+    return varStateMachine.normal_return( state_success );
 
 }
 catch (...) {
