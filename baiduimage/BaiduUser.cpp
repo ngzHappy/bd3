@@ -1,4 +1,5 @@
 ﻿#include <cassert>
+#include <text/gzip.hpp>
 #include "BaiduUser.hpp"
 #include <QtCore/qthread.h>
 #include <QtCore/qobject.h>
@@ -12,7 +13,7 @@ namespace baidu {
 namespace {
 
 inline void clear_data(QNetworkReply *reply) {
-      reply->close();
+    reply->close();
 }
 
 }/*namespace*/
@@ -91,6 +92,8 @@ public:
     public:
         QByteArray $m$gid;
         QByteArray $m$token;
+        QByteArray $m$rsaPublikKey;
+        QByteArray $m$rsaKeyIndex;
     };
     std::shared_ptr<ExternAns> $m$externAns;
     /*input*/
@@ -157,11 +160,127 @@ private:
     CPLUSPLUS_OBJECT(Login)
 };
 
-inline void Login::get_rsa_key() try{
+inline void Login::get_rsa_key() try {
     StateMachine varStateMachine{ this,state_get_rsa_key };
     auto varUserPrivate=this->lock();
     if (!varUserPrivate) { return; }
-    
+    auto varSTD=getBaiduStaticData();
+    QUrl varURL;
+    {
+        const auto & gid=this->$m$externAns->$m$gid;
+        const auto & token=this->$m$externAns->$m$token;
+        const auto && tt=BaiduUser::currentTime();
+
+        auto urlData=cat_to_url(
+            "tpl","mn",
+            "apiver","v3",
+            "tt",tt,
+            "class","login",
+            "gid",gid,
+            "callback","bd__cbs__dmwxux");
+
+        QByteArray varTmpUrl;
+        varTmpUrl.reserve(4
+            +varSTD->baidu_rsa_url.size()
+            +token.size()
+            +static_cast<int>(urlData.size()));
+        varTmpUrl.append(varSTD->baidu_rsa_url);
+        varTmpUrl.append(token);
+        varTmpUrl.append(urlData.c_str(),static_cast<int>(urlData.size()));
+        varURL.setUrl(varTmpUrl);
+    }
+
+    QNetworkRequest req(varURL);
+    req.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
+    req.setRawHeader(varSTD->key_cccept_encoding,varSTD->gzip_deflate);
+
+    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    auto varReply=networkAM->get(req);
+
+    varReply->connect(varReply,&QNetworkReply::finished,
+        [var=this->shared_from_this(),varReply]() {
+        try {
+            varReply->deleteLater();
+            StateMachine varStateMachine{ var.get(),state_get_rsa_key };
+            auto varUserPrivate=var->lock();
+            if (!varUserPrivate) { return; }
+            auto varSTD=getBaiduStaticData();
+
+            auto varJson=varReply->readAll();
+
+            {/*获得json*/
+                if (varJson.isEmpty()) {
+                    return varStateMachine.error_return(varReply->errorString());
+                }
+
+                /*解压gzip*/
+                if (qAsConst(varJson)[0]==char(0x001F)) {
+                    varJson=text::ungzip(varJson.cbegin(),varJson.cend());
+                }
+
+                /*remove ()*/
+                varJson=varJson.mid(varJson.indexOf("("_qls)+1);
+                if (varJson.isEmpty()) {
+                    return varStateMachine.error_return(varReply->errorString());
+                }
+                varJson.resize(varJson.size()-1);
+
+                if (varJson.isEmpty()) {
+                    return varStateMachine.error_return(varReply->errorString());
+                }
+                clear_data(varReply);
+            }
+
+            auto networkAM=varUserPrivate->$m$networkAccessManager;
+            auto jsEngine=networkAM->getJSEngine();
+
+            {
+                const auto json=jsEngine->evaluate("var bd__cbs__dmwxux = "_qls+varJson);
+
+                if (json.isError()) {
+                    return varStateMachine.error_return(json.toString());
+                }
+
+                const auto error=jsEngine->evaluate(u8R"(bd__cbs__dmwxux["errno"])"_qls);
+                if (error.isError()) {
+                    return varStateMachine.error_return(error.toString());
+                }
+                const auto pubkey=jsEngine->evaluate(u8R"(bd__cbs__dmwxux["pubkey"])"_qls);
+                if (pubkey.isError()) {
+                    return varStateMachine.error_return(pubkey.toString());
+                }
+                const auto key=jsEngine->evaluate(u8R"(bd__cbs__dmwxux["key"])"_qls);
+                if (key.isError()) {
+                    return varStateMachine.error_return(key.toString());
+                }
+
+                if (error.toString()==varSTD->zero) {
+                    auto & vpubkey = var->$m$externAns->$m$rsaPublikKey;
+                    auto & vkey=var->$m$externAns->$m$rsaKeyIndex;
+
+                    vpubkey=pubkey.toString().toUtf8();
+                    vkey=key.toString().toUtf8();
+
+                    if (vkey.isEmpty()||vpubkey.isEmpty()) {
+                        return varStateMachine.error_return(u8R"///(can not find pubkey)///"_qls);
+                    }
+
+                }
+                else {
+                    return varStateMachine.error_return(error.toString());
+                }
+
+            }
+
+            return varStateMachine.normal_return(state_waiting);
+
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    });
+
+    return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
     CPLUSPLUS_EXCEPTION(false);
@@ -199,8 +318,6 @@ inline void Login::get_baidu_token() try {
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
 
     auto varReply=networkAM->get(varRequest);
-    networkAM->getWatcher()->add(varReply);
-
     varReply->connect(varReply,&QNetworkReply::finished,
         [var=this->shared_from_this(),varReply]() {
         varReply->deleteLater();
@@ -214,6 +331,11 @@ inline void Login::get_baidu_token() try {
             {/*获得json*/
                 if (varJson.isEmpty()) {
                     return varStateMachine.error_return(varReply->errorString());
+                }
+
+                /*解压gzip*/
+                if (qAsConst(varJson)[0]==char(0x001F)) {
+                    varJson=text::ungzip(varJson.cbegin(),varJson.cend());
                 }
 
                 /*remove ()*/
@@ -293,7 +415,6 @@ inline void Login::get_baidu_login_cookie() try {
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
     auto networkAM=varUserPrivate->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
-    networkAM->getWatcher()->add(varReply);
     varReply->connect(varReply,&QNetworkReply::finished,
         [var=this->shared_from_this(),varReply]() {
         try {
@@ -325,7 +446,6 @@ inline void Login::get_baidu_cookie() try {
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
     auto networkAM=varUserPrivate->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
-    networkAM->getWatcher()->add(varReply);
     varReply->connect(varReply,&QNetworkReply::finished,
         [var=this->shared_from_this(),varReply]() {
         try {
@@ -446,7 +566,7 @@ void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
     varLogin->$m$passWordRaw=argPassWord;
     varLogin->$m$superPrivate=this->$m$thisp;
     varLogin->$m$singleThreadPool=getPrivateData()->$m$threadPool.get();
-    varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()? 
+    varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()?
         BaiduUser::gid():thisp->$m$gid;
 
     /*连接信号槽*/

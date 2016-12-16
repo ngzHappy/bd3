@@ -12,7 +12,7 @@
 namespace  baidu {
 
 static inline std::regex operator""_stdr(const char * a,std::size_t b) {
-    return{a,b};
+    return{ a,b };
 }
 
 static inline QString operator""_qstr(const char *a,std::size_t b) {
@@ -83,7 +83,10 @@ class _PrivateBaiduStaticData {
 public:
     _PrivateBaiduStaticData();
 public:
-    const std::regex token_check =u8R"///([0-9a-zA-Z]+)///"_stdr ;
+    const QByteArray gzip_deflate="gzip, deflate"_qba;
+    const QByteArray key_cccept_encoding=u8R"///(Accept-Encoding)///"_qba;
+    const QByteArray baidu_rsa_url=u8R"///(https://passport.baidu.com/v2/getpublickey?token=)///"_qba;
+    const std::regex token_check=u8R"///([0-9a-zA-Z]+)///"_stdr;
     const QLatin1String zero="0"_qls;
     const QByteArray baidu_token_url=u8R"(https://passport.baidu.com/v2/api/?getapi)"_qba;
     const QString baidu_login_url="https://www.baidu.com/cache/user/html/login-1.2.html"_qstr;
