@@ -2,6 +2,7 @@
 #define _PRIVATEBAIDUUSER_HPP
 
 #include <regex>
+#include <atomic>
 #include "BaiduUser.hpp"
 #include <QtQml/qjsvalue.h>
 #include <QtQml/qjsengine.h>
@@ -80,7 +81,7 @@ public:
     BaiduUser::BaiduUserState $m$state=BaiduUser::BaiduUserState::StateNone;
     QByteArray $m$gid;
     QByteArray $m$token;
-    bool $m$isLogin=false;
+    std::atomic<bool> $m$isLogin={false};
 private:
     CPLUSPLUS_OBJECT(_PrivateBaiduUser)
 };
