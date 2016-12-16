@@ -108,6 +108,7 @@ public:
     inline void get_baidu_cookie();
     inline void get_baidu_login_cookie();
     inline void get_baidu_token();
+    inline void get_rsa_key();
 
     inline void do_next();
 
@@ -119,6 +120,7 @@ public:
         state_getbaidu_cookie,
         state_getbaidu_login_cookie,
         state_get_baidu_token,
+        state_get_rsa_key,
     };
     State $m$state=state_create_networkaccessmanager;
     State $m$nextState=state_create_networkaccessmanager;
@@ -154,6 +156,16 @@ public:
 private:
     CPLUSPLUS_OBJECT(Login)
 };
+
+inline void Login::get_rsa_key() try{
+    StateMachine varStateMachine{ this,state_get_rsa_key };
+    auto varUserPrivate=this->lock();
+    if (!varUserPrivate) { return; }
+    
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
+}
 
 inline void Login::get_baidu_token() try {
     StateMachine varStateMachine{ this,state_get_baidu_token };
@@ -257,7 +269,7 @@ inline void Login::get_baidu_token() try {
 
             }
 
-            return varStateMachine.normal_return(state_waiting);
+            return varStateMachine.normal_return(state_get_rsa_key);
         }
         catch (...) {
             CPLUSPLUS_EXCEPTION(false);
@@ -372,6 +384,8 @@ inline void Login::do_next() try {
                 [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
             case state_get_baidu_token:return $m$singleThreadPool->runLambda(
                 [var=this->shared_from_this()](){var->get_baidu_token(); });
+            case state_get_rsa_key:return $m$singleThreadPool->runLambda(
+                [var=this->shared_from_this()](){var->get_rsa_key(); });
         }
     }
 
