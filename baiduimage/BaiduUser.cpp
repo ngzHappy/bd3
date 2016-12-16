@@ -12,7 +12,7 @@ namespace baidu {
 namespace {
 
 inline void clear_data(QNetworkReply *reply) {
-    reply->close();
+      reply->close();
 }
 
 }/*namespace*/
@@ -86,11 +86,20 @@ class Login :
     public baidu::DoBaiduUserObject,
     public std::enable_shared_from_this<Login> {
 public:
+    /*input output*/
+    class ExternAns {
+    public:
+        QByteArray $m$gid;
+        QByteArray $m$token;
+    };
+    std::shared_ptr<ExternAns> $m$externAns;
+    /*input*/
     QString $m$userName/*用户名*/;
     QString $m$passWordRaw/*密码明文*/;
-    QString $m$errorString=getBaiduStaticData()->unknow_error/*错误值*/;
     QSingleThreadPool * $m$singleThreadPool=nullptr;
     std::weak_ptr<BaiduPrivateBasic> $m$superPrivate/*回调结构的观察者*/;
+    /*output by signal*/
+    QString $m$errorString=getBaiduStaticData()->unknow_error/*错误值*/;
 
     inline std::shared_ptr<_PrivateBaiduUser> lock();
     inline void finished_success();
@@ -146,11 +155,120 @@ private:
     CPLUSPLUS_OBJECT(Login)
 };
 
-inline void Login::get_baidu_token() {
+inline void Login::get_baidu_token() try {
     StateMachine varStateMachine{ this,state_get_baidu_token };
     auto varUserPrivate=this->lock();
     if (!varUserPrivate) { return; }
+    auto varSTD=getBaiduStaticData();
+    QUrl varUrl;
+    {/*set url*/
+        const auto && tt=BaiduUser::currentTime();
+        const auto & gid=this->$m$externAns->$m$gid;
+        const auto url_=cat_to_url(
+            "tpl","mn",
+            "apiver","v3",
+            "tt",tt,
+            "class","login",
+            "gid",gid,
+            "logintype","dialogLogin",
+            "callback","bd__cbs__akwyzc"
+        );
+        QByteArray varTmpUrl;
+        varTmpUrl.reserve(4
+            +varSTD->baidu_token_url.size()
+            +static_cast<int>(url_.size()));
+        varTmpUrl.append(varSTD->baidu_token_url);
+        varTmpUrl.append(url_.c_str(),static_cast<int>(url_.size()));
+        varUrl.setUrl(varTmpUrl);
+    }
 
+    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    QNetworkRequest varRequest(varUrl);
+    varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
+
+    auto varReply=networkAM->get(varRequest);
+    networkAM->getWatcher()->add(varReply);
+
+    varReply->connect(varReply,&QNetworkReply::finished,
+        [var=this->shared_from_this(),varReply]() {
+        varReply->deleteLater();
+        StateMachine varStateMachine{ var.get(),state_get_baidu_token };
+        try {
+            auto varUserPrivate=var->lock();
+            if (!varUserPrivate) { return; }
+
+            auto varJson=varReply->readAll();
+
+            {/*获得json*/
+                if (varJson.isEmpty()) {
+                    return varStateMachine.error_return(varReply->errorString());
+                }
+
+                /*remove ()*/
+                varJson=varJson.mid(varJson.indexOf("("_qls)+1);
+                if (varJson.isEmpty()) {
+                    return varStateMachine.error_return(varReply->errorString());
+                }
+                varJson.resize(varJson.size()-1);
+
+                if (varJson.isEmpty()) {
+                    return varStateMachine.error_return(varReply->errorString());
+                }
+                clear_data(varReply);
+            }
+
+            auto networkAM=varUserPrivate->$m$networkAccessManager;
+            auto jsEngine=networkAM->getJSEngine();
+
+            {/*获得token*/
+                auto ans=jsEngine->evaluate("var bd__cbs__89tioq = "_qls+varJson);
+                if (ans.isError()) {
+                    return varStateMachine.error_return(ans.toString());
+                }
+                auto error=jsEngine->evaluate(u8R"(bd__cbs__89tioq["errInfo"]["no"])"_qls);
+                auto token=jsEngine->evaluate(u8R"(bd__cbs__89tioq["data"]["token"])"_qls);
+
+                if (error.isError()) {
+                    return varStateMachine.error_return(error.toString());
+                }
+                if (token.isError()) {
+                    return varStateMachine.error_return(token.toString());
+                }
+
+                auto varSTD=getBaiduStaticData();
+                if (error.toString()==varSTD->zero) {
+                    auto & ansToken=var->$m$externAns->$m$token;
+                    ansToken=token.toString().toUtf8();
+                    if (ansToken.isEmpty()) {
+                        return varStateMachine.error_return("find token is null!"_qls);
+                    }
+
+                    /*进一步检查token是否正确*/
+                    if (false==std::regex_match(ansToken.cbegin(),
+                        ansToken.cend(),
+                        varSTD->token_check)) {
+                        return varStateMachine.error_return("find token is not right!"_qls);
+                    }
+
+                }
+                else {
+                    return varStateMachine.error_return("can not find token!"_qls);
+                }
+
+            }
+
+            return varStateMachine.normal_return(state_waiting);
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    });
+
+    return varStateMachine.normal_return(state_waiting);
+
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
 }
 
 /*the cookie has been set in cookiejar*/
@@ -248,11 +366,11 @@ inline void Login::do_next() try {
             case state_waiting:break;
             case state_error:finished_error(); break;
             case state_success:finished_success(); break;
-            case state_getbaidu_cookie:$m$singleThreadPool->runLambda(
+            case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
                 [var=this->shared_from_this()](){var->get_baidu_cookie(); });
-            case state_getbaidu_login_cookie:$m$singleThreadPool->runLambda(
+            case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
                 [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
-            case state_get_baidu_token:$m$singleThreadPool->runLambda(
+            case state_get_baidu_token:return $m$singleThreadPool->runLambda(
                 [var=this->shared_from_this()](){var->get_baidu_token(); });
         }
     }
@@ -298,25 +416,43 @@ namespace baidu {
 
 void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
 
+    auto thisp=getPrivateData();
+    {/*如果已经登陆，则退出；如果正在执行其他行为，则退出；*/
+        if (thisp->$m$isLogin) { return; }
+        if (thisp->$m$state!=BaiduUserState::StateNone) { return; }
+    }
+
     /*改变状态机*/
     this->setState(BaiduUser::BaiduUserState::StateLogin);
 
     /*初始化登陆器*/
     auto varLogin=memory::make_shared<_private_login::Login>();
+    varLogin->$m$externAns=memory::make_shared<_private_login::Login::ExternAns>();
     varLogin->$m$userName=argUserName;
     varLogin->$m$passWordRaw=argPassWord;
     varLogin->$m$superPrivate=this->$m$thisp;
     varLogin->$m$singleThreadPool=getPrivateData()->$m$threadPool.get();
+    varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()? 
+        BaiduUser::gid():thisp->$m$gid;
 
     /*连接信号槽*/
+    /*同步更新数据*/
     connect(varLogin.get(),&DoBaiduUserObject::finished,
-            this,[this](bool a,const QString &b) {
+            this,[this,externAns=varLogin->$m$externAns](bool a,const QString &b) {
+        auto thisp=getPrivateData();
+        thisp->$m$gid=externAns->$m$gid;
+        thisp->$m$token=externAns->$m$token;
+        thisp->$m$isLogin=a;
         this->setState(BaiduUser::BaiduUserState::StateNone);
         this->loginFinished(a,b);
     },Qt::QueuedConnection);
 
     /*开始登陆*/
-    varLogin->do_next();
+    return varLogin->do_next();
+}
+
+bool BaiduUser::isLogin()const {
+    return getPrivateData()->$m$isLogin;
 }
 
 QByteArray BaiduUser::gid() {
@@ -353,6 +489,10 @@ QByteArray BaiduUser::gid() {
     ::new(ans.data()) Array;
 
     return std::move(ans);
+}
+
+QByteArray BaiduUser::currentTime() {
+    return QByteArray::number(QDateTime::currentMSecsSinceEpoch());
 }
 
 }/*baidu*/

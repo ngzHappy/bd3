@@ -3,12 +3,17 @@
 
 #ifdef __cplusplus
 
+#include <regex>
 #include <QtCore/qstring.h>
 #include <QtCore/qbytearray.h>
 #include <cplusplus_basic.hpp>
 #include <containers/string.hpp>
 
 namespace  baidu {
+
+static inline std::regex operator""_stdr(const char * a,std::size_t b) {
+    return{a,b};
+}
 
 static inline QString operator""_qstr(const char *a,std::size_t b) {
     return QString::fromUtf8(a,static_cast<int>(b));
@@ -78,6 +83,9 @@ class _PrivateBaiduStaticData {
 public:
     _PrivateBaiduStaticData();
 public:
+    const std::regex token_check =u8R"///([0-9a-zA-Z]+)///"_stdr ;
+    const QLatin1String zero="0"_qls;
+    const QByteArray baidu_token_url=u8R"(https://passport.baidu.com/v2/api/?getapi)"_qba;
     const QString baidu_login_url="https://www.baidu.com/cache/user/html/login-1.2.html"_qstr;
     const QByteArray userAgent="Mozilla/5.0 (Windows NT 10.0; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0"_qba;
     const QByteArray key_user_agent="User-Agent"_qba;

@@ -39,7 +39,9 @@ public:
    void setState(BaiduUserState);
 
    static QByteArray gid();
+   static QByteArray currentTime();
 
+   bool isLogin()const;
 public:
     Q_SIGNAL void stateChanged(int);
     Q_SIGNAL void loginFinished(bool,const QString &);
