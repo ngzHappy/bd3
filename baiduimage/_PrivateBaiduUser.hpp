@@ -72,12 +72,18 @@ public:
     virtual ~_PrivateBaiduUser();
 
     void construct(std::shared_ptr<QSingleThreadPool> &&,BaiduUser *);
-    void createNetworkAccessManager();
-
+   
     using NetworkAccessManager=_PrivateBaiduUserNetworkAccessManager;
-    std::shared_ptr<QObjectsWatcher> $m$watcherNetworkAccessManager;
-    std::shared_ptr<QSingleThreadPool> $m$threadPool;
-    NetworkAccessManager * $m$networkAccessManager=nullptr;
+    /*线程共享数据*/
+    class ExternData {
+    public:
+        std::shared_ptr<QObjectsWatcher> $m$watcherNetworkAccessManager;
+        std::shared_ptr<QSingleThreadPool> $m$threadPool;
+        NetworkAccessManager * $m$networkAccessManager=nullptr;
+        void createNetworkAccessManager();
+    };
+    std::shared_ptr<ExternData> $m$externData;
+    /*线程独占数据*/
     BaiduUser::BaiduUserState $m$state=BaiduUser::BaiduUserState::StateNone;
     QByteArray $m$gid;
     QByteArray $m$token;

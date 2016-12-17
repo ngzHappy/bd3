@@ -37,8 +37,9 @@ BaiduUser::~BaiduUser() {
 void _PrivateBaiduUser::construct(
         std::shared_ptr<QSingleThreadPool> &&arg,
         BaiduUser *) {
-    $m$threadPool=std::move(arg);
-    $m$watcherNetworkAccessManager=QObjectsWatcher::instance();
+    $m$externData=memory::make_shared<ExternData>();
+    $m$externData->$m$threadPool=std::move(arg);
+    $m$externData->$m$watcherNetworkAccessManager=QObjectsWatcher::instance();
 }
 
 QNetworkReply *_PrivateBaiduUserNetworkAccessManager::createRequest(
@@ -50,12 +51,12 @@ QNetworkReply *_PrivateBaiduUserNetworkAccessManager::createRequest(
     return std::move(ans);
 }
 
-void _PrivateBaiduUser::createNetworkAccessManager() {
+void _PrivateBaiduUser::ExternData::createNetworkAccessManager() {
     if ($m$networkAccessManager) { return; }
     assert($m$threadPool->getQThread()==QThread::currentThread());
-    $m$networkAccessManager=
-        new NetworkAccessManager($m$watcherNetworkAccessManager.get());
-    QObject::connect($m$watcherNetworkAccessManager.get(),
+    auto watcher=$m$watcherNetworkAccessManager.get();
+    $m$networkAccessManager= new NetworkAccessManager(watcher);
+    QObject::connect( watcher ,
                       &QObjectsWatcher::finished,
                       $m$networkAccessManager,
                       &NetworkAccessManager::deleteLater,
@@ -104,11 +105,13 @@ public:
     QString $m$userName/*用户名*/;
     QString $m$passWordRaw/*密码明文*/;
     QSingleThreadPool * $m$singleThreadPool=nullptr;
+    _PrivateBaiduUserNetworkAccessManager * $m$networkAccessManager=nullptr;
     std::weak_ptr<BaiduPrivateBasic> $m$superPrivate/*回调结构的观察者*/;
+    std::shared_ptr<_PrivateBaiduUser::ExternData> $m$superExternData/*来自父对象的线程共享数据*/;
     /*output by signal*/
     QString $m$errorString=getBaiduStaticData()->unknow_error/*错误值*/;
 
-    inline std::shared_ptr<_PrivateBaiduUser> lock();
+    inline bool expired() const;
     inline void finished_success();
     inline void finished_error();
     inline void create_networkaccessmanager();
@@ -223,8 +226,7 @@ public:
 static memory::StaticData<StaticData_postLogin> staticData_postLogin;
 inline void Login::post_login() try {
     StateMachine varStateMachine{ this,state_encrypt_RSA };
-    auto varUserPrivate=this->lock();
-    if (!varUserPrivate) { return; }
+    if (this->expired()) { return; }
 
     auto varSTD=getBaiduStaticData();
     static memory::StaticPointer<StaticData_postLogin>
@@ -300,7 +302,7 @@ inline void Login::post_login() try {
     req.setRawHeader(varPsd->key_Content_Type,varPsd->value_Content_Type);
     req.setRawHeader(varPsd->key_Accept_Encoding,varPsd->value_Accept_Encoding);
 
-    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->post(req,varPostData);
 
     varReply->connect(varReply,&QNetworkReply::finished,
@@ -403,8 +405,7 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     varReply->deleteLater();
     StateMachine varStateMachine{ this,state_encrypt_RSA };
 
-    auto varUserPrivate=this->lock();
-    if (!varUserPrivate) { return; }
+    if (this->expired()) { return; }
 
     auto varReplyData=varReply->readAll();
 
@@ -443,11 +444,11 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     }
     else {
         if (varAns.isOk==false) {
-             return varStateMachine.error_return(varAns.errorString);
+            return varStateMachine.error_return(varAns.errorString);
         }
     }
-    
-    return varStateMachine.normal_return( state_success );
+
+    return varStateMachine.normal_return(state_success);
 
 }
 catch (...) {
@@ -456,7 +457,7 @@ catch (...) {
 
 inline void Login::encrypt_RSA() try {
     StateMachine varStateMachine{ this,state_encrypt_RSA };
-    if ($m$superPrivate.expired()) { return; }
+    if (expired()) { return; }
 
     using Botan::byte;
     using Botan::Public_Key;
@@ -492,8 +493,7 @@ catch (...) {
 
 inline void Login::get_rsa_key() try {
     StateMachine varStateMachine{ this,state_get_rsa_key };
-    auto varUserPrivate=this->lock();
-    if (!varUserPrivate) { return; }
+    if (this->expired()) { return; }
     auto varSTD=getBaiduStaticData();
     QUrl varURL;
     {
@@ -524,7 +524,7 @@ inline void Login::get_rsa_key() try {
     req.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
     req.setRawHeader(varSTD->key_cccept_encoding,varSTD->gzip_deflate);
 
-    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(req);
 
     varReply->connect(varReply,&QNetworkReply::finished,
@@ -532,8 +532,7 @@ inline void Login::get_rsa_key() try {
         try {
             varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_get_rsa_key };
-            auto varUserPrivate=var->lock();
-            if (!varUserPrivate) { return; }
+            if (var->expired()) { return; }
             auto varSTD=getBaiduStaticData();
 
             auto varJson=varReply->readAll();
@@ -561,7 +560,7 @@ inline void Login::get_rsa_key() try {
                 clear_data(varReply);
             }
 
-            auto networkAM=varUserPrivate->$m$networkAccessManager;
+            auto networkAM=var->$m$networkAccessManager;
             auto jsEngine=networkAM->getJSEngine();
 
             {
@@ -618,8 +617,7 @@ catch (...) {
 
 inline void Login::get_baidu_token() try {
     StateMachine varStateMachine{ this,state_get_baidu_token };
-    auto varUserPrivate=this->lock();
-    if (!varUserPrivate) { return; }
+    if (this->expired()) { return; }
     auto varSTD=getBaiduStaticData();
     QUrl varUrl;
     {/*set url*/
@@ -643,7 +641,7 @@ inline void Login::get_baidu_token() try {
         varUrl.setUrl(varTmpUrl);
     }
 
-    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    auto networkAM=this->$m$networkAccessManager;
     QNetworkRequest varRequest(varUrl);
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
 
@@ -653,8 +651,7 @@ inline void Login::get_baidu_token() try {
         varReply->deleteLater();
         StateMachine varStateMachine{ var.get(),state_get_baidu_token };
         try {
-            auto varUserPrivate=var->lock();
-            if (!varUserPrivate) { return; }
+            if (var->expired()) { return; }
 
             auto varJson=varReply->readAll();
 
@@ -681,7 +678,7 @@ inline void Login::get_baidu_token() try {
                 clear_data(varReply);
             }
 
-            auto networkAM=varUserPrivate->$m$networkAccessManager;
+            auto networkAM=var->$m$networkAccessManager;
             auto jsEngine=networkAM->getJSEngine();
 
             {/*获得token*/
@@ -738,12 +735,11 @@ catch (...) {
 /*the cookie has been set in cookiejar*/
 inline void Login::get_baidu_login_cookie() try {
     StateMachine varStateMachine{ this,state_getbaidu_login_cookie };
-    auto varUserPrivate=this->lock();
-    if (!varUserPrivate) { return; }
+    if (this->expired()) { return; }
     auto varSTD=getBaiduStaticData();
     QNetworkRequest varRequest{ varSTD->baidu_login_url };
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
-    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
         [var=this->shared_from_this(),varReply]() {
@@ -769,12 +765,11 @@ catch (...) {
 /*the cookie has been set in cookiejar*/
 inline void Login::get_baidu_cookie() try {
     StateMachine varStateMachine{ this,state_getbaidu_cookie };
-    auto varUserPrivate=this->lock();
-    if (!varUserPrivate) { return; }
+    if (this->expired()) { return; }
     auto varSTD=getBaiduStaticData();
     QNetworkRequest varRequest{ varSTD->baidu_url };
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
-    auto networkAM=varUserPrivate->$m$networkAccessManager;
+    auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
         [var=this->shared_from_this(),varReply]() {
@@ -797,51 +792,46 @@ catch (...) {
     CPLUSPLUS_EXCEPTION(false);
 }
 
-inline std::shared_ptr<_PrivateBaiduUser> Login::lock() {
-    if (QObjectsWatcher::isQAppQuited()) { return{}; }
-    auto ans=$m$superPrivate.lock();
-    if (ans) {
-        return std::static_pointer_cast<_PrivateBaiduUser>(std::move(ans));
-    }
-    return{};
+inline bool Login::expired() const {
+    if (QObjectsWatcher::isQAppQuited()) { return true; }
+    return $m$superPrivate.expired();
 }
 
 inline void Login::finished_success() {
     $m$isFinishedCalled=true;
-    if ($m$superPrivate.expired()) { return; }
+    if (this->expired()) { return; }
     this->finished(true,{});
 }
 
 inline void Login::finished_error() {
     $m$isFinishedCalled=true;
-    if ($m$superPrivate.expired()) { return; }
+    if (this->expired()) { return; }
     this->finished(false,$m$errorString);
 }
 
 /*尽量增加异步性，提高响应速度*/
 inline void Login::do_next() try {
-    auto varPrivateData=$m$superPrivate.lock();
-    if (varPrivateData) {
-        switch ($m$nextState) {
-            case state_create_networkaccessmanager:return $m$singleThreadPool->runLambda(
-                            [var=this->shared_from_this()](){var->create_networkaccessmanager(); });
-            case state_waiting:break;
-            case state_error:finished_error(); break;
-            case state_success:finished_success(); break;
-            case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
-                [var=this->shared_from_this()](){var->get_baidu_cookie(); });
-            case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
-                [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
-            case state_get_baidu_token:return $m$singleThreadPool->runLambda(
-                [var=this->shared_from_this()](){var->get_baidu_token(); });
-            case state_get_rsa_key:return $m$singleThreadPool->runLambda(
-                [var=this->shared_from_this()](){var->get_rsa_key(); });
-            case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
-                [var=this->shared_from_this()](){var->encrypt_RSA(); });
-            case state_post_login:return $m$singleThreadPool->runLambda(
-                [var=this->shared_from_this()](){var->post_login(); });
-        }
+    if (this->expired()) { return; }
+    switch ($m$nextState) {
+        case state_create_networkaccessmanager:return $m$singleThreadPool->runLambda(
+                        [var=this->shared_from_this()](){var->create_networkaccessmanager(); });
+        case state_waiting:break;
+        case state_error:finished_error(); break;
+        case state_success:finished_success(); break;
+        case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->get_baidu_cookie(); });
+        case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
+        case state_get_baidu_token:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->get_baidu_token(); });
+        case state_get_rsa_key:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->get_rsa_key(); });
+        case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->encrypt_RSA(); });
+        case state_post_login:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->post_login(); });
     }
+
 
 }
 catch (...) {
@@ -850,24 +840,22 @@ catch (...) {
 
 inline void Login::create_networkaccessmanager()try {
     StateMachine varStateMachine{ this,state_create_networkaccessmanager };
-    auto varPrivateData=$m$superPrivate.lock();
-    if (varPrivateData) {
-        assert($m$singleThreadPool->getQThread()==QThread::currentThread());
-        $m$singleThreadPool->runLambda([var=this->shared_from_this()](){
-            StateMachine varStateMachine{ var.get(),state_create_networkaccessmanager };
-            try {
-                auto varPrivateData=var->lock();
-                if (varPrivateData) {
-                    varPrivateData->createNetworkAccessManager();
-                    return varStateMachine.normal_return(state_getbaidu_cookie);
-                }
-            }
-            catch (...) {
-                CPLUSPLUS_EXCEPTION(false);
-            }
-        });
-        return varStateMachine.normal_return(state_waiting);
-    }
+    if (this->expired()) { return; }
+    assert($m$singleThreadPool->getQThread()==QThread::currentThread());
+    $m$singleThreadPool->runLambda([var=this->shared_from_this()](){
+        StateMachine varStateMachine{ var.get(),state_create_networkaccessmanager };
+        try {
+            if (var->expired()) { return; }
+            var->$m$superExternData->createNetworkAccessManager();
+            var->$m$networkAccessManager=var->$m$superExternData->$m$networkAccessManager;
+            return varStateMachine.normal_return(state_getbaidu_cookie);
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    });
+    return varStateMachine.normal_return(state_waiting);
+
 }
 catch (...) {
     CPLUSPLUS_EXCEPTION(false);
@@ -896,10 +884,11 @@ void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
     /*初始化登陆器*/
     auto varLogin=memory::make_shared<_private_login::Login>();
     varLogin->$m$externAns=memory::make_shared<_private_login::Login::ExternAns>();
+    varLogin->$m$superExternData=getPrivateData()->$m$externData;
     varLogin->$m$userName=argUserName;
     varLogin->$m$passWordRaw=argPassWord;
     varLogin->$m$superPrivate=this->$m$thisp;
-    varLogin->$m$singleThreadPool=getPrivateData()->$m$threadPool.get();
+    varLogin->$m$singleThreadPool=getPrivateData()->$m$externData->$m$threadPool.get();
     varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()?
         BaiduUser::gid():thisp->$m$gid;
 

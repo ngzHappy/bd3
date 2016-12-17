@@ -12,7 +12,6 @@ QT_BASICSHARED_EXPORT void beginDestructQApplication();
 QT_BASICSHARED_EXPORT void endDestructQApplication();
 }/*qappwatcher*/
 
-
 template<typename _T_>
 class QApplicationWatcher{
     _T_ * _p_application;
