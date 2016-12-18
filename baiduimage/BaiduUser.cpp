@@ -265,7 +265,7 @@ public:
 
 static memory::StaticData<StaticData_postLogin> staticData_postLogin;
 inline void Login::post_login() try {
-    StateMachine varStateMachine{ this,state_encrypt_RSA };
+    StateMachine varStateMachine{ this,state_post_login };
     if (this->expired()) { return; }
 
     auto varSTD=getBaiduStaticData();
@@ -443,7 +443,7 @@ static void parserPostLoginJS(
 inline void Login::post_login_finished(QNetworkReply *varReply,
     const StaticData_postLogin*varPsd) try {
     varReply->deleteLater();
-    StateMachine varStateMachine{ this,state_encrypt_RSA };
+    StateMachine varStateMachine{ this,state_post_login };
 
     if (this->expired()) { return; }
 

@@ -27,15 +27,20 @@ LoginTest::LoginTest(QWidget *parent):
 
 LoginTest::~LoginTest() {
     delete ui;
+    delete baiduUser;
 }
 
 void LoginTest::on_login_clicked() {
-    baiduUser->login(
-    ui->userName->text(),
-    ui->passWord->text(),
-    ui->vertifyCode->text()
-    );
+    if (baiduUser) {
+        baiduUser->login(
+        ui->userName->text(),
+        ui->passWord->text(),
+        ui->vertifyCode->text()
+        );
+    }
 }
+
+
 
 
 
