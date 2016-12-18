@@ -173,20 +173,14 @@ public:
         ~StateMachine() {
             $m$thisp->do_next();
         }
+
+        Login * operator->() { return $m$thisp; }
+        const Login * operator->() const { return $m$thisp; }
     };
 
 private:
     CPLUSPLUS_OBJECT(Login)
 };
-
-inline void Login::get_verifycode_image() {
-    StateMachine varStateMachine{ this,state_get_verifycode_image };
-    if (this->expired()) { return; }
-
-    QNetworkRequest req(QUrl($m$externAns->$m$verifycode_url));
-
-    return varStateMachine.normal_return(state_waiting);
-}
 
 class StaticData_postLogin final {
 public:
@@ -854,8 +848,7 @@ inline void Login::do_next() try {
             [var=this->shared_from_this()](){var->get_verifycode_image(); });
         case state_verifycode:finished_verifycode(); break;
     }
-
-
+    
 }
 catch (...) {
     CPLUSPLUS_EXCEPTION(false);
@@ -879,6 +872,44 @@ inline void Login::create_networkaccessmanager()try {
     });
     return varStateMachine.normal_return(state_waiting);
 
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
+}
+
+inline void Login::get_verifycode_image()try {
+    StateMachine varStateMachine{ this,state_get_verifycode_image };
+    if (this->expired()) { return; }
+
+    QNetworkRequest req(QUrl($m$externAns->$m$verifycode_url));
+
+    auto networkAM=this->$m$networkAccessManager;
+    auto varReply=networkAM->get(req);
+    varReply->connect(varReply,&QNetworkReply::finished,[
+        var=this->shared_from_this(),varReply]() {
+            try {
+                varReply->deleteLater();
+                StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
+
+                QImage varImage;
+                {
+                    auto varImageData=varReply->readAll();
+                    varImage=QImage::fromData(varImageData);
+                }
+
+                if ((varImage.width()<1)||(varImage.height()<1)) {
+                    return varStateMachine.error_return(u8R"///(获取验证码图像错误)///"_qstr);
+                }
+
+                var->$m$externAns->$m$verifycode_image=std::move(varImage);
+                return varStateMachine.normal_return(state_verifycode);
+            }
+            catch (...) {
+                CPLUSPLUS_EXCEPTION(false);
+            }
+        });
+
+    return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
     CPLUSPLUS_EXCEPTION(false);
