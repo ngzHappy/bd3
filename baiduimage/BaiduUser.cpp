@@ -1,6 +1,7 @@
 ﻿#include <cassert>
 #include <text/gzip.hpp>
 #include "BaiduUser.hpp"
+#include <QtGui/qimage.h>
 #include <QtCore/qthread.h>
 #include <QtCore/qobject.h>
 #include "_PrivateBaiduUser.hpp"
@@ -99,6 +100,8 @@ public:
         QByteArray $m$passWord;
         QByteArray $m$verifycode;
         QByteArray $m$codestring;
+        QByteArray $m$verifycode_url;
+        QImage $m$verifycode_image;
     };
     std::shared_ptr<ExternAns> $m$externAns;
     /*input*/
@@ -122,6 +125,7 @@ public:
     inline void encrypt_RSA();
     inline void post_login();
     inline void post_login_finished(QNetworkReply *,const StaticData_postLogin*);
+    inline void get_verifycode_image();
 
     inline void do_next();
 
@@ -136,6 +140,7 @@ public:
         state_get_rsa_key,
         state_encrypt_RSA,
         state_post_login,
+        state_get_verifycode_image,
     };
     State $m$state=state_create_networkaccessmanager;
     State $m$nextState=state_create_networkaccessmanager;
@@ -171,6 +176,11 @@ public:
 private:
     CPLUSPLUS_OBJECT(Login)
 };
+
+inline void Login::get_verifycode_image() {
+    StateMachine varStateMachine{ this,state_get_verifycode_image };
+    if (this->expired()) { return; }
+}
 
 class StaticData_postLogin final {
 public:
@@ -433,14 +443,11 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     PostLoginJSParserAns varAns;
     parserPostLoginJS(varJS,varPsd,&varAns);
 
-
     if (varAns.VertifyCodeUrl.isEmpty()==false) {
-        /*this->_m_vertifycodeurl=std::move(varAns.VertifyCodeUrl);
-        this->_m_codestring=std::move(varAns.VertifyCodeID);
-        this->_m_vcodetype=std::move(varAns.vcodetype);
-        this->loginStepNext=s_error;
-        errorString=std::move(varAns.errorString);
-        break;*/
+        auto & externAns=*$m$externAns;
+        externAns.$m$codestring=std::move(varAns.VertifyCodeID);
+        externAns.$m$verifycode_url=std::move(varAns.VertifyCodeUrl);
+        return varStateMachine.normal_return(state_get_verifycode_image);
     }
     else {
         if (varAns.isOk==false) {
@@ -830,6 +837,8 @@ inline void Login::do_next() try {
             [var=this->shared_from_this()](){var->encrypt_RSA(); });
         case state_post_login:return $m$singleThreadPool->runLambda(
             [var=this->shared_from_this()](){var->post_login(); });
+        case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
+            [var=this->shared_from_this()](){var->get_verifycode_image(); });
     }
 
 
