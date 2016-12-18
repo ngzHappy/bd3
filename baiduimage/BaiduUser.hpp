@@ -45,7 +45,7 @@ public:
 public:
     Q_SIGNAL void stateChanged(int);
     Q_SIGNAL void loginFinished(bool,const QString &,const QImage &);
-    void login(const QString &,const QString &);
+    void login(const QString &,const QString &,const QString&/**/={});
 
     _PrivateBaiduUser * getPrivateData()const{
         return reinterpret_cast<_PrivateBaiduUser *>($m$thisp.get());

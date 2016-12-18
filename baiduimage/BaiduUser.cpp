@@ -102,6 +102,7 @@ public:
         QByteArray $m$codestring;
         QByteArray $m$verifycode_url;
         QImage $m$verifycode_image;
+        bool $m$isBaiduAsked;
     };
     std::shared_ptr<ExternAns> $m$externAns;
     /*input*/
@@ -444,6 +445,7 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     parserPostLoginJS(varJS,varPsd,&varAns);
 
     if (varAns.VertifyCodeUrl.isEmpty()==false) {
+        /*需要验证码*/
         auto & externAns=*$m$externAns;
         externAns.$m$codestring=std::move(varAns.VertifyCodeID);
         externAns.$m$verifycode_url=std::move(varAns.VertifyCodeUrl);
@@ -451,6 +453,7 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     }
     else {
         if (varAns.isOk==false) {
+            /*登陆失败*/
             return varStateMachine.error_return(varAns.errorString);
         }
     }
@@ -743,6 +746,12 @@ catch (...) {
 inline void Login::get_baidu_login_cookie() try {
     StateMachine varStateMachine{ this,state_getbaidu_login_cookie };
     if (this->expired()) { return; }
+
+    /*如果已经访问过www.baidu.com则跳过*/
+    if (this->$m$externAns->$m$isBaiduAsked) {
+        return varStateMachine.normal_return(state_get_baidu_token);
+    }
+
     auto varSTD=getBaiduStaticData();
     QNetworkRequest varRequest{ varSTD->baidu_login_url };
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
@@ -819,7 +828,7 @@ inline void Login::finished_error() {
 inline void Login::finished_verifycode() {
     $m$isFinishedCalled=true;
     if (this->expired()) { return; }
-    this->finished(false,u8R"///(验证码)///"_qstr,
+    this->finished(false,u8R"///(请输入验证码)///"_qstr,
         $m$externAns->$m$verifycode_image);
 }
 
@@ -848,7 +857,7 @@ inline void Login::do_next() try {
             [var=this->shared_from_this()](){var->get_verifycode_image(); });
         case state_verifycode:finished_verifycode(); break;
     }
-    
+
 }
 catch (...) {
     CPLUSPLUS_EXCEPTION(false);
@@ -907,7 +916,7 @@ inline void Login::get_verifycode_image()try {
                         varImageData=text::ungzip(varImageData.cbegin(),
                             varImageData.cend());
                     }
-                    
+
                     varImage=QImage::fromData(varImageData);
                 }
 
@@ -938,7 +947,9 @@ catch (...) {
 
 namespace baidu {
 
-void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
+void BaiduUser::login(const QString &argUserName,
+    const QString &argPassWord,
+    const QString & argVertifyCode) {
 
     auto thisp=getPrivateData();
     {/*如果已经登陆，则退出；如果正在执行其他行为，则退出；*/
@@ -959,6 +970,12 @@ void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
     varLogin->$m$singleThreadPool=getPrivateData()->$m$externData->$m$threadPool.get();
     varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()?
         BaiduUser::gid():thisp->$m$gid;
+    varLogin->$m$externAns->$m$isBaiduAsked=thisp->$m$isBaiduAsked;
+    varLogin->$m$externAns->$m$codestring=thisp->$m$vertifyCodeString;
+    if (argVertifyCode.isEmpty()==false) {
+        varLogin->$m$externAns->$m$verifycode=
+            argVertifyCode.toUtf8().toPercentEncoding();
+    }
 
     /*连接信号槽*/
     /*同步更新数据*/
@@ -968,7 +985,9 @@ void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
         auto thisp=getPrivateData();
         thisp->$m$gid=externAns->$m$gid;
         thisp->$m$token=externAns->$m$token;
+        thisp->$m$vertifyCodeString=externAns->$m$codestring;
         thisp->$m$isLogin=a;
+        thisp->$m$isBaiduAsked=externAns->$m$isBaiduAsked;
         this->setState(BaiduUser::BaiduUserState::StateNone);
         this->loginFinished(a,b,c);
     },Qt::QueuedConnection);

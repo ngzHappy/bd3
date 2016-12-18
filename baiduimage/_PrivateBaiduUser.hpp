@@ -85,9 +85,11 @@ public:
     std::shared_ptr<ExternData> $m$externData;
     /*线程独占数据*/
     BaiduUser::BaiduUserState $m$state=BaiduUser::BaiduUserState::StateNone;
-    QByteArray $m$gid;
-    QByteArray $m$token;
+    QByteArray $m$gid/*gid*/;
+    QByteArray $m$token/*token*/;
+    QByteArray $m$vertifyCodeString/*验证码ID*/;
     std::atomic<bool> $m$isLogin={false};
+    bool $m$isBaiduAsked=false;
 private:
     CPLUSPLUS_OBJECT(_PrivateBaiduUser)
 };
