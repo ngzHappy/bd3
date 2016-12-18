@@ -1,6 +1,7 @@
 ﻿#include <cassert>
 #include <text/gzip.hpp>
 #include "BaiduUser.hpp"
+#include "BaiduImage.hpp"
 #include <QtGui/qimage.h>
 #include <QtCore/qthread.h>
 #include <QtCore/qobject.h>
@@ -1077,47 +1078,6 @@ namespace baidu {
 namespace {
 namespace _private_baidu_image {
 
-/***
-w: 'a',
-k: 'b',
-v: 'c',
-1: 'd',
-j: 'e',
-u: 'f',
-2: 'g',
-i: 'h',
-t: 'i',
-3: 'j',
-h: 'k',
-s: 'l',
-4: 'm',
-g: 'n',
-5: 'o',
-r: 'p',
-q: 'q',
-6: 'r',
-f: 's',
-p: 't',
-7: 'u',
-e: 'v',
-o: 'w',
-8: '1',
-d: '2',
-n: '3',
-9: '4',
-c: '5',
-m: '6',
-0: '7',
-b: '8',
-l: '9',
-a: '0',
-
-_z2C$q   :
-_z&e3B   '
-AzdH3F  /
-
-***/
-
 std::pair<char *,char *> uncompress_baidu_image(char * begin,const char * const end) {
     if (false==(end>begin)) { return{ nullptr,nullptr }; }
 
@@ -1327,8 +1287,58 @@ std::pair<char *,char *> uncompress_baidu_image(char * begin,const char * const 
 
 }
 
+class DownLoadBaiduImage :
+    public DoBaiduUserObject,
+    public std::enable_shared_from_this<DownLoadBaiduImage>{
+public:
+
+    enum State {
+        state_waiting,
+        state_finished,
+        state_error,
+        state_start,
+        state_downlod,
+    };
+
+    inline void do_next();
+
+    QString $m$errorString;
+
+    inline void finished_success();
+    inline void finished_error();
+    inline void start_download();
+    inline void next_download();
+
+private:
+    CPLUSPLUS_OBJECT(DownLoadBaiduImage)
+};
+
+inline void DownLoadBaiduImage::do_next() {
+}
+
+inline void DownLoadBaiduImage::finished_success() {
+}
+
+inline void DownLoadBaiduImage::finished_error() {
+}
+
+inline void DownLoadBaiduImage::start_download() {
+}
+
+inline void DownLoadBaiduImage::next_download() {
+}
+
 }/*_private_baidu_image*/
 }/*namespace*/
+
+void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg){
+    if(arg==nullptr){return;}
+    auto varImagesDownLoad=memory::make_shared<_private_baidu_image::DownLoadBaiduImage>();
+    
+
+
+    return varImagesDownLoad->do_next();
+}
 
 std::pair<char*,char *> BaiduUser::uncompressBaiduImageUrl(char*a,const char *const b) {
     return _private_baidu_image::uncompress_baidu_image(a,b);

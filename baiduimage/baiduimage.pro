@@ -19,7 +19,8 @@ HEADERS  += MainWindow.hpp \
     BaiduUser.hpp \
     _PrivateBaiduUser.hpp \
     _PrivateBaiduStaticData.hpp \
-    LoginTest.hpp
+    LoginTest.hpp \
+    BaiduImage.hpp
 
 FORMS    += MainWindow.ui \
     LoginTest.ui
