@@ -63,10 +63,10 @@ void _PrivateBaiduUser::ExternData::createNetworkAccessManager() {
     auto watcher=$m$watcherNetworkAccessManager.get();
     $m$networkAccessManager=new NetworkAccessManager(watcher);
     QObject::connect(watcher,
-                      &QObjectsWatcher::finished,
-                      $m$networkAccessManager,
-                      &NetworkAccessManager::deleteLater,
-                      Qt::QueuedConnection);
+                     &QObjectsWatcher::finished,
+                     $m$networkAccessManager,
+                     &NetworkAccessManager::deleteLater,
+                     Qt::QueuedConnection);
     $m$threadPool->addWatcher($m$networkAccessManager);
 }
 
@@ -297,41 +297,41 @@ inline void Login::post_login() try {
             QByteArray::number(9900+(std::rand()&511));
         /*构建临时对象缓存数据*/
         const auto varTmpPostData=cat_to_url(
-            "staticpage",staticPage,
-            "charset","utf-8",
-            "token",externData.$m$token,
-            "tpl","mn",
-            "subpro","",
-            "apiver","v3",
-            "tt",tt,
-            "codestring",externData.$m$codestring/*验证码id*/,
-            "safeflg",safeflg,
-            "u",u,
-            "isPhone","false",
-            "detect",detect,
-            "gid",externData.$m$gid,
-            "quick_user",quick_user,
-            "logintype",loginType,
-            "logLoginType",logLoginType,
-            "idc","",
-            "loginmerge",loginmerge,
-            "splogin",splogin,
-            "username",varUserName,
-            "password",externData.$m$passWord,
-            "verifycode",externData.$m$verifycode/*验证码*/,
-            "mem_pass",memberPass,
-            "rsakey",externData.$m$rsaKeyIndex,
-            "crypttype","12",
-            "ppui_logintime",ppui_logintime,
-            "countrycode","",
-            "callback","parent.bd__pcbs__s09032"
+                    "staticpage",staticPage,
+                    "charset","utf-8",
+                    "token",externData.$m$token,
+                    "tpl","mn",
+                    "subpro","",
+                    "apiver","v3",
+                    "tt",tt,
+                    "codestring",externData.$m$codestring/*验证码id*/,
+                    "safeflg",safeflg,
+                    "u",u,
+                    "isPhone","false",
+                    "detect",detect,
+                    "gid",externData.$m$gid,
+                    "quick_user",quick_user,
+                    "logintype",loginType,
+                    "logLoginType",logLoginType,
+                    "idc","",
+                    "loginmerge",loginmerge,
+                    "splogin",splogin,
+                    "username",varUserName,
+                    "password",externData.$m$passWord,
+                    "verifycode",externData.$m$verifycode/*验证码*/,
+                    "mem_pass",memberPass,
+                    "rsakey",externData.$m$rsaKeyIndex,
+                    "crypttype","12",
+                    "ppui_logintime",ppui_logintime,
+                    "countrycode","",
+                    "callback","parent.bd__pcbs__s09032"
         );
 
         auto varPostSize=static_cast<int>(varTmpPostData.size())-1;
         varPostData.reserve(varPostSize+4);
         /*去掉第一个&*/
         varPostData.append(varTmpPostData.data()+1,
-            varPostSize);
+                           varPostSize);
     }
 
     QNetworkRequest req(varPsd->url);
@@ -346,8 +346,8 @@ inline void Login::post_login() try {
     auto varReply=networkAM->post(req,varPostData);
 
     varReply->connect(varReply,&QNetworkReply::finished,
-        [var=this->shared_from_this(),varReply,
-        varPsd=varPsd.pointer()]() {
+                      [var=this->shared_from_this(),varReply,
+                      varPsd=varPsd.pointer()]() {
         var->post_login_finished(varReply,varPsd);
     });
 
@@ -368,9 +368,9 @@ public:
 };
 
 static void parserPostLoginJS(
-    const gumbo::string&varJS,
-    const StaticData_postLogin*varPSD,
-    PostLoginJSParserAns*varAns
+        const gumbo::string&varJS,
+        const StaticData_postLogin*varPSD,
+        PostLoginJSParserAns*varAns
 ) {
     int varErrorNO=0;
     do {
@@ -389,13 +389,13 @@ static void parserPostLoginJS(
                     if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
                         code_string,varPSD->code_string_regex)) {
                         varAns->VertifyCodeID=QByteArray(code_string[1].first,
-                            static_cast<int>(code_string[1].length()));
+                                static_cast<int>(code_string[1].length()));
                         varAns->VertifyCodeUrl=varPSD->code_string_url
                             +varAns->VertifyCodeID;
                         if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
                             code_string,varPSD->vcodetype_regex)) {
                             auto varTmp=QByteArray(code_string[1].first,
-                                static_cast<int>(code_string[1].length()));
+                                    static_cast<int>(code_string[1].length()));
 #ifndef NDEBUG
                             QJSEngine test_eng;
                             auto check_test=test_eng.evaluate(u8R"(")"+varTmp+u8R"(")").toString();
@@ -405,7 +405,7 @@ static void parserPostLoginJS(
                                 .toPercentEncoding();
 #ifndef NDEBUG
                             assert(check_test.toUtf8().toPercentEncoding()
-                                ==varAns->vcodetype);
+                                   ==varAns->vcodetype);
 #endif
                         }
                         varAns->errorString=u8"请输入验证码"_qstr;
@@ -441,7 +441,7 @@ static void parserPostLoginJS(
 }
 
 inline void Login::post_login_finished(QNetworkReply *varReply,
-    const StaticData_postLogin*varPsd) try {
+                                       const StaticData_postLogin*varPsd) try {
     varReply->deleteLater();
     StateMachine varStateMachine{ this,state_post_login };
 
@@ -511,7 +511,7 @@ inline void Login::encrypt_RSA() try {
     PK_Encryptor_EME en(*publicKey,varSTD->EME_PKCS1_v1_5);
     const auto varPassWord=this->$m$passWordRaw.toUtf8();
     auto ans=en.encrypt((const byte*)varPassWord.data(),
-        varPassWord.size(),rng);
+                        varPassWord.size(),rng);
 
     if (ans.size()<1) {
         return varStateMachine.error_return(u8R"///(encrypt is null)///"_qls);
@@ -541,18 +541,18 @@ inline void Login::get_rsa_key() try {
         const auto && tt=BaiduUser::currentTime();
 
         auto urlData=cat_to_url(
-            "tpl","mn",
-            "apiver","v3",
-            "tt",tt,
-            "class","login",
-            "gid",gid,
-            "callback","bd__cbs__dmwxux");
+                    "tpl","mn",
+                    "apiver","v3",
+                    "tt",tt,
+                    "class","login",
+                    "gid",gid,
+                    "callback","bd__cbs__dmwxux");
 
         QByteArray varTmpUrl;
         varTmpUrl.reserve(4
-            +varSTD->baidu_rsa_url.size()
-            +token.size()
-            +static_cast<int>(urlData.size()));
+                          +varSTD->baidu_rsa_url.size()
+                          +token.size()
+                          +static_cast<int>(urlData.size()));
         varTmpUrl.append(varSTD->baidu_rsa_url);
         varTmpUrl.append(token);
         varTmpUrl.append(urlData.c_str(),static_cast<int>(urlData.size()));
@@ -567,7 +567,7 @@ inline void Login::get_rsa_key() try {
     auto varReply=networkAM->get(req);
 
     varReply->connect(varReply,&QNetworkReply::finished,
-        [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() {
         try {
             varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_get_rsa_key };
@@ -663,18 +663,18 @@ inline void Login::get_baidu_token() try {
         const auto && tt=BaiduUser::currentTime();
         const auto & gid=this->$m$externAns->$m$gid;
         const auto url_=cat_to_url(
-            "tpl","mn",
-            "apiver","v3",
-            "tt",tt,
-            "class","login",
-            "gid",gid,
-            "logintype","dialogLogin",
-            "callback","bd__cbs__akwyzc"
+                    "tpl","mn",
+                    "apiver","v3",
+                    "tt",tt,
+                    "class","login",
+                    "gid",gid,
+                    "logintype","dialogLogin",
+                    "callback","bd__cbs__akwyzc"
         );
         QByteArray varTmpUrl;
         varTmpUrl.reserve(4
-            +varSTD->baidu_token_url.size()
-            +static_cast<int>(url_.size()));
+                          +varSTD->baidu_token_url.size()
+                          +static_cast<int>(url_.size()));
         varTmpUrl.append(varSTD->baidu_token_url);
         varTmpUrl.append(url_.c_str(),static_cast<int>(url_.size()));
         varUrl.setUrl(varTmpUrl);
@@ -686,7 +686,7 @@ inline void Login::get_baidu_token() try {
 
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-        [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() {
         varReply->deleteLater();
         StateMachine varStateMachine{ var.get(),state_get_baidu_token };
         try {
@@ -787,7 +787,7 @@ inline void Login::get_baidu_login_cookie() try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-        [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() {
         try {
             varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_getbaidu_login_cookie };
@@ -817,7 +817,7 @@ inline void Login::get_baidu_cookie() try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-        [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() {
         try {
             varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_getbaidu_cookie };
@@ -859,7 +859,7 @@ inline void Login::finished_verifycode() {
     $m$isFinishedCalled=true;
     if (this->expired()) { return; }
     this->finished(false,u8R"///(请输入验证码)///"_qstr,
-        $m$externAns->$m$verifycode_image);
+                   $m$externAns->$m$verifycode_image);
 }
 
 /*尽量增加异步性，提高响应速度*/
@@ -872,19 +872,19 @@ inline void Login::do_next() try {
         case state_error:finished_error(); break;
         case state_success:finished_success(); break;
         case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->get_baidu_cookie(); });
+                        [var=this->shared_from_this()](){var->get_baidu_cookie(); });
         case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
+                        [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
         case state_get_baidu_token:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->get_baidu_token(); });
+                        [var=this->shared_from_this()](){var->get_baidu_token(); });
         case state_get_rsa_key:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->get_rsa_key(); });
+                        [var=this->shared_from_this()](){var->get_rsa_key(); });
         case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->encrypt_RSA(); });
+                        [var=this->shared_from_this()](){var->encrypt_RSA(); });
         case state_post_login:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->post_login(); });
+                        [var=this->shared_from_this()](){var->post_login(); });
         case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
-            [var=this->shared_from_this()](){var->get_verifycode_image(); });
+                        [var=this->shared_from_this()](){var->get_verifycode_image(); });
         case state_verifycode:finished_verifycode(); break;
     }
 
@@ -945,7 +945,7 @@ inline void Login::get_verifycode_image()try {
                     /*解压gzip*/
                     if (qAsConst(varImageData)[0]==char(0x001F)) {
                         varImageData=text::ungzip(varImageData.cbegin(),
-                            varImageData.cend());
+                                                  varImageData.cend());
                     }
 
                     varImage=QImage::fromData(varImageData);
@@ -979,8 +979,8 @@ catch (...) {
 namespace baidu {
 
 void BaiduUser::login(const QString &argUserName,
-    const QString &argPassWord,
-    const QString & argVertifyCode) {
+                      const QString &argPassWord,
+                      const QString & argVertifyCode) {
 
     auto thisp=getPrivateData();
     {/*如果已经登陆，则退出；如果正在执行其他行为，则退出；*/
@@ -1002,10 +1002,10 @@ void BaiduUser::login(const QString &argUserName,
     varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()?
         BaiduUser::gid():thisp->$m$gid;
     varLogin->$m$externAns->$m$isBaiduAsked=thisp->$m$isBaiduAsked;
-    varLogin->$m$externAns->$m$codestring=thisp->$m$vertifyCodeString;
     if (argVertifyCode.isEmpty()==false) {
         varLogin->$m$externAns->$m$verifycode=
             argVertifyCode.toUtf8().toPercentEncoding();
+        varLogin->$m$externAns->$m$codestring=thisp->$m$vertifyCodeString;
     }
 
     /*连接信号槽*/
@@ -1046,7 +1046,7 @@ QByteArray BaiduUser::gid() {
         char data[35];
     public:
         Array():data{
-            toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
+                    toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
             toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
             toHex0[std::rand()&15], '-',toHex0[std::rand()&15],
             toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
@@ -1073,5 +1073,261 @@ QByteArray BaiduUser::currentTime() {
 
 }/*baidu*/
 
+namespace baidu {
+namespace {
+namespace _private_baidu_image {
 
+/***
+w: 'a',
+k: 'b',
+v: 'c',
+1: 'd',
+j: 'e',
+u: 'f',
+2: 'g',
+i: 'h',
+t: 'i',
+3: 'j',
+h: 'k',
+s: 'l',
+4: 'm',
+g: 'n',
+5: 'o',
+r: 'p',
+q: 'q',
+6: 'r',
+f: 's',
+p: 't',
+7: 'u',
+e: 'v',
+o: 'w',
+8: '1',
+d: '2',
+n: '3',
+9: '4',
+c: '5',
+m: '6',
+0: '7',
+b: '8',
+l: '9',
+a: '0',
+
+_z2C$q   :
+_z&e3B   '
+AzdH3F  /
+
+***/
+
+std::pair<char *,char *> uncompress_baidu_image(char * begin,const char * const end) {
+    if (false==(end>begin)) { return{ nullptr,nullptr }; }
+
+    constexpr static char baidu_image_uncompress_table[]={
+        /*0*/static_cast<char>(0),
+        /*1*/static_cast<char>(1),
+        /*2*/static_cast<char>(2),
+        /*3*/static_cast<char>(3),
+        /*4*/static_cast<char>(4),
+        /*5*/static_cast<char>(5),
+        /*6*/static_cast<char>(6),
+        /*7*/static_cast<char>(7),
+        /*8*/static_cast<char>(8),
+        /*9*/static_cast<char>(9),
+        /*10*/static_cast<char>(10),
+        /*11*/static_cast<char>(11),
+        /*12*/static_cast<char>(12),
+        /*13*/static_cast<char>(13),
+        /*14*/static_cast<char>(14),
+        /*15*/static_cast<char>(15),
+        /*16*/static_cast<char>(16),
+        /*17*/static_cast<char>(17),
+        /*18*/static_cast<char>(18),
+        /*19*/static_cast<char>(19),
+        /*20*/static_cast<char>(20),
+        /*21*/static_cast<char>(21),
+        /*22*/static_cast<char>(22),
+        /*23*/static_cast<char>(23),
+        /*24*/static_cast<char>(24),
+        /*25*/static_cast<char>(25),
+        /*26*/static_cast<char>(26),
+        /*27*/static_cast<char>(27),
+        /*28*/static_cast<char>(28),
+        /*29*/static_cast<char>(29),
+        /*30*/static_cast<char>(30),
+        /*31*/static_cast<char>(31),
+        /*32*/static_cast<char>(32),
+        /*33*/static_cast<char>(33),
+        /*34*/static_cast<char>(34),
+        /*35*/static_cast<char>(35),
+        /*36*/static_cast<char>(36),
+        /*37*/static_cast<char>(37),
+        /*38*/static_cast<char>(38),
+        /*39*/static_cast<char>(39),
+        /*40*/static_cast<char>(40),
+        /*41*/static_cast<char>(41),
+        /*42*/static_cast<char>(42),
+        /*43*/static_cast<char>(43),
+        /*44*/static_cast<char>(44),
+        /*45*/static_cast<char>(45),
+        /*46*/static_cast<char>(46),
+        /*47*/static_cast<char>(47),
+        /*'0'*/static_cast<char>('7'),
+        /*'1'*/static_cast<char>('d'),
+        /*'2'*/static_cast<char>('g'),
+        /*'3'*/static_cast<char>('j'),
+        /*'4'*/static_cast<char>('m'),
+        /*'5'*/static_cast<char>('o'),
+        /*'6'*/static_cast<char>('r'),
+        /*'7'*/static_cast<char>('u'),
+        /*'8'*/static_cast<char>('1'),
+        /*'9'*/static_cast<char>('4'),
+        /*58*/static_cast<char>(58),
+        /*59*/static_cast<char>(59),
+        /*60*/static_cast<char>(60),
+        /*61*/static_cast<char>(61),
+        /*62*/static_cast<char>(62),
+        /*63*/static_cast<char>(63),
+        /*64*/static_cast<char>(64),
+        /*65*/static_cast<char>(65),
+        /*66*/static_cast<char>(66),
+        /*67*/static_cast<char>(67),
+        /*68*/static_cast<char>(68),
+        /*69*/static_cast<char>(69),
+        /*70*/static_cast<char>(70),
+        /*71*/static_cast<char>(71),
+        /*72*/static_cast<char>(72),
+        /*73*/static_cast<char>(73),
+        /*74*/static_cast<char>(74),
+        /*75*/static_cast<char>(75),
+        /*76*/static_cast<char>(76),
+        /*77*/static_cast<char>(77),
+        /*78*/static_cast<char>(78),
+        /*79*/static_cast<char>(79),
+        /*80*/static_cast<char>(80),
+        /*81*/static_cast<char>(81),
+        /*82*/static_cast<char>(82),
+        /*83*/static_cast<char>(83),
+        /*84*/static_cast<char>(84),
+        /*85*/static_cast<char>(85),
+        /*86*/static_cast<char>(86),
+        /*87*/static_cast<char>(87),
+        /*88*/static_cast<char>(88),
+        /*89*/static_cast<char>(89),
+        /*90*/static_cast<char>(90),
+        /*91*/static_cast<char>(91),
+        /*92*/static_cast<char>(92),
+        /*93*/static_cast<char>(93),
+        /*94*/static_cast<char>(94),
+        /*95*/static_cast<char>(95),
+        /*96*/static_cast<char>(96),
+        /*'a'*/static_cast<char>('0'),
+        /*'b'*/static_cast<char>('8'),
+        /*'c'*/static_cast<char>('5'),
+        /*'d'*/static_cast<char>('2'),
+        /*'e'*/static_cast<char>('v'),
+        /*'f'*/static_cast<char>('s'),
+        /*'g'*/static_cast<char>('n'),
+        /*'h'*/static_cast<char>('k'),
+        /*'i'*/static_cast<char>('h'),
+        /*'j'*/static_cast<char>('e'),
+        /*'k'*/static_cast<char>('b'),
+        /*'l'*/static_cast<char>('9'),
+        /*'m'*/static_cast<char>('6'),
+        /*'n'*/static_cast<char>('3'),
+        /*'o'*/static_cast<char>('w'),
+        /*'p'*/static_cast<char>('t'),
+        /*'q'*/static_cast<char>('q'),
+        /*'r'*/static_cast<char>('p'),
+        /*'s'*/static_cast<char>('l'),
+        /*'t'*/static_cast<char>('i'),
+        /*'u'*/static_cast<char>('f'),
+        /*'v'*/static_cast<char>('c'),
+        /*'w'*/static_cast<char>('a'),
+        /*120*/static_cast<char>(120),
+        /*121*/static_cast<char>(121),
+        /*122*/static_cast<char>(122),
+        /*123*/static_cast<char>(123),
+        /*124*/static_cast<char>(124),
+        /*125*/static_cast<char>(125),
+        /*126*/static_cast<char>(126),
+        /*127*/static_cast<char>(127),
+    };
+
+#ifdef NDEBUG
+#else
+    for (auto varTest=begin; varTest<end; ++varTest) {
+        assert((*varTest)<127);
+        assert((*varTest)>0);
+    }
+#endif
+
+    const char * const map_table=baidu_image_uncompress_table;
+    char * const ans_begin=begin;
+    char * read=begin;
+    char * write=begin;
+
+    if ((end-begin)>5) {
+        char current_char;
+        const char * const last_replace_multi=end-5;
+        for (; read<last_replace_multi; ++write) {
+            current_char=*read;
+            if (current_char=='_') {
+                begin=read;
+                if (*(++begin)=='z') {
+                    if (*(++begin)=='2') {
+                        if (*(++begin)=='C') {
+                            if (*(++begin)=='$') {
+                                if (*(++begin)=='q') {
+                                    *write=':';
+                                    read+=6;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                    else if (*begin=='&') {
+                        if (*(++begin)=='e') {
+                            if (*(++begin)=='3') {
+                                if (*(++begin)=='B') {
+                                    *write='.';
+                                    read+=6;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (current_char=='A') {
+                begin=read;
+                if (*(++begin)=='z') {
+                    if (*(++begin)=='d') {
+                        if (*(++begin)=='H') {
+                            if (*(++begin)=='3') {
+                                if (*(++begin)=='F') {
+                                    *write='/';
+                                    read+=6;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            *write=*(map_table+current_char);
+            ++read;
+        }
+    }
+
+    for (; read<end; ++write) {
+        *write=*(map_table+(*read));
+        ++read;
+    }
+
+    return{ ans_begin,write };
+
+}
+
+}/*_private_baidu_image*/
+}/*namespace*/
+}/*baidu*/
 
