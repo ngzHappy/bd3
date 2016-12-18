@@ -8,15 +8,16 @@
 
 namespace baidu {
 
-class BaiduImage : public QObject {
+class BaiduImage final : public QObject,
+        public std::enable_shared_from_this<BaiduImage> {
     Q_OBJECT
 public:
     class Item {
-        using _t_int=std::int32_t;
     public:
-        _t_int index;
         QString imageName;
         QByteArray imageUrl;
+    private:
+        CPLUSPLUS_OBJECT(Item)
     };
 
     inline void setData(QVector<std::shared_ptr<Item>> &&);

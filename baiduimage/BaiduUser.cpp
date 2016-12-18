@@ -981,7 +981,7 @@ namespace baidu {
 
 void BaiduUser::login(const QString &argUserName,
                       const QString &argPassWord,
-                      const QString & argVertifyCode) {
+                      const QString &argVertifyCode) {
 
     auto thisp=getPrivateData();
     {/*如果已经登陆，则退出；如果正在执行其他行为，则退出；*/
@@ -1289,7 +1289,7 @@ std::pair<char *,char *> uncompress_baidu_image(char * begin,const char * const 
 
 class DownLoadBaiduImage :
     public DoBaiduUserObject,
-    public std::enable_shared_from_this<DownLoadBaiduImage>{
+    public std::enable_shared_from_this<DownLoadBaiduImage> {
 public:
 
     enum State {
@@ -1299,27 +1299,88 @@ public:
         state_start,
         state_downlod,
     };
+    State $m$currentState=state_waiting;
+    State $m$nextState=state_start;
 
     inline void do_next();
 
     std::shared_ptr<QObject> $m$callBack;
+    std::shared_ptr<_PrivateBaiduUser::ExternData>$m$externSuperData;
 
     inline void finished_success();
     inline void finished_error();
     inline void start_download();
     inline void next_download();
 
+    class Item {
+    public:
+        std::int32_t image_index=0;
+        containers::string object_url;
+    private:
+        CPLUSPLUS_OBJECT(Item)
+    };
+
+    class ItemLess {
+    public:
+
+        bool operator()(const Item&l,const Item &r)const {
+            return l.object_url<r.object_url;
+        }
+
+        bool operator()(const std::shared_ptr<Item>&l,const std::shared_ptr<Item>&r)const {
+            return l->object_url<r->object_url;
+        }
+
+        bool operator()(const Item&l,const std::shared_ptr<Item>&r)const {
+            return l.object_url<r->object_url;
+        }
+
+        bool operator()(const std::shared_ptr<Item>&l,const Item &r)const {
+            return l->object_url<r.object_url;
+        }
+
+        using  is_transparent=std::less<void>::is_transparent;
+    };
+
     class ExternAns {
     public:
         bool $m$hasError=false;
         QString $m$errorString;
+        containers::set<std::shared_ptr<Item>,ItemLess>$m$Items;
     };
     std::shared_ptr<ExternAns> $m$externAns;
 
     inline DownLoadBaiduImage();
+
+    class StateMachine {
+        DownLoadBaiduImage * $m$super;
+    public:
+        auto * operator->() { return $m$super; }
+        const auto * operator->() const { return $m$super; }
+
+        inline StateMachine(DownLoadBaiduImage *,State);
+        inline ~StateMachine();
+
+        inline void normal_return(State);
+        inline void error_return(State);
+
+    };
+
 private:
     CPLUSPLUS_OBJECT(DownLoadBaiduImage)
 };
+
+inline DownLoadBaiduImage::StateMachine::StateMachine(DownLoadBaiduImage *,State) {
+}
+
+inline DownLoadBaiduImage::StateMachine::~StateMachine() {
+}
+
+inline void DownLoadBaiduImage::StateMachine::normal_return(State) {
+}
+
+inline void DownLoadBaiduImage::StateMachine::error_return(State) {
+}
 
 inline DownLoadBaiduImage::DownLoadBaiduImage() {
     $m$externAns=std::make_shared<ExternAns>();
@@ -1335,6 +1396,10 @@ inline void DownLoadBaiduImage::finished_error() {
 }
 
 inline void DownLoadBaiduImage::start_download() {
+    if ($m$externSuperData->$m$networkAccessManager==nullptr) {
+        this->$m$externSuperData->createNetworkAccessManager();
+    }
+    return next_download();
 }
 
 inline void DownLoadBaiduImage::next_download() {
@@ -1343,12 +1408,15 @@ inline void DownLoadBaiduImage::next_download() {
 }/*_private_baidu_image*/
 }/*namespace*/
 
-void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg){
-    if(arg==nullptr){return;}
+void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
+    if (arg==nullptr) { return; }
     using T=_private_baidu_image::DownLoadBaiduImage;
     auto varImagesDownLoad=memory::make_shared<T>();
-    
+
+    auto thisp=this->getPrivateData();
+
     varImagesDownLoad->$m$callBack=arg;
+    varImagesDownLoad->$m$externSuperData=thisp->$m$externData;
 
     connect(varImagesDownLoad.get(),&T::notify,
         arg.get(),[arg,
@@ -1360,7 +1428,7 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg){
         else {
             arg->finished(true,{});
         }
-     
+
     },Qt::QueuedConnection);
 
     return varImagesDownLoad->do_next();
