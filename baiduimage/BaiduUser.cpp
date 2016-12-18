@@ -881,19 +881,33 @@ inline void Login::get_verifycode_image()try {
     StateMachine varStateMachine{ this,state_get_verifycode_image };
     if (this->expired()) { return; }
 
-    QNetworkRequest req(QUrl($m$externAns->$m$verifycode_url));
+    auto varSTD=getBaiduStaticData();
+    QNetworkRequest varRequest{ varSTD->baidu_url };
+    varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
 
     auto networkAM=this->$m$networkAccessManager;
-    auto varReply=networkAM->get(req);
+    auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,[
         var=this->shared_from_this(),varReply]() {
             try {
                 varReply->deleteLater();
                 StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
+                if (var->expired()) { return; }
 
                 QImage varImage;
                 {
                     auto varImageData=varReply->readAll();
+
+                    if (varImageData.isEmpty()) {
+                        return varStateMachine.error_return(u8R"///(获取验证码图像错误)///"_qstr);
+                    }
+
+                    /*解压gzip*/
+                    if (qAsConst(varImageData)[0]==char(0x001F)) {
+                        varImageData=text::ungzip(varImageData.cbegin(),
+                            varImageData.cend());
+                    }
+                    
                     varImage=QImage::fromData(varImageData);
                 }
 
