@@ -12,7 +12,7 @@ namespace baidu{
 class DoBaiduUserObject : public QObject {
     Q_OBJECT
 public:
-    Q_SIGNAL void finished(bool,const QString &);
+    Q_SIGNAL void finished(bool,const QString &,const QImage &);
 };
 
 class BaiduPrivateBasic{
@@ -44,7 +44,7 @@ public:
    bool isLogin()const;
 public:
     Q_SIGNAL void stateChanged(int);
-    Q_SIGNAL void loginFinished(bool,const QString &);
+    Q_SIGNAL void loginFinished(bool,const QString &,const QImage &);
     void login(const QString &,const QString &);
 
     _PrivateBaiduUser * getPrivateData()const{

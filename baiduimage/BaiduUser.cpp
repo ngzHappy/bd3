@@ -56,8 +56,8 @@ void _PrivateBaiduUser::ExternData::createNetworkAccessManager() {
     if ($m$networkAccessManager) { return; }
     assert($m$threadPool->getQThread()==QThread::currentThread());
     auto watcher=$m$watcherNetworkAccessManager.get();
-    $m$networkAccessManager= new NetworkAccessManager(watcher);
-    QObject::connect( watcher ,
+    $m$networkAccessManager=new NetworkAccessManager(watcher);
+    QObject::connect(watcher,
                       &QObjectsWatcher::finished,
                       $m$networkAccessManager,
                       &NetworkAccessManager::deleteLater,
@@ -117,6 +117,7 @@ public:
     inline bool expired() const;
     inline void finished_success();
     inline void finished_error();
+    inline void finished_verifycode();
     inline void create_networkaccessmanager();
     inline void get_baidu_cookie();
     inline void get_baidu_login_cookie();
@@ -141,6 +142,7 @@ public:
         state_encrypt_RSA,
         state_post_login,
         state_get_verifycode_image,
+        state_verifycode,
     };
     State $m$state=state_create_networkaccessmanager;
     State $m$nextState=state_create_networkaccessmanager;
@@ -180,6 +182,10 @@ private:
 inline void Login::get_verifycode_image() {
     StateMachine varStateMachine{ this,state_get_verifycode_image };
     if (this->expired()) { return; }
+
+    QNetworkRequest req(QUrl($m$externAns->$m$verifycode_url));
+
+    return varStateMachine.normal_return(state_waiting);
 }
 
 class StaticData_postLogin final {
@@ -807,13 +813,20 @@ inline bool Login::expired() const {
 inline void Login::finished_success() {
     $m$isFinishedCalled=true;
     if (this->expired()) { return; }
-    this->finished(true,{});
+    this->finished(true,{},{});
 }
 
 inline void Login::finished_error() {
     $m$isFinishedCalled=true;
     if (this->expired()) { return; }
-    this->finished(false,$m$errorString);
+    this->finished(false,$m$errorString,{});
+}
+
+inline void Login::finished_verifycode() {
+    $m$isFinishedCalled=true;
+    if (this->expired()) { return; }
+    this->finished(false,u8R"///(验证码)///"_qstr,
+        $m$externAns->$m$verifycode_image);
 }
 
 /*尽量增加异步性，提高响应速度*/
@@ -839,6 +852,7 @@ inline void Login::do_next() try {
             [var=this->shared_from_this()](){var->post_login(); });
         case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
             [var=this->shared_from_this()](){var->get_verifycode_image(); });
+        case state_verifycode:finished_verifycode(); break;
     }
 
 
@@ -904,13 +918,14 @@ void BaiduUser::login(const QString &argUserName,const QString &argPassWord) {
     /*连接信号槽*/
     /*同步更新数据*/
     connect(varLogin.get(),&DoBaiduUserObject::finished,
-            this,[this,externAns=varLogin->$m$externAns](bool a,const QString &b) {
+            this,[this,externAns=varLogin->$m$externAns](
+        bool a,const QString &b,const QImage & c) {
         auto thisp=getPrivateData();
         thisp->$m$gid=externAns->$m$gid;
         thisp->$m$token=externAns->$m$token;
         thisp->$m$isLogin=a;
         this->setState(BaiduUser::BaiduUserState::StateNone);
-        this->loginFinished(a,b);
+        this->loginFinished(a,b,c);
     },Qt::QueuedConnection);
 
     /*开始登陆*/
