@@ -11,8 +11,15 @@ private:
     CPLUSPLUS_OBJECT(QtBasicLibrary)
 };
 
+#include "QNotifyObject.hpp"
 #include "QObjectsWatcher.hpp"
 #include "QSingleThreadPool.hpp"
 #include "QApplicationWatcher.hpp"
 
 #endif // QTBASICLIBRARY_HPP
+
+
+
+
+
+

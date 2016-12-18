@@ -12,14 +12,16 @@ SOURCES += QtBasicLibrary.cpp \
     QtBasicLibraryStart.cpp \
     QObjectsWatcher.cpp \
     QSingleThreadPool.cpp \
-    QApplicationWatcher.cpp
+    QApplicationWatcher.cpp \
+    QNotifyObject.cpp
 
 HEADERS += QtBasicLibrary.hpp\
         qt_basic_global.hpp \
     QObjectsWatcher.hpp \
     _PrivateQObjectsWatcher.hpp \
     QSingleThreadPool.hpp \
-    QApplicationWatcher.hpp
+    QApplicationWatcher.hpp \
+    QNotifyObject.hpp
 
 include($$PWD/private_qt3rd_base_library/zlib.pri)
 include($$PWD/quazip/quazip.pri)
