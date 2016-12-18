@@ -15,9 +15,12 @@ class LoginTest : public QWidget{
 public:
     explicit LoginTest(QWidget *parent = 0);
     ~LoginTest();
-
+private:
+    void test_uncompress_baiduimage_url();
 private slots:
     void on_login_clicked();
+    void on_deleteButton_clicked();
+
 private:
     QGraphicsPixmapItem * vertifyitem;
     baidu::BaiduUser * baiduUser;

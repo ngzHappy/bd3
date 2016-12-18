@@ -40,6 +40,7 @@ public:
 
    static QByteArray gid();
    static QByteArray currentTime();
+   static std::pair<char*,char *> uncompressBaiduImageUrl(char*,const char *const);
 
    bool isLogin()const;
 public:

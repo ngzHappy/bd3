@@ -1329,5 +1329,10 @@ std::pair<char *,char *> uncompress_baidu_image(char * begin,const char * const 
 
 }/*_private_baidu_image*/
 }/*namespace*/
+
+std::pair<char*,char *> BaiduUser::uncompressBaiduImageUrl(char*a,const char *const b) {
+    return _private_baidu_image::uncompress_baidu_image(a,b);
+}
+
 }/*baidu*/
 
