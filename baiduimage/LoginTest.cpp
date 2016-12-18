@@ -19,7 +19,9 @@ LoginTest::LoginTest(QWidget *parent):
             return;
         }
         qDebug()<<"log in fail"<<b;
-        vertifyitem->setPixmap( QPixmap::fromImage(c) );
+        if (c.isNull()==false) {
+            vertifyitem->setPixmap(QPixmap::fromImage(c));
+        }
     });
 }
 
