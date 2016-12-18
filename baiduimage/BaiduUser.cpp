@@ -1302,16 +1302,28 @@ public:
 
     inline void do_next();
 
-    QString $m$errorString;
+    std::shared_ptr<QObject> $m$callBack;
 
     inline void finished_success();
     inline void finished_error();
     inline void start_download();
     inline void next_download();
 
+    class ExternAns {
+    public:
+        bool $m$hasError=false;
+        QString $m$errorString;
+    };
+    std::shared_ptr<ExternAns> $m$externAns;
+
+    inline DownLoadBaiduImage();
 private:
     CPLUSPLUS_OBJECT(DownLoadBaiduImage)
 };
+
+inline DownLoadBaiduImage::DownLoadBaiduImage() {
+    $m$externAns=std::make_shared<ExternAns>();
+}
 
 inline void DownLoadBaiduImage::do_next() {
 }
@@ -1333,9 +1345,23 @@ inline void DownLoadBaiduImage::next_download() {
 
 void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg){
     if(arg==nullptr){return;}
-    auto varImagesDownLoad=memory::make_shared<_private_baidu_image::DownLoadBaiduImage>();
+    using T=_private_baidu_image::DownLoadBaiduImage;
+    auto varImagesDownLoad=memory::make_shared<T>();
     
+    varImagesDownLoad->$m$callBack=arg;
 
+    connect(varImagesDownLoad.get(),&T::notify,
+        arg.get(),[arg,
+        externAns=varImagesDownLoad->$m$externAns]() {
+
+        if (externAns->$m$hasError) {
+            arg->finished(false,externAns->$m$errorString);
+        }
+        else {
+            arg->finished(true,{});
+        }
+     
+    },Qt::QueuedConnection);
 
     return varImagesDownLoad->do_next();
 }
