@@ -135,7 +135,7 @@ public:
     inline void get_verifycode_image();
 
     inline void do_next();
-  
+
     enum State :int {
         state_create_networkaccessmanager,
         state_waiting,
@@ -851,7 +851,8 @@ inline void Login::finished_success() {
 inline void Login::finished_error() {
     $m$isFinishedCalled=true;
     if (this->expired()) { return; }
-    this->finished(false,$m$errorString,{});
+    this->finished(false,state_to_string($m$state)+
+        (" : "_qls+$m$errorString),{});
 }
 
 inline void Login::finished_verifycode() {
@@ -920,7 +921,7 @@ inline void Login::get_verifycode_image()try {
     if (this->expired()) { return; }
 
     auto varSTD=getBaiduStaticData();
-    const QUrl varUrl{this->$m$externAns->$m$verifycode_url};
+    const QUrl varUrl{ this->$m$externAns->$m$verifycode_url };
     QNetworkRequest varRequest{ varUrl };
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
 
