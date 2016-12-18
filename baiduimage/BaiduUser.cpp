@@ -9,6 +9,11 @@
 #include "_PrivateBaiduStaticData.hpp"
 #include <QtNetwork/qnetworkrequest.h>
 
+//#define BAIDUUSER_DEBUG
+#if defined(BAIDUUSER_DEBUG)
+#include <QtCore/qdebug.h>
+#endif
+
 namespace baidu {
 
 namespace {
@@ -130,7 +135,7 @@ public:
     inline void get_verifycode_image();
 
     inline void do_next();
-
+  
     enum State :int {
         state_create_networkaccessmanager,
         state_waiting,
@@ -145,6 +150,9 @@ public:
         state_get_verifycode_image,
         state_verifycode,
     };
+
+    inline static QLatin1String state_to_string(State);
+
     State $m$state=state_create_networkaccessmanager;
     State $m$nextState=state_create_networkaccessmanager;
     bool $m$isFinishedCalled=false;
@@ -160,6 +168,9 @@ public:
         StateMachine(Login * arg,State s):$m$thisp(arg) {
             arg->$m$state=s;
             arg->$m$nextState=state_error;
+#if defined(BAIDUUSER_DEBUG)
+            qDebug()<<state_to_string(s);
+#endif
         }
 
         void normal_return(State s) {
@@ -182,6 +193,24 @@ public:
 private:
     CPLUSPLUS_OBJECT(Login)
 };
+
+QLatin1String Login::state_to_string(State state) {
+    switch (state) {
+        case Login::state_create_networkaccessmanager: return u8R"///(state_create_networkaccessmanager)///"_qls;
+        case Login::state_waiting: return u8R"///(state_waiting)///"_qls;
+        case Login::state_error: return u8R"///(state_error)///"_qls;
+        case Login::state_success: return u8R"///(state_success)///"_qls;
+        case Login::state_getbaidu_cookie: return u8R"///(state_getbaidu_cookie)///"_qls;
+        case Login::state_getbaidu_login_cookie: return u8R"///(state_getbaidu_login_cookie)///"_qls;
+        case Login::state_get_baidu_token: return u8R"///(state_get_baidu_token)///"_qls;
+        case Login::state_get_rsa_key: return u8R"///(state_get_rsa_key)///"_qls;
+        case Login::state_encrypt_RSA: return u8R"///(state_encrypt_RSA)///"_qls;
+        case Login::state_post_login: return u8R"///(state_post_login)///"_qls;
+        case Login::state_get_verifycode_image: return u8R"///(state_get_verifycode_image)///"_qls;
+        case Login::state_verifycode: return u8R"///(state_verifycode)///"_qls;
+    }
+    return u8R"///(unknow)///"_qls;
+}
 
 class StaticData_postLogin final {
 public:
@@ -891,7 +920,8 @@ inline void Login::get_verifycode_image()try {
     if (this->expired()) { return; }
 
     auto varSTD=getBaiduStaticData();
-    QNetworkRequest varRequest{ varSTD->baidu_url };
+    const QUrl varUrl{this->$m$externAns->$m$verifycode_url};
+    QNetworkRequest varRequest{ varUrl };
     varRequest.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
 
     auto networkAM=this->$m$networkAccessManager;

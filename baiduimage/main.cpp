@@ -4,6 +4,7 @@
 #include <QtWidgets/QApplication>
 
 #include "BaiduUser.hpp"
+#include "LoginTest.hpp"
 
 #include <future>
 #include <chrono>
@@ -48,13 +49,8 @@ int main(int argc, char *argv[])try{
         networkThread.wait(1000);
     }
 
-    MainWindow window;
-    window.show();
-
-    baidu::BaiduUser user( QSingleThreadPool::qAppQSingleThreadPool() );
-   
-   
-    user.login("abc","def");
+    LoginTest test;
+    test.show();
 
     {
         auto ans = app->exec();
