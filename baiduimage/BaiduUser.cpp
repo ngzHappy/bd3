@@ -10,6 +10,10 @@
 #include "_PrivateBaiduStaticData.hpp"
 #include <QtNetwork/qnetworkrequest.h>
 
+#include <QtCore/qjsonarray.h>
+#include <QtCore/qjsonobject.h>
+#include <QtCore/qjsondocument.h>
+
 //#define BAIDUUSER_DEBUG
 #if defined(BAIDUUSER_DEBUG)
 #include <QtCore/qdebug.h>
@@ -486,6 +490,16 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
             /*登陆失败*/
             return varStateMachine.error_return(varAns.errorString);
         }
+    }
+
+    /*登陆成功*/
+    auto networkAM=this->$m$networkAccessManager;
+    auto varSD=getBaiduStaticData();
+
+    {/*登陆百度图片，获得cookie，不必等待返回*/
+        auto varReply=networkAM->get(QNetworkRequest(QUrl(varSD->baidu_image)));
+        varReply->connect(varReply,&QNetworkReply::finished,
+            varReply,&QObject::deleteLater);
     }
 
     return varStateMachine.normal_return(state_success);
@@ -1300,10 +1314,14 @@ public:
         state_downlod,
     };
 
+    bool $m$isFinishedCalled=false;
     State $m$currentState=state_waiting;
     State $m$nextState=state_start;
 
     inline void do_next();
+
+    std::weak_ptr<void> $m$parentWatcher;
+    inline bool expired() const;
 
     std::shared_ptr<QObject> $m$callBack;
     std::shared_ptr<_PrivateBaiduUser::ExternData>$m$externSuperData;
@@ -1348,13 +1366,15 @@ public:
         bool $m$hasError=false;
         QString $m$errorString;
         containers::set<std::shared_ptr<Item>,ItemLess>$m$Items;
+        QVector<std::shared_ptr<BaiduImage::Item>> $m$AnsItems;
     };
     std::shared_ptr<ExternAns> $m$externAns;
 
     inline DownLoadBaiduImage();
+    inline ~DownLoadBaiduImage();
 
     class StateMachine {
-        DownLoadBaiduImage * $m$super;
+        DownLoadBaiduImage * const $m$super;
     public:
         auto * operator->() { return $m$super; }
         const auto * operator->() const { return $m$super; }
@@ -1363,47 +1383,330 @@ public:
         inline ~StateMachine();
 
         inline void normal_return(State);
-        inline void error_return(State);
+        inline void error_return(const QString &);
 
     };
 
+    /*页面信息*/
+    std::int32_t page_perpage=30;
+    std::int32_t page_current=0;
+    std::int32_t page_last_count=0;
+    std::int32_t page_less_count=0;
+    /**/
+    int page_all_counts=(std::numeric_limits<int>::max)();
+    /*图片信息*/
+    QByteArray image_key_word;
+
+    inline void update_data();
 private:
     CPLUSPLUS_OBJECT(DownLoadBaiduImage)
 };
 
-inline DownLoadBaiduImage::StateMachine::StateMachine(DownLoadBaiduImage *,State) {
+inline bool DownLoadBaiduImage::expired() const {
+    if (QObjectsWatcher::isQAppQuited()) { return true; }
+    return $m$parentWatcher.expired();
+}
+
+inline DownLoadBaiduImage::StateMachine::StateMachine(
+    DownLoadBaiduImage *a,State s):$m$super(a) {
+    a->$m$currentState=s;
+    a->$m$nextState=state_error;
+}
+
+inline DownLoadBaiduImage::~DownLoadBaiduImage() {
+    if ($m$isFinishedCalled) { return; }
+    if (this->expired()) { return; }
+    this->finished_error();
 }
 
 inline DownLoadBaiduImage::StateMachine::~StateMachine() {
+    $m$super->do_next();
 }
 
-inline void DownLoadBaiduImage::StateMachine::normal_return(State) {
+inline void DownLoadBaiduImage::StateMachine::normal_return(State s) {
+    $m$super->$m$nextState=s;
 }
 
-inline void DownLoadBaiduImage::StateMachine::error_return(State) {
+inline void DownLoadBaiduImage::StateMachine::error_return(const QString &a) {
+    $m$super->$m$externAns->$m$errorString=a;
+    $m$super->$m$nextState=state_error;
 }
 
 inline DownLoadBaiduImage::DownLoadBaiduImage() {
     $m$externAns=std::make_shared<ExternAns>();
 }
 
-inline void DownLoadBaiduImage::do_next() {
+inline void DownLoadBaiduImage::do_next() try {
+    if (expired()) { return; }
+    auto varTP=$m$externSuperData->$m$threadPool.get();
+    switch ($m$nextState) {
+        case state_waiting:break;
+        case state_finished: finished_success(); break;
+        case state_error: finished_error(); break;
+        case state_start: varTP->runLambda([var=this->shared_from_this()]() {
+            var->start_download();
+        }); break;
+        case state_downlod: varTP->runLambda([var=this->shared_from_this()]() {
+            var->next_download();
+        });  break;
+    }
+
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void DownLoadBaiduImage::finished_success() {
+    $m$isFinishedCalled=true;
+    if (this->expired()) { return; }
+    $m$externAns->$m$hasError=false;
+    this->update_data();
+    this->notify();
 }
 
 inline void DownLoadBaiduImage::finished_error() {
+    $m$isFinishedCalled=true;
+    if (this->expired()) { return; }
+    $m$externAns->$m$hasError=true;
+    this->update_data();
+    this->notify();
 }
 
-inline void DownLoadBaiduImage::start_download() {
+inline void DownLoadBaiduImage::start_download() try {
     if ($m$externSuperData->$m$networkAccessManager==nullptr) {
         this->$m$externSuperData->createNetworkAccessManager();
     }
     return next_download();
 }
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
+}
 
-inline void DownLoadBaiduImage::next_download() {
+inline void DownLoadBaiduImage::update_data() {
+    auto & varItems=$m$externAns->$m$Items;
+    auto & varAns=$m$externAns->$m$AnsItems;
+    varAns.resize(static_cast<int>(varItems.size()));
+    for (const auto & varI:varItems) {
+        auto item=memory::make_shared<BaiduImage::Item>();
+        {
+            const auto & objurl=varI->object_url;
+            item->imageUrl=QByteArray(objurl.c_str(),static_cast<int>(objurl.size()));
+        }
+        varAns[varI->image_index]=std::move(item);
+    }
+    varItems.clear();
+}
+
+/***
+{
+    "queryEnc":"%E7%BE%8E%E5%A5%B3",
+    "queryExt":"美女",
+    "listNum":33802,
+    "displayNum":508118,
+    "gsm":"1e00000000001e",
+    "bdFmtDispNum":"约508,000",
+    "bdSearchTime":"",
+    "isNeedAsyncRequest":1,
+    "bdIsClustered":"1",
+    "data":[
+        {
+            "adType":"0",
+            "hasAspData":"0",
+            "thumbURL":"http://f.hiphotos.baidu.com/image/h%3D360/sign=ba4bbbdf1b30e924d0a49a377c096e66/242dd42a2834349bbe78c852cdea15ce37d3beef.jpg",
+            "middleURL":"http://f.hiphotos.baidu.com/image/h%3D200/sign=236c94ef2c381f3081198aa999004c67/242dd42a2834349bbe78c852cdea15ce37d3beef.jpg",
+            "largeTnImageUrl":"",
+            "hasLarge" :0,
+            "hoverURL":"http://f.hiphotos.baidu.com/image/h%3D360/sign=ba4bbbdf1b30e924d0a49a377c096e66/242dd42a2834349bbe78c852cdea15ce37d3beef.jpg",
+            "pageNum":0,
+            "objURL":"ippr_z2C$qAzdH3FAzdH3Fu_z&e3Bitri5p5f_z&e3Bkwt17_z&e3Bv54AzdH3Ft4w2jAzdH3FrtvAzdH3Ftpj4AzdH3Fd9d119dwdbn9n9lkkj0bvbcdv1jw8cvjn01nkjju_z&e3B3r2",
+            "fromURL":"ippr_z2C$qAzdH3FAzdH3Fooo_z&e3B99ln_z&e3Bv54AzdH3Fxtg22wg45pjAzdH3Fdab00AzdH3F8_z&e3Bip4",
+            "fromURLHost":"www.4493.com",
+            "currentIndex":"",
+            "width":900,
+            "height":563,
+            "type":"",
+            "filesize":"",
+            "bdSrcType":"-1",
+            "di":"0",
+            "pi": "21065057213",
+            "is":"0,36080",
+            "hasThumbData":"0",
+            "bdSetImgNum":15,
+            "spn":0,
+            "bdImgnewsDate":"1970-01-01 08:00",
+            "fromPageTitle":"",
+            "fromPageTitleEnc":"",
+            "bdSourceName":"",
+            "bdFromPageTitlePrefix":"",
+            "isAspDianjing":0,
+            "token":"",
+            "imgType" : "",
+            "cs" : "3178635078,662413851",
+            "os" : "",
+            "simid" : "",
+            "personalized":"0",
+            "simid_info":null,
+            "face_info":null,
+            "xiangshi_info":null,
+            "adPicId":"0",
+            "source_type":""
+        },
+***/
+static inline void parse_json(
+    DownLoadBaiduImage::StateMachine & s,
+    const QByteArray &argJson) {
+
+    QJsonParseError varJsonError;
+    auto varJsonDocument=QJsonDocument::fromJson(argJson,&varJsonError);
+
+    if (varJsonError.error!=QJsonParseError::NoError) {
+        return s.error_return(varJsonError.errorString());
+    }
+
+    const auto varRootObject=varJsonDocument.object();
+    QJsonArray varJsonArray;
+
+    {/*遍历json*/
+        auto rootB=varRootObject.constBegin();
+        auto rootE=varRootObject.constEnd();
+
+        for (auto varI=rootB; varI!=rootE; ++varI) {
+            if (varI->isArray()&&(varI.key()=="data"_qls)) {
+                varJsonArray=varI->toArray();
+            }
+            else {
+                const auto varKey=varI.key();
+                if (varKey=="listNum"_qls) {
+                    s->page_all_counts=varI->toInt();
+                }
+                //else if (varKey=="queryEnc"_qls) {}
+                //else if (varKey=="queryExt"_qls) {}
+                //else if (varKey=="displayNum"_qls) {}
+                //else if (varKey=="gsm"_qls) {}
+                //else if (varKey=="bdFmtDispNum"_qls) {}
+                //else if (varKey=="bdSearchTime"_qls) {}
+                //else if (varKey=="isNeedAsyncRequest"_qls) {}
+                //else if (varKey=="bdIsClustered"_qls) {}
+            }
+        }
+    }
+
+    {/*遍历jsonarray*/
+        for (const auto & varI:qAsConst(varJsonArray)) {
+            if (varI.isObject()) {
+                auto jsonObject=varI.toObject();
+                auto cend=jsonObject.constEnd();
+                auto item=memory::make_shared< DownLoadBaiduImage::Item >();
+                do {
+                    auto objurl=jsonObject.constFind("objURL"_qls);
+                    if (objurl==cend) { break; }
+                    auto rawURL=objurl->toString().toUtf8();
+                    auto plainURL=uncompress_baidu_image(const_cast<char*>(rawURL.constBegin()),
+                        rawURL.constEnd());
+                    item->object_url=containers::string(plainURL.first,plainURL.second);
+                    if (item->object_url.empty()) { break; }
+                    auto & items=s->$m$externAns->$m$Items;
+                    item->image_index=static_cast<std::int32_t>(items.size());
+                    items.insert(item);
+                } while (false);
+            }
+        }
+    }
+
+}
+
+inline void DownLoadBaiduImage::next_download() try {
+
+    if (expired()) { return; }
+
+    StateMachine s(this,state_downlod);
+    auto varSTD=getBaiduStaticData();
+
+    QUrl varUrl;
+    {
+        const auto pn=QByteArray::number(s->page_current);
+        const auto rn=QByteArray::number(s->page_perpage);
+        const auto url_=cat_to_url(
+            /**/"ipn","rj",
+            /**/"ct","201326592",
+            /**/"is","",
+            /**/"fp","result",
+            /**/"queryWord",s->image_key_word,
+            /**/"cl","2",
+            /**/"lm","-1",
+            /**/"ie","utf-8",
+            /**/"oe","utf-8",
+            /**/"adpicid","",
+            /**/"st","-1",
+            /**/"z","",
+            /**/"ic","0",
+            /**/"word",s->image_key_word,
+            /**/"s","",
+            /**/"se","",
+            /**/"tab","",
+            /**/"width","",
+            /**/"height","",
+            /**/"face","0",
+            /**/"istype","2",
+            /**/"qc","",
+            /**/"nc","1",
+            /**/"fr","",
+            /**/"pn",pn,
+            /**/"rn",rn,
+            /**/"gsm","96",
+            /**/"1482041581410",""
+        );
+        s->page_current+=s->page_perpage;
+        QByteArray url=varSTD->get_baidu_image_url;
+        url.reserve(url.size()+static_cast<int>(url_.size())+4);
+        url.append(url_.c_str(),static_cast<int>(url_.size()));
+        varUrl.setUrl(url);
+    }
+
+    auto varNAM=$m$externSuperData->$m$networkAccessManager;
+    QNetworkRequest varREQ(varUrl);
+    varREQ.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
+    varREQ.setRawHeader(varSTD->key_cccept_encoding,varSTD->gzip_deflate);
+
+    auto varReply=varNAM->get(varREQ);
+
+    connect(varReply,&QNetworkReply::finished,
+        [varReply,var=this->shared_from_this()]() {
+        varReply->deleteLater();
+        try {
+            StateMachine s(var.get(),state_downlod);
+            if (s->expired()) { return; }
+
+            QByteArray varJson=varReply->readAll();
+
+            {/*获得json*/
+                if (varJson.isEmpty()) {
+                    return s.error_return(varReply->errorString());
+                }
+
+                /*解压gzip*/
+                if (qAsConst(varJson)[0]==char(0x001F)) {
+                    varJson=text::ungzip(varJson.cbegin(),varJson.cend());
+                }
+
+                if (varJson.isEmpty()) {
+                    return s.error_return(varReply->errorString());
+                }
+                clear_data(varReply);
+            }
+
+            parse_json(s,varJson);
+
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    });
+
+    return s.normal_return(state_waiting);
+}
+catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
 }
 
 }/*_private_baidu_image*/
@@ -1418,6 +1721,11 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
 
     varImagesDownLoad->$m$callBack=arg;
     varImagesDownLoad->$m$externSuperData=thisp->$m$externData;
+    varImagesDownLoad->$m$parentWatcher=$m$thisp;
+
+    /*设置关键字*/
+    varImagesDownLoad->image_key_word=
+        arg->getKeyWord().toUtf8().toPercentEncoding();
 
     connect(varImagesDownLoad.get(),&T::notify,
         arg.get(),[arg,

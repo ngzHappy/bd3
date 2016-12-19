@@ -24,10 +24,15 @@ public:
     inline void setData(const QVector<std::shared_ptr<Item>> &);
     inline const QVector<std::shared_ptr<Item>>&getData()const;
 
+    inline const QString & getKeyWord()const;
+    inline void setKeyWord(const QString &);
+    inline void setKeyWord(QString &&);
+
 public:
     Q_SIGNAL void finished(bool,const QString &);
 private:
     QVector<std::shared_ptr<Item>> $m$data;
+    QString $m$keyword;
 private:
     CPLUSPLUS_OBJECT(BaiduImage)
 };
@@ -42,6 +47,18 @@ inline void BaiduImage::setData(const QVector<std::shared_ptr<Item>> &a) {
 
 inline auto BaiduImage::getData()const->const QVector<std::shared_ptr<Item>>& {
     return $m$data;
+}
+
+inline const QString & BaiduImage::getKeyWord()const {
+    return $m$keyword;
+}
+
+inline void BaiduImage::setKeyWord(const QString &a) {
+    $m$keyword=a;
+}
+
+inline void BaiduImage::setKeyWord(QString &&a) {
+    $m$keyword=std::move(a);
 }
 
 }/*baidu*/

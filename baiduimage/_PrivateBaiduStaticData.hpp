@@ -96,6 +96,8 @@ public:
     const QByteArray key_user_agent="User-Agent"_qba;
     const QString baidu_url="http://www.baidu.com"_qstr;
     const QString unknow_error="unknow error"_qstr;
+    const QString baidu_image="http://image.baidu.com/"_qstr;
+    const QByteArray get_baidu_image_url=u8R"///(http://image.baidu.com/search/acjson?tn=resultjson_com)///"_qba;
 private:
     CPLUSPLUS_OBJECT(_PrivateBaiduStaticData)
 };
