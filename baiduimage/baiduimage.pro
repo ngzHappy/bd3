@@ -13,17 +13,20 @@ SOURCES += main.cpp\
     BaiduUser.cpp \
     _PrivateBaiduUser.cpp \
     _PrivateBaiduStaticData.cpp \
-    LoginTest.cpp
+    LoginTest.cpp \
+    ImageTest.cpp
 
 HEADERS  += MainWindow.hpp \
     BaiduUser.hpp \
     _PrivateBaiduUser.hpp \
     _PrivateBaiduStaticData.hpp \
     LoginTest.hpp \
-    BaiduImage.hpp
+    BaiduImage.hpp \
+    ImageTest.hpp
 
 FORMS    += MainWindow.ui \
-    LoginTest.ui
+    LoginTest.ui \
+    ImageTest.ui
 
 include($$PWD/../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR

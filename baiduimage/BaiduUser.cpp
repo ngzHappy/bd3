@@ -19,6 +19,12 @@
 #include <QtCore/qdebug.h>
 #endif
 
+#define BAIDU_IMAGE_DEBUG
+#if defined(BAIDU_IMAGE_DEBUG)
+#include <fstream>
+#include <QtCore/qdebug.h>
+#endif
+
 namespace baidu {
 
 namespace {
@@ -1552,16 +1558,400 @@ inline void DownLoadBaiduImage::update_data() {
             "source_type":""
         },
 ***/
+
+/*数出从左到右连续1的个数*/
+static inline int left_1_count(unsigned char i) {
+    constexpr static int map_table[]={
+        /*0000'0000*/0,
+        /*0000'0001*/0,
+        /*0000'0010*/0,
+        /*0000'0011*/0,
+        /*0000'0100*/0,
+        /*0000'0101*/0,
+        /*0000'0110*/0,
+        /*0000'0111*/0,
+        /*0000'1000*/0,
+        /*0000'1001*/0,
+        /*0000'1010*/0,
+        /*0000'1011*/0,
+        /*0000'1100*/0,
+        /*0000'1101*/0,
+        /*0000'1110*/0,
+        /*0000'1111*/0,
+        /*0001'0000*/0,
+        /*0001'0001*/0,
+        /*0001'0010*/0,
+        /*0001'0011*/0,
+        /*0001'0100*/0,
+        /*0001'0101*/0,
+        /*0001'0110*/0,
+        /*0001'0111*/0,
+        /*0001'1000*/0,
+        /*0001'1001*/0,
+        /*0001'1010*/0,
+        /*0001'1011*/0,
+        /*0001'1100*/0,
+        /*0001'1101*/0,
+        /*0001'1110*/0,
+        /*0001'1111*/0,
+        /*0010'0000*/0,
+        /*0010'0001*/0,
+        /*0010'0010*/0,
+        /*0010'0011*/0,
+        /*0010'0100*/0,
+        /*0010'0101*/0,
+        /*0010'0110*/0,
+        /*0010'0111*/0,
+        /*0010'1000*/0,
+        /*0010'1001*/0,
+        /*0010'1010*/0,
+        /*0010'1011*/0,
+        /*0010'1100*/0,
+        /*0010'1101*/0,
+        /*0010'1110*/0,
+        /*0010'1111*/0,
+        /*0011'0000*/0,
+        /*0011'0001*/0,
+        /*0011'0010*/0,
+        /*0011'0011*/0,
+        /*0011'0100*/0,
+        /*0011'0101*/0,
+        /*0011'0110*/0,
+        /*0011'0111*/0,
+        /*0011'1000*/0,
+        /*0011'1001*/0,
+        /*0011'1010*/0,
+        /*0011'1011*/0,
+        /*0011'1100*/0,
+        /*0011'1101*/0,
+        /*0011'1110*/0,
+        /*0011'1111*/0,
+        /*0100'0000*/0,
+        /*0100'0001*/0,
+        /*0100'0010*/0,
+        /*0100'0011*/0,
+        /*0100'0100*/0,
+        /*0100'0101*/0,
+        /*0100'0110*/0,
+        /*0100'0111*/0,
+        /*0100'1000*/0,
+        /*0100'1001*/0,
+        /*0100'1010*/0,
+        /*0100'1011*/0,
+        /*0100'1100*/0,
+        /*0100'1101*/0,
+        /*0100'1110*/0,
+        /*0100'1111*/0,
+        /*0101'0000*/0,
+        /*0101'0001*/0,
+        /*0101'0010*/0,
+        /*0101'0011*/0,
+        /*0101'0100*/0,
+        /*0101'0101*/0,
+        /*0101'0110*/0,
+        /*0101'0111*/0,
+        /*0101'1000*/0,
+        /*0101'1001*/0,
+        /*0101'1010*/0,
+        /*0101'1011*/0,
+        /*0101'1100*/0,
+        /*0101'1101*/0,
+        /*0101'1110*/0,
+        /*0101'1111*/0,
+        /*0110'0000*/0,
+        /*0110'0001*/0,
+        /*0110'0010*/0,
+        /*0110'0011*/0,
+        /*0110'0100*/0,
+        /*0110'0101*/0,
+        /*0110'0110*/0,
+        /*0110'0111*/0,
+        /*0110'1000*/0,
+        /*0110'1001*/0,
+        /*0110'1010*/0,
+        /*0110'1011*/0,
+        /*0110'1100*/0,
+        /*0110'1101*/0,
+        /*0110'1110*/0,
+        /*0110'1111*/0,
+        /*0111'0000*/0,
+        /*0111'0001*/0,
+        /*0111'0010*/0,
+        /*0111'0011*/0,
+        /*0111'0100*/0,
+        /*0111'0101*/0,
+        /*0111'0110*/0,
+        /*0111'0111*/0,
+        /*0111'1000*/0,
+        /*0111'1001*/0,
+        /*0111'1010*/0,
+        /*0111'1011*/0,
+        /*0111'1100*/0,
+        /*0111'1101*/0,
+        /*0111'1110*/0,
+        /*0111'1111*/0,
+        /*1000'0000*/1,
+        /*1000'0001*/1,
+        /*1000'0010*/1,
+        /*1000'0011*/1,
+        /*1000'0100*/1,
+        /*1000'0101*/1,
+        /*1000'0110*/1,
+        /*1000'0111*/1,
+        /*1000'1000*/1,
+        /*1000'1001*/1,
+        /*1000'1010*/1,
+        /*1000'1011*/1,
+        /*1000'1100*/1,
+        /*1000'1101*/1,
+        /*1000'1110*/1,
+        /*1000'1111*/1,
+        /*1001'0000*/1,
+        /*1001'0001*/1,
+        /*1001'0010*/1,
+        /*1001'0011*/1,
+        /*1001'0100*/1,
+        /*1001'0101*/1,
+        /*1001'0110*/1,
+        /*1001'0111*/1,
+        /*1001'1000*/1,
+        /*1001'1001*/1,
+        /*1001'1010*/1,
+        /*1001'1011*/1,
+        /*1001'1100*/1,
+        /*1001'1101*/1,
+        /*1001'1110*/1,
+        /*1001'1111*/1,
+        /*1010'0000*/1,
+        /*1010'0001*/1,
+        /*1010'0010*/1,
+        /*1010'0011*/1,
+        /*1010'0100*/1,
+        /*1010'0101*/1,
+        /*1010'0110*/1,
+        /*1010'0111*/1,
+        /*1010'1000*/1,
+        /*1010'1001*/1,
+        /*1010'1010*/1,
+        /*1010'1011*/1,
+        /*1010'1100*/1,
+        /*1010'1101*/1,
+        /*1010'1110*/1,
+        /*1010'1111*/1,
+        /*1011'0000*/1,
+        /*1011'0001*/1,
+        /*1011'0010*/1,
+        /*1011'0011*/1,
+        /*1011'0100*/1,
+        /*1011'0101*/1,
+        /*1011'0110*/1,
+        /*1011'0111*/1,
+        /*1011'1000*/1,
+        /*1011'1001*/1,
+        /*1011'1010*/1,
+        /*1011'1011*/1,
+        /*1011'1100*/1,
+        /*1011'1101*/1,
+        /*1011'1110*/1,
+        /*1011'1111*/1,
+        /*1100'0000*/2,
+        /*1100'0001*/2,
+        /*1100'0010*/2,
+        /*1100'0011*/2,
+        /*1100'0100*/2,
+        /*1100'0101*/2,
+        /*1100'0110*/2,
+        /*1100'0111*/2,
+        /*1100'1000*/2,
+        /*1100'1001*/2,
+        /*1100'1010*/2,
+        /*1100'1011*/2,
+        /*1100'1100*/2,
+        /*1100'1101*/2,
+        /*1100'1110*/2,
+        /*1100'1111*/2,
+        /*1101'0000*/2,
+        /*1101'0001*/2,
+        /*1101'0010*/2,
+        /*1101'0011*/2,
+        /*1101'0100*/2,
+        /*1101'0101*/2,
+        /*1101'0110*/2,
+        /*1101'0111*/2,
+        /*1101'1000*/2,
+        /*1101'1001*/2,
+        /*1101'1010*/2,
+        /*1101'1011*/2,
+        /*1101'1100*/2,
+        /*1101'1101*/2,
+        /*1101'1110*/2,
+        /*1101'1111*/2,
+        /*1110'0000*/3,
+        /*1110'0001*/3,
+        /*1110'0010*/3,
+        /*1110'0011*/3,
+        /*1110'0100*/3,
+        /*1110'0101*/3,
+        /*1110'0110*/3,
+        /*1110'0111*/3,
+        /*1110'1000*/3,
+        /*1110'1001*/3,
+        /*1110'1010*/3,
+        /*1110'1011*/3,
+        /*1110'1100*/3,
+        /*1110'1101*/3,
+        /*1110'1110*/3,
+        /*1110'1111*/3,
+        /*1111'0000*/4,
+        /*1111'0001*/4,
+        /*1111'0010*/4,
+        /*1111'0011*/4,
+        /*1111'0100*/4,
+        /*1111'0101*/4,
+        /*1111'0110*/4,
+        /*1111'0111*/4,
+        /*1111'1000*/5,
+        /*1111'1001*/5,
+        /*1111'1010*/5,
+        /*1111'1011*/5,
+        /*1111'1100*/6,
+        /*1111'1101*/6,
+        /*1111'1110*/7,
+        /*1111'1111*/8,
+    };
+    return map_table[i];
+}
+
+/*移除非UTF8字符*/
+/*
+UTF-8 valid format list:
+0xxxxxxx
+110xxxxx 10xxxxxx
+1110xxxx 10xxxxxx 10xxxxxx
+11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+*/
+void static inline remove_invalid_utf8(
+    unsigned char * b,
+    const unsigned char * const e) {
+    constexpr unsigned char replace_char=' ';
+    for (; b<e; ++b) {
+        auto & current_char=*b;
+        auto current_char_left_1=left_1_count(current_char);
+        switch (current_char_left_1) {
+            case 0:continue; break;
+            case 1:current_char=replace_char; break;
+            case 2: {
+                const auto b1=b+1;
+                if ((b1<e)&&(1==left_1_count(*b1))) {
+                    b=b1; continue;
+                }
+                current_char=replace_char;
+            } break;
+            case 3: {
+                const auto b1=b+1;
+                const auto b2=b1+1;
+                if ((b2<e)
+                    &&(1==left_1_count(*b1))
+                    &&(1==left_1_count(*b2))) {
+                    b=b2;
+                    continue;
+                }
+                current_char=replace_char;
+            }break;
+            case 4: {
+                const auto b1=b+1;
+                const auto b2=b1+1;
+                const auto b3=b2+1;
+                if ((b3<e)
+                    &&(1==left_1_count(*b1))
+                    &&(1==left_1_count(*b2))
+                    &&(1==left_1_count(*b3))) {
+                    b=b3;
+                    continue;
+                }
+                current_char=replace_char;
+            }break;
+            case 5: {
+                const auto b1=b+1;
+                const auto b2=b1+1;
+                const auto b3=b2+1;
+                const auto b4=b3+1;
+                if ((b4<e)
+                    &&(1==left_1_count(*b1))
+                    &&(1==left_1_count(*b2))
+                    &&(1==left_1_count(*b3))
+                    &&(1==left_1_count(*b4))) {
+                    b=b4;
+                    continue;
+                }
+                current_char=replace_char;
+            }break;
+            case 6: {
+                const auto b1=b+1;
+                const auto b2=b1+1;
+                const auto b3=b2+1;
+                const auto b4=b3+1;
+                const auto b5=b4+1;
+                if ((b5<e)
+                    &&(1==left_1_count(*b1))
+                    &&(1==left_1_count(*b2))
+                    &&(1==left_1_count(*b3))
+                    &&(1==left_1_count(*b4))
+                    &&(1==left_1_count(*b5))) {
+                    b=b5;
+                    continue;
+                }
+                current_char=replace_char;
+            }break;
+            case 7: current_char=replace_char; break;
+            case 8: current_char=replace_char; break;
+        }
+    }
+}
+
+void static inline remove_invalid_utf8(
+    char * b,
+    const char * const e) {
+    return remove_invalid_utf8(reinterpret_cast<unsigned char*>(b),
+        reinterpret_cast<const unsigned char*const>(e));
+}
+
+static inline QByteArray force_to_utf8(const QByteArray & argInput) {
+    auto arg=argInput;
+    char *begin=arg.data();
+    auto end=begin+arg.size();
+    remove_invalid_utf8(begin,end);
+    return std::move(arg);
+}
+
 static inline void parse_json(
     DownLoadBaiduImage::StateMachine & s,
-    const QByteArray &argJson) {
-
+    const QByteArray &argJsonInput) {
+    const auto argJson=force_to_utf8(argJsonInput);
     QJsonParseError varJsonError;
     auto varJsonDocument=QJsonDocument::fromJson(argJson,&varJsonError);
 
     if (varJsonError.error!=QJsonParseError::NoError) {
+#if defined(BAIDU_IMAGE_DEBUG)
+        std::ofstream ofs("error_.js",std::ios::binary);
+        ofs.write(argJson.constData(),argJson.size());
+        qDebug()<<varJsonError.errorString()<<varJsonError.offset;
+#endif
         return s.error_return(varJsonError.errorString());
     }
+
+#if defined(BAIDU_IMAGE_DEBUG)
+    {/*just for test*/
+        static std::atomic<std::int32_t> indentedJsonIndex={0};
+        auto indentedJson=varJsonDocument.toJson();
+        std::ofstream ofs(("js_test_"+
+            QByteArray::number(++indentedJsonIndex)
+            +"_.js").constData());
+        ofs<<indentedJson.constData();
+    }
+#endif
 
     const auto varRootObject=varJsonDocument.object();
     QJsonArray varJsonArray;
@@ -1612,6 +2002,8 @@ static inline void parse_json(
             }
         }
     }
+
+    return s.normal_return(DownLoadBaiduImage::state_downlod);
 
 }
 
