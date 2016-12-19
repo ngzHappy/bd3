@@ -98,6 +98,7 @@ public:
     const QString unknow_error="unknow error"_qstr;
     const QString baidu_image="http://image.baidu.com/"_qstr;
     const QByteArray get_baidu_image_url=u8R"///(http://image.baidu.com/search/acjson?tn=resultjson_com)///"_qba;
+    const QByteArray get_baidu_image_set_url=u8R"///(http://image.baidu.com/search/imagesetpic?tn=avatarnewimagesetpic)///"_qba;
 private:
     CPLUSPLUS_OBJECT(_PrivateBaiduStaticData)
 };

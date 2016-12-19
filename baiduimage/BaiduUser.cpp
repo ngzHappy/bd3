@@ -1317,7 +1317,7 @@ public:
         state_finished,
         state_error,
         state_start,
-        state_downlod,
+        state_download,
         state_download_set,
     };
 
@@ -1479,8 +1479,11 @@ inline void DownLoadBaiduImage::do_next() try {
         case state_start: varTP->runLambda([var=this->shared_from_this()]() {
             var->start_download();
         }); break;
-        case state_downlod: varTP->runLambda([var=this->shared_from_this()]() {
+        case state_download: varTP->runLambda([var=this->shared_from_this()]() {
             var->next_download();
+        });  break;
+        case state_download_set: varTP->runLambda([var=this->shared_from_this()]() {
+            var->next_download_set();
         });  break;
     }
 
@@ -1882,8 +1885,7 @@ void static inline remove_invalid_utf8(
                 if ((b2<e)
                         &&(1==left_1_count(*b1))
                         &&(1==left_1_count(*b2))) {
-                    b=b2;
-                    continue;
+                    b=b2; continue;
                 }
                 current_char=replace_char;
             }break;
@@ -1895,8 +1897,7 @@ void static inline remove_invalid_utf8(
                         &&(1==left_1_count(*b1))
                         &&(1==left_1_count(*b2))
                         &&(1==left_1_count(*b3))) {
-                    b=b3;
-                    continue;
+                    b=b3; continue;
                 }
                 current_char=replace_char;
             }break;
@@ -1910,8 +1911,7 @@ void static inline remove_invalid_utf8(
                         &&(1==left_1_count(*b2))
                         &&(1==left_1_count(*b3))
                         &&(1==left_1_count(*b4))) {
-                    b=b4;
-                    continue;
+                    b=b4; continue;
                 }
                 current_char=replace_char;
             }break;
@@ -1927,8 +1927,7 @@ void static inline remove_invalid_utf8(
                         &&(1==left_1_count(*b3))
                         &&(1==left_1_count(*b4))
                         &&(1==left_1_count(*b5))) {
-                    b=b5;
-                    continue;
+                    b=b5; continue;
                 }
                 current_char=replace_char;
             }break;
@@ -2049,7 +2048,7 @@ static inline void parse_json(
     }
 
     if (s->$m$imageSet.empty()) {
-        return s.normal_return(DownLoadBaiduImage::state_downlod);
+        return s.normal_return(DownLoadBaiduImage::state_download);
     }
     else {
         return s.normal_return(DownLoadBaiduImage::state_download_set);
@@ -2061,7 +2060,7 @@ inline void DownLoadBaiduImage::next_download() try {
 
     if (expired()) { return; }
 
-    StateMachine s(this,state_downlod);
+    StateMachine s(this,state_download);
     auto varSTD=getBaiduStaticData();
 
     QUrl varUrl;
@@ -2116,7 +2115,7 @@ inline void DownLoadBaiduImage::next_download() try {
             [varReply,var=this->shared_from_this()]() {
         varReply->deleteLater();
         try {
-            StateMachine s(var.get(),state_downlod);
+            StateMachine s(var.get(),state_download);
             if (s->expired()) { return; }
 
             QByteArray varJson=varReply->readAll();
@@ -2151,18 +2150,186 @@ catch (...) {
     CPLUSPLUS_EXCEPTION(false);
 }
 
+static inline void parse_set_json(
+    DownLoadBaiduImage::StateMachine & s,
+    const QByteArray &argJsonInput) {
+
+    const auto argJson=force_to_utf8(argJsonInput);
+    QJsonParseError varJsonError;
+    auto varJsonDocument=QJsonDocument::fromJson(argJson,&varJsonError);
+
+    if (varJsonError.error!=QJsonParseError::NoError) {
+#if defined(BAIDU_IMAGE_DEBUG)
+        std::ofstream ofs("error_set_.js",std::ios::binary);
+        ofs.write(argJson.constData(),argJson.size());
+        qDebug()<<varJsonError.errorString()<<varJsonError.offset;
+#endif
+        return s.error_return(varJsonError.errorString());
+    }
+
+#if defined(BAIDU_IMAGE_DEBUG)
+    {/*just for test*/
+        static std::atomic<std::int32_t> indentedJsonIndex={ 0 };
+        auto indentedJson=varJsonDocument.toJson();
+        std::ofstream ofs(("0x0000_js_set_test_"+
+            QByteArray::number(++indentedJsonIndex)
+            +"_.js").constData());
+        ofs<<indentedJson.constData();
+    }
+#endif
+
+    const auto varRootObject=varJsonDocument.object();
+    QJsonArray varJsonArray;
+
+    {/*遍历json*/
+        auto rootB=varRootObject.constBegin();
+        auto rootE=varRootObject.constEnd();
+
+        for (auto varI=rootB; varI!=rootE; ++varI) {
+            if (varI->isArray()&&(varI.key()=="data"_qls)) {
+                varJsonArray=varI->toArray();
+            }
+        }
+    }
+
+    if (varJsonArray.count()<1) {
+        if (s->$m$imageSet.empty()) {
+            return s.normal_return(DownLoadBaiduImage::state_download);
+        }
+        else {
+            return s.normal_return(DownLoadBaiduImage::state_download_set);
+        }
+    }
+
+    {/*遍历jsonarray*/
+        for (const auto & varI:qAsConst(varJsonArray)) {
+            if (varI.isObject()) {
+                auto jsonObject=varI.toObject();
+                auto cend=jsonObject.constEnd();
+                auto item=memory::make_shared< DownLoadBaiduImage::Item >();
+
+                do {
+                    auto objurl=jsonObject.constFind("objURL"_qls);
+                    if (objurl==cend) { break; }
+                    auto rawURL=objurl->toString().toUtf8();
+                    auto plainURL=uncompress_baidu_image(const_cast<char*>(rawURL.constBegin()),
+                        rawURL.constEnd());
+                    item->object_url=containers::string(plainURL.first,plainURL.second);
+                    if (item->object_url.empty()) { break; }
+                    auto & items=s->$m$externAns->$m$Items;
+                    item->image_index=static_cast<std::int32_t>(items.size());
+                    items.insert(item);
+                } while (false);
+
+            }
+        }
+    }
+
+    if (s->$m$imageSet.empty()) {
+        return s.normal_return(DownLoadBaiduImage::state_download);
+    }
+    else {
+        return s.normal_return(DownLoadBaiduImage::state_download_set);
+    }
+
+}
+
 inline void DownLoadBaiduImage::next_download_set() try {
     if (expired()) { return; }
 
     StateMachine s(this,state_download_set);
     auto varSTD=getBaiduStaticData();
 
+    const auto varIs=s->$m$imageSet.begin()->toUtf8().toPercentEncoding();
+    s->$m$imageSet.pop_front();
 
+    QUrl varUrl;
+    {
+        auto url_=cat_to_url(
+            "ipn","rj",
+            "ct","201326592",
+            "is",varIs,
+            "fp","detail",
+            "cl","2",
+            "lm","-1",
+            "ie","utf-8",
+            "oe","utf-8",
+            "adpicid","0",
+            "st","-1",
+            "word",s->image_key_word,
+            "z","0",
+            "ic","0",
+            "s","undefined",
+            "se","",
+            "tab","0",
+            "width","",
+            "height","",
+            "face","undefined",
+            "istype","1",
+            "qc","",
+            "nc=","",
+            "fr=","",
+            "simics","",
+            "srctype","",
+            "bdtype","-1",
+            "rpstart","0",
+            "rpnum","0",
+            "cardserver","",
+            "tabname","",
+            "pn","0",
+            "rn","60",
+            "gsm","0",
+            "1482124294084",""
+        );
+        QByteArray url=varSTD->get_baidu_image_set_url;
+        url.reserve(url.size()+static_cast<int>(url_.size())+4);
+        url.append(url_.c_str(),static_cast<int>(url_.size()));
+        varUrl.setUrl(url);
+    }
 
+    auto varNAM=$m$externSuperData->$m$networkAccessManager;
+    QNetworkRequest varREQ(varUrl);
+    varREQ.setRawHeader(varSTD->key_user_agent,varSTD->userAgent);
+    varREQ.setRawHeader(varSTD->key_cccept_encoding,varSTD->gzip_deflate);
+
+    auto varReply=varNAM->get(varREQ);
+
+    connect(varReply,&QNetworkReply::finished,
+        [varReply,var=this->shared_from_this()]() {
+        varReply->deleteLater();
+        try {
+            StateMachine s(var.get(),state_download_set);
+            if (s->expired()) { return; }
+
+            QByteArray varJson=varReply->readAll();
+
+            {/*获得json*/
+                if (varJson.isEmpty()) {
+                    return s.error_return(varReply->errorString());
+                }
+
+                /*解压gzip*/
+                if (qAsConst(varJson)[0]==char(0x001F)) {
+                    varJson=text::ungzip(varJson.cbegin(),varJson.cend());
+                }
+
+                if (varJson.isEmpty()) {
+                    return s.error_return(varReply->errorString());
+                }
+                clear_data(varReply);
+            }
+
+            parse_set_json(s,varJson);
+
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    });
 
     return s.normal_return(state_waiting);
 }
-catch (...) { 
+catch (...) {
     CPLUSPLUS_EXCEPTION(false);
 }
 
