@@ -100,15 +100,24 @@ void LoginTest::on_imageButton_clicked() {
     baiduUser->downLoad(imageTest);
 
     connect(imageTest.get(),&baidu::BaiduImage::finished,
-        [imageTest](bool,const auto&) mutable {
+        [imageTest](bool isok,const auto& e) mutable {
+        if (false==isok) {
+            qDebug()<<e;
+        }
+        auto runOnceLock=makeQRunOnce(imageTest);
         const auto & data=imageTest->getData();
         std::ofstream final_ans("final_ans.js");
         for (const auto & varI:data) {
             const auto & url=varI->imageUrl;
             final_ans.write(url.data(),url.size());
             final_ans.put('\n');
+            final_ans.put('\t');
+            final_ans.write("out=",4);
+            const auto varName = varI->imageName.toUtf8();
+            final_ans.write(varName.constData(),varName.size());
+            final_ans.put('\n');
         }
-        imageTest.reset();
+        
     });
 
 }

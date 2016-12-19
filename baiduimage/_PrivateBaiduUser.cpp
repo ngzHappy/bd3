@@ -1,4 +1,5 @@
-﻿#include "_PrivateBaiduUser.hpp"
+﻿#include <QtCore/qdebug.h>
+#include "_PrivateBaiduUser.hpp"
 
 namespace baidu{
 
@@ -81,6 +82,9 @@ NetworkCookieJar::~NetworkCookieJar(){
 
 }
 
+_PrivateBaiduUserNetworkAccessManager::~_PrivateBaiduUserNetworkAccessManager(){
+    //qDebug()<<"~_PrivateBaiduUserNetworkAccessManager";
+}
 
 }/*baidu*/
 

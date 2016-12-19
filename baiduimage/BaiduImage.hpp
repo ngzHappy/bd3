@@ -28,6 +28,7 @@ public:
     inline void setKeyWord(const QString &);
     inline void setKeyWord(QString &&);
 
+    ~BaiduImage();
 public:
     Q_SIGNAL void finished(bool,const QString &);
 private:

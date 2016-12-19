@@ -21,7 +21,8 @@ HEADERS += QtBasicLibrary.hpp\
     _PrivateQObjectsWatcher.hpp \
     QSingleThreadPool.hpp \
     QApplicationWatcher.hpp \
-    QNotifyObject.hpp
+    QNotifyObject.hpp \
+    QRunOnce.hpp
 
 include($$PWD/private_qt3rd_base_library/zlib.pri)
 include($$PWD/quazip/quazip.pri)

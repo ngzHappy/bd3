@@ -65,6 +65,14 @@ QNetworkReply *_PrivateBaiduUserNetworkAccessManager::createRequest(
         QIODevice *c) {
     auto ans=_Super::createRequest(a,b,c);
     $m$thisWatcher->add(ans);
+#ifdef DEBUG_BAIDUUSERNETWORKACCESSMANAGER
+    ++$m$replyCount;
+    qDebug()<<"+"<<$m$replyCount.load();
+    ans->connect(ans,&QObject::destroyed,this,[this]() {
+        --$m$replyCount;
+        qDebug()<<"-"<<$m$replyCount.load();
+    });
+#endif
     return std::move(ans);
 }
 
@@ -589,7 +597,8 @@ inline void Login::get_rsa_key() try {
     auto varReply=networkAM->get(req);
 
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() mutable {
+        auto runOnceLock=makeQRunOnce(var);
         try {
             varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_get_rsa_key };
@@ -708,8 +717,8 @@ inline void Login::get_baidu_token() try {
 
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() {
-        varReply->deleteLater();
+                      [var=this->shared_from_this(),varReply]() mutable {
+        auto runOnceLock=makeQRunOnce(var,*varReply);  
         StateMachine varStateMachine{ var.get(),state_get_baidu_token };
         try {
             if (var->expired()) { return; }
@@ -809,9 +818,9 @@ inline void Login::get_baidu_login_cookie() try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() mutable {
+        auto runOnceLock=makeQRunOnce(var,*varReply);
         try {
-            varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_getbaidu_login_cookie };
             if (varReply->error()!=QNetworkReply::NoError) {
                 return varStateMachine.error_return(varReply->errorString());
@@ -839,9 +848,9 @@ inline void Login::get_baidu_cookie() try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() {
+                      [var=this->shared_from_this(),varReply]() mutable {
+        auto runOnceLock=makeQRunOnce(var,*varReply);
         try {
-            varReply->deleteLater();
             StateMachine varStateMachine{ var.get(),state_getbaidu_cookie };
             if (varReply->error()!=QNetworkReply::NoError) {
                 return varStateMachine.error_return(varReply->errorString());
@@ -950,9 +959,9 @@ inline void Login::get_verifycode_image()try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,[
-        var=this->shared_from_this(),varReply]() {
+        var=this->shared_from_this(),varReply]() mutable {
+            auto runOnceLock=makeQRunOnce(var,*varReply);
             try {
-                varReply->deleteLater();
                 StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
                 if (var->expired()) { return; }
 
@@ -1034,7 +1043,8 @@ void BaiduUser::login(const QString &argUserName,
     /*同步更新数据*/
     connect(varLogin.get(),&DoBaiduUserObject::finished,
             this,[this,externAns=varLogin->$m$externAns](
-        bool a,const QString &b,const QImage & c) {
+        bool a,const QString &b,const QImage & c) mutable {
+        auto runOnceLock=makeQRunOnce(externAns);
         auto thisp=getPrivateData();
         thisp->$m$gid=externAns->$m$gid;
         thisp->$m$token=externAns->$m$token;
@@ -1529,13 +1539,13 @@ inline void DownLoadBaiduImage::update_data() {
             item->imageUrl=QByteArray(objurl.c_str(),static_cast<int>(objurl.size()));
 
             auto varImageName=
-                QByteArray::number(varI->image_index).leftJustified(16,'0');
+                QByteArray::number(varI->image_index).rightJustified(16,'0');
 
             auto suffixPos=objurl.find_last_of('.');
             if (suffixPos!=objurl.npos) {
                 auto suffixSize=(objurl.size()-suffixPos);
                 if ((suffixSize<6)&&(suffixSize>1)) {
-                    varImageName.append(objurl.data()+suffixPos+1,suffixSize-1);
+                    varImageName.append(objurl.data()+suffixPos,suffixSize);
                 }
                 else {
                     varImageName+=".jpg"_qls;
@@ -1979,6 +1989,8 @@ static inline void parse_json(
     const auto argJson=force_to_utf8(argJsonInput);
     QJsonParseError varJsonError;
     auto varJsonDocument=QJsonDocument::fromJson(argJson,&varJsonError);
+    
+    qDebug()<<s->page_current;
 
     if (varJsonError.error!=QJsonParseError::NoError) {
 #if defined(BAIDU_IMAGE_DEBUG)
@@ -2133,8 +2145,8 @@ inline void DownLoadBaiduImage::next_download() try {
     auto varReply=varNAM->get(varREQ);
 
     connect(varReply,&QNetworkReply::finished,
-            [varReply,var=this->shared_from_this()]() {
-        varReply->deleteLater();
+            [varReply,var=this->shared_from_this()]() mutable {
+        auto runOnceLock=makeQRunOnce(var,*varReply);
         try {
             StateMachine s(var.get(),state_download);
             if (s->expired()) { return; }
@@ -2323,8 +2335,8 @@ inline void DownLoadBaiduImage::next_download_set() try {
     auto varReply=varNAM->get(varREQ);
 
     connect(varReply,&QNetworkReply::finished,
-        [varReply,var=this->shared_from_this()]() {
-        varReply->deleteLater();
+        [varReply,var=this->shared_from_this()]() mutable {
+        auto runOnceLock=makeQRunOnce(var,*varReply);
         try {
             StateMachine s(var.get(),state_download_set);
             if (s->expired()) { return; }
@@ -2382,6 +2394,7 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
     connect(varImagesDownLoad.get(),&T::notify,
             arg.get(),[arg,
             externAns=varImagesDownLoad->$m$externAns]() mutable {
+        auto runOnceLock=makeQRunOnce(externAns);
         arg->setData(std::move(externAns->$m$AnsItems));
         if (externAns->$m$hasError) {
             arg->finished(false,externAns->$m$errorString);
@@ -2389,7 +2402,6 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
         else {
             arg->finished(true,{});
         }
-        arg.reset();
     },Qt::QueuedConnection);
 
     return varImagesDownLoad->do_next();
@@ -2397,6 +2409,10 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
 
 std::pair<char*,char *> BaiduUser::uncompressBaiduImageUrl(char*a,const char *const b) {
     return _private_baidu_image::uncompress_baidu_image(a,b);
+}
+
+BaiduImage::~BaiduImage() {
+    qDebug()<<"~BaiduImage";
 }
 
 }/*baidu*/

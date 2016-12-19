@@ -8,6 +8,8 @@ QT += widgets
 TARGET = baiduimage
 TEMPLATE = app
 
+CONFIG += console
+
 SOURCES += main.cpp\
         MainWindow.cpp \
     BaiduUser.cpp \

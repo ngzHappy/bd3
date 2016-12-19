@@ -46,7 +46,7 @@ public:
 private:
     CPLUSPLUS_OBJECT(NetworkCookieJar)
 };
-
+#define DEBUG_BAIDUUSERNETWORKACCESSMANAGER
 class _PrivateBaiduUserNetworkAccessManager : public QNetworkAccessManager {
     Q_OBJECT
 private:
@@ -59,9 +59,13 @@ public:
     NetworkCookieJar *cookieJar() const {
         return static_cast<NetworkCookieJar *>(_Super::cookieJar());
     }
+    ~_PrivateBaiduUserNetworkAccessManager();
 protected:
     QNetworkReply *createRequest(Operation,const QNetworkRequest &,QIODevice *) override;
     mutable QJSEngine $m$jsEngine;
+#ifdef DEBUG_BAIDUUSERNETWORKACCESSMANAGER
+    std::atomic<int> $m$replyCount={0};
+#endif
 private:
     CPLUSPLUS_OBJECT(_PrivateBaiduUserNetworkAccessManager)
 };
@@ -72,7 +76,7 @@ public:
     virtual ~_PrivateBaiduUser();
 
     void construct(std::shared_ptr<QSingleThreadPool> &&,BaiduUser *);
-   
+
     using NetworkAccessManager=_PrivateBaiduUserNetworkAccessManager;
     /*线程共享数据*/
     class ExternData {
