@@ -241,8 +241,8 @@ public:
     const QByteArray value_Content_Type{ "application/x-www-form-urlencoded"_qba };
     const QByteArray key_Accept_Encoding{ "Accept-Encoding"_qba };
     const QByteArray value_Accept_Encoding{ "gzip, deflate"_qba };
-    const std::map<int,QString,std::less<>,memory::Allocator<int>> error_code=[]() {
-        std::map<int,QString,std::less<>,memory::Allocator<int>> ans{
+    const std::map<int,QString,std::less<void>,memory::Allocator<int>> error_code=[]() {
+        std::map<int,QString,std::less<void>,memory::Allocator<int>> ans{
             { -1	    ,u8"系统错误,请您稍后再试"_qstr },
             { 1	        ,u8"您输入的帐号格式不正确"_qstr },
             { 2	        ,u8"您输入的帐号不存在"_qstr },
@@ -1423,8 +1423,6 @@ public:
     /*页面信息*/
     std::int32_t page_perpage=30;
     std::int32_t page_current=0;
-    std::int32_t page_last_count=0;
-    std::int32_t page_less_count=0;
     /**/
     int page_all_counts=(std::numeric_limits<int>::max)();
     /*图片信息*/
@@ -2164,7 +2162,12 @@ static inline void parse_set_json(
         ofs.write(argJson.constData(),argJson.size());
         qDebug()<<varJsonError.errorString()<<varJsonError.offset;
 #endif
-        return s.error_return(varJsonError.errorString());
+        if (s->$m$imageSet.empty()) {
+            return s.normal_return(DownLoadBaiduImage::state_download);
+        }
+        else {
+            return s.normal_return(DownLoadBaiduImage::state_download_set);
+        }
     }
 
 #if defined(BAIDU_IMAGE_DEBUG)
@@ -2206,12 +2209,13 @@ static inline void parse_set_json(
             if (varI.isObject()) {
                 auto jsonObject=varI.toObject();
                 auto cend=jsonObject.constEnd();
-                auto item=memory::make_shared< DownLoadBaiduImage::Item >();
+                auto item=memory::make_shared<DownLoadBaiduImage::Item>();
 
                 do {
                     auto objurl=jsonObject.constFind("objURL"_qls);
                     if (objurl==cend) { break; }
                     auto rawURL=objurl->toString().toUtf8();
+                    /**/
                     auto plainURL=uncompress_baidu_image(const_cast<char*>(rawURL.constBegin()),
                         rawURL.constEnd());
                     item->object_url=containers::string(plainURL.first,plainURL.second);
@@ -2239,6 +2243,10 @@ inline void DownLoadBaiduImage::next_download_set() try {
 
     StateMachine s(this,state_download_set);
     auto varSTD=getBaiduStaticData();
+
+    if ($m$imageSet.empty()) {
+        return s.normal_return(state_download);
+    }
 
     const auto varIs=s->$m$imageSet.begin()->toUtf8().toPercentEncoding();
     s->$m$imageSet.pop_front();
