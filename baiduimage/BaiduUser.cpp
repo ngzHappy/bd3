@@ -1318,6 +1318,7 @@ public:
         state_error,
         state_start,
         state_downlod,
+        state_download_set,
     };
 
     bool $m$isFinishedCalled=false;
@@ -1336,6 +1337,7 @@ public:
     inline void finished_error();
     inline void start_download();
     inline void next_download();
+    inline void next_download_set();
 
     class Item {
     public:
@@ -1417,6 +1419,7 @@ public:
 
     };
 
+    containers::list<QString> $m$imageSet;
     /*页面信息*/
     std::int32_t page_perpage=30;
     std::int32_t page_current=0;
@@ -2015,6 +2018,19 @@ static inline void parse_json(
                 auto jsonObject=varI.toObject();
                 auto cend=jsonObject.constEnd();
                 auto item=memory::make_shared< DownLoadBaiduImage::Item >();
+
+                do {/*"is": "0,0", "bdSetImgNum": 8, */
+                    auto bdSetImgNum=jsonObject.constFind("bdSetImgNum"_qls);
+                    if (bdSetImgNum==cend) { break; }
+                    auto setNum=bdSetImgNum->toInt();
+                    if (setNum<1) { break; }
+                    auto varIs=jsonObject.constFind("is"_qls);
+                    if (varIs==cend) { break; }
+                    auto varIsValue=varIs->toString().trimmed();
+                    if (varIsValue.isEmpty()) { break; }
+                    s->$m$imageSet.push_back(std::move(varIsValue));
+                } while (false);
+
                 do {
                     auto objurl=jsonObject.constFind("objURL"_qls);
                     if (objurl==cend) { break; }
@@ -2027,11 +2043,17 @@ static inline void parse_json(
                     item->image_index=static_cast<std::int32_t>(items.size());
                     items.insert(item);
                 } while (false);
+
             }
         }
     }
 
-    return s.normal_return(DownLoadBaiduImage::state_downlod);
+    if (s->$m$imageSet.empty()) {
+        return s.normal_return(DownLoadBaiduImage::state_downlod);
+    }
+    else {
+        return s.normal_return(DownLoadBaiduImage::state_download_set);
+    }
 
 }
 
@@ -2126,6 +2148,21 @@ inline void DownLoadBaiduImage::next_download() try {
     return s.normal_return(state_waiting);
 }
 catch (...) {
+    CPLUSPLUS_EXCEPTION(false);
+}
+
+inline void DownLoadBaiduImage::next_download_set() try {
+    if (expired()) { return; }
+
+    StateMachine s(this,state_download_set);
+    auto varSTD=getBaiduStaticData();
+
+
+
+
+    return s.normal_return(state_waiting);
+}
+catch (...) { 
     CPLUSPLUS_EXCEPTION(false);
 }
 
