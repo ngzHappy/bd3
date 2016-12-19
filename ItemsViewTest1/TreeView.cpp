@@ -60,7 +60,21 @@ TreeView::TreeView(QWidget *parent):
         std::unique_ptr<QObject> varOldDelegate{ this->itemDelegate() };
         this->setItemDelegate(new TreeViewItemDelegate(this));
     }
+     
+    {
+        connect(this,&TreeView::_p_scroll_to,this,
+            [this](const QModelIndex& argIndex) {
+            this->scrollTo(argIndex,QAbstractItemView::PositionAtCenter);
+        });
+    }
 
+}
+
+void TreeView::currentChanged(
+    const QModelIndex &current,
+    const QModelIndex &previous) {
+    _Super::currentChanged(current,previous);
+    _p_scroll_to(current);
 }
 
 TreeView::~TreeView() {

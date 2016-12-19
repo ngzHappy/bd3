@@ -11,33 +11,35 @@ int main(int argc, char *argv[]){
 
     auto * model = view.getItemsModel();
 
-//    {
-//        QString title("xxxx");
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//    }
+    for(int i=0;i<1000;++i){
+        QString title("xxxx");
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+    }
 
-//    {
-//        QString title("yyyyy");
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//        model->addListData(title,TreeViewItemData::instance());
-//    }
+    {
+        QString title("yyyyy");
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+        model->addListData(title,TreeViewItemData::instance());
+    }
 
-    QTimer timer;
-    timer.connect(&timer,&QTimer::timeout,
-                  [model](){
-        if(std::rand()&1){
-            model->addListData("aazz",TreeViewItemData::instance());
-        }else{
-            model->addListData("aazz",TreeViewItemData::instance());
-        }
-    });
-    timer.start(500);
+    view.setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+//    QTimer timer;
+//    timer.connect(&timer,&QTimer::timeout,
+//                  [model](){
+//        if(std::rand()&1){
+//            model->addListData("aazz",TreeViewItemData::instance());
+//        }else{
+//            model->addListData("aazz",TreeViewItemData::instance());
+//        }
+//    });
+//    timer.start(500);
 
     return app.exec();
 }

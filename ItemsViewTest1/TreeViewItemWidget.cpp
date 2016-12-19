@@ -11,11 +11,21 @@ void TreeViewItemWidget::paintEvent(QPaintEvent *event) {
 
     _Super::paintEvent(event);
 
-    QPainter painter(this);
-    painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor(122,255,33));
-    painter.fillRect(this->rect(),QColor(rand()&255,rand()&255,133));
+    const bool isSelected= $m$QStyleOptionViewItem.state & QStyle::State_Selected ;
 
+    QPainter painter(this);
+
+    if (isSelected) {
+        painter.setPen(QPen(QColor(0,0,0),2));
+        painter.setBrush(QColor(255,255,255));
+        painter.drawRect(this->rect());
+    }
+    else {
+        painter.setPen(Qt::NoPen);
+        painter.fillRect(this->rect(),QColor(rand()&255,rand()&255,133));
+    }
+
+    painter.setBrush(QColor(122,255,33));
     painter.setPen(QPen(QColor(0,0,0),2));
     painter.drawText(10,10,
         QString::number( reinterpret_cast<std::uintptr_t>( this )) );

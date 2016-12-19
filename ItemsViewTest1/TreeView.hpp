@@ -22,7 +22,9 @@ protected:
     void timerEvent(QTimerEvent *event) override;
     void verticalScrollbarValueChanged(int) override;
     void gcEvent();
+    void currentChanged(const QModelIndex &, const QModelIndex &)override;
     Q_SIGNAL void verticalScrollbarValueChangeFinished();
+    Q_SIGNAL void _p_scroll_to(const QModelIndex&);
 private:
     class _PrivateTreeView;
     _PrivateTreeView * $m$this;
