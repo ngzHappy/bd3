@@ -2,6 +2,8 @@
 #include <cassert>
 #include <type_traits>
 #include <shared_mutex>
+#include <QtCore/qdebug.h>
+#include <QtCore/qtimer.h>
 #include <QtCore/qthread.h>
 #include "QObjectsWatcher.hpp"
 #include "QApplicationWatcher.hpp"
@@ -17,7 +19,10 @@ QObjectsWatcher::QObjectsWatcher(QObject *arg):QObject(arg) {
 }
 
 QObjectsWatcher::~QObjectsWatcher() {
-    delete _pm_data;
+    auto _pm_old=_pm_data;
+    delete _pm_old;
+
+    _pm_data=nullptr;
 }
 
 _PrivateQObjectsWatcher::_PrivateQObjectsWatcher(QObjectsWatcher *s):super(s) {
@@ -28,6 +33,12 @@ _PrivateQObjectsWatcher::_PrivateQObjectsWatcher(QObjectsWatcher *s):super(s) {
 _PrivateQObjectsWatcher::~_PrivateQObjectsWatcher() {
 
 }
+
+static QObject * _delete_in_qapp=nullptr;
+static void _s_delete_in_qapp() {
+    _delete_in_qapp=new QObject;
+}
+Q_COREAPP_STARTUP_FUNCTION(_s_delete_in_qapp)
 
 void _PrivateQObjectsWatcher::do_quit() {
     isQuit=true;
@@ -40,12 +51,23 @@ void _PrivateQObjectsWatcher::do_quit() {
     }
 
     if (isDeleteOnFinished) {
-        delete super;
+     
+        if (_delete_in_qapp==nullptr) {
+            delete super;
+        }
+        else {
+            /*延迟10ms后删除*/
+            QTimer::singleShot(10,_delete_in_qapp,[super=this->super]() {
+                //qDebug()<<"delete do_quit"<<super;
+                delete super; 
+            });
+        }
     }
 }
 
 void _PrivateQObjectsWatcher::quit() {
     if (isQuit) { return; }
+
     auto varLock=getObjectItemsLock();
     if (isQuit) { return; }
     isQuit=true;
@@ -85,10 +107,15 @@ void _PrivateQObjectsWatcher::add(QObject *arg) {
 void _PrivateQObjectsWatcher::remove(QObject *arg) {
     if (arg==nullptr) { return; }
     auto varLock=getObjectItemsLock();
-    auto pos=objectItems.find(arg);
-    if (pos==objectItems.end()) { return; }
-    this->disconnect(pos->connectData);
-    objectItems.erase(pos);
+
+    {
+        auto pos=objectItems.find(arg);
+        if (pos==objectItems.end()) { return; }
+
+        this->disconnect(pos->connectData);
+
+        objectItems.erase(pos);
+    }
 
     /*really quit*/
     if ((isQuit)&&(objectItems.empty()==true)) {
@@ -118,11 +145,13 @@ void QObjectsWatcher::setOnFinishedDelete(bool arg) {
 }
 
 namespace {
+
 bool _p_isQAppQuited() {
     if (QCoreApplication::closingDown()) { return true; }
     if (QCoreApplication::startingUp()) { return false; }
     return QCoreApplication::instance()==nullptr;
 }
+
 }
 
 bool QObjectsWatcher::isQAppQuited() {

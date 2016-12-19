@@ -3,6 +3,8 @@
 #include <QtBasicLibrary.hpp>
 #include <QtWidgets/QApplication>
 
+#include <QtCore/qtimer.h>
+
 #include "BaiduUser.hpp"
 #include "LoginTest.hpp"
 
@@ -34,6 +36,12 @@ int main(int argc, char *argv[])try{
     QtBasicLibrary qtBasicLibrary;
       
     QApplicationWatcher<QApplication> app(argc, argv);
+
+    /*每隔一段时间清理内存*/
+    QTimer gcTimer;
+    gcTimer.connect(&gcTimer,&QTimer::timeout,
+        [](){memory::clean();});
+    gcTimer.start(512);
 
     {
         std::promise<bool> promise;

@@ -157,7 +157,8 @@ static void toQuitQThread(_ThreadObjectRunableEvent * obj,QThread *arg) {
               _ThreadObjectRunableEvent*a,QThread*d):
             _fun(f),
             _obj(a),
-            _data(d) {}
+            _data(d) {
+        }
         void do_run() override { _fun(_obj,_data); }
     private:
         CPLUSPLUS_OBJECT(Event)
@@ -220,7 +221,7 @@ QSingleThreadPool::QSingleThreadPool(const private_construct &) {
 QSingleThreadPool::QSingleThreadPool(QObject *p):QObject(p) {
     watcher_=QObjectsWatcher::instance();
 
-    std::promise< _p_thread_data_t > varPromise;
+    std::promise<_p_thread_data_t> varPromise;
     auto varThread=new _Thread(&varPromise);
 
     connect(varThread,&QThread::finished,
@@ -256,7 +257,7 @@ QSingleThreadPool::~QSingleThreadPool() {
 
 }
 
-void QSingleThreadPool::run(void(*f)(void), int p) {
+void QSingleThreadPool::run(void(*f)(void),int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(void);
@@ -269,7 +270,7 @@ void QSingleThreadPool::run(void(*f)(void), int p) {
     _p_run(new Event(f),p);
 }
 
-void QSingleThreadPool::run(void(*f)(void*),void *d, int p) {
+void QSingleThreadPool::run(void(*f)(void*),void *d,int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(void*);
@@ -283,7 +284,7 @@ void QSingleThreadPool::run(void(*f)(void*),void *d, int p) {
     _p_run(new Event(f,d),p);
 }
 
-void QSingleThreadPool::run(void(*f)(const void*),const void *d, int p) {
+void QSingleThreadPool::run(void(*f)(const void*),const void *d,int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const void*);
@@ -299,7 +300,7 @@ void QSingleThreadPool::run(void(*f)(const void*),const void *d, int p) {
 
 void QSingleThreadPool::run(
         void(*f)(const std::shared_ptr<void> &),
-        std::shared_ptr<void> d, int p) {
+        std::shared_ptr<void> d,int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const std::shared_ptr<void> &);
@@ -318,7 +319,7 @@ void QSingleThreadPool::run(
 
 void QSingleThreadPool::run(
         void(*f)(const std::shared_ptr<const void> &),
-        std::shared_ptr<const void> d, int p) {
+        std::shared_ptr<const void> d,int p) {
     if (f==nullptr) { return; }
     class Event :public _RunableEvent {
         void(*_fun)(const std::shared_ptr<const void> &);
@@ -335,7 +336,7 @@ void QSingleThreadPool::run(
     _p_run(new Event(f,std::move(d)),p);
 }
 
-void QSingleThreadPool::runStdFunction(std::function<void(void)> f, int p) {
+void QSingleThreadPool::runStdFunction(std::function<void(void)> f,int p) {
     if (bool(f)==false) { return; }
     class Event :public _RunableEvent {
         std::function<void(void)> _fun;
@@ -356,7 +357,7 @@ void QSingleThreadPool::removeWatcher(QObject *arg) {
     watcher_->remove(arg);
 }
 
-void QSingleThreadPool::_p_run(RunableEvent *arg, int p) {
+void QSingleThreadPool::_p_run(RunableEvent *arg,int p) {
     QCoreApplication::postEvent(thread_object_,arg,p);
 }
 
@@ -410,8 +411,7 @@ std::shared_ptr<QSingleThreadPool> QSingleThreadPool::qAppQSingleThreadPool() {
     return{};
 }
 
-
-std::weak_ptr<QSingleThreadPool> qAppQSingleThreadPoolWatcher(){
+std::weak_ptr<QSingleThreadPool> qAppQSingleThreadPoolWatcher() {
     std::shared_lock<std::shared_timed_mutex> _lock_{ *qappwatcher::getMutex() };
     auto app=qApp;
     if (app&&(app->closingDown()==false)) {

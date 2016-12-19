@@ -46,7 +46,8 @@ public:
 private:
     CPLUSPLUS_OBJECT(NetworkCookieJar)
 };
-#define DEBUG_BAIDUUSERNETWORKACCESSMANAGER
+
+//#define DEBUG_BAIDUUSERNETWORKACCESSMANAGER
 class _PrivateBaiduUserNetworkAccessManager : public QNetworkAccessManager {
     Q_OBJECT
 private:
@@ -78,6 +79,7 @@ public:
     void construct(std::shared_ptr<QSingleThreadPool> &&,BaiduUser *);
 
     using NetworkAccessManager=_PrivateBaiduUserNetworkAccessManager;
+   
     /*线程共享数据*/
     class ExternData {
     public:
@@ -86,6 +88,7 @@ public:
         NetworkAccessManager * $m$networkAccessManager=nullptr;
         void createNetworkAccessManager();
     };
+
     std::shared_ptr<ExternData> $m$externData;
     /*线程独占数据*/
     BaiduUser::BaiduUserState $m$state=BaiduUser::BaiduUserState::StateNone;

@@ -95,30 +95,86 @@ void LoginTest::on_imageButton_clicked() {
         baiduUser=new baidu::BaiduUser(memory::make_shared<QSingleThreadPool>());
     }
 
-    auto imageTest=memory::make_shared<baidu::BaiduImage>();
-    imageTest->setKeyWord(QString::fromUtf8(u8R"///(美女)///"));
-    baiduUser->downLoad(imageTest);
+    {
+        auto imageTest=memory::make_shared<baidu::BaiduImage>();
+        imageTest->setKeyWord(QString::fromUtf8(u8R"///(美女)///"));
+        baiduUser->downLoad(imageTest);
 
-    connect(imageTest.get(),&baidu::BaiduImage::finished,
-        [imageTest](bool isok,const auto& e) mutable {
-        if (false==isok) {
-            qDebug()<<e;
-        }
-        auto runOnceLock=makeQRunOnce(imageTest);
-        const auto & data=imageTest->getData();
-        std::ofstream final_ans("final_ans.js");
-        for (const auto & varI:data) {
-            const auto & url=varI->imageUrl;
-            final_ans.write(url.data(),url.size());
-            final_ans.put('\n');
-            final_ans.put('\t');
-            final_ans.write("out=",4);
-            const auto varName = varI->imageName.toUtf8();
-            final_ans.write(varName.constData(),varName.size());
-            final_ans.put('\n');
-        }
-        
-    });
+        connect(imageTest.get(),&baidu::BaiduImage::finished,
+            [imageTest](bool isok,const auto& e) mutable {
+            if (false==isok) {
+                qDebug()<<e;
+            }
+            auto runOnceLock=makeQRunOnce(imageTest);
+            const auto & data=imageTest->getData();
+            std::ofstream final_ans("meinv.txt");
+            for (const auto & varI:data) {
+                const auto & url=varI->imageUrl;
+                final_ans.write(url.data(),url.size());
+                final_ans.put('\n');
+                final_ans.put('\t');
+                final_ans.write("out=",4);
+                const auto varName=varI->imageName.toUtf8();
+                final_ans.write(varName.constData(),varName.size());
+                final_ans.put('\n');
+            }
+            memory::clean();
+        });
+    }
+
+    {
+        auto imageTest=memory::make_shared<baidu::BaiduImage>();
+        imageTest->setKeyWord(QString::fromUtf8(u8R"///(欧美美女)///"));
+        baiduUser->downLoad(imageTest);
+
+        connect(imageTest.get(),&baidu::BaiduImage::finished,
+            [imageTest](bool isok,const auto& e) mutable {
+            if (false==isok) {
+                qDebug()<<e;
+            }
+            auto runOnceLock=makeQRunOnce(imageTest);
+            const auto & data=imageTest->getData();
+            std::ofstream final_ans("oumeimeinv.txt");
+            for (const auto & varI:data) {
+                const auto & url=varI->imageUrl;
+                final_ans.write(url.data(),url.size());
+                final_ans.put('\n');
+                final_ans.put('\t');
+                final_ans.write("out=",4);
+                const auto varName=varI->imageName.toUtf8();
+                final_ans.write(varName.constData(),varName.size());
+                final_ans.put('\n');
+            }
+            memory::clean();
+        });
+    }
+
+    {
+        auto imageTest=memory::make_shared<baidu::BaiduImage>();
+        imageTest->setKeyWord(QString::fromUtf8(u8R"///(欧美萝莉)///"));
+        baiduUser->downLoad(imageTest);
+
+        connect(imageTest.get(),&baidu::BaiduImage::finished,
+            [imageTest](bool isok,const auto& e) mutable {
+            if (false==isok) {
+                qDebug()<<e;
+            }
+            auto runOnceLock=makeQRunOnce(imageTest);
+            const auto & data=imageTest->getData();
+            std::ofstream final_ans("oumeiluoli.txt");
+            for (const auto & varI:data) {
+                const auto & url=varI->imageUrl;
+                final_ans.write(url.data(),url.size());
+                final_ans.put('\n');
+                final_ans.put('\t');
+                final_ans.write("out=",4);
+                const auto varName=varI->imageName.toUtf8();
+                final_ans.write(varName.constData(),varName.size());
+                final_ans.put('\n');
+            }
+            memory::clean();
+        });
+    }
 
 }
 
