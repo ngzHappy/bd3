@@ -19,7 +19,7 @@
 #include <QtCore/qdebug.h>
 #endif
 
-#define BAIDU_IMAGE_DEBUG
+//#define BAIDU_IMAGE_DEBUG
 #if defined(BAIDU_IMAGE_DEBUG)
 #include <fstream>
 #include <QtCore/qdebug.h>
@@ -358,8 +358,9 @@ inline void Login::post_login() try {
 
     varReply->connect(varReply,&QNetworkReply::finished,
                       [var=this->shared_from_this(),varReply,
-                      varPsd=varPsd.pointer()]() {
+                      varPsd=varPsd.pointer()]() mutable {
         var->post_login_finished(varReply,varPsd);
+        var.reset();
     });
 
     return varStateMachine.normal_return(state_waiting);
@@ -1520,14 +1521,36 @@ inline void DownLoadBaiduImage::update_data() {
     auto & varItems=$m$externAns->$m$Items;
     auto & varAns=$m$externAns->$m$AnsItems;
     varAns.resize(static_cast<int>(varItems.size()));
+
     for (const auto & varI:varItems) {
         auto item=memory::make_shared<BaiduImage::Item>();
         {
             const auto & objurl=varI->object_url;
             item->imageUrl=QByteArray(objurl.c_str(),static_cast<int>(objurl.size()));
+
+            auto varImageName=
+                QByteArray::number(varI->image_index).leftJustified(16,'0');
+
+            auto suffixPos=objurl.find_last_of('.');
+            if (suffixPos!=objurl.npos) {
+                auto suffixSize=(objurl.size()-suffixPos);
+                if ((suffixSize<6)&&(suffixSize>1)) {
+                    varImageName.append(objurl.data()+suffixPos+1,suffixSize-1);
+                }
+                else {
+                    varImageName+=".jpg"_qls;
+                }
+            }
+            else {
+                varImageName+=".jpg"_qls;
+            }
+
+            item->imageName=varImageName;
+
         }
         varAns[varI->image_index]=std::move(item);
     }
+
     varItems.clear();
 }
 
@@ -2215,10 +2238,7 @@ static inline void parse_set_json(
                     auto objurl=jsonObject.constFind("objURL"_qls);
                     if (objurl==cend) { break; }
                     auto rawURL=objurl->toString().toUtf8();
-                    /**/
-                    auto plainURL=uncompress_baidu_image(const_cast<char*>(rawURL.constBegin()),
-                        rawURL.constEnd());
-                    item->object_url=containers::string(plainURL.first,plainURL.second);
+                    item->object_url=containers::string(rawURL.constData(),rawURL.size());
                     if (item->object_url.empty()) { break; }
                     auto & items=s->$m$externAns->$m$Items;
                     item->image_index=static_cast<std::int32_t>(items.size());
@@ -2361,15 +2381,15 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
 
     connect(varImagesDownLoad.get(),&T::notify,
             arg.get(),[arg,
-            externAns=varImagesDownLoad->$m$externAns]() {
-
+            externAns=varImagesDownLoad->$m$externAns]() mutable {
+        arg->setData(std::move(externAns->$m$AnsItems));
         if (externAns->$m$hasError) {
             arg->finished(false,externAns->$m$errorString);
         }
         else {
             arg->finished(true,{});
         }
-
+        arg.reset();
     },Qt::QueuedConnection);
 
     return varImagesDownLoad->do_next();

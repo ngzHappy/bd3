@@ -1,4 +1,5 @@
 ﻿#include <string>
+#include <fstream>
 #include "LoginTest.hpp"
 #include "ui_LoginTest.h"
 #include <QtCore/qdebug.h>
@@ -10,7 +11,7 @@ LoginTest::LoginTest(QWidget *parent):
     test_uncompress_baiduimage_url();
     /***********************************/
     vertifyitem=new QGraphicsPixmapItem;
-    ui->imageShow->setScene( new QGraphicsScene( ui->imageShow ) );
+    ui->imageShow->setScene(new QGraphicsScene(ui->imageShow));
     ui->imageShow->scene()->addItem(vertifyitem);
     baiduUser=new baidu::BaiduUser(memory::make_shared<QSingleThreadPool>());
     /***********************************/
@@ -42,11 +43,11 @@ void LoginTest::on_login_clicked() {
                 ui->userName->text(),
                 ui->passWord->text(),
                 ui->vertifyCode->text()
-                );
+    );
 
 }
 
-void LoginTest::test_uncompress_baiduimage_url(){
+void LoginTest::test_uncompress_baiduimage_url() {
     using namespace baidu;
     BaiduUser::uncompressBaiduImageUrl(nullptr,nullptr);
     using namespace std::string_literals;
@@ -81,21 +82,37 @@ void LoginTest::test_uncompress_baiduimage_url(){
 
 }
 
-void LoginTest::on_deleteButton_clicked(){
-    if(baiduUser){
+void LoginTest::on_deleteButton_clicked() {
+    if (baiduUser) {
         delete baiduUser;
         baiduUser=nullptr;
     }
 }
 
-void LoginTest::on_imageButton_clicked(){
+void LoginTest::on_imageButton_clicked() {
 
     if (baiduUser==nullptr) {
         baiduUser=new baidu::BaiduUser(memory::make_shared<QSingleThreadPool>());
     }
 
-    auto imageTest = memory::make_shared<baidu::BaiduImage>();
+    auto imageTest=memory::make_shared<baidu::BaiduImage>();
     imageTest->setKeyWord(QString::fromUtf8(u8R"///(美女)///"));
-    baiduUser->downLoad( imageTest );
+    baiduUser->downLoad(imageTest);
+
+    connect(imageTest.get(),&baidu::BaiduImage::finished,
+        [imageTest](bool,const auto&) mutable {
+        const auto & data=imageTest->getData();
+        std::ofstream final_ans("final_ans.js");
+        for (const auto & varI:data) {
+            const auto & url=varI->imageUrl;
+            final_ans.write(url.data(),url.size());
+            final_ans.put('\n');
+        }
+        imageTest.reset();
+    });
 
 }
+
+
+
+
