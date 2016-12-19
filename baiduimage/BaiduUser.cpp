@@ -103,8 +103,8 @@ namespace _private_login {
 
 class StaticData_postLogin;
 class Login :
-    public baidu::DoBaiduUserObject,
-    public std::enable_shared_from_this<Login> {
+        public baidu::DoBaiduUserObject,
+        public std::enable_shared_from_this<Login> {
 public:
     /*input output*/
     class ExternAns {
@@ -207,18 +207,18 @@ private:
 
 QLatin1String Login::state_to_string(State state) {
     switch (state) {
-        case Login::state_create_networkaccessmanager: return u8R"///(state_create_networkaccessmanager)///"_qls;
-        case Login::state_waiting: return u8R"///(state_waiting)///"_qls;
-        case Login::state_error: return u8R"///(state_error)///"_qls;
-        case Login::state_success: return u8R"///(state_success)///"_qls;
-        case Login::state_getbaidu_cookie: return u8R"///(state_getbaidu_cookie)///"_qls;
-        case Login::state_getbaidu_login_cookie: return u8R"///(state_getbaidu_login_cookie)///"_qls;
-        case Login::state_get_baidu_token: return u8R"///(state_get_baidu_token)///"_qls;
-        case Login::state_get_rsa_key: return u8R"///(state_get_rsa_key)///"_qls;
-        case Login::state_encrypt_RSA: return u8R"///(state_encrypt_RSA)///"_qls;
-        case Login::state_post_login: return u8R"///(state_post_login)///"_qls;
-        case Login::state_get_verifycode_image: return u8R"///(state_get_verifycode_image)///"_qls;
-        case Login::state_verifycode: return u8R"///(state_verifycode)///"_qls;
+    case Login::state_create_networkaccessmanager: return u8R"///(state_create_networkaccessmanager)///"_qls;
+    case Login::state_waiting: return u8R"///(state_waiting)///"_qls;
+    case Login::state_error: return u8R"///(state_error)///"_qls;
+    case Login::state_success: return u8R"///(state_success)///"_qls;
+    case Login::state_getbaidu_cookie: return u8R"///(state_getbaidu_cookie)///"_qls;
+    case Login::state_getbaidu_login_cookie: return u8R"///(state_getbaidu_login_cookie)///"_qls;
+    case Login::state_get_baidu_token: return u8R"///(state_get_baidu_token)///"_qls;
+    case Login::state_get_rsa_key: return u8R"///(state_get_rsa_key)///"_qls;
+    case Login::state_encrypt_RSA: return u8R"///(state_encrypt_RSA)///"_qls;
+    case Login::state_post_login: return u8R"///(state_post_login)///"_qls;
+    case Login::state_get_verifycode_image: return u8R"///(state_get_verifycode_image)///"_qls;
+    case Login::state_verifycode: return u8R"///(state_verifycode)///"_qls;
     }
     return u8R"///(unknow)///"_qls;
 }
@@ -281,7 +281,7 @@ inline void Login::post_login() try {
 
     auto varSTD=getBaiduStaticData();
     static memory::StaticPointer<StaticData_postLogin>
-        varPsd{ staticData_postLogin };
+            varPsd{ staticData_postLogin };
     auto & externData=*($m$externAns);
 
     const static constexpr char staticPage[]={ "https%3A%2F%2Fwww.baidu.com%2Fcache%2Fuser%2Fhtml%2Fv3Jump.html" };
@@ -301,11 +301,11 @@ inline void Login::post_login() try {
         const auto tt=BaiduUser::currentTime();
         /*用户名*/
         const QByteArray varUserName=$m$userName
-            .toUtf8()
-            .toPercentEncoding();
+                .toUtf8()
+                .toPercentEncoding();
         /*一个随机数*/
         const auto ppui_logintime=
-            QByteArray::number(9900+(std::rand()&511));
+                QByteArray::number(9900+(std::rand()&511));
         /*构建临时对象缓存数据*/
         const auto varTmpPostData=cat_to_url(
                     "staticpage",staticPage,
@@ -336,7 +336,7 @@ inline void Login::post_login() try {
                     "ppui_logintime",ppui_logintime,
                     "countrycode","",
                     "callback","parent.bd__pcbs__s09032"
-        );
+                    );
 
         auto varPostSize=static_cast<int>(varTmpPostData.size())-1;
         varPostData.reserve(varPostSize+4);
@@ -365,7 +365,7 @@ inline void Login::post_login() try {
     return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 class PostLoginJSParserAns {
@@ -382,13 +382,13 @@ static void parserPostLoginJS(
         const gumbo::string&varJS,
         const StaticData_postLogin*varPSD,
         PostLoginJSParserAns*varAns
-) {
+        ) {
     int varErrorNO=0;
     do {
         std::cmatch error_no;
         if (std::regex_search(
-            varJS.c_str(),varJS.c_str()+varJS.size(),
-            error_no,varPSD->error_no_regex)) {
+                    varJS.c_str(),varJS.c_str()+varJS.size(),
+                    error_no,varPSD->error_no_regex)) {
             varErrorNO=std::atoi(error_no[1].first);
             varAns->errorCode=varErrorNO;
             if (varErrorNO!=0) {
@@ -398,13 +398,13 @@ static void parserPostLoginJS(
                     /*codeString=([^&]+)*/
                     std::cmatch code_string;
                     if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
-                        code_string,varPSD->code_string_regex)) {
+                                          code_string,varPSD->code_string_regex)) {
                         varAns->VertifyCodeID=QByteArray(code_string[1].first,
                                 static_cast<int>(code_string[1].length()));
                         varAns->VertifyCodeUrl=varPSD->code_string_url
-                            +varAns->VertifyCodeID;
+                                +varAns->VertifyCodeID;
                         if (std::regex_search(varJS.c_str(),varJS.c_str()+varJS.size(),
-                            code_string,varPSD->vcodetype_regex)) {
+                                              code_string,varPSD->vcodetype_regex)) {
                             auto varTmp=QByteArray(code_string[1].first,
                                     static_cast<int>(code_string[1].length()));
 #ifndef NDEBUG
@@ -413,7 +413,7 @@ static void parserPostLoginJS(
 #endif
 
                             varAns->vcodetype=varTmp.replace(u8R"(\/)",2,u8R"(/)",1)
-                                .toPercentEncoding();
+                                    .toPercentEncoding();
 #ifndef NDEBUG
                             assert(check_test.toUtf8().toPercentEncoding()
                                    ==varAns->vcodetype);
@@ -474,7 +474,7 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     }
 
     auto varTmpJson=
-        gumbo::getAllJavaScript(varReplyData.cbegin(),varReplyData.cend());
+            gumbo::getAllJavaScript(varReplyData.cbegin(),varReplyData.cend());
 
     if (varTmpJson.empty()) {
         return varStateMachine.error_return(u8R"///(can not find json)///"_qls);
@@ -505,14 +505,14 @@ inline void Login::post_login_finished(QNetworkReply *varReply,
     {/*登陆百度图片，获得cookie，不必等待返回*/
         auto varReply=networkAM->get(QNetworkRequest(QUrl(varSD->baidu_image)));
         varReply->connect(varReply,&QNetworkReply::finished,
-            varReply,&QObject::deleteLater);
+                          varReply,&QObject::deleteLater);
     }
 
     return varStateMachine.normal_return(state_success);
 
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void Login::encrypt_RSA() try {
@@ -548,7 +548,7 @@ inline void Login::encrypt_RSA() try {
 
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void Login::get_rsa_key() try {
@@ -672,7 +672,7 @@ inline void Login::get_rsa_key() try {
     return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void Login::get_baidu_token() try {
@@ -691,7 +691,7 @@ inline void Login::get_baidu_token() try {
                     "gid",gid,
                     "logintype","dialogLogin",
                     "callback","bd__cbs__akwyzc"
-        );
+                    );
         QByteArray varTmpUrl;
         varTmpUrl.reserve(4
                           +varSTD->baidu_token_url.size()
@@ -766,8 +766,8 @@ inline void Login::get_baidu_token() try {
 
                     /*进一步检查token是否正确*/
                     if (false==std::regex_match(ansToken.cbegin(),
-                        ansToken.cend(),
-                        varSTD->token_check)) {
+                                                ansToken.cend(),
+                                                varSTD->token_check)) {
                         return varStateMachine.error_return("find token is not right!"_qls);
                     }
 
@@ -789,7 +789,7 @@ inline void Login::get_baidu_token() try {
 
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 /*the cookie has been set in cookiejar*/
@@ -825,7 +825,7 @@ inline void Login::get_baidu_login_cookie() try {
     return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 /*the cookie has been set in cookiejar*/
@@ -855,7 +855,7 @@ inline void Login::get_baidu_cookie() try {
     return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline bool Login::expired() const {
@@ -873,7 +873,7 @@ inline void Login::finished_error() {
     $m$isFinishedCalled=true;
     if (this->expired()) { return; }
     this->finished(false,state_to_string($m$state)+
-        (" : "_qls+$m$errorString),{});
+                   (" : "_qls+$m$errorString),{});
 }
 
 inline void Login::finished_verifycode() {
@@ -887,31 +887,31 @@ inline void Login::finished_verifycode() {
 inline void Login::do_next() try {
     if (this->expired()) { return; }
     switch ($m$nextState) {
-        case state_create_networkaccessmanager:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->create_networkaccessmanager(); });
-        case state_waiting:break;
-        case state_error:finished_error(); break;
-        case state_success:finished_success(); break;
-        case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_baidu_cookie(); });
-        case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
-        case state_get_baidu_token:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_baidu_token(); });
-        case state_get_rsa_key:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_rsa_key(); });
-        case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->encrypt_RSA(); });
-        case state_post_login:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->post_login(); });
-        case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_verifycode_image(); });
-        case state_verifycode:finished_verifycode(); break;
+    case state_create_networkaccessmanager:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->create_networkaccessmanager(); });
+    case state_waiting:break;
+    case state_error:finished_error(); break;
+    case state_success:finished_success(); break;
+    case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->get_baidu_cookie(); });
+    case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
+    case state_get_baidu_token:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->get_baidu_token(); });
+    case state_get_rsa_key:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->get_rsa_key(); });
+    case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->encrypt_RSA(); });
+    case state_post_login:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->post_login(); });
+    case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
+                    [var=this->shared_from_this()](){var->get_verifycode_image(); });
+    case state_verifycode:finished_verifycode(); break;
     }
 
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void Login::create_networkaccessmanager()try {
@@ -934,7 +934,7 @@ inline void Login::create_networkaccessmanager()try {
 
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void Login::get_verifycode_image()try {
@@ -949,45 +949,45 @@ inline void Login::get_verifycode_image()try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,[
-        var=this->shared_from_this(),varReply]() {
-            try {
-                varReply->deleteLater();
-                StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
-                if (var->expired()) { return; }
+                      var=this->shared_from_this(),varReply]() {
+        try {
+            varReply->deleteLater();
+            StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
+            if (var->expired()) { return; }
 
-                QImage varImage;
-                {
-                    auto varImageData=varReply->readAll();
+            QImage varImage;
+            {
+                auto varImageData=varReply->readAll();
 
-                    if (varImageData.isEmpty()) {
-                        return varStateMachine.error_return(u8R"///(获取验证码图像错误)///"_qstr);
-                    }
-
-                    /*解压gzip*/
-                    if (qAsConst(varImageData)[0]==char(0x001F)) {
-                        varImageData=text::ungzip(varImageData.cbegin(),
-                                                  varImageData.cend());
-                    }
-
-                    varImage=QImage::fromData(varImageData);
-                }
-
-                if ((varImage.width()<1)||(varImage.height()<1)) {
+                if (varImageData.isEmpty()) {
                     return varStateMachine.error_return(u8R"///(获取验证码图像错误)///"_qstr);
                 }
 
-                var->$m$externAns->$m$verifycode_image=std::move(varImage);
-                return varStateMachine.normal_return(state_verifycode);
+                /*解压gzip*/
+                if (qAsConst(varImageData)[0]==char(0x001F)) {
+                    varImageData=text::ungzip(varImageData.cbegin(),
+                                              varImageData.cend());
+                }
+
+                varImage=QImage::fromData(varImageData);
             }
-            catch (...) {
-                CPLUSPLUS_EXCEPTION(false);
+
+            if ((varImage.width()<1)||(varImage.height()<1)) {
+                return varStateMachine.error_return(u8R"///(获取验证码图像错误)///"_qstr);
             }
-        });
+
+            var->$m$externAns->$m$verifycode_image=std::move(varImage);
+            return varStateMachine.normal_return(state_verifycode);
+        }
+        catch (...) {
+            CPLUSPLUS_EXCEPTION(false);
+        }
+    });
 
     return varStateMachine.normal_return(state_waiting);
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 }/**/
@@ -1021,11 +1021,11 @@ void BaiduUser::login(const QString &argUserName,
     varLogin->$m$superPrivate=this->$m$thisp;
     varLogin->$m$singleThreadPool=getPrivateData()->$m$externData->$m$threadPool.get();
     varLogin->$m$externAns->$m$gid=thisp->$m$gid.isEmpty()?
-        BaiduUser::gid():thisp->$m$gid;
+                BaiduUser::gid():thisp->$m$gid;
     varLogin->$m$externAns->$m$isBaiduAsked=thisp->$m$isBaiduAsked;
     if (argVertifyCode.isEmpty()==false) {
         varLogin->$m$externAns->$m$verifycode=
-            argVertifyCode.toUtf8().toPercentEncoding();
+                argVertifyCode.toUtf8().toPercentEncoding();
         varLogin->$m$externAns->$m$codestring=thisp->$m$vertifyCodeString;
     }
 
@@ -1033,7 +1033,7 @@ void BaiduUser::login(const QString &argUserName,
     /*同步更新数据*/
     connect(varLogin.get(),&DoBaiduUserObject::finished,
             this,[this,externAns=varLogin->$m$externAns](
-        bool a,const QString &b,const QImage & c) {
+            bool a,const QString &b,const QImage & c) {
         auto thisp=getPrivateData();
         thisp->$m$gid=externAns->$m$gid;
         thisp->$m$token=externAns->$m$token;
@@ -1079,7 +1079,7 @@ QByteArray BaiduUser::gid() {
             toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
             toHex0[std::rand()&15],toHex0[std::rand()&15],toHex0[std::rand()&15],
             toHex0[std::rand()&15],toHex0[std::rand()&15]
-        } {
+    } {
         }
     };
 
@@ -1308,8 +1308,8 @@ std::pair<char *,char *> uncompress_baidu_image(char * begin,const char * const 
 }
 
 class DownLoadBaiduImage :
-    public DoBaiduUserObject,
-    public std::enable_shared_from_this<DownLoadBaiduImage> {
+        public DoBaiduUserObject,
+        public std::enable_shared_from_this<DownLoadBaiduImage> {
 public:
 
     enum State {
@@ -1346,22 +1346,46 @@ public:
     };
 
     class ItemLess {
+        static inline bool _p_less(const containers::string &l,const containers::string &r){
+            /*同一个对象*/
+            if(&l==&r){
+                return false;
+            }
+            /*比较大小*/
+            {
+                const auto varLS=l.size();
+                const auto varRS=r.size();
+                if( varLS < varRS ){ return true; }
+                if( varRS < varLS  ){ return false; }
+            }
+            /*比较值*/
+            auto lb=l.begin();
+            auto le=l.end();
+            auto rb=r.begin();
+            for(;lb!=le;++lb,++rb){
+                const auto &varL=*lb;
+                const auto &varR=*rb;
+                if( varL < varR ){ return true; }
+                if( varR < varL ){ return false; }
+            }
+            return false;
+        }
     public:
 
         bool operator()(const Item&l,const Item &r)const {
-            return l.object_url<r.object_url;
+            return _p_less(l.object_url,r.object_url);
         }
 
         bool operator()(const std::shared_ptr<Item>&l,const std::shared_ptr<Item>&r)const {
-            return l->object_url<r->object_url;
+            return _p_less(l->object_url,r->object_url);
         }
 
         bool operator()(const Item&l,const std::shared_ptr<Item>&r)const {
-            return l.object_url<r->object_url;
+            return _p_less(l.object_url,r->object_url);
         }
 
         bool operator()(const std::shared_ptr<Item>&l,const Item &r)const {
-            return l->object_url<r.object_url;
+            return _p_less(l->object_url,r.object_url);
         }
 
         using  is_transparent=std::less<void>::is_transparent;
@@ -1414,7 +1438,7 @@ inline bool DownLoadBaiduImage::expired() const {
 }
 
 inline DownLoadBaiduImage::StateMachine::StateMachine(
-    DownLoadBaiduImage *a,State s):$m$super(a) {
+        DownLoadBaiduImage *a,State s):$m$super(a) {
     a->$m$currentState=s;
     a->$m$nextState=state_error;
 }
@@ -1446,20 +1470,20 @@ inline void DownLoadBaiduImage::do_next() try {
     if (expired()) { return; }
     auto varTP=$m$externSuperData->$m$threadPool.get();
     switch ($m$nextState) {
-        case state_waiting:break;
-        case state_finished: finished_success(); break;
-        case state_error: finished_error(); break;
-        case state_start: varTP->runLambda([var=this->shared_from_this()]() {
+    case state_waiting:break;
+    case state_finished: finished_success(); break;
+    case state_error: finished_error(); break;
+    case state_start: varTP->runLambda([var=this->shared_from_this()]() {
             var->start_download();
         }); break;
-        case state_downlod: varTP->runLambda([var=this->shared_from_this()]() {
+    case state_downlod: varTP->runLambda([var=this->shared_from_this()]() {
             var->next_download();
         });  break;
     }
 
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void DownLoadBaiduImage::finished_success() {
@@ -1485,7 +1509,7 @@ inline void DownLoadBaiduImage::start_download() try {
     return next_download();
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 inline void DownLoadBaiduImage::update_data() {
@@ -1833,89 +1857,89 @@ UTF-8 valid format list:
 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
 */
 void static inline remove_invalid_utf8(
-    unsigned char * b,
-    const unsigned char * const e) {
+        unsigned char * b,
+        const unsigned char * const e) {
     constexpr unsigned char replace_char=' ';
     for (; b<e; ++b) {
         auto & current_char=*b;
         auto current_char_left_1=left_1_count(current_char);
         switch (current_char_left_1) {
-            case 0:continue; break;
-            case 1:current_char=replace_char; break;
-            case 2: {
-                const auto b1=b+1;
-                if ((b1<e)&&(1==left_1_count(*b1))) {
-                    b=b1; continue;
-                }
-                current_char=replace_char;
-            } break;
-            case 3: {
-                const auto b1=b+1;
-                const auto b2=b1+1;
-                if ((b2<e)
+        case 0:continue; break;
+        case 1:current_char=replace_char; break;
+        case 2: {
+            const auto b1=b+1;
+            if ((b1<e)&&(1==left_1_count(*b1))) {
+                b=b1; continue;
+            }
+            current_char=replace_char;
+        } break;
+        case 3: {
+            const auto b1=b+1;
+            const auto b2=b1+1;
+            if ((b2<e)
                     &&(1==left_1_count(*b1))
                     &&(1==left_1_count(*b2))) {
-                    b=b2;
-                    continue;
-                }
-                current_char=replace_char;
-            }break;
-            case 4: {
-                const auto b1=b+1;
-                const auto b2=b1+1;
-                const auto b3=b2+1;
-                if ((b3<e)
+                b=b2;
+                continue;
+            }
+            current_char=replace_char;
+        }break;
+        case 4: {
+            const auto b1=b+1;
+            const auto b2=b1+1;
+            const auto b3=b2+1;
+            if ((b3<e)
                     &&(1==left_1_count(*b1))
                     &&(1==left_1_count(*b2))
                     &&(1==left_1_count(*b3))) {
-                    b=b3;
-                    continue;
-                }
-                current_char=replace_char;
-            }break;
-            case 5: {
-                const auto b1=b+1;
-                const auto b2=b1+1;
-                const auto b3=b2+1;
-                const auto b4=b3+1;
-                if ((b4<e)
+                b=b3;
+                continue;
+            }
+            current_char=replace_char;
+        }break;
+        case 5: {
+            const auto b1=b+1;
+            const auto b2=b1+1;
+            const auto b3=b2+1;
+            const auto b4=b3+1;
+            if ((b4<e)
                     &&(1==left_1_count(*b1))
                     &&(1==left_1_count(*b2))
                     &&(1==left_1_count(*b3))
                     &&(1==left_1_count(*b4))) {
-                    b=b4;
-                    continue;
-                }
-                current_char=replace_char;
-            }break;
-            case 6: {
-                const auto b1=b+1;
-                const auto b2=b1+1;
-                const auto b3=b2+1;
-                const auto b4=b3+1;
-                const auto b5=b4+1;
-                if ((b5<e)
+                b=b4;
+                continue;
+            }
+            current_char=replace_char;
+        }break;
+        case 6: {
+            const auto b1=b+1;
+            const auto b2=b1+1;
+            const auto b3=b2+1;
+            const auto b4=b3+1;
+            const auto b5=b4+1;
+            if ((b5<e)
                     &&(1==left_1_count(*b1))
                     &&(1==left_1_count(*b2))
                     &&(1==left_1_count(*b3))
                     &&(1==left_1_count(*b4))
                     &&(1==left_1_count(*b5))) {
-                    b=b5;
-                    continue;
-                }
-                current_char=replace_char;
-            }break;
-            case 7: current_char=replace_char; break;
-            case 8: current_char=replace_char; break;
+                b=b5;
+                continue;
+            }
+            current_char=replace_char;
+        }break;
+        case 7: current_char=replace_char; break;
+        case 8: current_char=replace_char; break;
         }
     }
 }
 
 void static inline remove_invalid_utf8(
-    char * b,
-    const char * const e) {
+        char * b,
+        const char * const e) {
     return remove_invalid_utf8(reinterpret_cast<unsigned char*>(b),
-        reinterpret_cast<const unsigned char*const>(e));
+                               reinterpret_cast<const unsigned char*const>(e));
 }
 
 static inline QByteArray force_to_utf8(const QByteArray & argInput) {
@@ -1927,8 +1951,8 @@ static inline QByteArray force_to_utf8(const QByteArray & argInput) {
 }
 
 static inline void parse_json(
-    DownLoadBaiduImage::StateMachine & s,
-    const QByteArray &argJsonInput) {
+        DownLoadBaiduImage::StateMachine & s,
+        const QByteArray &argJsonInput) {
     const auto argJson=force_to_utf8(argJsonInput);
     QJsonParseError varJsonError;
     auto varJsonDocument=QJsonDocument::fromJson(argJson,&varJsonError);
@@ -1947,8 +1971,8 @@ static inline void parse_json(
         static std::atomic<std::int32_t> indentedJsonIndex={0};
         auto indentedJson=varJsonDocument.toJson();
         std::ofstream ofs(("js_test_"+
-            QByteArray::number(++indentedJsonIndex)
-            +"_.js").constData());
+                           QByteArray::number(++indentedJsonIndex)
+                           +"_.js").constData());
         ofs<<indentedJson.constData();
     }
 #endif
@@ -1981,6 +2005,10 @@ static inline void parse_json(
         }
     }
 
+    if( varJsonArray.count() < 2 ){
+        return s.normal_return( DownLoadBaiduImage::state_finished );
+    }
+
     {/*遍历jsonarray*/
         for (const auto & varI:qAsConst(varJsonArray)) {
             if (varI.isObject()) {
@@ -1992,7 +2020,7 @@ static inline void parse_json(
                     if (objurl==cend) { break; }
                     auto rawURL=objurl->toString().toUtf8();
                     auto plainURL=uncompress_baidu_image(const_cast<char*>(rawURL.constBegin()),
-                        rawURL.constEnd());
+                                                         rawURL.constEnd());
                     item->object_url=containers::string(plainURL.first,plainURL.second);
                     if (item->object_url.empty()) { break; }
                     auto & items=s->$m$externAns->$m$Items;
@@ -2019,35 +2047,35 @@ inline void DownLoadBaiduImage::next_download() try {
         const auto pn=QByteArray::number(s->page_current);
         const auto rn=QByteArray::number(s->page_perpage);
         const auto url_=cat_to_url(
-            /**/"ipn","rj",
-            /**/"ct","201326592",
-            /**/"is","",
-            /**/"fp","result",
-            /**/"queryWord",s->image_key_word,
-            /**/"cl","2",
-            /**/"lm","-1",
-            /**/"ie","utf-8",
-            /**/"oe","utf-8",
-            /**/"adpicid","",
-            /**/"st","-1",
-            /**/"z","",
-            /**/"ic","0",
-            /**/"word",s->image_key_word,
-            /**/"s","",
-            /**/"se","",
-            /**/"tab","",
-            /**/"width","",
-            /**/"height","",
-            /**/"face","0",
-            /**/"istype","2",
-            /**/"qc","",
-            /**/"nc","1",
-            /**/"fr","",
-            /**/"pn",pn,
-            /**/"rn",rn,
-            /**/"gsm","96",
-            /**/"1482041581410",""
-        );
+                    /**/"ipn","rj",
+                    /**/"ct","201326592",
+                    /**/"is","",
+                    /**/"fp","result",
+                    /**/"queryWord",s->image_key_word,
+                    /**/"cl","2",
+                    /**/"lm","-1",
+                    /**/"ie","utf-8",
+                    /**/"oe","utf-8",
+                    /**/"adpicid","",
+                    /**/"st","-1",
+                    /**/"z","",
+                    /**/"ic","0",
+                    /**/"word",s->image_key_word,
+                    /**/"s","",
+                    /**/"se","",
+                    /**/"tab","",
+                    /**/"width","",
+                    /**/"height","",
+                    /**/"face","0",
+                    /**/"istype","2",
+                    /**/"qc","",
+                    /**/"nc","1",
+                    /**/"fr","",
+                    /**/"pn",pn,
+                    /**/"rn",rn,
+                    /**/"gsm","96",
+                    /**/"1482041581410",""
+                    );
         s->page_current+=s->page_perpage;
         QByteArray url=varSTD->get_baidu_image_url;
         url.reserve(url.size()+static_cast<int>(url_.size())+4);
@@ -2063,7 +2091,7 @@ inline void DownLoadBaiduImage::next_download() try {
     auto varReply=varNAM->get(varREQ);
 
     connect(varReply,&QNetworkReply::finished,
-        [varReply,var=this->shared_from_this()]() {
+            [varReply,var=this->shared_from_this()]() {
         varReply->deleteLater();
         try {
             StateMachine s(var.get(),state_downlod);
@@ -2098,7 +2126,7 @@ inline void DownLoadBaiduImage::next_download() try {
     return s.normal_return(state_waiting);
 }
 catch (...) {
-    CPLUSPLUS_EXCEPTION(false);
+CPLUSPLUS_EXCEPTION(false);
 }
 
 }/*_private_baidu_image*/
@@ -2117,11 +2145,11 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
 
     /*设置关键字*/
     varImagesDownLoad->image_key_word=
-        arg->getKeyWord().toUtf8().toPercentEncoding();
+            arg->getKeyWord().toUtf8().toPercentEncoding();
 
     connect(varImagesDownLoad.get(),&T::notify,
-        arg.get(),[arg,
-        externAns=varImagesDownLoad->$m$externAns]() {
+            arg.get(),[arg,
+            externAns=varImagesDownLoad->$m$externAns]() {
 
         if (externAns->$m$hasError) {
             arg->finished(false,externAns->$m$errorString);
