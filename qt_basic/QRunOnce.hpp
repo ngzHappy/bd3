@@ -10,7 +10,7 @@
 namespace _private_QRunOnce_ {
 
 template<typename T,bool=(std::is_base_of<QObject,T>::value)||
-         (std::is_pointer<T>::value&&std::is_convertible<T,QObject *>::value)>
+(std::is_pointer<T>::value&&std::is_convertible<T,QObject *>::value)>
 class Item {
 public:
     Item(QObject &o) { o.deleteLater(); }
@@ -27,17 +27,18 @@ public:
 
 template<typename T>
 class Item<T,false> {
-    T * _xobject;
     T __xobject/*a copy of data*/;
 public:
-    Item(T &o):_xobject(&o),__xobject(o) {}
 
-    void destruct(){
-        if (_xobject) {
-            _xobject->reset()/*do not call delete*/;
-            _xobject=nullptr;
-            __xobject.reset()/*call delete here*/;
-        }
+    Item(T&&o):__xobject(std::move(o)) {
+    }
+
+    Item(const T&&)=delete;
+    Item(const T&)=delete;
+    Item(T&)=delete;
+
+    void destruct() {
+        __xobject.reset();
     }
 
     Item()=default;
@@ -49,25 +50,25 @@ public:
 
 /*rewrite in c++17*/
 template<typename T>
-void destruct(std::tuple<T> & arg){
+void destruct(std::tuple<T> & arg) {
     std::get<0>(arg).destruct();
 }
 
 template<typename T0,typename T1>
-void destruct(std::tuple<T0,T1> & arg){
+void destruct(std::tuple<T0,T1> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
 }
 
 template<typename T0,typename T1,typename T2>
-void destruct(std::tuple<T0,T1,T2> & arg){
+void destruct(std::tuple<T0,T1,T2> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
     std::get<2>(arg).destruct();
 }
 
 template<typename T0,typename T1,typename T2,typename T3>
-void destruct(std::tuple<T0,T1,T2,T3> & arg){
+void destruct(std::tuple<T0,T1,T2,T3> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
     std::get<2>(arg).destruct();
@@ -75,8 +76,8 @@ void destruct(std::tuple<T0,T1,T2,T3> & arg){
 }
 
 template<typename T0,typename T1,typename T2,typename T3,
-         typename T4>
-void destruct(std::tuple<T0,T1,T2,T3,T4> & arg){
+    typename T4>
+    void destruct(std::tuple<T0,T1,T2,T3,T4> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
     std::get<2>(arg).destruct();
@@ -85,8 +86,8 @@ void destruct(std::tuple<T0,T1,T2,T3,T4> & arg){
 }
 
 template<typename T0,typename T1,typename T2,typename T3,
-         typename T4,typename T5>
-void destruct(std::tuple<T0,T1,T2,T3,T4,T5> & arg){
+    typename T4,typename T5>
+    void destruct(std::tuple<T0,T1,T2,T3,T4,T5> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
     std::get<2>(arg).destruct();
@@ -96,8 +97,8 @@ void destruct(std::tuple<T0,T1,T2,T3,T4,T5> & arg){
 }
 
 template<typename T0,typename T1,typename T2,typename T3,
-         typename T4,typename T5,typename T6>
-void destruct(std::tuple<T0,T1,T2,T3,T4,T5,T6> & arg){
+    typename T4,typename T5,typename T6>
+    void destruct(std::tuple<T0,T1,T2,T3,T4,T5,T6> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
     std::get<2>(arg).destruct();
@@ -108,8 +109,8 @@ void destruct(std::tuple<T0,T1,T2,T3,T4,T5,T6> & arg){
 }
 
 template<typename T0,typename T1,typename T2,typename T3,
-         typename T4,typename T5,typename T6,typename T7>
-void destruct(std::tuple<T0,T1,T2,T3,T4,T5,T6,T7> & arg){
+    typename T4,typename T5,typename T6,typename T7>
+    void destruct(std::tuple<T0,T1,T2,T3,T4,T5,T6,T7> & arg) {
     std::get<0>(arg).destruct();
     std::get<1>(arg).destruct();
     std::get<2>(arg).destruct();
@@ -142,22 +143,25 @@ template<typename ... T >
 class QRunOnce : public std::tuple< _private_QRunOnce_::Item<T>... > {
     using _Super=std::tuple< _private_QRunOnce_::Item<T>... >;
     void * _p_this_not_moved;
-    void _p_destruct(){
-        if(_p_this_not_moved){
-            _private_QRunOnce_::destruct( *this );
+    void _p_destruct() {
+        if (_p_this_not_moved) {
+            _private_QRunOnce_::destruct(*this);
             _p_this_not_moved=nullptr;
         }
     }
 public:
-    QRunOnce(){ _p_this_not_moved=nullptr; }
-    QRunOnce(T &...args):_Super(args...) { _p_this_not_moved=this; }
-    ~QRunOnce(){ _p_destruct(); }
+    QRunOnce() { _p_this_not_moved=nullptr; }
+    template<typename ... U>
+    QRunOnce(U &&...args):_Super(std::forward<U>(args) ...) {
+        _p_this_not_moved=this;
+    }
+    ~QRunOnce() { _p_destruct(); }
 
     QRunOnce(const QRunOnce &)=delete;
     QRunOnce&operator=(const QRunOnce &)=delete;
     QRunOnce&operator=(QRunOnce &&)=delete;
 
-    QRunOnce(QRunOnce && arg):_Super( std::move(arg) ){
+    QRunOnce(QRunOnce && arg):_Super(std::move(arg)) {
         this->_p_this_not_moved=arg._p_this_not_moved;
         arg._p_this_not_moved=nullptr;
     }
@@ -167,8 +171,8 @@ private:
 };
 
 template<typename ... T>
-inline QRunOnce<T...> makeQRunOnce(T &...args) {
-    return QRunOnce<T...>(args...) ;
+inline QRunOnce< std::remove_reference_t<T> ...> makeQRunOnce(T &&...args) {
+    return QRunOnce<std::remove_reference_t<T>...>(std::forward<T>(args) ...);
 }
 
 #endif // QRUNONCE_HPP

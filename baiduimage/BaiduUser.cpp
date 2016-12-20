@@ -365,10 +365,10 @@ inline void Login::post_login() try {
     auto varReply=networkAM->post(req,varPostData);
 
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply,
+                      [var=this,cvar=this->shared_from_this(),varReply,
                       varPsd=varPsd.pointer()]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var)/*写到try里面阻止C++编译器优化*/;
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar))/*写到try里面阻止C++编译器优化*/;
             var->post_login_finished(varReply,varPsd);
         }
         catch (...) {
@@ -602,10 +602,10 @@ inline void Login::get_rsa_key() try {
     auto varReply=networkAM->get(req);
 
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() mutable {
+                      [var=this,cvar=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var);
-            StateMachine varStateMachine{ var.get(),state_get_rsa_key };
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+            StateMachine varStateMachine{ var,state_get_rsa_key };
             if (var->expired()) { return; }
             auto varSTD=getBaiduStaticData();
 
@@ -721,10 +721,10 @@ inline void Login::get_baidu_token() try {
 
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() mutable {
+                      [var=this,cvar=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var);
-            StateMachine varStateMachine{ var.get(),state_get_baidu_token };
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+            StateMachine varStateMachine{ var,state_get_baidu_token };
             if (var->expired()) { return; }
 
             auto varJson=varReply->readAll();
@@ -822,10 +822,10 @@ inline void Login::get_baidu_login_cookie() try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() mutable {
+                      [var=this,cvar=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var);
-            StateMachine varStateMachine{ var.get(),state_getbaidu_login_cookie };
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+            StateMachine varStateMachine{ var,state_getbaidu_login_cookie };
             if (varReply->error()!=QNetworkReply::NoError) {
                 return varStateMachine.error_return(varReply->errorString());
             }
@@ -852,10 +852,10 @@ inline void Login::get_baidu_cookie() try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,
-                      [var=this->shared_from_this(),varReply]() mutable {
+                      [var=this,cvar=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var);
-            StateMachine varStateMachine{ var.get(),state_getbaidu_cookie };
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+            StateMachine varStateMachine{ var,state_getbaidu_cookie };
             if (varReply->error()!=QNetworkReply::NoError) {
                 return varStateMachine.error_return(varReply->errorString());
             }
@@ -902,46 +902,46 @@ inline void Login::do_next() try {
     if (this->expired()) { return; }
     switch ($m$nextState) {
         case state_create_networkaccessmanager:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->create_networkaccessmanager();
         });
         case state_waiting:break;
         case state_error:finished_error(); break;
         case state_success:finished_success(); break;
         case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->get_baidu_cookie();
         });
         case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->get_baidu_login_cookie();
         });
         case state_get_baidu_token:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->get_baidu_token();
         });
         case state_get_rsa_key:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->get_rsa_key();
         });
         case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->encrypt_RSA();
         });
         case state_post_login:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->post_login();
         });
         case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()]()mutable{
-            auto runOnceLock=makeQRunOnce(var);
+                        [var=this,cvar=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->get_verifycode_image();
         });
         case state_verifycode:finished_verifycode(); break;
@@ -987,10 +987,10 @@ inline void Login::get_verifycode_image()try {
     auto networkAM=this->$m$networkAccessManager;
     auto varReply=networkAM->get(varRequest);
     varReply->connect(varReply,&QNetworkReply::finished,[
-        var=this->shared_from_this(),varReply]() mutable {
+        var=this,cvar=this->shared_from_this(),varReply]() mutable {
             try {
-                auto runOnceLock=makeQRunOnce(varReply,var);
-                StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
+                auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+                StateMachine varStateMachine{ var,state_get_verifycode_image };
                 if (var->expired()) { return; }
 
                 QImage varImage;
@@ -1070,10 +1070,11 @@ void BaiduUser::login(const QString &argUserName,
     /*连接信号槽*/
     /*同步更新数据*/
     connect(varLogin.get(),&DoBaiduUserObject::finished,
-            this,[this,externAns=varLogin->$m$externAns](
+            this,[this,cexternAns=varLogin->$m$externAns,
+        externAns=varLogin->$m$externAns.get()](
         bool a,const QString &b,const QImage & c) mutable {
         try {
-            auto runOnceLock=makeQRunOnce(externAns);
+            auto runOnceLock=makeQRunOnce(std::move(cexternAns));
             auto thisp=getPrivateData();
             thisp->$m$gid=externAns->$m$gid;
             thisp->$m$token=externAns->$m$token;
@@ -1517,16 +1518,16 @@ inline void DownLoadBaiduImage::do_next() try {
         case state_waiting:break;
         case state_finished: finished_success(); break;
         case state_error: finished_error(); break;
-        case state_start: varTP->runLambda([var=this->shared_from_this()]() mutable{
-            auto runOnceLock=makeQRunOnce(var);
+        case state_start: varTP->runLambda([var=this,cvar=this->shared_from_this()]() mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->start_download();
         }); break;
-        case state_download: varTP->runLambda([var=this->shared_from_this()]() mutable{
-            auto runOnceLock=makeQRunOnce(var);
+        case state_download: varTP->runLambda([var=this,cvar=this->shared_from_this()]() mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->next_download();
         });  break;
-        case state_download_set: varTP->runLambda([var=this->shared_from_this()]() mutable{
-            auto runOnceLock=makeQRunOnce(var);
+        case state_download_set: varTP->runLambda([var=this,cvar=this->shared_from_this()]() mutable{
+            auto runOnceLock=makeQRunOnce(std::move(cvar));
             var->next_download_set();
         });  break;
     }
@@ -2180,10 +2181,10 @@ inline void DownLoadBaiduImage::next_download() try {
     auto varReply=varNAM->get(varREQ);
 
     connect(varReply,&QNetworkReply::finished,
-            [varReply,var=this->shared_from_this()]() mutable {
+            [varReply,var=this,cvar=this->shared_from_this()]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var);
-            StateMachine s(var.get(),state_download);
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+            StateMachine s(var,state_download);
             if (s->expired()) { return; }
 
             QByteArray varJson=varReply->readAll();
@@ -2370,10 +2371,10 @@ inline void DownLoadBaiduImage::next_download_set() try {
     auto varReply=varNAM->get(varREQ);
 
     connect(varReply,&QNetworkReply::finished,
-        [varReply,var=this->shared_from_this()]() mutable {
+        [varReply,var=this,cvar=this->shared_from_this()]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply,var);
-            StateMachine s(var.get(),state_download_set);
+            auto runOnceLock=makeQRunOnce(varReply,std::move(cvar));
+            StateMachine s(var,state_download_set);
             if (s->expired()) { return; }
 
             QByteArray varJson=varReply->readAll();
@@ -2427,10 +2428,12 @@ void BaiduUser::downLoad(std::shared_ptr<BaiduImage> arg) {
         arg->getKeyWord().toUtf8().toPercentEncoding();
 
     connect(varImagesDownLoad.get(),&T::notify,
-            arg.get(),[arg,
-            externAns=varImagesDownLoad->$m$externAns]() mutable {
+            arg.get(),[arg=arg.get(),
+            externAns=varImagesDownLoad->$m$externAns.get(),
+            carg=arg,
+            cexternAns=varImagesDownLoad->$m$externAns]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(externAns,arg);
+            auto runOnceLock=makeQRunOnce(std::move(cexternAns),std::move(carg));
             arg->setData(std::move(externAns->$m$AnsItems));
             if (externAns->$m$hasError) {
                 arg->finished(false,externAns->$m$errorString);

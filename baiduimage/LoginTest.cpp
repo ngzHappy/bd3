@@ -101,11 +101,11 @@ void LoginTest::on_imageButton_clicked() {
         baiduUser->downLoad(imageTest);
 
         connect(imageTest.get(),&baidu::BaiduImage::finished,
-            [imageTest](bool isok,const auto& e) mutable {
+            [cimageTest=imageTest,imageTest=imageTest.get()](bool isok,const auto& e) mutable {
             if (false==isok) {
                 qDebug()<<e;
             }
-            auto runOnceLock=makeQRunOnce(imageTest);
+            auto runOnceLock=makeQRunOnce(std::move(cimageTest));
             const auto & data=imageTest->getData();
             std::ofstream final_ans("meinv.txt");
             for (const auto & varI:data) {
@@ -128,11 +128,11 @@ void LoginTest::on_imageButton_clicked() {
         baiduUser->downLoad(imageTest);
 
         connect(imageTest.get(),&baidu::BaiduImage::finished,
-            [imageTest](bool isok,const auto& e) mutable {
+            [cimageTest=imageTest,imageTest=imageTest.get()](bool isok,const auto& e) mutable {
             if (false==isok) {
                 qDebug()<<e;
             }
-            auto runOnceLock=makeQRunOnce(imageTest);
+            auto runOnceLock=makeQRunOnce(std::move(cimageTest));
             const auto & data=imageTest->getData();
             std::ofstream final_ans("oumeimeinv.txt");
             for (const auto & varI:data) {
@@ -155,11 +155,11 @@ void LoginTest::on_imageButton_clicked() {
         baiduUser->downLoad(imageTest);
 
         connect(imageTest.get(),&baidu::BaiduImage::finished,
-            [imageTest](bool isok,const auto& e) mutable {
+            [cimageTest=imageTest,imageTest=imageTest.get()](bool isok,const auto& e) mutable {
             if (false==isok) {
                 qDebug()<<e;
             }
-            auto runOnceLock=makeQRunOnce(imageTest);
+            auto runOnceLock=makeQRunOnce(std::move(cimageTest));
             const auto & data=imageTest->getData();
             std::ofstream final_ans("oumeiluoli.txt");
             for (const auto & varI:data) {
