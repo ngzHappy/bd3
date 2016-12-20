@@ -902,24 +902,48 @@ inline void Login::do_next() try {
     if (this->expired()) { return; }
     switch ($m$nextState) {
         case state_create_networkaccessmanager:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->create_networkaccessmanager(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->create_networkaccessmanager();
+        });
         case state_waiting:break;
         case state_error:finished_error(); break;
         case state_success:finished_success(); break;
         case state_getbaidu_cookie:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_baidu_cookie(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->get_baidu_cookie();
+        });
         case state_getbaidu_login_cookie:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_baidu_login_cookie(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->get_baidu_login_cookie();
+        });
         case state_get_baidu_token:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_baidu_token(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->get_baidu_token();
+        });
         case state_get_rsa_key:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_rsa_key(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->get_rsa_key();
+        });
         case state_encrypt_RSA:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->encrypt_RSA(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->encrypt_RSA();
+        });
         case state_post_login:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->post_login(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->post_login();
+        });
         case state_get_verifycode_image:return $m$singleThreadPool->runLambda(
-                        [var=this->shared_from_this()](){var->get_verifycode_image(); });
+                        [var=this->shared_from_this()]()mutable{
+            auto runOnceLock=makeQRunOnce(var);
+            var->get_verifycode_image();
+        });
         case state_verifycode:finished_verifycode(); break;
     }
 
@@ -1493,13 +1517,16 @@ inline void DownLoadBaiduImage::do_next() try {
         case state_waiting:break;
         case state_finished: finished_success(); break;
         case state_error: finished_error(); break;
-        case state_start: varTP->runLambda([var=this->shared_from_this()]() {
+        case state_start: varTP->runLambda([var=this->shared_from_this()]() mutable{
+            auto runOnceLock=makeQRunOnce(var);
             var->start_download();
         }); break;
-        case state_download: varTP->runLambda([var=this->shared_from_this()]() {
+        case state_download: varTP->runLambda([var=this->shared_from_this()]() mutable{
+            auto runOnceLock=makeQRunOnce(var);
             var->next_download();
         });  break;
-        case state_download_set: varTP->runLambda([var=this->shared_from_this()]() {
+        case state_download_set: varTP->runLambda([var=this->shared_from_this()]() mutable{
+            auto runOnceLock=makeQRunOnce(var);
             var->next_download_set();
         });  break;
     }
