@@ -368,7 +368,7 @@ inline void Login::post_login() try {
                       [var=this->shared_from_this(),varReply,
                       varPsd=varPsd.pointer()]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply)/*写到try里面阻止C++编译器优化*/;
+            auto runOnceLock=makeQRunOnce(varReply,var)/*写到try里面阻止C++编译器优化*/;
             var->post_login_finished(varReply,varPsd);
         }
         catch (...) {
@@ -604,7 +604,7 @@ inline void Login::get_rsa_key() try {
     varReply->connect(varReply,&QNetworkReply::finished,
                       [var=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply);
+            auto runOnceLock=makeQRunOnce(varReply,var);
             StateMachine varStateMachine{ var.get(),state_get_rsa_key };
             if (var->expired()) { return; }
             auto varSTD=getBaiduStaticData();
@@ -723,7 +723,7 @@ inline void Login::get_baidu_token() try {
     varReply->connect(varReply,&QNetworkReply::finished,
                       [var=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply);
+            auto runOnceLock=makeQRunOnce(varReply,var);
             StateMachine varStateMachine{ var.get(),state_get_baidu_token };
             if (var->expired()) { return; }
 
@@ -824,7 +824,7 @@ inline void Login::get_baidu_login_cookie() try {
     varReply->connect(varReply,&QNetworkReply::finished,
                       [var=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply);
+            auto runOnceLock=makeQRunOnce(varReply,var);
             StateMachine varStateMachine{ var.get(),state_getbaidu_login_cookie };
             if (varReply->error()!=QNetworkReply::NoError) {
                 return varStateMachine.error_return(varReply->errorString());
@@ -854,7 +854,7 @@ inline void Login::get_baidu_cookie() try {
     varReply->connect(varReply,&QNetworkReply::finished,
                       [var=this->shared_from_this(),varReply]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply);
+            auto runOnceLock=makeQRunOnce(varReply,var);
             StateMachine varStateMachine{ var.get(),state_getbaidu_cookie };
             if (varReply->error()!=QNetworkReply::NoError) {
                 return varStateMachine.error_return(varReply->errorString());
@@ -965,7 +965,7 @@ inline void Login::get_verifycode_image()try {
     varReply->connect(varReply,&QNetworkReply::finished,[
         var=this->shared_from_this(),varReply]() mutable {
             try {
-                auto runOnceLock=makeQRunOnce(varReply);
+                auto runOnceLock=makeQRunOnce(varReply,var);
                 StateMachine varStateMachine{ var.get(),state_get_verifycode_image };
                 if (var->expired()) { return; }
 
@@ -2155,7 +2155,7 @@ inline void DownLoadBaiduImage::next_download() try {
     connect(varReply,&QNetworkReply::finished,
             [varReply,var=this->shared_from_this()]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply);
+            auto runOnceLock=makeQRunOnce(varReply,var);
             StateMachine s(var.get(),state_download);
             if (s->expired()) { return; }
 
@@ -2345,7 +2345,7 @@ inline void DownLoadBaiduImage::next_download_set() try {
     connect(varReply,&QNetworkReply::finished,
         [varReply,var=this->shared_from_this()]() mutable {
         try {
-            auto runOnceLock=makeQRunOnce(varReply);
+            auto runOnceLock=makeQRunOnce(varReply,var);
             StateMachine s(var.get(),state_download_set);
             if (s->expired()) { return; }
 
