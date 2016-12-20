@@ -1,5 +1,6 @@
 ﻿#include <QtCore/qdebug.h>
 #include "_PrivateBaiduUser.hpp"
+#include <QtNetwork/qnetworkproxy.h>
 
 namespace baidu{
 
@@ -18,6 +19,7 @@ _PrivateBaiduUserNetworkAccessManager::_PrivateBaiduUserNetworkAccessManager(QOb
        this->setCookieJar(cj);
        cj->setParent(this);
     }
+    this->setProxy( QNetworkProxy::NoProxy );
 }
 
 QList<QNetworkCookie> NetworkCookieJar::cookiesForUrl(const QUrl &url) const {
