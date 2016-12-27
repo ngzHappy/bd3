@@ -11,6 +11,10 @@
 #define CPLUSPLUS_EXCEPTION(_is_quit_) exception::exception_handle(static_cast<bool>(_is_quit_),__LINE__,__func__,__FILE__)
 #endif // !CPLUSPLUS_EXCEPTION
 
+#ifndef DECLTYPE
+#define DECLTYPE(_v__) std::remove_cv_t<std::remove_reference_t<decltype(_v__)>>
+#endif // !DECLTYPE
+
 #include <utility>
 #include <numeric>
 #include <algorithm>
