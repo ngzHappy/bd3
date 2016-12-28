@@ -1,6 +1,6 @@
 ﻿/* Boost interval/interval.hpp header file
  *
- * Copyright 2002-2003 Herv� Br鰊nimann, Guillaume Melquiond, Sylvain Pion
+ * Copyright 2002-2003 HervBr鰊nimann, Guillaume Melquiond, Sylvain Pion
  *
  * Distributed under the Boost Software License, Version 1.0.
  * (See accompanying file LICENSE_1_0.txt or

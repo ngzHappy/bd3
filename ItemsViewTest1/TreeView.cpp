@@ -60,7 +60,7 @@ TreeView::TreeView(QWidget *parent):
         std::unique_ptr<QObject> varOldDelegate{ this->itemDelegate() };
         this->setItemDelegate(new TreeViewItemDelegate(this));
     }
-     
+
     {
         connect(this,&TreeView::_p_scroll_to,this,
             [this](const QModelIndex& argIndex) {
@@ -188,10 +188,17 @@ void TreeViewItemDelegate::paint(
         auto & varOpenedWidgets=super->$m$this->$m$OpendWidgets;
         auto varPos=varOpenedWidgets.find(index);
         if (varPos==varOpenedWidgets.end()) {
+            /*在index位置打开新的paint设备*/
             super->openPersistentEditor(index);
         }
         else {
-            (*varPos)->update(styleOption,index);
+             TreeViewItemWidget * w = *varPos;
+             if(w->isPainting()){
+                 qDebug()<<true;
+                 return;
+             }
+         
+            w->update(styleOption,index);
         }
         return;
     }

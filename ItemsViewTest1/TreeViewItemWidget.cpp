@@ -8,7 +8,7 @@ TreeViewItemWidget::TreeViewItemWidget(QWidget * p)
 #include <QtCore>
 #include <QtGui/QPainter>
 void TreeViewItemWidget::paintEvent(QPaintEvent *event) {
-
+   
     _Super::paintEvent(event);
 
     const bool isSelected= $m$QStyleOptionViewItem.state & QStyle::State_Selected ;

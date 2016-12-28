@@ -15,6 +15,7 @@ private:
     std::weak_ptr<TreeViewItemData> $m$Watcher/*判断数据是否失效*/;
     QModelIndex $m$ModelIndexWhenOpened/*用于gc*/;
     QStyleOptionViewItem $m$QStyleOptionViewItem/*用于update*/;
+    
 public:
     TreeViewItemWidget(QWidget *);
     using _Super::update;
@@ -30,6 +31,7 @@ public:
     virtual void update(const QStyleOptionViewItem&,const QModelIndex&);
     virtual bool isOptionChanged(const QStyleOptionViewItem&);
     virtual void setData(const QModelIndex &);
+    bool isPainting() const {return this->testAttribute(Qt::WA_WState_InPaintEvent); }
 
     ~TreeViewItemWidget();
 protected:

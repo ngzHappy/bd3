@@ -32,6 +32,8 @@ tool_test_maker.file=$$PWD/tool/test_maker/test_maker.pro
 tool_test_maker.depends+=library_cplusplus_basic
 tool_test_maker.depends+=qt_basic_library
 
+SUBDIRS += tool/boost_change_name
+
 SUBDIRS += \
     test/void_test \
     tool/memory_maker \

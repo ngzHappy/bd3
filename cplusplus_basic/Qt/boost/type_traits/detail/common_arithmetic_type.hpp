@@ -46,7 +46,7 @@ template<> struct arithmetic_type<3>
 #endif
 
 // There are five standard signed integer types:
-// 鈥渟igned char鈥�, 鈥渟hort int鈥�, 鈥渋nt鈥�, 鈥渓ong int鈥�, and 鈥渓ong long int鈥�.
+// 鈥渟igned char鈥 鈥渟hort int鈥 鈥渋nt鈥 鈥渓ong int鈥 and 鈥渓ong long int鈥
 
 template<> struct arithmetic_type<4>
 {
@@ -79,8 +79,8 @@ template<> struct arithmetic_type<8>
 };
 
 // For each of the standard signed integer types, there exists a corresponding
-// (but different) standard unsigned integer type: 鈥渦nsigned char鈥�, 鈥渦nsigned short int鈥�,
-// 鈥渦nsigned int鈥�, 鈥渦nsigned long int鈥�, and 鈥渦nsigned long long int鈥�
+// (but different) standard unsigned integer type: 鈥渦nsigned char鈥 鈥渦nsigned short int鈥
+// 鈥渦nsigned int鈥 鈥渦nsigned long int鈥 and 鈥渦nsigned long long int鈥
 
 template<> struct arithmetic_type<9>
 {

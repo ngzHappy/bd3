@@ -17,7 +17,8 @@ SOURCES += main.cpp\
     TreeViewItemModel.cpp \
     TreeViewItemData.cpp \
     TreeViewItemDataList.cpp \
-    TreeViewItemWidget.cpp
+    TreeViewItemWidget.cpp \
+    BoostTest.cpp
 
 HEADERS  += BasicTreeView.hpp \
     cplusplus_basic.hpp \
@@ -26,9 +27,10 @@ HEADERS  += BasicTreeView.hpp \
     TreeViewItemData.hpp \
     TreeViewItemDataList.hpp \
     TreeViewItemWidget.hpp \
-    TreeViewItemDelegate.hpp
+    TreeViewItemDelegate.hpp \
+    BoostTest.hpp
 
-
+INCLUDEPATH += $$PWD/../cplusplus_basic
 
 
 
