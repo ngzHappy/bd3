@@ -4,6 +4,7 @@
 #include <Qt/boost/multi_index/member.hpp>
 #include <Qt/boost/multi_index/ordered_index.hpp>
 #include <Qt/boost/multi_index/sequenced_index.hpp>
+#include <Qt/boost/multi_index/random_access_index.hpp>
 
 class Test{
 public:

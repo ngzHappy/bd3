@@ -13,4 +13,10 @@ SOURCES += main.cpp
 include($$PWD/../../this_project.pri)
 DESTDIR=$$THIS_PROJECT_DESTDIR
 
+HEADERS += \
+    partboost.hpp
+
+DISTFILES += \
+    remove_boost_thread.py
+
 
