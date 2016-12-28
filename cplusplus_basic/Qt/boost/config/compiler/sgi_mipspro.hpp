@@ -9,7 +9,7 @@
 
 #define BOOST_COMPILER "SGI Irix compiler version " BOOST_STRINGIZE(_COMPILER_VERSION)
 
-#include "Qt/boost/config/compiler/common_edg.hpp"
+#include <Qt/boost/config/compiler/common_edg.hpp>
 
 //
 // Threading support:

@@ -12,7 +12,7 @@
 #include <Qt/boost/type_traits/is_pod.hpp>
 #include <Qt/boost/static_assert.hpp>
 #include <Qt/boost/config.hpp>
-#include <cstddef>
+#include <cstddef> // size_t
 #include <Qt/boost/detail/workaround.hpp>
 
 #ifdef BOOST_MSVC

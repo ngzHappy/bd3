@@ -19,7 +19,7 @@
 
 #include <Qt/boost/geometry/core/access.hpp>
 #include <Qt/boost/geometry/core/assert.hpp>
-#include <Qt/boost/geometry/strategies/intersection.hpp>
+#include <Qt/boost/geometry/strategies/intersection_strategies.hpp>
 
 #include <Qt/boost/geometry/algorithms/convert.hpp>
 #include <Qt/boost/geometry/algorithms/detail/overlay/turn_info.hpp>
@@ -989,6 +989,7 @@ struct get_turn_info
                     // Swap p/q
                     side_calculator
                         <
+                            typename inters_info::cs_tag,
                             typename inters_info::robust_point2_type,
                             typename inters_info::robust_point1_type
                         > swapped_side_calc(inters.rqi(), inters.rqj(), inters.rqk(),

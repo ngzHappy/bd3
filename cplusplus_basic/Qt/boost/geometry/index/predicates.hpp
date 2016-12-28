@@ -11,10 +11,6 @@
 #ifndef BOOST_GEOMETRY_INDEX_PREDICATES_HPP
 #define BOOST_GEOMETRY_INDEX_PREDICATES_HPP
 
-#include <utility>
-#include <Qt/boost/tuple/tuple.hpp>
-#include <Qt/boost/mpl/assert.hpp>
-
 #include <Qt/boost/geometry/index/detail/predicates.hpp>
 #include <Qt/boost/geometry/index/detail/tuples.hpp>
 

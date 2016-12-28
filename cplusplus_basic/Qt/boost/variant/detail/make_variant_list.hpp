@@ -13,11 +13,11 @@
 #ifndef BOOST_VARIANT_DETAIL_MAKE_VARIANT_LIST_HPP
 #define BOOST_VARIANT_DETAIL_MAKE_VARIANT_LIST_HPP
 
-#include "Qt/boost/variant/variant_fwd.hpp"
+#include <Qt/boost/variant/variant_fwd.hpp>
 
-#include "Qt/boost/mpl/list.hpp"
-#include "Qt/boost/preprocessor/cat.hpp"
-#include "Qt/boost/preprocessor/enum.hpp"
+#include <Qt/boost/mpl/list.hpp>
+#include <Qt/boost/preprocessor/cat.hpp>
+#include <Qt/boost/preprocessor/enum.hpp>
 
 namespace boost {
 namespace detail { namespace variant {

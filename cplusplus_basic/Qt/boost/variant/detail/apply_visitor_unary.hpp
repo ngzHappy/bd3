@@ -13,14 +13,14 @@
 #ifndef BOOST_VARIANT_DETAIL_APPLY_VISITOR_UNARY_HPP
 #define BOOST_VARIANT_DETAIL_APPLY_VISITOR_UNARY_HPP
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/detail/workaround.hpp"
-#include "Qt/boost/variant/detail/generic_result_type.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/detail/workaround.hpp>
+#include <Qt/boost/variant/detail/generic_result_type.hpp>
 
 #if BOOST_WORKAROUND(__EDG__, BOOST_TESTED_AT(302))
-#include "Qt/boost/core/enable_if.hpp"
-#include "Qt/boost/mpl/not.hpp"
-#include "Qt/boost/type_traits/is_const.hpp"
+#include <Qt/boost/core/enable_if.hpp>
+#include <Qt/boost/mpl/not.hpp>
+#include <Qt/boost/type_traits/is_const.hpp>
 #endif
 
 #if !defined(BOOST_NO_CXX14_DECLTYPE_AUTO) && !defined(BOOST_NO_CXX11_DECLTYPE_N3276)
@@ -30,7 +30,7 @@
 #   include <Qt/boost/mpl/size.hpp>
 #   include <Qt/boost/utility/declval.hpp>
 #   include <Qt/boost/core/enable_if.hpp>
-#   include "Qt/boost/variant/detail/has_result_type.hpp"
+#   include <Qt/boost/variant/detail/has_result_type.hpp>
 #endif
 
 namespace boost {

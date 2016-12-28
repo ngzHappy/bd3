@@ -15,7 +15,7 @@
 #ifndef BOOST_VARIANT_DETAIL_OVER_SEQUENCE_HPP
 #define BOOST_VARIANT_DETAIL_OVER_SEQUENCE_HPP
 
-#include "Qt/boost/mpl/aux_/config/ctps.hpp"
+#include <Qt/boost/mpl/aux_/config/ctps.hpp>
 
 
 namespace boost {

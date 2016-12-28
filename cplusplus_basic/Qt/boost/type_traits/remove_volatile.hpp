@@ -13,7 +13,7 @@
 
 #include <Qt/boost/config.hpp>
 #include <Qt/boost/detail/workaround.hpp>
-#include <cstddef>
+#include <cstddef> // size_t
 
 namespace boost {
 

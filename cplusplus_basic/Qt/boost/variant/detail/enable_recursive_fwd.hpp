@@ -13,11 +13,11 @@
 #ifndef BOOST_VARIANT_DETAIL_ENABLE_RECURSIVE_FWD_HPP
 #define BOOST_VARIANT_DETAIL_ENABLE_RECURSIVE_FWD_HPP
 
-#include "Qt/boost/mpl/aux_/config/ctps.hpp"
+#include <Qt/boost/mpl/aux_/config/ctps.hpp>
 
-#include "Qt/boost/mpl/bool_fwd.hpp"
+#include <Qt/boost/mpl/bool_fwd.hpp>
 
-#   include "Qt/boost/mpl/bool.hpp"
+#   include <Qt/boost/mpl/bool.hpp>
 
 namespace boost {
 namespace detail { namespace variant {

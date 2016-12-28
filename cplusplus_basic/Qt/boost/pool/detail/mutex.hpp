@@ -8,8 +8,14 @@ namespace boost{
 namespace details{
 namespace pool{
 
-typedef std::recursive_mutex default_mutex;
-
+class default_mutex :public std::recursive_mutex {
+    using super=std::recursive_mutex;
+public:
+    using super::super;
+    using super::unlock;
+    using super::try_lock;
+    void lock(){ while(false==try_lock()){} }
+};
 
 } // namespace pool
 } // namespace details

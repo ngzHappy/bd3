@@ -23,10 +23,10 @@
 #include <iterator> // for iterator_traits
 #include <new> // for placement new
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/detail/workaround.hpp"
-#include "Qt/boost/move/move.hpp"
-#include "Qt/boost/move/adl_move_swap.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/detail/workaround.hpp>
+#include <Qt/boost/move/move.hpp>
+#include <Qt/boost/move/adl_move_swap.hpp>
 
 namespace boost { namespace detail { namespace variant {
 

@@ -15,7 +15,7 @@
 #define BOOST_TT_IS_ARRAY_HPP_INCLUDED
 
 #include <Qt/boost/type_traits/integral_constant.hpp>
-#include <cstddef>
+#include <cstddef> // size_t
 
 namespace boost {
 

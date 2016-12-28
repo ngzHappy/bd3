@@ -13,27 +13,27 @@
 #ifndef BOOST_VARIANT_DETAIL_VISITATION_IMPL_HPP
 #define BOOST_VARIANT_DETAIL_VISITATION_IMPL_HPP
 
-#include "Qt/boost/config.hpp"
+#include <Qt/boost/config.hpp>
 
-#include "Qt/boost/variant/detail/backup_holder.hpp"
-#include "Qt/boost/variant/detail/cast_storage.hpp"
-#include "Qt/boost/variant/detail/forced_return.hpp"
-#include "Qt/boost/variant/detail/generic_result_type.hpp"
-#include "Qt/boost/variant/variant_fwd.hpp" // for BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES
+#include <Qt/boost/variant/detail/backup_holder.hpp>
+#include <Qt/boost/variant/detail/cast_storage.hpp>
+#include <Qt/boost/variant/detail/forced_return.hpp>
+#include <Qt/boost/variant/detail/generic_result_type.hpp>
+#include <Qt/boost/variant/variant_fwd.hpp> // for BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES
 
-#include "Qt/boost/mpl/eval_if.hpp"
-#include "Qt/boost/mpl/bool.hpp"
-#include "Qt/boost/mpl/identity.hpp"
-#include "Qt/boost/mpl/int.hpp"
-#include "Qt/boost/mpl/next.hpp"
-#include "Qt/boost/mpl/deref.hpp"
-#include "Qt/boost/mpl/or.hpp"
-#include "Qt/boost/preprocessor/cat.hpp"
-#include "Qt/boost/preprocessor/inc.hpp"
-#include "Qt/boost/preprocessor/repeat.hpp"
-#include "Qt/boost/type_traits/is_same.hpp"
-#include "Qt/boost/type_traits/has_nothrow_copy.hpp"
-#include "Qt/boost/type_traits/is_nothrow_move_constructible.hpp"
+#include <Qt/boost/mpl/eval_if.hpp>
+#include <Qt/boost/mpl/bool.hpp>
+#include <Qt/boost/mpl/identity.hpp>
+#include <Qt/boost/mpl/int.hpp>
+#include <Qt/boost/mpl/next.hpp>
+#include <Qt/boost/mpl/deref.hpp>
+#include <Qt/boost/mpl/or.hpp>
+#include <Qt/boost/preprocessor/cat.hpp>
+#include <Qt/boost/preprocessor/inc.hpp>
+#include <Qt/boost/preprocessor/repeat.hpp>
+#include <Qt/boost/type_traits/is_same.hpp>
+#include <Qt/boost/type_traits/has_nothrow_copy.hpp>
+#include <Qt/boost/type_traits/is_nothrow_move_constructible.hpp>
 
 #if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
 # pragma warning (push) 
@@ -49,7 +49,7 @@
 #if !defined(BOOST_VARIANT_VISITATION_UNROLLING_LIMIT)
 
 #ifndef BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES
-#   include "Qt/boost/mpl/limits/list.hpp"
+#   include <Qt/boost/mpl/limits/list.hpp>
 #   define BOOST_VARIANT_VISITATION_UNROLLING_LIMIT   \
         BOOST_MPL_LIMIT_LIST_SIZE
 #else
@@ -258,7 +258,7 @@ visitation_impl(
     typedef typename is_same< next_type,apply_visitor_unrolled >::type
         is_apply_visitor_unrolled;
 
-    return visitation_impl(
+    return detail::variant::visitation_impl(
           internal_which, logical_which
         , visitor, storage
         , is_apply_visitor_unrolled()

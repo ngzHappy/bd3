@@ -1,4 +1,5 @@
 ﻿/*headers**************************************************/
+#include <boost/optional.hpp>
 #include <boost/bimap.hpp>/*双向map*/
 #include <boost/geometry.hpp>/*几何计算库*/
 #include <boost/multi_array.hpp>/*多维数组*/

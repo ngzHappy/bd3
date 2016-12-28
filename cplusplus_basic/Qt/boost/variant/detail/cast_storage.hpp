@@ -13,7 +13,7 @@
 #ifndef BOOST_VARIANT_DETAIL_CAST_STORAGE_HPP
 #define BOOST_VARIANT_DETAIL_CAST_STORAGE_HPP
 
-#include "Qt/boost/config.hpp"
+#include <Qt/boost/config.hpp>
 
 namespace boost {
 namespace detail { namespace variant {

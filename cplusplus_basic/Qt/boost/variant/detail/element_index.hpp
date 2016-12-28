@@ -12,13 +12,13 @@
 #ifndef BOOST_VARIANT_DETAIL_ELEMENT_INDEX_HPP
 #define BOOST_VARIANT_DETAIL_ELEMENT_INDEX_HPP
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/variant/recursive_wrapper_fwd.hpp"
-#include "Qt/boost/variant/variant_fwd.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/variant/recursive_wrapper_fwd.hpp>
+#include <Qt/boost/variant/variant_fwd.hpp>
 
-#include "Qt/boost/type_traits/remove_cv.hpp"
-#include "Qt/boost/type_traits/remove_reference.hpp"
-#include "Qt/boost/mpl/find_if.hpp"
+#include <Qt/boost/type_traits/remove_cv.hpp>
+#include <Qt/boost/type_traits/remove_reference.hpp>
+#include <Qt/boost/mpl/find_if.hpp>
 
 namespace boost { namespace detail { namespace variant {
 

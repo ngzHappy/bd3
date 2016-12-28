@@ -15,10 +15,10 @@
 
 #include <iosfwd> // for std::basic_ostream forward declare
 
-#include "Qt/boost/variant/variant_fwd.hpp"
+#include <Qt/boost/variant/variant_fwd.hpp>
 
-#include "Qt/boost/detail/templated_streams.hpp"
-#include "Qt/boost/variant/static_visitor.hpp"
+#include <Qt/boost/detail/templated_streams.hpp>
+#include <Qt/boost/variant/static_visitor.hpp>
 
 namespace boost {
 

@@ -13,8 +13,8 @@
 #ifndef BOOST_VARIANT_DETAIL_BACKUP_HOLDER_HPP
 #define BOOST_VARIANT_DETAIL_BACKUP_HOLDER_HPP
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/assert.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/assert.hpp>
 
 namespace boost {
 namespace detail { namespace variant {

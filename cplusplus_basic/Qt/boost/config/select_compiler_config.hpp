@@ -122,26 +122,26 @@
 //
 // This section allows dependency scanners to find all the headers we *might* include:
 //
-#include "Qt/boost/config/compiler/gcc_xml.hpp"
-#include "Qt/boost/config/compiler/cray.hpp"
-#include "Qt/boost/config/compiler/comeau.hpp"
-#include "Qt/boost/config/compiler/pathscale.hpp"
-#include "Qt/boost/config/compiler/intel.hpp"
-#include "Qt/boost/config/compiler/clang.hpp"
-#include "Qt/boost/config/compiler/digitalmars.hpp"
-#include "Qt/boost/config/compiler/gcc.hpp"
-#include "Qt/boost/config/compiler/kai.hpp"
-#include "Qt/boost/config/compiler/sgi_mipspro.hpp"
-#include "Qt/boost/config/compiler/compaq_cxx.hpp"
-#include "Qt/boost/config/compiler/greenhills.hpp"
-#include "Qt/boost/config/compiler/codegear.hpp"
-#include "Qt/boost/config/compiler/borland.hpp"
-#include "Qt/boost/config/compiler/metrowerks.hpp"
-#include "Qt/boost/config/compiler/sunpro_cc.hpp"
-#include "Qt/boost/config/compiler/hp_acc.hpp"
-#include "Qt/boost/config/compiler/mpw.hpp"
-#include "Qt/boost/config/compiler/vacpp.hpp"
-#include "Qt/boost/config/compiler/pgi.hpp"
-#include "Qt/boost/config/compiler/visualc.hpp"
+#include <Qt/boost/config/compiler/gcc_xml.hpp>
+#include <Qt/boost/config/compiler/cray.hpp>
+#include <Qt/boost/config/compiler/comeau.hpp>
+#include <Qt/boost/config/compiler/pathscale.hpp>
+#include <Qt/boost/config/compiler/intel.hpp>
+#include <Qt/boost/config/compiler/clang.hpp>
+#include <Qt/boost/config/compiler/digitalmars.hpp>
+#include <Qt/boost/config/compiler/gcc.hpp>
+#include <Qt/boost/config/compiler/kai.hpp>
+#include <Qt/boost/config/compiler/sgi_mipspro.hpp>
+#include <Qt/boost/config/compiler/compaq_cxx.hpp>
+#include <Qt/boost/config/compiler/greenhills.hpp>
+#include <Qt/boost/config/compiler/codegear.hpp>
+#include <Qt/boost/config/compiler/borland.hpp>
+#include <Qt/boost/config/compiler/metrowerks.hpp>
+#include <Qt/boost/config/compiler/sunpro_cc.hpp>
+#include <Qt/boost/config/compiler/hp_acc.hpp>
+#include <Qt/boost/config/compiler/mpw.hpp>
+#include <Qt/boost/config/compiler/vacpp.hpp>
+#include <Qt/boost/config/compiler/pgi.hpp>
+#include <Qt/boost/config/compiler/visualc.hpp>
 
 #endif

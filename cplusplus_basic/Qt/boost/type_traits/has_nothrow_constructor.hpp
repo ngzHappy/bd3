@@ -9,6 +9,7 @@
 #ifndef BOOST_TT_HAS_NOTHROW_CONSTRUCTOR_HPP_INCLUDED
 #define BOOST_TT_HAS_NOTHROW_CONSTRUCTOR_HPP_INCLUDED
 
+#include <cstddef> // size_t
 #include <Qt/boost/type_traits/intrinsics.hpp>
 #include <Qt/boost/type_traits/integral_constant.hpp>
 

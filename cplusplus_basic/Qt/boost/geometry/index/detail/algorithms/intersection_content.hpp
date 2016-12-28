@@ -2,7 +2,7 @@
 //
 // boxes union/intersection area/volume
 //
-// Copyright (c) 2011-2014 Adam Wulkiewicz, Lodz, Poland.
+// Copyright (c) 2011-2016 Adam Wulkiewicz, Lodz, Poland.
 //
 // Use, modification and distribution is subject to the Boost Software License,
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -12,7 +12,7 @@
 #define BOOST_GEOMETRY_INDEX_DETAIL_ALGORITHMS_INTERSECTION_CONTENT_HPP
 
 #include <Qt/boost/geometry/algorithms/intersection.hpp>
-#include <Qt/boost/geometry/strategies/intersection.hpp>
+#include <Qt/boost/geometry/strategies/intersection_strategies.hpp>
 #include <Qt/boost/geometry/index/detail/algorithms/content.hpp>
 
 namespace boost { namespace geometry { namespace index { namespace detail {

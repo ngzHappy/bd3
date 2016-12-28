@@ -4,7 +4,7 @@
 //-----------------------------------------------------------------------------
 //
 // Copyright (c) 2003 Eric Friedman, Itay Maman
-// Copyright (c) 2013 Antony Polukhin
+// Copyright (c) 2013-2016 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
@@ -13,28 +13,17 @@
 #ifndef BOOST_VARIANT_VARIANT_FWD_HPP
 #define BOOST_VARIANT_VARIANT_FWD_HPP
 
-#include "Qt/boost/variant/detail/config.hpp"
+#include <Qt/boost/variant/detail/config.hpp>
 
-#include "Qt/boost/blank_fwd.hpp"
-#include "Qt/boost/mpl/arg.hpp"
-#include "Qt/boost/mpl/limits/arity.hpp"
-#include "Qt/boost/mpl/aux_/na.hpp"
-#include "Qt/boost/preprocessor/cat.hpp"
-#include "Qt/boost/preprocessor/enum.hpp"
-#include "Qt/boost/preprocessor/enum_params.hpp"
-#include "Qt/boost/preprocessor/enum_shifted_params.hpp"
-#include "Qt/boost/preprocessor/repeat.hpp"
-
-///////////////////////////////////////////////////////////////////////////////
-// macro BOOST_VARIANT_NO_REFERENCE_SUPPORT
-//
-// Defined if variant does not support references as bounded types. 
-//
-#if defined(BOOST_VARIANT_AUX_BROKEN_CONSTRUCTOR_TEMPLATE_ORDERING) \
- && !defined(BOOST_VARIANT_AUX_HAS_CONSTRUCTOR_TEMPLATE_ORDERING_SFINAE_WKND) \
- && !defined(BOOST_VARIANT_NO_REFERENCE_SUPPORT)
-#   define BOOST_VARIANT_NO_REFERENCE_SUPPORT
-#endif
+#include <Qt/boost/blank_fwd.hpp>
+#include <Qt/boost/mpl/arg.hpp>
+#include <Qt/boost/mpl/limits/arity.hpp>
+#include <Qt/boost/mpl/aux_/na.hpp>
+#include <Qt/boost/preprocessor/cat.hpp>
+#include <Qt/boost/preprocessor/enum.hpp>
+#include <Qt/boost/preprocessor/enum_params.hpp>
+#include <Qt/boost/preprocessor/enum_shifted_params.hpp>
+#include <Qt/boost/preprocessor/repeat.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // macro BOOST_VARIANT_NO_TYPE_SEQUENCE_SUPPORT
@@ -54,7 +43,7 @@
 // so only types declared w/ MPL lambda workarounds will work.
 //
 
-#include "Qt/boost/variant/detail/substitute_fwd.hpp"
+#include <Qt/boost/variant/detail/substitute_fwd.hpp>
 
 #if defined(BOOST_VARIANT_DETAIL_NO_SUBSTITUTE) \
   && !defined(BOOST_VARIANT_NO_FULL_RECURSIVE_VARIANT_SUPPORT)
@@ -140,7 +129,7 @@
 // Implementation-defined preprocessor symbol describing the actual
 // length of variant's pseudo-variadic template parameter list.
 //
-#include "Qt/boost/mpl/limits/list.hpp"
+#include <Qt/boost/mpl/limits/list.hpp>
 #define BOOST_VARIANT_LIMIT_TYPES \
     BOOST_MPL_LIMIT_LIST_SIZE
 
@@ -151,7 +140,7 @@
 // arguments. That is,
 //   make_recursive_variant< ..., T<[1], recursive_variant_, ... [N]> >.
 //
-#include "Qt/boost/mpl/limits/arity.hpp"
+#include <Qt/boost/mpl/limits/arity.hpp>
 #define BOOST_VARIANT_RECURSIVE_VARIANT_MAX_ARITY \
     BOOST_MPL_LIMIT_METAFUNCTION_ARITY
 

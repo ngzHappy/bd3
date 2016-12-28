@@ -12,8 +12,8 @@
 #ifndef BOOST_VARIANT_DETAIL_HAS_RESULT_TYPE_HPP
 #define BOOST_VARIANT_DETAIL_HAS_RESULT_TYPE_HPP
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/type_traits/remove_reference.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/type_traits/remove_reference.hpp>
 
 
 namespace boost { namespace detail { namespace variant {

@@ -13,8 +13,8 @@
 #ifndef BOOST_VARIANT_APPLY_VISITOR_HPP
 #define BOOST_VARIANT_APPLY_VISITOR_HPP
 
-#include "Qt/boost/variant/detail/apply_visitor_unary.hpp"
-#include "Qt/boost/variant/detail/apply_visitor_binary.hpp"
-#include "Qt/boost/variant/detail/apply_visitor_delayed.hpp"
+#include <Qt/boost/variant/detail/apply_visitor_unary.hpp>
+#include <Qt/boost/variant/detail/apply_visitor_binary.hpp>
+#include <Qt/boost/variant/detail/apply_visitor_delayed.hpp>
 
 #endif // BOOST_VARIANT_APPLY_VISITOR_HPP

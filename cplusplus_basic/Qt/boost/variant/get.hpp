@@ -15,19 +15,23 @@
 
 #include <exception>
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/detail/workaround.hpp"
-#include "Qt/boost/static_assert.hpp"
-#include "Qt/boost/throw_exception.hpp"
-#include "Qt/boost/utility/addressof.hpp"
-#include "Qt/boost/variant/variant_fwd.hpp"
-#include "Qt/boost/variant/detail/element_index.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/detail/workaround.hpp>
+#include <Qt/boost/static_assert.hpp>
+#include <Qt/boost/throw_exception.hpp>
+#include <Qt/boost/utility/addressof.hpp>
+#include <Qt/boost/variant/variant_fwd.hpp>
+#include <Qt/boost/variant/detail/element_index.hpp>
 
-#include "Qt/boost/type_traits/add_reference.hpp"
-#include "Qt/boost/type_traits/add_pointer.hpp"
+#include <Qt/boost/type_traits/add_reference.hpp>
+#include <Qt/boost/type_traits/add_pointer.hpp>
 
 namespace boost {
 
+#if defined(BOOST_CLANG)
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
 //////////////////////////////////////////////////////////////////////////
 // class bad_get
 //
@@ -45,6 +49,10 @@ public: // std::exception implementation
     }
 
 };
+#if defined(BOOST_CLANG)
+#   pragma clang diagnostic pop
+#endif
+
 
 //////////////////////////////////////////////////////////////////////////
 // function template get<T>
@@ -139,7 +147,7 @@ relaxed_get(
     )
 {
     typedef typename add_pointer<U>::type U_ptr;
-    U_ptr result = relaxed_get<U>(&operand);
+    U_ptr result = relaxed_get<U>(boost::addressof(operand));
 
     if (!result)
         boost::throw_exception(bad_get());
@@ -155,7 +163,7 @@ relaxed_get(
     )
 {
     typedef typename add_pointer<const U>::type U_ptr;
-    U_ptr result = relaxed_get<const U>(&operand);
+    U_ptr result = relaxed_get<const U>(boost::addressof(operand));
 
     if (!result)
         boost::throw_exception(bad_get());

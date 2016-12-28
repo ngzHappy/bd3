@@ -13,14 +13,14 @@
 #ifndef BOOST_VARIANT_DETAIL_APPLY_VISITOR_DELAYED_HPP
 #define BOOST_VARIANT_DETAIL_APPLY_VISITOR_DELAYED_HPP
 
-#include "Qt/boost/variant/detail/generic_result_type.hpp"
+#include <Qt/boost/variant/detail/generic_result_type.hpp>
 
-#include "Qt/boost/variant/detail/apply_visitor_unary.hpp"
-#include "Qt/boost/variant/detail/apply_visitor_binary.hpp"
-#include "Qt/boost/variant/variant_fwd.hpp" // for BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES
+#include <Qt/boost/variant/detail/apply_visitor_unary.hpp>
+#include <Qt/boost/variant/detail/apply_visitor_binary.hpp>
+#include <Qt/boost/variant/variant_fwd.hpp> // for BOOST_VARIANT_DO_NOT_USE_VARIADIC_TEMPLATES
 
 
-#include "Qt/boost/variant/detail/has_result_type.hpp"
+#include <Qt/boost/variant/detail/has_result_type.hpp>
 #include <Qt/boost/core/enable_if.hpp>
 
 namespace boost {

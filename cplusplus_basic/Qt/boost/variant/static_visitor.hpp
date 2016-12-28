@@ -13,11 +13,11 @@
 #ifndef BOOST_VARIANT_STATIC_VISITOR_HPP
 #define BOOST_VARIANT_STATIC_VISITOR_HPP
 
-#include "Qt/boost/config.hpp"
-#include "Qt/boost/detail/workaround.hpp"
+#include <Qt/boost/config.hpp>
+#include <Qt/boost/detail/workaround.hpp>
 
-#include "Qt/boost/mpl/if.hpp"
-#include "Qt/boost/type_traits/is_base_and_derived.hpp"
+#include <Qt/boost/mpl/if.hpp>
+#include <Qt/boost/type_traits/is_base_and_derived.hpp>
 
 #include <Qt/boost/type_traits/integral_constant.hpp>
 #include <Qt/boost/mpl/aux_/lambda_support.hpp>

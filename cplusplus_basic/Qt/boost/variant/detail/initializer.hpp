@@ -15,26 +15,26 @@
 
 #include <new> // for placement new
 
-#include "Qt/boost/config.hpp"
+#include <Qt/boost/config.hpp>
 
-#include "Qt/boost/call_traits.hpp"
-#include "Qt/boost/detail/reference_content.hpp"
-#include "Qt/boost/variant/recursive_wrapper_fwd.hpp"
-#include "Qt/boost/variant/detail/move.hpp"
+#include <Qt/boost/call_traits.hpp>
+#include <Qt/boost/detail/reference_content.hpp>
+#include <Qt/boost/variant/recursive_wrapper_fwd.hpp>
+#include <Qt/boost/variant/detail/move.hpp>
 
 #if !defined(BOOST_NO_USING_DECLARATION_OVERLOADS_FROM_TYPENAME_BASE)
-#   include "Qt/boost/mpl/aux_/value_wknd.hpp"
-#   include "Qt/boost/mpl/int.hpp"
-#   include "Qt/boost/mpl/iter_fold.hpp"
-#   include "Qt/boost/mpl/next.hpp"
-#   include "Qt/boost/mpl/deref.hpp"
-#   include "Qt/boost/mpl/pair.hpp"
-#   include "Qt/boost/mpl/protect.hpp"
+#   include <Qt/boost/mpl/aux_/value_wknd.hpp>
+#   include <Qt/boost/mpl/int.hpp>
+#   include <Qt/boost/mpl/iter_fold.hpp>
+#   include <Qt/boost/mpl/next.hpp>
+#   include <Qt/boost/mpl/deref.hpp>
+#   include <Qt/boost/mpl/pair.hpp>
+#   include <Qt/boost/mpl/protect.hpp>
 #else
-#   include "Qt/boost/variant/variant_fwd.hpp"
-#   include "Qt/boost/preprocessor/cat.hpp"
-#   include "Qt/boost/preprocessor/enum.hpp"
-#   include "Qt/boost/preprocessor/repeat.hpp"
+#   include <Qt/boost/variant/variant_fwd.hpp>
+#   include <Qt/boost/preprocessor/cat.hpp>
+#   include <Qt/boost/preprocessor/enum.hpp>
+#   include <Qt/boost/preprocessor/repeat.hpp>
 #endif
 
 namespace boost {
@@ -111,7 +111,7 @@ struct make_initializer_node
                 return BOOST_MPL_AUX_VALUE_WKND(index)::value; // which
             }
 
-#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES            
+#ifndef BOOST_NO_CXX11_RVALUE_REFERENCES
             static int initialize(void* dest, param2_T operand)
             {
                 // This assert must newer trigger, because all the reference contents are

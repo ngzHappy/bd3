@@ -15,8 +15,8 @@
 // Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_GEOMETRY_IO_SVG_WRITE_SVG_HPP
-#define BOOST_GEOMETRY_IO_SVG_WRITE_SVG_HPP
+#ifndef BOOST_GEOMETRY_IO_SVG_WRITE_HPP
+#define BOOST_GEOMETRY_IO_SVG_WRITE_HPP
 
 #include <ostream>
 #include <string>
@@ -24,6 +24,10 @@
 #include <Qt/boost/config.hpp>
 #include <Qt/boost/mpl/assert.hpp>
 #include <Qt/boost/range.hpp>
+
+#include <Qt/boost/variant/apply_visitor.hpp>
+#include <Qt/boost/variant/static_visitor.hpp>
+#include <Qt/boost/variant/variant_fwd.hpp>
 
 #include <Qt/boost/geometry/algorithms/detail/interior_iterator.hpp>
 
@@ -48,7 +52,7 @@ struct svg_point
 {
     template <typename Char, typename Traits>
     static inline void apply(std::basic_ostream<Char, Traits>& os,
-                Point const& p, std::string const& style, int size)
+                Point const& p, std::string const& style, double size)
     {
         os << "<circle cx=\"" << geometry::get<0>(p)
             << "\" cy=\"" << geometry::get<1>(p)
@@ -63,7 +67,7 @@ struct svg_box
 {
     template <typename Char, typename Traits>
     static inline void apply(std::basic_ostream<Char, Traits>& os,
-                Box const& box, std::string const& style, int )
+                Box const& box, std::string const& style, double)
     {
         // Prevent invisible boxes, making them >=1, using "max"
         BOOST_USING_STD_MAX();
@@ -87,7 +91,7 @@ struct svg_segment
 {
     template <typename Char, typename Traits>
     static inline void apply(std::basic_ostream<Char, Traits>& os,
-        Segment const& segment, std::string const& style, int)
+        Segment const& segment, std::string const& style, double)
     {
         typedef typename coordinate_type<Segment>::type ct;
         ct x1 = geometry::get<0, 0>(segment);
@@ -110,7 +114,7 @@ struct svg_range
 {
     template <typename Char, typename Traits>
     static inline void apply(std::basic_ostream<Char, Traits>& os,
-        Range const& range, std::string const& style, int )
+        Range const& range, std::string const& style, double)
     {
         typedef typename boost::range_iterator<Range const>::type iterator;
 
@@ -138,7 +142,7 @@ struct svg_poly
 {
     template <typename Char, typename Traits>
     static inline void apply(std::basic_ostream<Char, Traits>& os,
-        Polygon const& polygon, std::string const& style, int )
+        Polygon const& polygon, std::string const& style, double)
     {
         typedef typename geometry::ring_type<Polygon>::type ring_type;
         typedef typename boost::range_iterator<ring_type const>::type iterator_type;
@@ -197,6 +201,25 @@ struct prefix_ring
 };
 
 
+template <typename MultiGeometry, typename Policy>
+struct svg_multi
+{
+    template <typename Char, typename Traits>
+    static inline void apply(std::basic_ostream<Char, Traits>& os,
+        MultiGeometry const& multi, std::string const& style, double size)
+    {
+        for (typename boost::range_iterator<MultiGeometry const>::type
+                    it = boost::begin(multi);
+            it != boost::end(multi);
+            ++it)
+        {
+            Policy::apply(os, *it, style, size);
+        }
+
+    }
+
+};
+
 
 }} // namespace detail::svg
 #endif // DOXYGEN_NO_DETAIL
@@ -214,7 +237,7 @@ The static method should have the signature:
 template <typename Char, typename Traits>
 static inline void apply(std::basic_ostream<Char, Traits>& os, G const& geometry)
 */
-template <typename GeometryTag, typename Geometry>
+template <typename Geometry, typename Tag = typename tag<Geometry>::type>
 struct svg
 {
     BOOST_MPL_ASSERT_MSG
@@ -225,25 +248,114 @@ struct svg
 };
 
 template <typename Point>
-struct svg<point_tag, Point> : detail::svg::svg_point<Point> {};
+struct svg<Point, point_tag> : detail::svg::svg_point<Point> {};
 
 template <typename Segment>
-struct svg<segment_tag, Segment> : detail::svg::svg_segment<Segment> {};
+struct svg<Segment, segment_tag> : detail::svg::svg_segment<Segment> {};
 
 template <typename Box>
-struct svg<box_tag, Box> : detail::svg::svg_box<Box> {};
+struct svg<Box, box_tag> : detail::svg::svg_box<Box> {};
 
 template <typename Linestring>
-struct svg<linestring_tag, Linestring>
+struct svg<Linestring, linestring_tag>
     : detail::svg::svg_range<Linestring, detail::svg::prefix_linestring> {};
 
 template <typename Ring>
-struct svg<ring_tag, Ring>
+struct svg<Ring, ring_tag>
     : detail::svg::svg_range<Ring, detail::svg::prefix_ring> {};
 
 template <typename Polygon>
-struct svg<polygon_tag, Polygon>
+struct svg<Polygon, polygon_tag>
     : detail::svg::svg_poly<Polygon> {};
+
+template <typename MultiPoint>
+struct svg<MultiPoint, multi_point_tag>
+    : detail::svg::svg_multi
+        <
+            MultiPoint,
+            detail::svg::svg_point
+                <
+                    typename boost::range_value<MultiPoint>::type
+                >
+
+        >
+{};
+
+template <typename MultiLinestring>
+struct svg<MultiLinestring, multi_linestring_tag>
+    : detail::svg::svg_multi
+        <
+            MultiLinestring,
+            detail::svg::svg_range
+                <
+                    typename boost::range_value<MultiLinestring>::type,
+                    detail::svg::prefix_linestring
+                >
+
+        >
+{};
+
+template <typename MultiPolygon>
+struct svg<MultiPolygon, multi_polygon_tag>
+    : detail::svg::svg_multi
+        <
+            MultiPolygon,
+            detail::svg::svg_poly
+                <
+                    typename boost::range_value<MultiPolygon>::type
+                >
+
+        >
+{};
+
+
+template <typename Geometry>
+struct devarianted_svg
+{
+    template <typename OutputStream>
+    static inline void apply(OutputStream& os,
+                             Geometry const& geometry,
+                             std::string const& style,
+                             double size)
+    {
+        svg<Geometry>::apply(os, geometry, style, size);
+    }
+};
+
+template <BOOST_VARIANT_ENUM_PARAMS(typename T)>
+struct devarianted_svg<variant<BOOST_VARIANT_ENUM_PARAMS(T)> >
+{
+    template <typename OutputStream>
+    struct visitor: static_visitor<void>
+    {
+        OutputStream& m_os;
+        std::string const& m_style;
+        double m_size;
+
+        visitor(OutputStream& os, std::string const& style, double size)
+            : m_os(os)
+            , m_style(style)
+            , m_size(size)
+        {}
+
+        template <typename Geometry>
+        inline void operator()(Geometry const& geometry) const
+        {
+            devarianted_svg<Geometry>::apply(m_os, geometry, m_style, m_size);
+        }
+    };
+
+    template <typename OutputStream>
+    static inline void apply(
+        OutputStream& os,
+        variant<BOOST_VARIANT_ENUM_PARAMS(T)> const& geometry,
+        std::string const& style,
+        double size
+    )
+    {
+        boost::apply_visitor(visitor<OutputStream>(os, style, size), geometry);
+    }
+};
 
 } // namespace dispatch
 #endif // DOXYGEN_NO_DISPATCH
@@ -254,12 +366,12 @@ struct svg<polygon_tag, Polygon>
 \ingroup svg
 \details Stream manipulator, streams geometry classes as SVG (Scalable Vector Graphics)
 */
-template <typename G>
+template <typename Geometry>
 class svg_manipulator
 {
 public:
 
-    inline svg_manipulator(G const& g, std::string const& style, int size)
+    inline svg_manipulator(Geometry const& g, std::string const& style, double size)
         : m_geometry(g)
         , m_style(style)
         , m_size(size)
@@ -269,18 +381,18 @@ public:
     inline friend std::basic_ostream<Char, Traits>& operator<<(
                     std::basic_ostream<Char, Traits>& os, svg_manipulator const& m)
     {
-        dispatch::svg
-            <
-                typename tag<G>::type, G
-            >::apply(os, m.m_geometry, m.m_style, m.m_size);
+        dispatch::devarianted_svg<Geometry>::apply(os,
+                                                   m.m_geometry,
+                                                   m.m_style,
+                                                   m.m_size);
         os.flush();
         return os;
     }
 
 private:
-    G const& m_geometry;
+    Geometry const& m_geometry;
     std::string const& m_style;
-    int m_size;
+    double m_size;
 };
 
 /*!
@@ -293,13 +405,14 @@ private:
 \ingroup svg
 */
 template <typename Geometry>
-inline svg_manipulator<Geometry> svg(Geometry const& geometry, std::string const& style, int size = -1)
+inline svg_manipulator<Geometry> svg(Geometry const& geometry,
+            std::string const& style, double size = -1.0)
 {
-    concept::check<Geometry const>();
+    concepts::check<Geometry const>();
 
     return svg_manipulator<Geometry>(geometry, style, size);
 }
 
 }} // namespace boost::geometry
 
-#endif // BOOST_GEOMETRY_IO_SVG_WRITE_SVG_HPP
+#endif // BOOST_GEOMETRY_IO_SVG_WRITE_HPP

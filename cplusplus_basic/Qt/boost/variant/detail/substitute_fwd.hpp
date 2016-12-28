@@ -13,9 +13,9 @@
 #ifndef BOOST_VARIANT_DETAIL_SUBSTITUTE_FWD_HPP
 #define BOOST_VARIANT_DETAIL_SUBSTITUTE_FWD_HPP
 
-#include "Qt/boost/mpl/aux_/lambda_arity_param.hpp"
-#include "Qt/boost/mpl/aux_/template_arity.hpp"
-#include "Qt/boost/mpl/int_fwd.hpp"
+#include <Qt/boost/mpl/aux_/lambda_arity_param.hpp>
+#include <Qt/boost/mpl/aux_/template_arity.hpp>
+#include <Qt/boost/mpl/int_fwd.hpp>
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,8 +24,8 @@
 // Defined if 'substitute' is not implementable on the current compiler.
 //
 
-#include "Qt/boost/mpl/aux_/config/ctps.hpp"
-#include "Qt/boost/mpl/aux_/config/ttp.hpp"
+#include <Qt/boost/mpl/aux_/config/ctps.hpp>
+#include <Qt/boost/mpl/aux_/config/ttp.hpp>
 
 #if defined(BOOST_NO_TEMPLATE_TEMPLATE_PARAMETERS) \
  && !defined(BOOST_VARIANT_DETAIL_NO_SUBSTITUTE)
