@@ -112,3 +112,7 @@ opencv_pca.file=$$PWD/opencv/opencv_pca/opencv_pca.pro
 opencv_pca.depends+=library_opencv_basic
 SUBDIRS += opencv_pca
 
+opencv_gif.file=$$PWD/opencv/opencv_gif/opencv_gif.pro
+opencv_gif.depends+=library_opencv_basic
+SUBDIRS += opencv_gif
+

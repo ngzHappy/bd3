@@ -23,6 +23,7 @@
 #include <Qt/boost/container/detail/workaround.hpp>
 
 #ifndef BOOST_NO_EXCEPTIONS
+   #include <exception>
    #include <stdexcept> //for std exception types
    #include <string>    //for implicit std::string conversion
    #include <new>       //for std::bad_alloc
@@ -141,9 +142,9 @@ namespace container {
    //! <li>If BOOST_NO_EXCEPTIONS and BOOST_CONTAINER_USER_DEFINED_THROW_CALLBACKS are defined
    //!   the user must provide an implementation and the function should not return.</li>
    //! </ul>
-   inline void throw_logic_error(const char* str)
+   inline void throw_logic_error(const char* str1)
    {
-      throw std::logic_error(str);
+      throw std::logic_error(str1);
    }
 
    //! Exception callback called by Boost.Container  to report errors that can only be detected during runtime.
@@ -157,9 +158,9 @@ namespace container {
    //! <li>If BOOST_NO_EXCEPTIONS and BOOST_CONTAINER_USER_DEFINED_THROW_CALLBACKS are defined
    //!   the user must provide an implementation and the function should not return.</li>
    //! </ul>
-   inline void throw_runtime_error(const char* str)
+   inline void throw_runtime_error(const char* str1)
    {
-      throw std::runtime_error(str);
+      throw std::runtime_error(str1);
    }
 
 #endif

@@ -12,6 +12,7 @@
 #include <Qt/boost/core/no_exceptions_support.hpp>
 
 #ifndef BOOST_NO_EXCEPTIONS
+#include <exception>
 #include <stdexcept>
 #include <Qt/boost/throw_exception.hpp>
 #else
@@ -19,18 +20,21 @@
 #include <Qt/boost/geometry/index/detail/assert.hpp>
 #endif
 
-namespace boost { namespace geometry { namespace index { namespace detail {
+namespace boost {
+namespace geometry {
+namespace index {
+namespace detail {
 
 #ifndef BOOST_NO_EXCEPTIONS
 
-inline void throw_runtime_error(const char * str)
-{
-    BOOST_THROW_EXCEPTION(std::runtime_error(str));
+#undef throw_runtime_error
+inline void throw_runtime_error(const char * str){
+    BOOST_THROW_EXCEPTION(std::runtime_error{str});
 }
 
-inline void throw_logic_error(const char * str)
-{
-    BOOST_THROW_EXCEPTION(std::logic_error(str));
+#undef throw_logic_error
+inline void throw_logic_error(const char * str1){
+    BOOST_THROW_EXCEPTION(std::logic_error{str1});
 }
 
 inline void throw_invalid_argument(const char * str)
