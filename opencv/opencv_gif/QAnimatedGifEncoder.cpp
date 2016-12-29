@@ -39,38 +39,41 @@ namespace {
 inline void put_char(QIODevice * o,char c) {
     o->putChar(c);
 }
+inline void put_char(QIODevice * o,unsigned char c)=delete;
 
 }/*namespace*/
 
 namespace mgui {
 
 namespace {
+using const_uchar=const unsigned char/*定义类型const unsigned char*/;
+using type_uchar=unsigned char/*定义类型unsigned char*/;
 
 /*
  * unsigned char to double
  * 直接查表，加快速度
 */
 constexpr const double uchar2doule[]{
-    0.  ,   1.  ,   2.  ,   3.  ,	4.,	    5.,	    6.,	    7.,	    8.,	    9.,	    10.,	11.,	12.,	13.,	14.,	15.,
-    16. ,   17. ,   18. ,   19. ,	20.,	21.,	22.,	23.,	24.,	25.,	26.,	27.,	28.,	29.,	30.,	31.,
-    32. ,   33. ,   34. ,   35. ,	36.,	37.,	38.,	39.,	40.,	41.,	42.,	43.,	44.,	45.,	46.,	47.,
-    48. ,   49. ,   50. ,   51. ,	52.,	53.,	54.,	55.,	56.,	57.,	58.,	59.,	60.,	61.,	62.,	63.,
-    64. ,   65. ,   66. ,   67. ,	68.,	69.,	70.,	71.,	72.,	73.,	74.,	75.,	76.,	77.,	78.,	79.,
-    80. ,   81. ,   82. ,   83. ,	84.,	85.,	86.,	87.,	88.,	89.,	90.,	91.,	92.,	93.,	94.,	95.,
-    96. ,   97. ,   98. ,   99. ,	100.,	101.,	102.,	103.,	104.,	105.,	106.,	107.,	108.,	109.,	110.,	111.,
-    112.,   113.,   114.,   115.,	116.,	117.,	118.,	119.,	120.,	121.,	122.,	123.,	124.,	125.,	126.,	127.,
-    128.,   129.,   130.,   131.,	132.,	133.,	134.,	135.,	136.,	137.,	138.,	139.,	140.,	141.,	142.,	143.,
-    144.,   145.,   146.,   147.,	148.,	149.,	150.,	151.,	152.,	153.,	154.,	155.,	156.,	157.,	158.,	159.,
-    160.,   161.,   162.,   163.,	164.,	165.,	166.,	167.,	168.,	169.,	170.,	171.,	172.,	173.,	174.,	175.,
-    176.,   177.,   178.,   179.,	180.,	181.,	182.,	183.,	184.,	185.,	186.,	187.,	188.,	189.,	190.,	191.,
-    192.,   193.,   194.,   195.,	196.,	197.,	198.,	199.,	200.,	201.,	202.,	203.,	204.,	205.,	206.,	207.,
-    208.,   209.,   210.,   211.,	212.,	213.,	214.,	215.,	216.,	217.,	218.,	219.,	220.,	221.,	222.,	223.,
-    224.,   225.,   226.,   227.,	228.,	229.,	230.,	231.,	232.,	233.,	234.,	235.,	236.,	237.,	238.,	239.,
-    240.,   241.,   242.,   243.,	244.,	245.,	246.,	247.,	248.,	249.,	250.,	251.,	252.,	253.,	254.,	255.,
+    0.  ,   1.  ,   2.  ,   3.  ,    4.,        5.,        6.,        7.,        8.,        9.,        10.,    11.,    12.,    13.,    14.,    15.,
+    16. ,   17. ,   18. ,   19. ,    20.,    21.,    22.,    23.,    24.,    25.,    26.,    27.,    28.,    29.,    30.,    31.,
+    32. ,   33. ,   34. ,   35. ,    36.,    37.,    38.,    39.,    40.,    41.,    42.,    43.,    44.,    45.,    46.,    47.,
+    48. ,   49. ,   50. ,   51. ,    52.,    53.,    54.,    55.,    56.,    57.,    58.,    59.,    60.,    61.,    62.,    63.,
+    64. ,   65. ,   66. ,   67. ,    68.,    69.,    70.,    71.,    72.,    73.,    74.,    75.,    76.,    77.,    78.,    79.,
+    80. ,   81. ,   82. ,   83. ,    84.,    85.,    86.,    87.,    88.,    89.,    90.,    91.,    92.,    93.,    94.,    95.,
+    96. ,   97. ,   98. ,   99. ,    100.,    101.,    102.,    103.,    104.,    105.,    106.,    107.,    108.,    109.,    110.,    111.,
+    112.,   113.,   114.,   115.,    116.,    117.,    118.,    119.,    120.,    121.,    122.,    123.,    124.,    125.,    126.,    127.,
+    128.,   129.,   130.,   131.,    132.,    133.,    134.,    135.,    136.,    137.,    138.,    139.,    140.,    141.,    142.,    143.,
+    144.,   145.,   146.,   147.,    148.,    149.,    150.,    151.,    152.,    153.,    154.,    155.,    156.,    157.,    158.,    159.,
+    160.,   161.,   162.,   163.,    164.,    165.,    166.,    167.,    168.,    169.,    170.,    171.,    172.,    173.,    174.,    175.,
+    176.,   177.,   178.,   179.,    180.,    181.,    182.,    183.,    184.,    185.,    186.,    187.,    188.,    189.,    190.,    191.,
+    192.,   193.,   194.,   195.,    196.,    197.,    198.,    199.,    200.,    201.,    202.,    203.,    204.,    205.,    206.,    207.,
+    208.,   209.,   210.,   211.,    212.,    213.,    214.,    215.,    216.,    217.,    218.,    219.,    220.,    221.,    222.,    223.,
+    224.,   225.,   226.,   227.,    228.,    229.,    230.,    231.,    232.,    233.,    234.,    235.,    236.,    237.,    238.,    239.,
+    240.,   241.,   242.,   243.,    244.,    245.,    246.,    247.,    248.,    249.,    250.,    251.,    252.,    253.,    254.,    255.,
 };
 
 constexpr const float uchar2float[]{
-    0.f  ,   1.f  ,   2.f,   3.f  ,	4.f,5.f,	  6.,	    7.f,	    8.f,	    9.f,	    10.f,	11.f,	12.f,	13.f,	14.f,	15.f,
+    0.f  ,   1.f  ,   2.f,    3.f  ,	4.f,    5.f,	  6.f,	    7.f,	    8.f,	    9.f,	    10.f,	11.f,	12.f,	13.f,	14.f,	15.f,
     16.f ,   17.f ,   18.f,   19.f ,	20.f,	21.f,	22.f,	23.f,	24.f,	25.f,	26.f,	27.f,	28.f,	29.f,	30.f,	31.f,
     32.f ,   33.f ,   34.f,   35.f ,	36.f,	37.f,	38.f,	39.f,	40.f,	41.f,	42.f,	43.f,	44.f,	45.f,	46.f,	47.f,
     48.f ,   49.f ,   50.f,   51.f ,	52.f,	53.f,	54.f,	55.f,	56.f,	57.f,	58.f,	59.f,	60.f,	61.f,	62.f,	63.f,
@@ -86,6 +89,25 @@ constexpr const float uchar2float[]{
     208.f,   209.f,   210.f,   211.f,	212.f,	213.f,	214.f,	215.f,	216.f,	217.f,	218.f,	219.f,	220.f,	221.f,	222.f,	223.f,
     224.f,   225.f,   226.f,   227.f,	228.f,	229.f,	230.f,	231.f,	232.f,	233.f,	234.f,	235.f,	236.f,	237.f,	238.f,	239.f,
     240.f,   241.f,   242.f,   243.f,	244.f,	245.f,	246.f,	247.f,	248.f,	249.f,	250.f,	251.f,	252.f,	253.f,	254.f,	255.f,
+};
+
+constexpr const float uchar2float_0_1[]{
+    0.f/255,     1.f/255,     2.f/255,     3.f/255,      4.f/255,      5.f/255,      6.f/255,      7.f/255,     8.f/255,     9.f/255,     10.f/255,    11.f/255,    12.f/255,    13.f/255,    14.f/255,    15.f/255,
+    16.f/255,    17.f/255,    18.f/255,    19.f/255,     20.f/255,     21.f/255,     22.f/255,     23.f/255,    24.f/255,    25.f/255,    26.f/255,    27.f/255,    28.f/255,    29.f/255,    30.f/255,    31.f/255,
+    32.f/255,    33.f/255,    34.f/255,    35.f/255,     36.f/255,     37.f/255,     38.f/255,     39.f/255,    40.f/255,    41.f/255,    42.f/255,    43.f/255,    44.f/255,    45.f/255,    46.f/255,    47.f/255,
+    48.f/255,    49.f/255,    50.f/255,    51.f/255,     52.f/255,     53.f/255,     54.f/255,     55.f/255,    56.f/255,    57.f/255,    58.f/255,    59.f/255,    60.f/255,    61.f/255,    62.f/255,    63.f/255,
+    64.f/255,    65.f/255,    66.f/255,    67.f/255,     68.f/255,     69.f/255,     70.f/255,     71.f/255,    72.f/255,    73.f/255,    74.f/255,    75.f/255,    76.f/255,    77.f/255,    78.f/255,    79.f/255,
+    80.f/255,    81.f/255,    82.f/255,    83.f/255,     84.f/255,     85.f/255,     86.f/255,     87.f/255,    88.f/255,    89.f/255,    90.f/255,    91.f/255,    92.f/255,    93.f/255,    94.f/255,    95.f/255,
+    96.f/255,    97.f/255,    98.f/255,    99.f/255,     100.f/255,    101.f/255,    102.f/255,    103.f/255,    104.f/255,    105.f/255,    106.f/255,    107.f/255,    108.f/255,    109.f/255,    110.f/255,    111.f/255,
+    112.f/255,   113.f/255,   114.f/255,   115.f/255,    116.f/255,    117.f/255,    118.f/255,    119.f/255,    120.f/255,    121.f/255,    122.f/255,    123.f/255,    124.f/255,    125.f/255,    126.f/255 ,   127.f/255,
+    128.f/255,   129.f/255,   130.f/255,   131.f/255,    132.f/255,    133.f/255,    134.f/255,    135.f/255,    136.f/255,    137.f/255,    138.f/255,    139.f/255,    140.f/255,    141.f/255,    142.f/255 ,   143.f/255,
+    144.f/255,   145.f/255,   146.f/255,   147.f/255,    148.f/255,    149.f/255,    150.f/255,    151.f/255,    152.f/255,    153.f/255,    154.f/255,    155.f/255,    156.f/255,    157.f/255,    158.f/255 ,   159.f/255,
+    160.f/255,   161.f/255,   162.f/255,   163.f/255,    164.f/255,    165.f/255,    166.f/255,    167.f/255,    168.f/255,    169.f/255,    170.f/255,    171.f/255,    172.f/255,    173.f/255,    174.f/255 ,   175.f/255,
+    176.f/255,   177.f/255,   178.f/255,   179.f/255,    180.f/255,    181.f/255,    182.f/255,    183.f/255,    184.f/255,    185.f/255,    186.f/255,    187.f/255,    188.f/255,    189.f/255,    190.f/255 ,   191.f/255,
+    192.f/255,   193.f/255,   194.f/255,   195.f/255,    196.f/255,    197.f/255,    198.f/255,    199.f/255,    200.f/255,    201.f/255,    202.f/255,    203.f/255,    204.f/255,    205.f/255,    206.f/255 ,   207.f/255,
+    208.f/255,   209.f/255,   210.f/255,   211.f/255,    212.f/255,    213.f/255,    214.f/255,    215.f/255,    216.f/255,    217.f/255,    218.f/255,    219.f/255,    220.f/255,    221.f/255,    222.f/255 ,   223.f/255,
+    224.f/255,   225.f/255,   226.f/255,   227.f/255,    228.f/255,    229.f/255,    230.f/255,    231.f/255,    232.f/255,    233.f/255,    234.f/255,    235.f/255,    236.f/255,    237.f/255,    238.f/255 ,   239.f/255,
+    240.f/255,   241.f/255,   242.f/255,   243.f/255,    244.f/255,    245.f/255,    246.f/255,    247.f/255,    248.f/255,    249.f/255,    250.f/255,    251.f/255,    252.f/255,    253.f/255,    254.f/255 ,   255.f/255,
 };
 
 template<typename T1,typename T>
@@ -111,7 +133,7 @@ namespace mgui {
 
 namespace {
 //隐式数据共享
-typedef  QVector<Byte>  PixType;
+typedef QVector<type_uchar> PixType;
 
 /*将rgb24位转为灰度图*/
 class QuantizationAlgorithm {
@@ -119,7 +141,7 @@ public:
     QuantizationAlgorithm()=default;
     virtual void construct(const PixType & /*thepic*/,Integer /*len*/,Integer /*sample*/)=0;
     virtual ~QuantizationAlgorithm()=default;
-    virtual QVector<Byte> process()=0;
+    virtual QVector<type_uchar> process()=0;
     virtual Integer map(Integer b,Integer g,Integer r)=0;
 };
 
@@ -151,7 +173,7 @@ public:
     };
 
     PixType pix;
-    QVector<Byte> quantization;
+    QVector<type_uchar> quantization;
 
     typedef boost::geometry::model::point<
         std::int32_t,3,
@@ -165,12 +187,18 @@ public:
             Integer /*len*/,
             Integer /*sample*/) override {
         pix=hepic;
+#ifndef NDEBUG
+        for (const auto & i:uchar2float_0_1) {
+            assert(i>=0);
+            assert(i<=1);
+        }
+#endif
     }
 
-    QVector<Byte> process() {
+    QVector<type_uchar> process() {
 
         /*清空数据*/
-        QVector<Byte> & ans=quantization;
+        QVector<type_uchar> & ans=quantization;
         ans.clear();
         rtree=std::make_shared<rtree_t>();
 
@@ -198,6 +226,13 @@ private:
     struct Data {
         Double a,b,c;
         std::int32_t count;
+        Data()=default;
+        Data(const Double & arg0,
+            const Double & arg1,
+            const Double & arg2,
+            const std::int32_t & arg3):a(arg0),
+            b(arg1),c(arg2),count(arg3) {
+        }
     };
     struct RGBFloat {
         Float r,g,b;
@@ -217,19 +252,37 @@ private:
 
     rgb_byte_vector rgb_float_vector_to_rgb_byte_vector(const rgb_float_vector & arg) {
         rgb_byte_vector varAns;
+        rgb_float_vector varAnsTmp;
+
         varAns.resize(arg.size());
+        varAnsTmp.resize(arg.size());
+
         try {
+
             cv::Mat matInputWrap(1,
                 static_cast<int>(arg.size()),
                 CV_32FC3,
                 const_cast<RGBFloat*>(arg.data())
             );
+
             cv::Mat matOutPutWrap(1,
+                static_cast<int>(varAnsTmp.size()),
+                CV_32FC3,
+                const_cast<RGBFloat*>(varAnsTmp.data())
+            );
+
+            cv::cvtColor(matInputWrap,matOutPutWrap,cv::COLOR_Lab2RGB);
+
+            matOutPutWrap*=255.0f;
+            matOutPutWrap+=0.505555f/*四舍五入*/;
+
+            matInputWrap=cv::Mat{ 1,
                 static_cast<int>(varAns.size()),
                 CV_8UC3,
-                const_cast<DataItem*>(varAns.data())
-            );
-            cv::cvtColor(matInputWrap,matOutPutWrap,cv::COLOR_Lab2RGB,CV_8UC3);
+                const_cast<DataItem*>(varAns.data()) };
+
+            matOutPutWrap.convertTo(matInputWrap,CV_8UC3);
+
         }
         catch (...) {
             varAns.clear();
@@ -253,9 +306,9 @@ private:
                 auto varI=varAns.begin();
                 for (const auto & i:hist) {
                     varTmpData.emplace_back(
-                        uchar2float[i.first.a],
-                        uchar2float[i.first.b],
-                        uchar2float[i.first.c]
+                        uchar2float_0_1[i.first.a],
+                        uchar2float_0_1[i.first.b],
+                        uchar2float_0_1[i.first.c]
                     );
                     varI->count=i.second;
                     ++varI;
@@ -289,6 +342,7 @@ private:
         catch (...) {
             varAns.clear();
             CPLUSPLUS_EXCEPTION(false);
+            return std::move(varAns);
         }
 
         return std::move(varAns);
@@ -325,9 +379,9 @@ private:
                 rtree->insert(std::make_pair(
                     point_t(i.first.a,i.first.b,i.first.c),index_++
                 ));
-                quantization.push_back(reinterpret_cast<const Byte&>(i.first.a));
-                quantization.push_back(reinterpret_cast<const Byte&>(i.first.b));
-                quantization.push_back(reinterpret_cast<const Byte&>(i.first.c));
+                quantization.push_back(i.first.a);
+                quantization.push_back(i.first.b);
+                quantization.push_back(i.first.c);
             }
             return;
         }
@@ -337,8 +391,10 @@ private:
             std::list<Data>data;
             double mean_x,mean_y,mean_z;
             double std_x,std_y,std_z;
+            double std_value;
 
             void update() {
+                std_value=0;
                 double x=0,y=0,z=0;
                 double x_w=0;
 
@@ -349,11 +405,15 @@ private:
                     z+=i.c*i.count;
                 }
 
+                assert(x_w>0);
                 mean_x=x/x_w;
                 mean_y=y/x_w;
                 mean_z=z/x_w;
 
-                std_x=0; std_y=0; std_z=0;
+                std_x=0;
+                std_y=0;
+                std_z=0;
+
                 for (const auto & i:(data)) {
 
                     z=std::abs((i.c-mean_z));
@@ -361,15 +421,18 @@ private:
                     x=std::abs((i.a-mean_x));
 
                     /*小误差快速收敛*/
-                    if (x<0.5) { x*=.5; }
-                    if (y<0.5) { y*=.5; }
-                    if (z<0.5) { z*=.5; }
+                    if (x<0.5) { x*=.05; }
+                    if (y<0.5) { y*=.05; }
+                    if (z<0.5) { z*=.05; }
 
                     std_x+=x*i.count;
                     std_y+=y*i.count;
                     std_z+=z*i.count;
                 }
 
+                std_value=std_z;
+                std_value+=std_y;
+                std_value+=std_x;
             }
 
             std::pair<
@@ -436,8 +499,8 @@ private:
                 std::shared_ptr<Pack> &l,
                 std::shared_ptr<Pack> &r
                 ) {
-            const auto std_l=(l->std_z+(l->std_x+l->std_y));
-            const auto std_r=(r->std_x+(r->std_y+r->std_z));
+            const auto & std_l=l->std_value;
+            const auto & std_r=r->std_value;
             return std_l>std_r;
         };
 
@@ -455,9 +518,13 @@ private:
         hist.clear();
         while (packs.size()<256) {
             std::sort(packs.begin(),packs.end(),comp_pack_function);
-            auto next_=packs.begin()->get()->next();
-            packs[0]=next_.first;
-            packs.push_back(next_.second);
+            auto * first=packs.begin()->get();
+            if (first->std_value<std::numeric_limits<Double>::epsilon()) {
+                break;
+            }
+            auto next_=first->next();
+            packs[0]=std::move(next_.first);
+            packs.push_back(std::move(next_.second));
         }
 
         rgb_float_vector varTmpAns;
@@ -485,9 +552,9 @@ private:
                 point_t(x,y,z),index++
             ));
 
-            quantization.push_back((const Byte&)(x));
-            quantization.push_back((const Byte&)(y));
-            quantization.push_back((const Byte&)(z));
+            quantization.push_back(x);
+            quantization.push_back(y);
+            quantization.push_back(z);
 
         }
 
@@ -609,7 +676,7 @@ private:
     inline void output(Integer code,type_iodevice * outs);
 private:
     CPLUSPLUS_OBJECT(LZWEncoder)
-    };/*LZWEncoder*/
+};/*LZWEncoder*/
 
 inline void LZWEncoder::char_out(type_uchar c,type_iodevice * outs) {
     accum[a_count++]=c;
@@ -703,7 +770,7 @@ inline void LZWEncoder::encode(type_iodevice * os) {
     assert(initCodeSize>=0);
     this->put_char(os,initCodeSize); /*write "initial code size" byte*/
     remaining=imgW * imgH; /*reset navigation variables*/
-    assert(remaining==(argPixAryEnd-argPixAryBegin));
+    assert(remaining==(pixAryEnd-pixAryBegin));
     curPixel=0;
     compress(initCodeSize+1,os); /*compress and write the pixel data*/
     this->put_char(os,type_uchar(0));
@@ -741,8 +808,6 @@ inline void LZWEncoder::output(Integer code,type_iodevice * outs) {
     cur_bits+=n_bits;
 
     while (cur_bits>=8) {
-        assert(cur_accum<=MAX_UCHAR);
-        assert(cur_accum>=0);
         char_out(cur_accum,outs);
         cur_accum>>=8;
         cur_bits-=8;
@@ -769,8 +834,6 @@ inline void LZWEncoder::output(Integer code,type_iodevice * outs) {
     if (code==EOFCode) {
         /*At EOF, write the rest of the buffer.*/
         while (cur_bits>0) {
-            assert(cur_accum>=0);
-            assert(cur_accum<=MAX_UCHAR);
             char_out(cur_accum,outs);
             cur_accum>>=8;
             cur_bits-=8;
@@ -801,9 +864,9 @@ public:
     OutputStream * out=0;
     BufferedImage image; // current frame
     PixType  pixels; // BGR byte array from frame
-    QVector<Byte> indexedPixels; // converted frame indexed to palette
+    QVector<type_uchar> indexedPixels; // converted frame indexed to palette
     Integer colorDepth=8; // number of bit planes
-    QVector<Byte> colorTab; // RGB palette
+    QVector<type_uchar> colorTab; // RGB palette
     Boolean usedEntry[256]; // active palette entries
     Integer palSize=7; // color table size (bits-1)
     Integer dispose=-1; // disposal code (-1 = use default)
@@ -821,10 +884,10 @@ QAnimatedGifEncoder::QAnimatedGifEncoder() {
     };
 }
 
-
 QAnimatedGifEncoder::~QAnimatedGifEncoder() {
-    if (this->thisData->started)
+    if (this->thisData->started) {
         this->finish();
+    }
 }
 
 void QAnimatedGifEncoder::setDelay(const Integer ms) {
@@ -874,7 +937,9 @@ inline QImage change_image_format_and_size(
 ) {
 
     if (argImage.isNull()) {
-        return QImage{ argWidth,argHeight,QImage::Format::Format_RGB888 };
+        auto varAns=QImage{ argWidth,argHeight,QImage::Format::Format_RGB888 };
+        varAns.fill({ 255,0,0 });
+        return std::move(varAns);
     }
 
     QImage varAns=argImage;
@@ -899,6 +964,7 @@ inline QImage change_image_format_and_size(
 
 }/*namespace*/
 
+/*将图片化为一行*/
 void QAnimatedGifEncoder::getImagePixels() {
     ThisData * var_thisData=thisData.get();
 
@@ -907,14 +973,13 @@ void QAnimatedGifEncoder::getImagePixels() {
                 var_thisData->width,
                 var_thisData->height);
 
-    {//set bits
+    {/*set bits*/
         const auto var_w=var_thisData->image.width();
         const auto var_h=var_thisData->image.height();
         const QImage & varImage=var_thisData->image;
         auto & pixs=var_thisData->pixels;
         pixs.clear();
-        pixs.reserve(var_w*var_h);
-
+        pixs.reserve(3*var_w*var_h);
 
         auto varData=varImage.constBits();
         const auto varBytesPerLine=varImage.bytesPerLine();
@@ -922,15 +987,14 @@ void QAnimatedGifEncoder::getImagePixels() {
         for (auto ii=0; ii<var_h; ++ii,varData+=varBytesPerLine) {
             auto varDataLine=varData;
             for (auto jj=0; jj<var_w; ++jj) {
-                pixs.push_back(*reinterpret_cast<const Byte*>(varDataLine++));
-                pixs.push_back(*reinterpret_cast<const Byte*>(varDataLine++));
-                pixs.push_back(*reinterpret_cast<const Byte*>(varDataLine++));
+                pixs.push_back(uchar2float[*varDataLine++]);
+                pixs.push_back(uchar2float[*varDataLine++]);
+                pixs.push_back(uchar2float[*varDataLine++]);
             }
         }
     }
 
 }
-
 
 Boolean QAnimatedGifEncoder::addFrame(BufferedImage && im) {
     ThisData * var_thisData=thisData.get();
@@ -976,7 +1040,9 @@ Boolean QAnimatedGifEncoder::addFrame(BufferedImage && im) {
 
 void QAnimatedGifEncoder::writePalette() {
     ThisData * var_thisData=thisData.get();
-    var_thisData->out->write(var_thisData->colorTab.data(),var_thisData->colorTab.size());
+    var_thisData->out->write(
+        reinterpret_cast<const Byte *>(var_thisData->colorTab.data()),
+        static_cast<Integer>(var_thisData->colorTab.size()));
     Integer n=(3*256)-var_thisData->colorTab.size();
     for (Integer i=0; i<n; ++i) {
         writeSome(Byte(0),var_thisData->out);
@@ -999,9 +1065,9 @@ void QAnimatedGifEncoder::writePixels() {
 
 void QAnimatedGifEncoder::writeGraphicCtrlExt() {
     ThisData * var_thisData=thisData.get();
-    put_char(var_thisData->out,(0x21)); // extension introducer
-    put_char(var_thisData->out,(Byte(0xf9))); // GCE label
-    put_char(var_thisData->out,(4)); // data block size
+    put_char(var_thisData->out,Byte(0x21)); // extension introducer
+    put_char(var_thisData->out,Byte(0x00f9)); // GCE label
+    put_char(var_thisData->out,Byte(4)); // data block size
     Integer transp,disp;
     if (var_thisData->isGivenTransparent==false) {
         transp=0;
@@ -1019,7 +1085,7 @@ void QAnimatedGifEncoder::writeGraphicCtrlExt() {
     put_char(var_thisData->out,(Byte((disp|transp)&0x00ff))); // 8   transparency flag
     writeShort(var_thisData->delay); // delay x 1/100 sec
     put_char(var_thisData->out,(Byte(0x00ff&var_thisData->transIndex))); // transparent color index
-    put_char(var_thisData->out,(0)); // block terminator
+    put_char(var_thisData->out,Byte(0)); // block terminator
 }
 
 void QAnimatedGifEncoder::writeLSD() {
@@ -1035,7 +1101,7 @@ void QAnimatedGifEncoder::writeLSD() {
 
 void QAnimatedGifEncoder::writeImageDesc() {
     ThisData * var_thisData=thisData.get();
-    put_char(var_thisData->out,(0x2c));
+    put_char(var_thisData->out,Byte(0x2c));
     writeShort(0); // image position x,y = 0,0
     writeShort(0);
     writeShort(var_thisData->width); // image size
@@ -1043,11 +1109,11 @@ void QAnimatedGifEncoder::writeImageDesc() {
     // packed fields
     if (var_thisData->firstFrame) {
         // no LCT  - GCT is used for first (or only) frame
-        put_char(var_thisData->out,(0));
+        put_char(var_thisData->out,Byte(0));
     }
     else {
         // specify normal LCT
-        put_char(var_thisData->out,(0x80|var_thisData->palSize)); // 6-8 size of color table
+        put_char(var_thisData->out,Byte(0x80|var_thisData->palSize)); // 6-8 size of color table
     }
 }
 
@@ -1059,14 +1125,14 @@ void QAnimatedGifEncoder::writeShort(Integer value) {
 
 void QAnimatedGifEncoder::writeNetscapeExt() {
     ThisData * var_thisData=thisData.get();
-    put_char(var_thisData->out,(0x21)); // extension introducer
-    writeSome(Byte(0xff),var_thisData->out); // app extension label
-    put_char(var_thisData->out,(11)); // block size
+    put_char(var_thisData->out,Byte(0x21)); // extension introducer
+    writeSome(Byte(0x00ff),var_thisData->out); // app extension label
+    put_char(var_thisData->out,Byte(11)); // block size
     writeString((const Byte *)("NETSCAPE2.0")); // app id + auth code
-    put_char(var_thisData->out,(3)); // sub-block size
-    put_char(var_thisData->out,(1)); // loop sub-block id
+    put_char(var_thisData->out,Byte(3)); // sub-block size
+    put_char(var_thisData->out,Byte(1)); // loop sub-block id
     writeShort(var_thisData->repeat); // loop count (extra iterations, 0=repeat forever)
-    put_char(var_thisData->out,(0)); // block terminator
+    put_char(var_thisData->out,Byte(0)); // block terminator
 }
 
 Boolean QAnimatedGifEncoder::addFrame(const BufferedImage & im) {
@@ -1093,7 +1159,7 @@ Boolean QAnimatedGifEncoder::finish() {
     if (var_thisData->out==0) { ok=false; }
     else
         try {
-        put_char(var_thisData->out,(0x3b));
+        put_char(var_thisData->out,Byte(0x3b));
         if (var_thisData->closeStream) {
             var_thisData->out->close();
         }
@@ -1102,7 +1168,7 @@ Boolean QAnimatedGifEncoder::finish() {
         ok=false;
     }
 
-    // reset for subsequent use
+    /*reset for subsequent use*/
     var_thisData->transIndex=0;
     var_thisData->out=null;
     var_thisData->image=QImage();
@@ -1145,6 +1211,7 @@ Boolean QAnimatedGifEncoder::start(OutputStream & os) {
     catch (...) {
         ok=false;
     }
+
     var_thisData->started=ok;
     return ok;
 }
@@ -1158,10 +1225,11 @@ Integer QAnimatedGifEncoder::findClosest(Color c) {
     Integer minpos=0;
     Integer dmin=256*256*256;
     Integer len=Integer(var_thisData->colorTab.size());
+    const auto & colorTab=var_thisData->colorTab;
     for (Integer i=0; i<len;) {
-        Integer dr=r-(var_thisData->colorTab[i++]&0xff);
-        Integer dg=g-(var_thisData->colorTab[i++]&0xff);
-        Integer db=b-(var_thisData->colorTab[i]&0xff);
+        Integer dr=r-(colorTab[i++]);
+        Integer dg=g-(colorTab[i++]);
+        Integer db=b-(colorTab[i]);
         Integer d=dr * dr+dg * dg+db * db;
         Integer index=i/3;
         if (var_thisData->usedEntry[index]&&(d<dmin)) {
@@ -1177,31 +1245,28 @@ Integer QAnimatedGifEncoder::findClosest(Color c) {
 void QAnimatedGifEncoder::analyzePixels() {
     ThisData * var_thisData=thisData.get();
     typedef Integer size_type;
-    auto len=size_type(var_thisData->pixels.size());
-    auto nPix=len/size_type(3);
+    const auto len=size_type(var_thisData->pixels.size());
+    const auto nPix=len/size_type(3);
     var_thisData->indexedPixels.resize(nPix);
     QuantizationAlgorithm * nq=new Quantization;//new NeuQuant;
     std::unique_ptr<QuantizationAlgorithm> uptr_nq(nq);
     nq->construct(var_thisData->pixels,len,var_thisData->sample);
     var_thisData->colorTab=nq->process();
 
-    // map image pixels to new palette
-    Integer k=0;
+    const auto & pixels=var_thisData->pixels;
+    /*map image pixels to new palette*/
+    auto k=pixels.constBegin();
     for (Integer i=0; i<nPix; ++i) {
         /*java规定求值顺序从左至右 但是C/C++无此规定*/
-        const Integer k0=k++;
-        const Integer k1=k++;
-        const Integer k2=k++;
+        const Integer k0=*k++;
+        const Integer k1=*k++;
+        const Integer k2=*k++;
 
-        Integer index=
-            nq->map(
-                Integer(var_thisData->pixels[k0])&0x00ff,
-                Integer(var_thisData->pixels[k1])&0x00ff,
-                Integer(var_thisData->pixels[k2])&0x00ff
-            );
+        const Integer index=nq->map(k0,k1,k2);
         var_thisData->usedEntry[index]=true;
-        var_thisData->indexedPixels[i]=(Byte)(index&0x000000ff);
+        var_thisData->indexedPixels[i]=index;
     }
+
     var_thisData->pixels.clear();
     var_thisData->colorDepth=8;
     var_thisData->palSize=7;

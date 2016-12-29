@@ -66,6 +66,8 @@ inline MainState::~MainState() {
 
 }/*namespace*/
 
+#include "QAnimatedGifEncoder.hpp"
+
 int main(int argc,char *argv[])try {
 
     auto varMainState=
@@ -75,6 +77,24 @@ int main(int argc,char *argv[])try {
     /*注入启动数据*/
     varMainWindow.openLua();
     varMainWindow.show();
+
+    {
+        using namespace mgui;
+        QAnimatedGifEncoder e;
+        QFile file("test.gif");
+        file.open(QIODevice::WriteOnly);
+        e.start(file);
+        e.setDelay(50);   // 1 frame per sec
+        e.addFrame(QImage("images:giftest/000010"));
+        e.addFrame(QImage("images:giftest/000011"));
+        e.addFrame(QImage("images:giftest/000012"));
+        e.addFrame(QImage("images:giftest/000013"));
+        e.addFrame(QImage("images:giftest/000014"));
+        e.addFrame(QImage("images:giftest/000015"));
+        e.addFrame(QImage("images:giftest/000016"));
+        e.addFrame(QImage("images:giftest/000017"));
+        e.finish();
+    }
 
     return varMainState->exec();
 

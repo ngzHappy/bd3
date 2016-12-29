@@ -20,7 +20,7 @@ typedef float Float;
 typedef double Double;
 typedef class Void {} Void;
 typedef QIODevice OutputStream;
-typedef QImage BufferedImage;//BufferedImage 应当提供隐式数据共享
+typedef QImage BufferedImage;/*BufferedImage 应当提供隐式数据共享*/
 typedef QRgb Color;
 typedef QString String;
 
@@ -29,7 +29,7 @@ typedef QString String;
     * more frames.
     * <pre>
     * Example:
-    *    AnimatedGifEncoder e = new AnimatedGifEncoder();
+    *    QAnimatedGifEncoder e ;
     *    e.start(outputFileName);
     *    e.setDelay(1000);   // 1 frame per sec
     *    e.addFrame(image1);
@@ -49,7 +49,7 @@ typedef QString String;
 class QAnimatedGifEncoder {
     class ThisData;
     friend class ThisData;
-    std::unique_ptr<ThisData,std::function<void(ThisData *)>> thisData;/**/
+    std::unique_ptr<ThisData,void(*)(ThisData *)> thisData{nullptr,nullptr};/**/
     static_assert(sizeof(Double)==8,"Double should be 64 bit");
     static_assert(sizeof(Float)==4,"Float should be 32 bit");
 public:
