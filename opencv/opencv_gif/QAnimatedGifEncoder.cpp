@@ -124,8 +124,8 @@ public:
     PixType pix;
     QVector<Byte> quantization;
     typedef boost::geometry::model::point<
-    std::int32_t,3,
-    boost::geometry::cs::cartesian> point_t/*笛卡尔坐标系点*/;
+        std::int32_t,3,
+        boost::geometry::cs::cartesian> point_t/*笛卡尔坐标系点*/;
     typedef std::pair<point_t,std::int32_t> value_t;
     typedef boost::geometry::index::rtree<value_t,boost::geometry::index::quadratic<16>> rtree_t;
     std::shared_ptr<rtree_t> rtree/*使用rtree加快搜索速度*/;
@@ -186,8 +186,8 @@ private:
             std::int32_t index_=0;
             for (auto & i:hist) {
                 rtree->insert(std::make_pair(
-                                  point_t(i.first.a,i.first.b,i.first.c),index_++
-                                  ));
+                    point_t(i.first.a,i.first.b,i.first.c),index_++
+                ));
                 quantization.push_back(Byte(i.first.a&0x00ff));
                 quantization.push_back(Byte(i.first.b&0x00ff));
                 quantization.push_back(Byte(i.first.c&0x00ff));
@@ -240,9 +240,9 @@ private:
             }
 
             std::pair<
-                    std::shared_ptr<Pack>,
-                    std::shared_ptr<Pack>
-                    >next() {
+                std::shared_ptr<Pack>,
+                std::shared_ptr<Pack>
+            >next() {
                 if ((std_x>=std_y)&&(std_x>=std_z)) {
                     return split_x();
                 }
@@ -253,9 +253,9 @@ private:
             }
 
             std::pair<
-                    std::shared_ptr<Pack>,
-                    std::shared_ptr<Pack>
-                    >split_x() {
+                std::shared_ptr<Pack>,
+                std::shared_ptr<Pack>
+            >split_x() {
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
@@ -268,9 +268,9 @@ private:
                 return{ std::move(l),std::move(r) };
             }
             std::pair<
-                    std::shared_ptr<Pack>,
-                    std::shared_ptr<Pack>
-                    >split_y() {
+                std::shared_ptr<Pack>,
+                std::shared_ptr<Pack>
+            >split_y() {
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
@@ -283,9 +283,9 @@ private:
                 return{ std::move(l),std::move(r) };
             }
             std::pair<
-                    std::shared_ptr<Pack>,
-                    std::shared_ptr<Pack>
-                    >split_z() {
+                std::shared_ptr<Pack>,
+                std::shared_ptr<Pack>
+            >split_z() {
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
@@ -318,8 +318,8 @@ private:
                                               uchar2doule[i.first.b],
                                               uchar2doule[i.first.c],
                                               i.second
-                                          }
-                                          );
+                }
+                );
             }
             pack_root->update();
             packs.push_back(std::move(pack_root));
@@ -350,8 +350,8 @@ private:
             if (c>255) { c=255; }
 
             rtree->insert(std::make_pair(
-                              point_t(a,b,c),index++
-                              ));
+                point_t(a,b,c),index++
+            ));
 
             quantization.push_back(Byte(a&0x00ff));
             quantization.push_back(Byte(b&0x00ff));
@@ -371,13 +371,16 @@ namespace {
 
 class LZWEncoder {
 public:
-    using const_uchar=const unsigned char;
-    using type_uchar=unsigned char;
+    using const_uchar=const unsigned char/*定义类型const unsigned char*/;
+    using type_uchar=unsigned char/*定义类型unsigned char*/;
+    using type_iodevice=QIODevice/*定义输出流类型*/;
 private:
-    inline static void put_char(QIODevice * o,const_uchar & c) {
+    /*对外输出1个char*/
+    inline static void put_char(type_iodevice * o,const_uchar & c) {
         o->putChar(static_cast<const char &>(c));
     }
-    inline static void write_chars(QIODevice * o,const_uchar * d,Integer s) {
+    /*对外输出n个char*/
+    inline static void write_chars(type_iodevice * o,const_uchar * d,Integer s) {
         o->write(reinterpret_cast<const char*>(d),s);
     }
 public:
@@ -443,14 +446,15 @@ public:
         return masks[arg];
     }
 
-    Integer a_count=0;
+    Integer a_count=0/*缓冲区的大小*/;
 
     const_uchar * pixAryBegin=nullptr;
-    const_uchar * pixAryEnd=nullptr;
+    const_uchar * pixAryEnd=nullptr/*预留，将来用于调试*/;
 private:
     LZWEncoder() {}
 public:
-    //----------------------------------------------------------------------------
+    /*----------------------------------------------------------------------------*/
+    /*用于压缩灰度图*/
     LZWEncoder(
             Integer width/*image width*/,
             Integer height/*image height*/,
@@ -463,8 +467,8 @@ public:
         pixAryEnd=argPixAryEnd;
         initCodeSize=(std::max)(2,color_depth);
     }
-
-    void char_out(type_uchar c,OutputStream * outs) {
+private:
+    void char_out(type_uchar c,type_iodevice * outs) {
         accum[a_count++]=c;
         if (a_count>=254) {
             flush_char(outs);
@@ -473,7 +477,7 @@ public:
 
     /*Clear out the hash table*/
     /*table clear for block compress*/
-    void cl_block(OutputStream * outs) {
+    void cl_block(type_iodevice * outs) {
         cl_hash(hsize);
         free_ent=ClearCode+2;
         clear_flg=true;
@@ -482,12 +486,12 @@ public:
 
     /*reset code table*/
     void cl_hash(const Integer hsize) {
-        for (Integer i=0; i<hsize; ++i){
+        for (Integer i=0; i<hsize; ++i) {
             htab[i]=-1;
         }
     }
 
-    void compress(Integer init_bits,OutputStream *outs) {
+    void compress(Integer init_bits,type_iodevice *outs) {
         Integer fcode=0;
         Integer i=0;
         Integer c=0;
@@ -515,7 +519,7 @@ public:
         cl_hash(hsize_reg); /*clear hash table*/
         output(ClearCode,outs);
 
-outer_loop:
+    outer_loop:
         while ((c=nextPixel())!=EOF) {
             fcode=(c<<maxbits)+ent;
             i=(c<<hshift)^ent; /*xor hashing*/
@@ -554,8 +558,9 @@ outer_loop:
 
     }
 
+public:
     /*----------------------------------------------------------------------------*/
-    void encode(OutputStream * os) {
+    void encode(type_iodevice * os) {
         assert(initCodeSize<=MAX_UCHAR);
         assert(initCodeSize>=0);
         this->put_char(os,initCodeSize); /*write "initial code size" byte*/
@@ -564,9 +569,9 @@ outer_loop:
         compress(initCodeSize+1,os); /*compress and write the pixel data*/
         this->put_char(os,type_uchar(0));
     }
-
+private:
     /*Flush the packet to disk, and reset the accumulator*/
-    void flush_char(OutputStream * outs) {
+    void flush_char(type_iodevice * outs) {
         if (a_count>0) {
             assert(a_count<=MAX_UCHAR);
             assert(a_count>=0);
@@ -584,7 +589,7 @@ outer_loop:
     // Return the next pixel from the image
     //----------------------------------------------------------------------------
     Integer nextPixel() {
-        if (remaining==0) {
+        if (remaining<1) {
             return EOF;
         }
         --remaining;
@@ -592,7 +597,7 @@ outer_loop:
         return pix;
     }
 
-    void output(Integer code,OutputStream * outs) {
+    void output(Integer code,type_iodevice * outs) {
         cur_accum&=masks(cur_bits);
 
         if (cur_bits>0) {
@@ -621,10 +626,12 @@ outer_loop:
             }
             else {
                 ++n_bits;
-                if (n_bits==maxbits)
+                if (n_bits==maxbits) {
                     maxcode=maxmaxcode;
-                else
+                }
+                else {
                     maxcode=MAXCODE(n_bits);
+                }
             }
         }
 
@@ -736,7 +743,7 @@ inline QImage change_image_format_and_size(
         const QImage & argImage,
         Integer argWidth,
         Integer argHeight
-        ) {
+) {
 
     if (argImage.isNull()) {
         return QImage{ argWidth,argHeight,QImage::Format::Format_RGB888 };
@@ -814,7 +821,7 @@ Boolean QAnimatedGifEncoder::addFrame(BufferedImage && im) {
                 QSize(var_thisData->width,var_thisData->height),
                 Qt::IgnoreAspectRatio,
                 Qt::SmoothTransformation
-                );
+    );
 
     getImagePixels(); // convert to correct format if necessary
     analyzePixels(); // build color table & map pixels
@@ -851,13 +858,13 @@ void QAnimatedGifEncoder::writePalette() {
 void QAnimatedGifEncoder::writePixels() {
     ThisData * var_thisData=thisData.get();
     LZWEncoder * encoder=
-            new LZWEncoder(
-                var_thisData->width,
-                var_thisData->height,
-                reinterpret_cast<LZWEncoder::const_uchar *>(var_thisData->indexedPixels.cbegin()),
-                reinterpret_cast<LZWEncoder::const_uchar *>(var_thisData->indexedPixels.cend()),
-                var_thisData->colorDepth
-                );
+        new LZWEncoder(
+            var_thisData->width,
+            var_thisData->height,
+            reinterpret_cast<LZWEncoder::const_uchar *>(var_thisData->indexedPixels.cbegin()),
+            reinterpret_cast<LZWEncoder::const_uchar *>(var_thisData->indexedPixels.cend()),
+            var_thisData->colorDepth
+        );
     std::unique_ptr<LZWEncoder> _(encoder);
     encoder->encode(var_thisData->out);
 }
@@ -1059,11 +1066,11 @@ void QAnimatedGifEncoder::analyzePixels() {
         const Integer k2=k++;
 
         Integer index=
-                nq->map(
-                    Integer(var_thisData->pixels[k0])&0x00ff,
-                    Integer(var_thisData->pixels[k1])&0x00ff,
-                    Integer(var_thisData->pixels[k2])&0x00ff
-                    );
+            nq->map(
+                Integer(var_thisData->pixels[k0])&0x00ff,
+                Integer(var_thisData->pixels[k1])&0x00ff,
+                Integer(var_thisData->pixels[k2])&0x00ff
+            );
         var_thisData->usedEntry[index]=true;
         var_thisData->indexedPixels[i]=(Byte)(index&0x000000ff);
     }
