@@ -400,6 +400,25 @@ private:
             Double mean_z;
 
             void eval_mean() {
+
+                count=0;
+                mean_x=0;
+                mean_y=0;
+                mean_z=0;
+
+                for (const auto &varI:data) {
+
+                    count+=varI.count;
+                    mean_x+=varI.a*varI.count;
+                    mean_y+=varI.b*varI.count;
+                    mean_z+=varI.c*varI.count;
+
+                }
+
+                mean_x/=count;
+                mean_y/=count;
+                mean_z/=count;
+
             }
 
             void update() {
@@ -554,7 +573,7 @@ private:
                 std::shared_ptr<Pack> &l,
                 std::shared_ptr<Pack> &r
                 ) {
-            return l->count>r->count;
+            return l->data.size()>r->data.size();
         };
 
         std::vector<std::shared_ptr<Pack>> packs;
@@ -575,11 +594,11 @@ private:
             auto * first=packs.begin()->get();
             if (first->count<1) {
                 break;
-            }
+        }
             auto next_=first->next();
             packs[0]=std::move(next_.first);
             packs.push_back(std::move(next_.second));
-        }
+    }
 
         rgb_float_vector varTmpAns;
         varTmpAns.reserve(256);
@@ -613,7 +632,7 @@ private:
 
         }
 
-    }
+}
 };
 
 }/*namespace*/
@@ -1265,7 +1284,7 @@ Boolean QAnimatedGifEncoder::start(OutputStream & os) {
     }
     catch (...) {
         ok=false;
-    }
+}
 
     var_thisData->started=ok;
     return ok;
@@ -1456,7 +1475,7 @@ void QAnimatedGifEncoder::analyzePixels() {
             px=0; ++py;
         }
 #endif
-        }
+}
 
     var_thisData->pixels.clear();
     var_thisData->colorDepth=8;
