@@ -388,61 +388,62 @@ private:
 
         /*降低颜色数目*/
         struct Pack {
-            std::list<Data>data;
-            double mean_x,mean_y,mean_z;
-            double std_x,std_y,std_z;
-            double std_value;
+            std::vector<Data>data;
+
+            Double length_x=0;
+            Double length_y=0;
+            Double length_z=0;
+            std::int32_t count=0;
+
+            Double mean_x;
+            Double mean_y;
+            Double mean_z;
+
+            void eval_mean() {
+            }
 
             void update() {
-                std_value=0;
-                double x=0,y=0,z=0;
-                double x_w=0;
 
-                for (const auto & i:(data)) {
-                    x_w+=i.count;
-                    x+=i.a*i.count;
-                    y+=i.b*i.count;
-                    z+=i.c*i.count;
+                Double max_x=std::numeric_limits<Double>::max();
+                Double min_x=std::numeric_limits<Double>::lowest();
+
+                Double max_y=std::numeric_limits<Double>::max();
+                Double min_y=std::numeric_limits<Double>::lowest();
+
+                Double max_z=std::numeric_limits<Double>::max();
+                Double min_z=std::numeric_limits<Double>::lowest();
+
+                count=0;
+
+                for (const auto &varI:data) {
+
+                    count+=varI.count;
+
+                    if (varI.a>max_x) { max_x=varI.a; }
+                    if (varI.a<min_x) { min_x=varI.a; }
+
+                    if (varI.b>max_y) { max_y=varI.b; }
+                    if (varI.b<min_y) { min_y=varI.b; }
+
+                    if (varI.c>max_z) { max_z=varI.c; }
+                    if (varI.c<min_z) { min_z=varI.c; }
+
                 }
 
-                assert(x_w>0);
-                mean_x=x/x_w;
-                mean_y=y/x_w;
-                mean_z=z/x_w;
+                length_x=max_x-min_x;
+                length_y=max_y-min_y;
+                length_z=max_z-min_z;
 
-                std_x=0;
-                std_y=0;
-                std_z=0;
-
-                for (const auto & i:(data)) {
-
-                    z=std::abs((i.c-mean_z));
-                    y=std::abs((i.b-mean_y));
-                    x=std::abs((i.a-mean_x));
-
-                    /*小误差快速收敛*/
-                    if (x<0.5) { x*=.05; }
-                    if (y<0.5) { y*=.05; }
-                    if (z<0.5) { z*=.05; }
-
-                    std_x+=x*i.count;
-                    std_y+=y*i.count;
-                    std_z+=z*i.count;
-                }
-
-                std_value=std_z;
-                std_value+=std_y;
-                std_value+=std_x;
             }
 
             std::pair<
                 std::shared_ptr<Pack>,
                 std::shared_ptr<Pack>
             >next() {
-                if ((std_x>=std_y)&&(std_x>=std_z)) {
+                if ((length_x>=length_y)&&(length_x>=length_z)) {
                     return split_x();
                 }
-                if ((std_y>=std_x)&&(std_y>=std_z)) {
+                if ((length_y>=length_x)&&(length_y>=length_z)) {
                     return split_y();
                 }
                 return split_z();
@@ -455,9 +456,27 @@ private:
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
-                for (const Data & i:data) {
-                    if (i.a>mean_x) { l->data.push_back(i); }
-                    else { r->data.push_back(i); }
+                std::sort(data.begin(),data.end(),[](const auto &l,const auto &r) {
+                    return l.a<r.a;
+                });
+
+                auto half_count=count/2;
+
+                for (auto &varI:data) {
+                    auto old_half_count=half_count;
+                    half_count-=varI.count;
+                    if (half_count>=0) {
+                        l->data.push_back(varI);
+                    }
+                    else if (old_half_count<=0) {
+                        r->data.push_back(varI);
+                    }
+                    else {
+                        varI.count=old_half_count;
+                        l->data.push_back(varI);
+                        varI.count=-half_count;
+                        r->data.push_back(varI);
+                    }
                 }
 
                 l->update(); r->update();
@@ -470,9 +489,27 @@ private:
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
-                for (const Data & i:data) {
-                    if (i.b>mean_y) { l->data.push_back(i); }
-                    else { r->data.push_back(i); }
+                std::sort(data.begin(),data.end(),[](const auto &l,const auto &r) {
+                    return l.b<r.b;
+                });
+
+                auto half_count=count/2;
+
+                for (auto &varI:data) {
+                    auto old_half_count=half_count;
+                    half_count-=varI.count;
+                    if (half_count>=0) {
+                        l->data.push_back(varI);
+                    }
+                    else if (old_half_count<=0) {
+                        r->data.push_back(varI);
+                    }
+                    else {
+                        varI.count=old_half_count;
+                        l->data.push_back(varI);
+                        varI.count=-half_count;
+                        r->data.push_back(varI);
+                    }
                 }
 
                 l->update(); r->update();
@@ -485,9 +522,27 @@ private:
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
-                for (const Data & i:data) {
-                    if (i.c>mean_z) { l->data.push_back(i); }
-                    else { r->data.push_back(i); }
+                std::sort(data.begin(),data.end(),[](const auto &l,const auto &r) {
+                    return l.c<r.c;
+                });
+
+                auto half_count=count/2;
+
+                for (auto &varI:data) {
+                    auto old_half_count=half_count;
+                    half_count-=varI.count;
+                    if (half_count>=0) {
+                        l->data.push_back(varI);
+                    }
+                    else if (old_half_count<=0) {
+                        r->data.push_back(varI);
+                    }
+                    else {
+                        varI.count=old_half_count;
+                        l->data.push_back(varI);
+                        varI.count=-half_count;
+                        r->data.push_back(varI);
+                    }
                 }
 
                 l->update(); r->update();
@@ -499,9 +554,7 @@ private:
                 std::shared_ptr<Pack> &l,
                 std::shared_ptr<Pack> &r
                 ) {
-            const auto & std_l=l->std_value;
-            const auto & std_r=r->std_value;
-            return std_l>std_r;
+            return l->count>r->count;
         };
 
         std::vector<std::shared_ptr<Pack>> packs;
@@ -510,7 +563,8 @@ private:
         /*初始化迭代*/
         {
             auto pack_root=std::make_shared<Pack>();
-            pack_root->data=rgb_hist_map_to_data_list(hist);
+            auto tmp=rgb_hist_map_to_data_list(hist);
+            pack_root->data={ tmp.begin(),tmp.end() };
             pack_root->update();
             packs.push_back(std::move(pack_root));
         }
@@ -519,7 +573,7 @@ private:
         while (packs.size()<256) {
             std::sort(packs.begin(),packs.end(),comp_pack_function);
             auto * first=packs.begin()->get();
-            if (first->std_value<std::numeric_limits<Double>::epsilon()) {
+            if (first->count<1) {
                 break;
             }
             auto next_=first->next();
@@ -530,6 +584,7 @@ private:
         rgb_float_vector varTmpAns;
         varTmpAns.reserve(256);
         for (auto & p:packs) {
+            p->eval_mean();
             varTmpAns.emplace_back(
                 p->mean_x,
                 p->mean_y,
@@ -1252,7 +1307,7 @@ void QAnimatedGifEncoder::analyzePixels() {
     std::unique_ptr<QuantizationAlgorithm> uptr_nq(nq);
     nq->construct(var_thisData->pixels,len,var_thisData->sample);
     var_thisData->colorTab=nq->process();
-//#define FLOYD_STEINBERG
+    //#define FLOYD_STEINBERG
     const auto & pixels=var_thisData->pixels;
     /*map image pixels to new palette*/
     auto k=const_cast<type_uchar*>(pixels.constBegin());
@@ -1335,8 +1390,8 @@ void QAnimatedGifEncoder::analyzePixels() {
             if (g<0) { g=0; }
             if (b<0) { b=0; }
 
-            or=r; 
-            og=g; 
+            or=r;
+            og=g;
             ob=b;
 
         }
@@ -1363,8 +1418,8 @@ void QAnimatedGifEncoder::analyzePixels() {
             if (g<0) { g=0; }
             if (b<0) { b=0; }
 
-            or=r; 
-            og=g; 
+            or=r;
+            og=g;
             ob=b;
         }
 
@@ -1390,18 +1445,18 @@ void QAnimatedGifEncoder::analyzePixels() {
             if (g<0) { g=0; }
             if (b<0) { b=0; }
 
-            or=r; 
-            og=g; 
+            or=r;
+            og=g;
             ob=b;
         }
 
         /*更新x y*/
         ++px;
         if (px>=var_thisData->width) {
-            px=0;++py;
+            px=0; ++py;
         }
 #endif
-    }
+        }
 
     var_thisData->pixels.clear();
     var_thisData->colorDepth=8;
@@ -1410,7 +1465,7 @@ void QAnimatedGifEncoder::analyzePixels() {
     if (var_thisData->isGivenTransparent) {//----
         var_thisData->transIndex=findClosest(var_thisData->transparent);
     }
-}
+    }
 
 void QAnimatedGifEncoder::writeString(const String & s) {
     ThisData * var_thisData=thisData.get();
