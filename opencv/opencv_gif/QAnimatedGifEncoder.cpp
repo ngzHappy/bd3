@@ -987,9 +987,9 @@ void QAnimatedGifEncoder::getImagePixels() {
         for (auto ii=0; ii<var_h; ++ii,varData+=varBytesPerLine) {
             auto varDataLine=varData;
             for (auto jj=0; jj<var_w; ++jj) {
-                pixs.push_back(uchar2float[*varDataLine++]);
-                pixs.push_back(uchar2float[*varDataLine++]);
-                pixs.push_back(uchar2float[*varDataLine++]);
+                pixs.push_back(*varDataLine++);
+                pixs.push_back(*varDataLine++);
+                pixs.push_back(*varDataLine++);
             }
         }
     }
@@ -1252,19 +1252,155 @@ void QAnimatedGifEncoder::analyzePixels() {
     std::unique_ptr<QuantizationAlgorithm> uptr_nq(nq);
     nq->construct(var_thisData->pixels,len,var_thisData->sample);
     var_thisData->colorTab=nq->process();
-
+//#define FLOYD_STEINBERG
     const auto & pixels=var_thisData->pixels;
     /*map image pixels to new palette*/
-    auto k=pixels.constBegin();
+    auto k=const_cast<type_uchar*>(pixels.constBegin());
+#if defined(FLOYD_STEINBERG)
+    Integer px=0/*当前x*/;
+    Integer py=0/*当前y*/;
+    const Integer line_step=var_thisData->width*3;
+    constexpr Integer left_limit=0;
+    const Integer right_limit=var_thisData->width-1;
+    const Integer bottom_limit=var_thisData->height-1;
+    type_uchar * next_bottom_right_item=nullptr;
+    type_uchar * next_right_item=nullptr;
+    type_uchar * next_middle_item=nullptr;
+    const auto & colorTab=var_thisData->colorTab;
+#endif
     for (Integer i=0; i<nPix; ++i) {
-        /*java规定求值顺序从左至右 但是C/C++无此规定*/
-        const Integer k0=*k++;
-        const Integer k1=*k++;
-        const Integer k2=*k++;
+#if defined(FLOYD_STEINBERG)
+        /*求下一行pix的坐标*/
+        if (py<bottom_limit) {
+            next_middle_item=k+line_step;
 
-        const Integer index=nq->map(k0,k1,k2);
+            if (px<right_limit) {
+                next_bottom_right_item=next_middle_item+3;
+            }
+            else {
+                next_bottom_right_item=nullptr;
+            }
+
+        }
+        else {
+            next_bottom_right_item=nullptr;
+            next_middle_item=nullptr;
+        }
+
+        if (px<right_limit) {
+            next_right_item=k+3;
+        }
+        else {
+            next_right_item=nullptr;
+        }
+#endif
+        const Integer r0=*k++/*原始r*/;
+        const Integer g0=*k++/*原始g*/;
+        const Integer b0=*k++/*原始b*/;
+
+        Integer index=nq->map(r0,g0,b0);
+
         var_thisData->usedEntry[index]=true;
         var_thisData->indexedPixels[i]=index;
+
+#if defined(FLOYD_STEINBERG)
+        index*=3;
+        const Integer r1=colorTab[index++]/*新的r*/;
+        const Integer g1=colorTab[index++]/*新的g*/;
+        const Integer b1=colorTab[index]/*新的b*/;
+
+        const auto er=r1-r0/*r的误差*/;
+        const auto eg=g1-g0/*g的误差*/;
+        const auto eb=b1-b0/*b的误差*/;
+
+        /*3/8*/
+        if (next_middle_item) {
+            auto & or=*next_middle_item++;
+            auto & og=*next_middle_item++;
+            auto & ob=*next_middle_item;
+
+            Integer r=or;
+            Integer g=og;
+            Integer b=ob;
+
+            r+=(er*3)>>3;
+            g+=(eg*3)>>3;
+            b+=(eb*3)>>3;
+
+            if (r>255) { r=255; }
+            if (g>255) { g=255; }
+            if (b>255) { b=255; }
+
+            if (r<0) { r=0; }
+            if (g<0) { g=0; }
+            if (b<0) { b=0; }
+
+            or=r; 
+            og=g; 
+            ob=b;
+
+        }
+
+        /*1/4*/
+        if (next_bottom_right_item) {
+            auto & or=*next_bottom_right_item++;
+            auto & og=*next_bottom_right_item++;
+            auto & ob=*next_bottom_right_item;
+
+            Integer r=or;
+            Integer g=og;
+            Integer b=ob;
+
+            r+=(er)>>2;
+            g+=(eg)>>2;
+            b+=(eb)>>2;
+
+            if (r>255) { r=255; }
+            if (g>255) { g=255; }
+            if (b>255) { b=255; }
+
+            if (r<0) { r=0; }
+            if (g<0) { g=0; }
+            if (b<0) { b=0; }
+
+            or=r; 
+            og=g; 
+            ob=b;
+        }
+
+        /*3/8*/
+        if (next_right_item) {
+            auto & or=*next_right_item++;
+            auto & og=*next_right_item++;
+            auto & ob=*next_right_item;
+
+            Integer r=or;
+            Integer g=og;
+            Integer b=ob;
+
+            r+=(er*3)>>3;
+            g+=(eg*3)>>3;
+            b+=(eb*3)>>3;
+
+            if (r>255) { r=255; }
+            if (g>255) { g=255; }
+            if (b>255) { b=255; }
+
+            if (r<0) { r=0; }
+            if (g<0) { g=0; }
+            if (b<0) { b=0; }
+
+            or=r; 
+            og=g; 
+            ob=b;
+        }
+
+        /*更新x y*/
+        ++px;
+        if (px>=var_thisData->width) {
+            px=0;++py;
+        }
+#endif
     }
 
     var_thisData->pixels.clear();
