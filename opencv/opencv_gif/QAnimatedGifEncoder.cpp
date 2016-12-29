@@ -1,4 +1,9 @@
-﻿#include "QAnimatedGifEncoder.hpp"
+﻿/*
+ * 抖动算法
+ * http://blog.csdn.net/xiaojidan2011/article/details/7972710
+*/
+
+#include "QAnimatedGifEncoder.hpp"
 
 #include <cmath>
 #include <array>
@@ -97,9 +102,9 @@ public:
         unsigned char a,b,c;
         DataItem():a(0),b(0),c(0) {}
         DataItem(
-            unsigned char _0,
-            unsigned char _1,
-            unsigned char _2):a(_0),b(_1),c(_2) {
+                unsigned char _0,
+                unsigned char _1,
+                unsigned char _2):a(_0),b(_1),c(_2) {
         }
         template<typename T0,typename T1,typename T2>
         DataItem(T0 _0,T1 _1,T2 _2):
@@ -119,7 +124,7 @@ public:
     PixType pix;
     QVector<Byte> quantization;
     typedef boost::geometry::model::point<
-        std::int32_t,3,
+    std::int32_t,3,
     boost::geometry::cs::cartesian> point_t/*笛卡尔坐标系点*/;
     typedef std::pair<point_t,std::int32_t> value_t;
     typedef boost::geometry::index::rtree<value_t,boost::geometry::index::quadratic<16>> rtree_t;
@@ -147,14 +152,15 @@ public:
             point_t point(_1_,_2_,_3_);
             std::vector<value_t> ans;
             rtree->query(
-                boost::geometry::index::nearest(point,1),
-                std::back_inserter(ans));
+                        boost::geometry::index::nearest(point,1),
+                        std::back_inserter(ans));
             if (ans.empty()==false) {
                 return ans[0].second;
             }
         }
         return 0;
     }
+
 private:
     void evalQuantization() {
 
@@ -180,8 +186,8 @@ private:
             std::int32_t index_=0;
             for (auto & i:hist) {
                 rtree->insert(std::make_pair(
-                    point_t(i.first.a,i.first.b,i.first.c),index_++
-                ));
+                                  point_t(i.first.a,i.first.b,i.first.c),index_++
+                                  ));
                 quantization.push_back(Byte(i.first.a&0x00ff));
                 quantization.push_back(Byte(i.first.b&0x00ff));
                 quantization.push_back(Byte(i.first.c&0x00ff));
@@ -203,6 +209,7 @@ private:
             void update() {
                 double x=0,y=0,z=0;
                 double x_w=0;
+
                 for (const auto & i:(data)) {
                     x_w+=i.count;
                     x+=i.a*i.count;
@@ -233,9 +240,9 @@ private:
             }
 
             std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >next() {
+                    std::shared_ptr<Pack>,
+                    std::shared_ptr<Pack>
+                    >next() {
                 if ((std_x>=std_y)&&(std_x>=std_z)) {
                     return split_x();
                 }
@@ -246,9 +253,9 @@ private:
             }
 
             std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >split_x() {
+                    std::shared_ptr<Pack>,
+                    std::shared_ptr<Pack>
+                    >split_x() {
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
@@ -258,12 +265,12 @@ private:
                 }
 
                 l->update(); r->update();
-                return{std::move(l),std::move(r)};
+                return{ std::move(l),std::move(r) };
             }
             std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >split_y() {
+                    std::shared_ptr<Pack>,
+                    std::shared_ptr<Pack>
+                    >split_y() {
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
@@ -273,12 +280,12 @@ private:
                 }
 
                 l->update(); r->update();
-                return{std::move(l),std::move(r)};
+                return{ std::move(l),std::move(r) };
             }
             std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >split_z() {
+                    std::shared_ptr<Pack>,
+                    std::shared_ptr<Pack>
+                    >split_z() {
                 std::shared_ptr<Pack> l=std::make_shared<Pack>();
                 std::shared_ptr<Pack> r=std::make_shared<Pack>();
 
@@ -288,14 +295,14 @@ private:
                 }
 
                 l->update(); r->update();
-                return{std::move(l),std::move(r)};
+                return{ std::move(l),std::move(r) };
             }
         };
 
         auto comp_pack_function=[](
-            std::shared_ptr<Pack> &l,
-            std::shared_ptr<Pack> &r
-            ) {
+                std::shared_ptr<Pack> &l,
+                std::shared_ptr<Pack> &r
+                ) {
             auto std_l=(l->std_z+(l->std_x+l->std_y));
             auto std_r=(r->std_x+(r->std_y+r->std_z));
             return std_l>std_r;
@@ -307,12 +314,12 @@ private:
             auto pack_root=std::make_shared<Pack>();
             for (const auto & i:hist) {
                 pack_root->data.push_back({
-                    uchar2doule[i.first.a],
-                    uchar2doule[i.first.b],
-                    uchar2doule[i.first.c],
-                    i.second
-                }
-                );
+                                              uchar2doule[i.first.a],
+                                              uchar2doule[i.first.b],
+                                              uchar2doule[i.first.c],
+                                              i.second
+                                          }
+                                          );
             }
             pack_root->update();
             packs.push_back(std::move(pack_root));
@@ -343,8 +350,8 @@ private:
             if (c>255) { c=255; }
 
             rtree->insert(std::make_pair(
-                point_t(a,b,c),index++
-            ));
+                              point_t(a,b,c),index++
+                              ));
 
             quantization.push_back(Byte(a&0x00ff));
             quantization.push_back(Byte(b&0x00ff));
@@ -361,64 +368,111 @@ private:
 
 namespace mgui {
 namespace {
+
 class LZWEncoder {
 public:
+    using const_uchar=const unsigned char;
+    using type_uchar=unsigned char;
+private:
+    inline static void put_char(QIODevice * o,const_uchar & c) {
+        o->putChar(static_cast<const char &>(c));
+    }
+    inline static void write_chars(QIODevice * o,const_uchar * d,Integer s) {
+        o->write(reinterpret_cast<const char*>(d),s);
+    }
+public:
+
 #ifndef EOF
-    static const Integer EOF; /*= -1*/
+    static constexpr Integer EOF=-1; /*= -1*/
 #endif
+
     enum :Integer {
         BITS=12,
-        HSIZE=5003
+        HSIZE=5003,
+        ACCUM_SIZE=256,
+        MASKS_SIZE=17,
+        MAX_UCHAR=255,
     };
 
     std::array<Integer,HSIZE> htab;
     std::array<Integer,HSIZE> codetab;
-    std::array<Byte,256> accum;
+    std::array<type_uchar,ACCUM_SIZE> accum/*缓存区*/;
 
     Integer imgW=0;
     Integer imgH=0;
-    QVector<Byte> pixAry;
     Integer initCodeSize=0;
     Integer remaining=0;
     Integer curPixel=0;
-    Integer n_bits=0; // number of bits/code
-    Integer maxbits=BITS; // user settable max # bits/code
-    Integer maxcode=0; // maximum code, given n_bits
-    Integer maxmaxcode=(1<<BITS); // should NEVER generate this code
-    Integer hsize=HSIZE; // for dynamic table sizing
-    Integer free_ent=0; // first unused entry
+    Integer n_bits=0; /*number of bits/code*/
+    Integer maxbits=BITS; /*user settable max # bits/code*/
+    Integer maxcode=0; /*maximum code, given n_bits*/
+    Integer maxmaxcode=(1<<BITS); /*should NEVER generate this code*/
+    Integer hsize=HSIZE; /*for dynamic table sizing*/
+    Integer free_ent=0; /*first unused entry*/
     Boolean clear_flg=false;
     Integer g_init_bits=0;
     Integer ClearCode=0;
     Integer EOFCode=0;
     Integer cur_accum=0;
     Integer cur_bits=0;
-    static const std::array<Integer,17> masks;// =
-    Integer a_count=0;
 
-    LZWEncoder() {
+    template<typename T>
+    static inline Integer masks(T arg) {
+        assert(arg<MASKS_SIZE);
+        assert(arg>=0);
+        static constexpr Integer masks[MASKS_SIZE]{
+            0x00000000,/*0*/
+            0x00000001,/*1*/
+            0x00000003,/*2*/
+            0x00000007,/*3*/
+            0x0000000F,/*4*/
+            0x0000001F,/*5*/
+            0x0000003F,/*6*/
+            0x0000007F,/*7*/
+            0x000000FF,/*8*/
+            0x000001FF,/*9*/
+            0x000003FF,/*10*/
+            0x000007FF,/*11*/
+            0x00000FFF,/*12*/
+            0x00001FFF,/*13*/
+            0x00003FFF,/*14*/
+            0x00007FFF,/*15*/
+            0x0000FFFF,/*16*/
+        };
+        static_assert(sizeof(masks)/sizeof(Integer)==MASKS_SIZE,"");
+        return masks[arg];
     }
 
+    Integer a_count=0;
+
+    const_uchar * pixAryBegin=nullptr;
+    const_uchar * pixAryEnd=nullptr;
+private:
+    LZWEncoder() {}
+public:
     //----------------------------------------------------------------------------
     LZWEncoder(
-            Integer width,
-            Integer height,
-            const QVector<Byte> & pixels,
+            Integer width/*image width*/,
+            Integer height/*image height*/,
+            const_uchar * argPixAryBegin/*image data char8_t*/,
+            const_uchar * argPixAryEnd/*image data char8_t*/,
             Integer color_depth):LZWEncoder() {
         imgW=width;
         imgH=height;
-        pixAry=pixels;
+        pixAryBegin=argPixAryBegin;
+        pixAryEnd=argPixAryEnd;
         initCodeSize=(std::max)(2,color_depth);
     }
 
-    void char_out(Byte c,OutputStream * outs) {
+    void char_out(type_uchar c,OutputStream * outs) {
         accum[a_count++]=c;
-        if (a_count>=254)
+        if (a_count>=254) {
             flush_char(outs);
+        }
     }
 
-    //// Clear out the hash table
-    //// table clear for block compress
+    /*Clear out the hash table*/
+    /*table clear for block compress*/
     void cl_block(OutputStream * outs) {
         cl_hash(hsize);
         free_ent=ClearCode+2;
@@ -426,10 +480,11 @@ public:
         output(ClearCode,outs);
     }
 
-    //// reset code table
+    /*reset code table*/
     void cl_hash(const Integer hsize) {
-        for (Integer i=0; i<hsize; ++i)
+        for (Integer i=0; i<hsize; ++i){
             htab[i]=-1;
+        }
     }
 
     void compress(Integer init_bits,OutputStream *outs) {
@@ -440,79 +495,88 @@ public:
         Integer disp=0;
         Integer hsize_reg=0;
         Integer hshift=0;
-        // Set up the globals:  g_init_bits - initial number of bits
+        /*Set up the globals:  g_init_bits - initial number of bits*/
         g_init_bits=init_bits;
-        // Set up the necessary values
+        /*Set up the necessary values*/
         clear_flg=false;
         n_bits=g_init_bits;
         maxcode=MAXCODE(n_bits);
         ClearCode=1<<(init_bits-1);
         EOFCode=ClearCode+1;
         free_ent=ClearCode+2;
-        a_count=0; // clear packet
+        a_count=0; /*clear packet*/
         ent=nextPixel();
         hshift=0;
-        for (fcode=hsize; fcode<65536; fcode*=2){
+        for (fcode=hsize; fcode<65536; fcode*=2) {
             ++hshift;
         }
-        hshift=8-hshift; // set hash code range bound
+        hshift=8-hshift; /*set hash code range bound*/
         hsize_reg=hsize;
-        cl_hash(hsize_reg); // clear hash table
+        cl_hash(hsize_reg); /*clear hash table*/
         output(ClearCode,outs);
-    outer_loop: while ((c=nextPixel())!=EOF) {
-        fcode=(c<<maxbits)+ent;
-        i=(c<<hshift)^ent; // xor hashing
-        if (htab[i]==fcode) {
-            ent=codetab[i];
-            continue;
-        }
-        else if (htab[i]>=0) /*non-empty slot*/ {
-            disp=hsize_reg-i; /*secondary hash (after G. Knott)*/
-            if (i==0){
-                disp=1;
+
+outer_loop:
+        while ((c=nextPixel())!=EOF) {
+            fcode=(c<<maxbits)+ent;
+            i=(c<<hshift)^ent; /*xor hashing*/
+            if (htab[i]==fcode) {
+                ent=codetab[i];
+                continue;
             }
-            do {
-                if ((i-=disp)<0)
-                    i+=hsize_reg;
-                if (htab[i]==fcode) {
-                    ent=codetab[i];
-                    goto outer_loop;
+            else if (htab[i]>=0) /*non-empty slot*/ {
+                disp=hsize_reg-i; /*secondary hash (after G. Knott)*/
+                if (i==0) {
+                    disp=1;
                 }
-            } while (htab[i]>=0);
+                do {
+                    if ((i-=disp)<0)
+                        i+=hsize_reg;
+                    if (htab[i]==fcode) {
+                        ent=codetab[i];
+                        goto outer_loop;
+                    }
+                } while (htab[i]>=0);
+            }
+            output(ent,outs);
+            ent=c;
+            if (free_ent<maxmaxcode) {
+                codetab[i]=free_ent++; // code -> hashtable
+                htab[i]=fcode;
+            }
+            else {
+                cl_block(outs);
+            }
         }
+
+        /* Put out the final code.*/
         output(ent,outs);
-        ent=c;
-        if (free_ent<maxmaxcode) {
-            codetab[i]=free_ent++; // code -> hashtable
-            htab[i]=fcode;
-        }
-        else
-            cl_block(outs);
-    }
-                // Put out the final code.
-                output(ent,outs);
-                output(EOFCode,outs);
+        output(EOFCode,outs);
+
     }
 
-    //----------------------------------------------------------------------------
+    /*----------------------------------------------------------------------------*/
     void encode(OutputStream * os) {
-        put_char(os,initCodeSize&0x00ff); // write "initial code size" byte
-        remaining=imgW * imgH; // reset navigation variables
+        assert(initCodeSize<=MAX_UCHAR);
+        assert(initCodeSize>=0);
+        this->put_char(os,initCodeSize); /*write "initial code size" byte*/
+        remaining=imgW * imgH; /*reset navigation variables*/
         curPixel=0;
-        compress(initCodeSize+1,os); // compress and write the pixel data
-        put_char(os,0);
+        compress(initCodeSize+1,os); /*compress and write the pixel data*/
+        this->put_char(os,type_uchar(0));
     }
 
-    //// Flush the packet to disk, and reset the accumulator
+    /*Flush the packet to disk, and reset the accumulator*/
     void flush_char(OutputStream * outs) {
         if (a_count>0) {
-            put_char(outs,0x00ff&a_count);
-            outs->write(accum.data(),a_count);
+            assert(a_count<=MAX_UCHAR);
+            assert(a_count>=0);
+            this->put_char(outs,a_count);
+            this->write_chars(outs,accum.data(),a_count);
             a_count=0;
         }
     }
 
-    static inline Integer MAXCODE(Integer n_bits) {
+    static constexpr inline Integer MAXCODE(Integer n_bits) {
         return (1<<n_bits)-1;
     }
 
@@ -520,30 +584,36 @@ public:
     // Return the next pixel from the image
     //----------------------------------------------------------------------------
     Integer nextPixel() {
-        if (remaining==0){
+        if (remaining==0) {
             return EOF;
         }
         --remaining;
-        Byte pix=pixAry[curPixel++];
-        return pix&0x00ff;
+        type_uchar pix=pixAryBegin[curPixel++];
+        return pix;
     }
 
     void output(Integer code,OutputStream * outs) {
-        cur_accum&=masks[cur_bits];
-        if (cur_bits>0){
+        cur_accum&=masks(cur_bits);
+
+        if (cur_bits>0) {
             cur_accum|=(code<<cur_bits);
         }
-        else{
+        else {
             cur_accum=code;
         }
+
         cur_bits+=n_bits;
+
         while (cur_bits>=8) {
-            char_out((Byte)(cur_accum&0x00ff),outs);
+            assert(cur_accum<=MAX_UCHAR);
+            assert(cur_accum>=0);
+            char_out(cur_accum,outs);
             cur_accum>>=8;
             cur_bits-=8;
         }
-        // If the next entry is going to be too big for the code size,
-        // then increase it, if possible.
+
+        /*If the next entry is going to be too big for the code size,*/
+        /*then increase it, if possible.*/
         if (free_ent>maxcode||clear_flg) {
             if (clear_flg) {
                 maxcode=MAXCODE(n_bits=g_init_bits);
@@ -557,40 +627,22 @@ public:
                     maxcode=MAXCODE(n_bits);
             }
         }
+
         if (code==EOFCode) {
-            // At EOF, write the rest of the buffer.
+            /*At EOF, write the rest of the buffer.*/
             while (cur_bits>0) {
-                char_out((Byte)(cur_accum&0x00ff),outs);
+                assert(cur_accum>=0);
+                assert(cur_accum<=MAX_UCHAR);
+                char_out(cur_accum,outs);
                 cur_accum>>=8;
                 cur_bits-=8;
-        }
+            }
             flush_char(outs);
-    }
-}
-};
-#ifndef EOF
-const Integer LZWEncoder::EOF=-1; /*= -1*/
-#endif
+        }
 
-const std::array<Integer,17> LZWEncoder::masks={
-    0x00000000,
-    0x00000001,
-    0x00000003,
-    0x00000007,
-    0x0000000F,
-    0x0000001F,
-    0x0000003F,
-    0x0000007F,
-    0x000000FF,
-    0x000001FF,
-    0x000003FF,
-    0x000007FF,
-    0x00000FFF,
-    0x00001FFF,
-    0x00003FFF,
-    0x00007FFF,
-    0x0000FFFF
-};
+    }
+
+};/*LZWEncoder*/
 
 }/*namespace*/
 }/*mgui*/
@@ -629,8 +681,8 @@ public:
 QAnimatedGifEncoder::QAnimatedGifEncoder() {
     ThisData * var_thisData=new ThisData;
     thisData={
-            var_thisData,
-            [](ThisData * par_data) {delete par_data; }
+        var_thisData,
+        [](ThisData * par_data) {delete par_data; }
     };
 }
 
@@ -684,27 +736,27 @@ inline QImage change_image_format_and_size(
         const QImage & argImage,
         Integer argWidth,
         Integer argHeight
-        ){
+        ) {
 
-    if( argImage.isNull() ){
-        return QImage{argWidth,argHeight,QImage::Format::Format_RGB888};
+    if (argImage.isNull()) {
+        return QImage{ argWidth,argHeight,QImage::Format::Format_RGB888 };
     }
 
     QImage varAns=argImage;
     {
         QImage::Format varType=varAns.format();
-        if( varType != QImage::Format::Format_RGB888  ){
-            varAns=varAns.convertToFormat( QImage::Format::Format_RGB888 );
+        if (varType!=QImage::Format::Format_RGB888) {
+            varAns=varAns.convertToFormat(QImage::Format::Format_RGB888);
         }
     }
 
     const auto varWidth=varAns.width();
     const auto varHeight=varAns.height();
 
-    if((varHeight!=argHeight)||(varWidth!=argWidth)){
-        varAns = varAns.scaled(argWidth,argHeight,
-                      Qt::AspectRatioMode::IgnoreAspectRatio,
-                      Qt::TransformationMode::SmoothTransformation);
+    if ((varHeight!=argHeight)||(varWidth!=argWidth)) {
+        varAns=varAns.scaled(argWidth,argHeight,
+                             Qt::AspectRatioMode::IgnoreAspectRatio,
+                             Qt::TransformationMode::SmoothTransformation);
     }
 
     return std::move(varAns);
@@ -759,10 +811,10 @@ Boolean QAnimatedGifEncoder::addFrame(BufferedImage && im) {
 
     var_thisData->image=im;
     var_thisData->image=var_thisData->image.scaled(
-        QSize(var_thisData->width,var_thisData->height),
-        Qt::IgnoreAspectRatio,
-        Qt::SmoothTransformation
-    );
+                QSize(var_thisData->width,var_thisData->height),
+                Qt::IgnoreAspectRatio,
+                Qt::SmoothTransformation
+                );
 
     getImagePixels(); // convert to correct format if necessary
     analyzePixels(); // build color table & map pixels
@@ -799,12 +851,13 @@ void QAnimatedGifEncoder::writePalette() {
 void QAnimatedGifEncoder::writePixels() {
     ThisData * var_thisData=thisData.get();
     LZWEncoder * encoder=
-        new LZWEncoder(
-            var_thisData->width,
-            var_thisData->height,
-            var_thisData->indexedPixels,
-            var_thisData->colorDepth
-        );
+            new LZWEncoder(
+                var_thisData->width,
+                var_thisData->height,
+                reinterpret_cast<LZWEncoder::const_uchar *>(var_thisData->indexedPixels.cbegin()),
+                reinterpret_cast<LZWEncoder::const_uchar *>(var_thisData->indexedPixels.cend()),
+                var_thisData->colorDepth
+                );
     std::unique_ptr<LZWEncoder> _(encoder);
     encoder->encode(var_thisData->out);
 }
@@ -831,7 +884,7 @@ void QAnimatedGifEncoder::writeGraphicCtrlExt() {
     put_char(var_thisData->out,(Byte((disp|transp)&0x00ff))); // 8   transparency flag
     writeShort(var_thisData->delay); // delay x 1/100 sec
     put_char(var_thisData->out,(Byte(0x00ff&var_thisData->transIndex))); // transparent color index
-    put_char( var_thisData->out,(0)); // block terminator
+    put_char(var_thisData->out,(0)); // block terminator
 }
 
 void QAnimatedGifEncoder::writeLSD() {
@@ -1006,11 +1059,11 @@ void QAnimatedGifEncoder::analyzePixels() {
         const Integer k2=k++;
 
         Integer index=
-            nq->map(
-                Integer(var_thisData->pixels[k0])&0x00ff,
-                Integer(var_thisData->pixels[k1])&0x00ff,
-                Integer(var_thisData->pixels[k2])&0x00ff
-            );
+                nq->map(
+                    Integer(var_thisData->pixels[k0])&0x00ff,
+                    Integer(var_thisData->pixels[k1])&0x00ff,
+                    Integer(var_thisData->pixels[k2])&0x00ff
+                    );
         var_thisData->usedEntry[index]=true;
         var_thisData->indexedPixels[i]=(Byte)(index&0x000000ff);
     }
