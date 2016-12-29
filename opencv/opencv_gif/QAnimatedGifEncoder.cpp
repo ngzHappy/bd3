@@ -15,6 +15,7 @@
 
 /*qt:qtl*/
 #include <QtCore/QVector>
+#include <QtCore/qdebug.h>
 
 /*boost:rtree*/
 #include <Qt/boost/geometry/index/rtree.hpp>
@@ -573,18 +574,35 @@ private:
                 std::shared_ptr<Pack> &l,
                 std::shared_ptr<Pack> &r
                 ) {
-            return l->data.size()>r->data.size();
+
+            Double lDataSize=l->data.size();
+            Double rDataSize=r->data.size();
+
+            if ((lDataSize>50)&&(rDataSize>50)) {
+                return (l->count)>(r->count);
+            }
+
+            Double minSize=std::min(lDataSize,rDataSize);
+            minSize=std::abs(Double(lDataSize)-rDataSize)/minSize;
+
+            if (minSize<0.3) {
+                return l->count>r->count;
+            }
+
+            return lDataSize>rDataSize;
         };
 
         std::vector<std::shared_ptr<Pack>> packs;
         packs.reserve(256);
 
+        std::int32_t allCount=1;
         /*初始化迭代*/
         {
             auto pack_root=std::make_shared<Pack>();
             auto tmp=rgb_hist_map_to_data_list(hist);
             pack_root->data={ tmp.begin(),tmp.end() };
             pack_root->update();
+            allCount=pack_root->count;
             packs.push_back(std::move(pack_root));
         }
 
@@ -594,12 +612,13 @@ private:
             auto * first=packs.begin()->get();
             if (first->count<1) {
                 break;
-        }
+            }
             auto next_=first->next();
             packs[0]=std::move(next_.first);
             packs.push_back(std::move(next_.second));
-    }
+        }
 
+        //qDebug()<<packs.size();
         rgb_float_vector varTmpAns;
         varTmpAns.reserve(256);
         for (auto & p:packs) {
@@ -608,7 +627,6 @@ private:
                 p->mean_x,
                 p->mean_y,
                 p->mean_z);
-            p.reset();
         }
 
         auto varTmpAnsRGB=
@@ -632,7 +650,7 @@ private:
 
         }
 
-}
+    }
 };
 
 }/*namespace*/
@@ -1284,7 +1302,7 @@ Boolean QAnimatedGifEncoder::start(OutputStream & os) {
     }
     catch (...) {
         ok=false;
-}
+    }
 
     var_thisData->started=ok;
     return ok;
@@ -1484,7 +1502,7 @@ void QAnimatedGifEncoder::analyzePixels() {
     if (var_thisData->isGivenTransparent) {//----
         var_thisData->transIndex=findClosest(var_thisData->transparent);
     }
-    }
+}
 
 void QAnimatedGifEncoder::writeString(const String & s) {
     ThisData * var_thisData=thisData.get();
