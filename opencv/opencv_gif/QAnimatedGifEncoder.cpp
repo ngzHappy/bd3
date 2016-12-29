@@ -374,6 +374,20 @@ public:
     using const_uchar=const unsigned char/*定义类型const unsigned char*/;
     using type_uchar=unsigned char/*定义类型unsigned char*/;
     using type_iodevice=QIODevice/*定义输出流类型*/;
+    using Integer=std::int32_t;
+    static constexpr inline Integer MAXCODE(Integer n_bits) {
+        return (1<<n_bits)-1;
+    }
+#ifndef EOF
+    static constexpr Integer EOF=-1; /*= -1*/
+#endif
+    enum :Integer {
+        BITS=12,
+        HSIZE=5003,
+        ACCUM_SIZE=256,
+        MASKS_SIZE=17,
+        MAX_UCHAR=255,
+    };
 private:
     /*对外输出1个char*/
     inline static void put_char(type_iodevice * o,const_uchar & c) {
@@ -383,20 +397,6 @@ private:
     inline static void write_chars(type_iodevice * o,const_uchar * d,Integer s) {
         o->write(reinterpret_cast<const char*>(d),s);
     }
-public:
-
-#ifndef EOF
-    static constexpr Integer EOF=-1; /*= -1*/
-#endif
-
-    enum :Integer {
-        BITS=12,
-        HSIZE=5003,
-        ACCUM_SIZE=256,
-        MASKS_SIZE=17,
-        MAX_UCHAR=255,
-    };
-
     std::array<Integer,HSIZE> htab;
     std::array<Integer,HSIZE> codetab;
     std::array<type_uchar,ACCUM_SIZE> accum/*缓存区*/;
@@ -451,7 +451,7 @@ public:
     const_uchar * pixAryBegin=nullptr;
     const_uchar * pixAryEnd=nullptr/*预留，将来用于调试*/;
 private:
-    LZWEncoder() {}
+    LZWEncoder()=default;
 public:
     /*----------------------------------------------------------------------------*/
     /*用于压缩灰度图*/
@@ -460,196 +460,193 @@ public:
             Integer height/*image height*/,
             const_uchar * argPixAryBegin/*image data char8_t*/,
             const_uchar * argPixAryEnd/*image data char8_t*/,
-            Integer color_depth):LZWEncoder() {
+            Integer color_depth/*it should be 8*/):LZWEncoder() {
         imgW=width;
         imgH=height;
         pixAryBegin=argPixAryBegin;
         pixAryEnd=argPixAryEnd;
         initCodeSize=(std::max)(2,color_depth);
     }
+    inline void encode(type_iodevice * os);
 private:
-    void char_out(type_uchar c,type_iodevice * outs) {
-        accum[a_count++]=c;
-        if (a_count>=254) {
-            flush_char(outs);
-        }
+    inline void char_out(type_uchar c,type_iodevice * outs);
+    inline void cl_block(type_iodevice * outs);
+    inline void cl_hash(const Integer hsize);
+    inline void compress(Integer init_bits,type_iodevice *outs);
+    inline void flush_char(type_iodevice * outs);
+    inline Integer nextPixel();
+    inline void output(Integer code,type_iodevice * outs);
+private:
+    CPLUSPLUS_OBJECT(LZWEncoder)
+};/*LZWEncoder*/
+
+inline void LZWEncoder::char_out(type_uchar c,type_iodevice * outs) {
+    accum[a_count++]=c;
+    if (a_count>=254) {
+        flush_char(outs);
     }
+}/*inline void LZWEncoder::char_out(type_uchar c,type_iodevice * outs)*/
 
-    /*Clear out the hash table*/
-    /*table clear for block compress*/
-    void cl_block(type_iodevice * outs) {
-        cl_hash(hsize);
-        free_ent=ClearCode+2;
-        clear_flg=true;
-        output(ClearCode,outs);
+inline void LZWEncoder::cl_block(type_iodevice * outs) {
+    cl_hash(hsize);
+    free_ent=ClearCode+2;
+    clear_flg=true;
+    output(ClearCode,outs);
+}/*inline void LZWEncoder::cl_block(type_iodevice * outs)*/
+
+inline void LZWEncoder::cl_hash(const Integer hsize) {
+    for (Integer i=0; i<hsize; ++i) {
+        htab[i]=-1;
     }
+}/*inline void LZWEncoder::cl_hash(const Integer hsize)*/
 
-    /*reset code table*/
-    void cl_hash(const Integer hsize) {
-        for (Integer i=0; i<hsize; ++i) {
-            htab[i]=-1;
-        }
+inline void  LZWEncoder::compress(Integer init_bits,type_iodevice *outs) {
+    Integer fcode=0;
+    Integer i=0;
+    Integer c=0;
+    Integer ent=0;
+    Integer disp=0;
+    Integer hsize_reg=0;
+    Integer hshift=0;
+    /*Set up the globals:  g_init_bits - initial number of bits*/
+    g_init_bits=init_bits;
+    /*Set up the necessary values*/
+    clear_flg=false;
+    n_bits=g_init_bits;
+    maxcode=MAXCODE(n_bits);
+    ClearCode=1<<(init_bits-1);
+    EOFCode=ClearCode+1;
+    free_ent=ClearCode+2;
+    a_count=0; /*clear packet*/
+    ent=nextPixel();
+    hshift=0;
+    for (fcode=hsize; fcode<65536; fcode*=2) {
+        ++hshift;
     }
+    hshift=8-hshift; /*set hash code range bound*/
+    hsize_reg=hsize;
+    cl_hash(hsize_reg); /*clear hash table*/
+    output(ClearCode,outs);
 
-    void compress(Integer init_bits,type_iodevice *outs) {
-        Integer fcode=0;
-        Integer i=0;
-        Integer c=0;
-        Integer ent=0;
-        Integer disp=0;
-        Integer hsize_reg=0;
-        Integer hshift=0;
-        /*Set up the globals:  g_init_bits - initial number of bits*/
-        g_init_bits=init_bits;
-        /*Set up the necessary values*/
-        clear_flg=false;
-        n_bits=g_init_bits;
-        maxcode=MAXCODE(n_bits);
-        ClearCode=1<<(init_bits-1);
-        EOFCode=ClearCode+1;
-        free_ent=ClearCode+2;
-        a_count=0; /*clear packet*/
-        ent=nextPixel();
-        hshift=0;
-        for (fcode=hsize; fcode<65536; fcode*=2) {
-            ++hshift;
+outer_loop:
+    while ((c=nextPixel())!=EOF) {
+        fcode=(c<<maxbits)+ent;
+        i=(c<<hshift)^ent; /*xor hashing*/
+        if (htab[i]==fcode) {
+            ent=codetab[i];
+            continue;
         }
-        hshift=8-hshift; /*set hash code range bound*/
-        hsize_reg=hsize;
-        cl_hash(hsize_reg); /*clear hash table*/
-        output(ClearCode,outs);
-
-    outer_loop:
-        while ((c=nextPixel())!=EOF) {
-            fcode=(c<<maxbits)+ent;
-            i=(c<<hshift)^ent; /*xor hashing*/
-            if (htab[i]==fcode) {
-                ent=codetab[i];
-                continue;
+        else if (htab[i]>=0) /*non-empty slot*/ {
+            disp=hsize_reg-i; /*secondary hash (after G. Knott)*/
+            if (i==0) {
+                disp=1;
             }
-            else if (htab[i]>=0) /*non-empty slot*/ {
-                disp=hsize_reg-i; /*secondary hash (after G. Knott)*/
-                if (i==0) {
-                    disp=1;
+            do {
+                if ((i-=disp)<0)
+                    i+=hsize_reg;
+                if (htab[i]==fcode) {
+                    ent=codetab[i];
+                    goto outer_loop;
                 }
-                do {
-                    if ((i-=disp)<0)
-                        i+=hsize_reg;
-                    if (htab[i]==fcode) {
-                        ent=codetab[i];
-                        goto outer_loop;
-                    }
-                } while (htab[i]>=0);
-            }
-            output(ent,outs);
-            ent=c;
-            if (free_ent<maxmaxcode) {
-                codetab[i]=free_ent++; // code -> hashtable
-                htab[i]=fcode;
-            }
-            else {
-                cl_block(outs);
-            }
+            } while (htab[i]>=0);
         }
-
-        /* Put out the final code.*/
         output(ent,outs);
-        output(EOFCode,outs);
-
-    }
-
-public:
-    /*----------------------------------------------------------------------------*/
-    void encode(type_iodevice * os) {
-        assert(initCodeSize<=MAX_UCHAR);
-        assert(initCodeSize>=0);
-        this->put_char(os,initCodeSize); /*write "initial code size" byte*/
-        remaining=imgW * imgH; /*reset navigation variables*/
-        curPixel=0;
-        compress(initCodeSize+1,os); /*compress and write the pixel data*/
-        this->put_char(os,type_uchar(0));
-    }
-private:
-    /*Flush the packet to disk, and reset the accumulator*/
-    void flush_char(type_iodevice * outs) {
-        if (a_count>0) {
-            assert(a_count<=MAX_UCHAR);
-            assert(a_count>=0);
-            this->put_char(outs,a_count);
-            this->write_chars(outs,accum.data(),a_count);
-            a_count=0;
-        }
-    }
-
-    static constexpr inline Integer MAXCODE(Integer n_bits) {
-        return (1<<n_bits)-1;
-    }
-
-    //----------------------------------------------------------------------------
-    // Return the next pixel from the image
-    //----------------------------------------------------------------------------
-    Integer nextPixel() {
-        if (remaining<1) {
-            return EOF;
-        }
-        --remaining;
-        type_uchar pix=pixAryBegin[curPixel++];
-        return pix;
-    }
-
-    void output(Integer code,type_iodevice * outs) {
-        cur_accum&=masks(cur_bits);
-
-        if (cur_bits>0) {
-            cur_accum|=(code<<cur_bits);
+        ent=c;
+        if (free_ent<maxmaxcode) {
+            codetab[i]=free_ent++; // code -> hashtable
+            htab[i]=fcode;
         }
         else {
-            cur_accum=code;
+            cl_block(outs);
         }
+    }
 
-        cur_bits+=n_bits;
+    /* Put out the final code.*/
+    output(ent,outs);
+    output(EOFCode,outs);
 
-        while (cur_bits>=8) {
-            assert(cur_accum<=MAX_UCHAR);
+}/*inline void  LZWEncoder::compress(Integer init_bits,type_iodevice *outs)*/
+
+inline void LZWEncoder::encode(type_iodevice * os) {
+    assert(initCodeSize<=MAX_UCHAR);
+    assert(initCodeSize>=0);
+    this->put_char(os,initCodeSize); /*write "initial code size" byte*/
+    remaining=imgW * imgH; /*reset navigation variables*/
+    assert(remaining==(argPixAryEnd-argPixAryBegin));
+    curPixel=0;
+    compress(initCodeSize+1,os); /*compress and write the pixel data*/
+    this->put_char(os,type_uchar(0));
+}/*inline void LZWEncoder::encode(type_iodevice * os) */
+
+void LZWEncoder::flush_char(type_iodevice * outs) {
+    if (a_count>0) {
+        assert(a_count<=MAX_UCHAR);
+        assert(a_count>=0);
+        this->put_char(outs,a_count);
+        this->write_chars(outs,accum.data(),a_count);
+        a_count=0;
+    }
+}/*void LZWEncoder::flush_char(type_iodevice * outs)*/
+
+inline LZWEncoder::Integer LZWEncoder::nextPixel() {
+    if (remaining<1) {
+        return EOF;
+    }
+    --remaining;
+    type_uchar pix=pixAryBegin[curPixel++];
+    return pix;
+}/*inline LZWEncoder::Integer LZWEncoder::nextPixel()*/
+
+inline void LZWEncoder::output(Integer code,type_iodevice * outs) {
+    cur_accum&=masks(cur_bits);
+
+    if (cur_bits>0) {
+        cur_accum|=(code<<cur_bits);
+    }
+    else {
+        cur_accum=code;
+    }
+
+    cur_bits+=n_bits;
+
+    while (cur_bits>=8) {
+        assert(cur_accum<=MAX_UCHAR);
+        assert(cur_accum>=0);
+        char_out(cur_accum,outs);
+        cur_accum>>=8;
+        cur_bits-=8;
+    }
+
+    /*If the next entry is going to be too big for the code size,*/
+    /*then increase it, if possible.*/
+    if (free_ent>maxcode||clear_flg) {
+        if (clear_flg) {
+            maxcode=MAXCODE(n_bits=g_init_bits);
+            clear_flg=false;
+        }
+        else {
+            ++n_bits;
+            if (n_bits==maxbits) {
+                maxcode=maxmaxcode;
+            }
+            else {
+                maxcode=MAXCODE(n_bits);
+            }
+        }
+    }
+
+    if (code==EOFCode) {
+        /*At EOF, write the rest of the buffer.*/
+        while (cur_bits>0) {
             assert(cur_accum>=0);
+            assert(cur_accum<=MAX_UCHAR);
             char_out(cur_accum,outs);
             cur_accum>>=8;
             cur_bits-=8;
         }
-
-        /*If the next entry is going to be too big for the code size,*/
-        /*then increase it, if possible.*/
-        if (free_ent>maxcode||clear_flg) {
-            if (clear_flg) {
-                maxcode=MAXCODE(n_bits=g_init_bits);
-                clear_flg=false;
-            }
-            else {
-                ++n_bits;
-                if (n_bits==maxbits) {
-                    maxcode=maxmaxcode;
-                }
-                else {
-                    maxcode=MAXCODE(n_bits);
-                }
-            }
-        }
-
-        if (code==EOFCode) {
-            /*At EOF, write the rest of the buffer.*/
-            while (cur_bits>0) {
-                assert(cur_accum>=0);
-                assert(cur_accum<=MAX_UCHAR);
-                char_out(cur_accum,outs);
-                cur_accum>>=8;
-                cur_bits-=8;
-            }
-            flush_char(outs);
-        }
-
+        flush_char(outs);
     }
-
-};/*LZWEncoder*/
+}/*inline void LZWEncoder::output(Integer code,type_iodevice * outs)*/
 
 }/*namespace*/
 }/*mgui*/
