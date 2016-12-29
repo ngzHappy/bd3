@@ -394,6 +394,7 @@ private:
             Double length_x=0;
             Double length_y=0;
             Double length_z=0;
+            Double vSize=0;
             std::int32_t count=0;
 
             Double mean_x;
@@ -424,14 +425,14 @@ private:
 
             void update() {
 
-                Double max_x=std::numeric_limits<Double>::max();
-                Double min_x=std::numeric_limits<Double>::lowest();
+                Double min_x=std::numeric_limits<Double>::max();
+                Double max_x=std::numeric_limits<Double>::lowest();
 
-                Double max_y=std::numeric_limits<Double>::max();
-                Double min_y=std::numeric_limits<Double>::lowest();
+                Double min_y=std::numeric_limits<Double>::max();
+                Double max_y=std::numeric_limits<Double>::lowest();
 
-                Double max_z=std::numeric_limits<Double>::max();
-                Double min_z=std::numeric_limits<Double>::lowest();
+                Double min_z=std::numeric_limits<Double>::max();
+                Double max_z=std::numeric_limits<Double>::lowest();
 
                 count=0;
 
@@ -453,6 +454,10 @@ private:
                 length_x=max_x-min_x;
                 length_y=max_y-min_y;
                 length_z=max_z-min_z;
+
+                vSize= .001*length_x;
+                vSize*=.001*length_y;
+                vSize*=.001*length_z;
 
             }
 
@@ -574,22 +579,16 @@ private:
                 std::shared_ptr<Pack> &l,
                 std::shared_ptr<Pack> &r
                 ) {
+            return l->data.size()>r->data.size();
+        };
 
-            Double lDataSize=l->data.size();
-            Double rDataSize=r->data.size();
-
-            if ((lDataSize>50)&&(rDataSize>50)) {
-                return (l->count)>(r->count);
-            }
-
-            Double minSize=std::min(lDataSize,rDataSize);
-            minSize=std::abs(Double(lDataSize)-rDataSize)/minSize;
-
-            if (minSize<0.3) {
-                return l->count>r->count;
-            }
-
-            return lDataSize>rDataSize;
+        auto comp_pack_function_1=[](
+            std::shared_ptr<Pack> &l,
+            std::shared_ptr<Pack> &r
+            ) {
+            auto lvSize=l->vSize * l->data.size();
+            auto rvSize=r->vSize * r->data.size();
+            return lvSize>rvSize;
         };
 
         std::vector<std::shared_ptr<Pack>> packs;
@@ -608,7 +607,14 @@ private:
 
         hist.clear();
         while (packs.size()<256) {
-            std::sort(packs.begin(),packs.end(),comp_pack_function);
+
+            if (packs.size()>32) {
+                std::sort(packs.begin(),packs.end(),comp_pack_function_1);
+            }
+            else {
+                std::sort(packs.begin(),packs.end(),comp_pack_function);
+            }
+
             auto * first=packs.begin()->get();
             if (first->count<1) {
                 break;
@@ -618,7 +624,7 @@ private:
             packs.push_back(std::move(next_.second));
         }
 
-        //qDebug()<<packs.size();
+        qDebug()<<packs.size();
         rgb_float_vector varTmpAns;
         varTmpAns.reserve(256);
         for (auto & p:packs) {
@@ -1344,11 +1350,11 @@ void QAnimatedGifEncoder::analyzePixels() {
     std::unique_ptr<QuantizationAlgorithm> uptr_nq(nq);
     nq->construct(var_thisData->pixels,len,var_thisData->sample);
     var_thisData->colorTab=nq->process();
-    //#define FLOYD_STEINBERG
+//#define __FLOYD_STEINBERG 1
     const auto & pixels=var_thisData->pixels;
     /*map image pixels to new palette*/
     auto k=const_cast<type_uchar*>(pixels.constBegin());
-#if defined(FLOYD_STEINBERG)
+#if defined(__FLOYD_STEINBERG)
     Integer px=0/*当前x*/;
     Integer py=0/*当前y*/;
     const Integer line_step=var_thisData->width*3;
@@ -1361,7 +1367,7 @@ void QAnimatedGifEncoder::analyzePixels() {
     const auto & colorTab=var_thisData->colorTab;
 #endif
     for (Integer i=0; i<nPix; ++i) {
-#if defined(FLOYD_STEINBERG)
+#if defined(__FLOYD_STEINBERG)
         /*求下一行pix的坐标*/
         if (py<bottom_limit) {
             next_middle_item=k+line_step;
@@ -1395,7 +1401,7 @@ void QAnimatedGifEncoder::analyzePixels() {
         var_thisData->usedEntry[index]=true;
         var_thisData->indexedPixels[i]=index;
 
-#if defined(FLOYD_STEINBERG)
+#if defined(__FLOYD_STEINBERG)
         index*=3;
         const Integer r1=colorTab[index++]/*新的r*/;
         const Integer g1=colorTab[index++]/*新的g*/;
@@ -1485,7 +1491,7 @@ void QAnimatedGifEncoder::analyzePixels() {
             or=r;
             og=g;
             ob=b;
-        }
+}
 
         /*更新x y*/
         ++px;
