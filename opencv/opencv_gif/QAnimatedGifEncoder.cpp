@@ -5,6 +5,7 @@
 
 #include "QAnimatedGifEncoder.hpp"
 
+/*stl*/
 #include <cmath>
 #include <array>
 #include <vector>
@@ -12,18 +13,26 @@
 #include <algorithm>
 #include <type_traits>
 
+/*qt:qtl*/
 #include <QtCore/QVector>
-#include <QtGui/QPainter>
 
+/*boost:rtree*/
 #include <Qt/boost/geometry/index/rtree.hpp>
+
+/*opencv*/
+#include <opencv2/opencv.hpp>
 
 #ifndef null
 #define null 0
-#endif
+#endif/*null*/
 
 #ifndef one
 #define one (Integer(1))
-#endif
+#endif/*one*/
+
+#ifndef CPLUSPLUS_OBJECT
+#define CPLUSPLUS_OBJECT(...)
+#endif/*CPLUSPLUS_OBJECT*/
 
 namespace {
 
@@ -37,33 +46,56 @@ namespace mgui {
 
 namespace {
 
+/*
+ * unsigned char to double
+ * 直接查表，加快速度
+*/
 constexpr const double uchar2doule[]{
-    0/256.0,	1/256.0,	2/256.0,	3/256.0,	4/256.0,	5/256.0,	6/256.0,	7/256.0,	8/256.0,	9/256.0,	10/256.0,	11/256.0,	12/256.0,	13/256.0,	14/256.0,	15/256.0,
-    16/256.0,	17/256.0,	18/256.0,	19/256.0,	20/256.0,	21/256.0,	22/256.0,	23/256.0,	24/256.0,	25/256.0,	26/256.0,	27/256.0,	28/256.0,	29/256.0,	30/256.0,	31/256.0,
-    32/256.0,	33/256.0,	34/256.0,	35/256.0,	36/256.0,	37/256.0,	38/256.0,	39/256.0,	40/256.0,	41/256.0,	42/256.0,	43/256.0,	44/256.0,	45/256.0,	46/256.0,	47/256.0,
-    48/256.0,	49/256.0,	50/256.0,	51/256.0,	52/256.0,	53/256.0,	54/256.0,	55/256.0,	56/256.0,	57/256.0,	58/256.0,	59/256.0,	60/256.0,	61/256.0,	62/256.0,	63/256.0,
-    64/256.0,	65/256.0,	66/256.0,	67/256.0,	68/256.0,	69/256.0,	70/256.0,	71/256.0,	72/256.0,	73/256.0,	74/256.0,	75/256.0,	76/256.0,	77/256.0,	78/256.0,	79/256.0,
-    80/256.0,	81/256.0,	82/256.0,	83/256.0,	84/256.0,	85/256.0,	86/256.0,	87/256.0,	88/256.0,	89/256.0,	90/256.0,	91/256.0,	92/256.0,	93/256.0,	94/256.0,	95/256.0,
-    96/256.0,	97/256.0,	98/256.0,	99/256.0,	100/256.0,	101/256.0,	102/256.0,	103/256.0,	104/256.0,	105/256.0,	106/256.0,	107/256.0,	108/256.0,	109/256.0,	110/256.0,	111/256.0,
-    112/256.0,	113/256.0,	114/256.0,	115/256.0,	116/256.0,	117/256.0,	118/256.0,	119/256.0,	120/256.0,	121/256.0,	122/256.0,	123/256.0,	124/256.0,	125/256.0,	126/256.0,	127/256.0,
-    128/256.0,	129/256.0,	130/256.0,	131/256.0,	132/256.0,	133/256.0,	134/256.0,	135/256.0,	136/256.0,	137/256.0,	138/256.0,	139/256.0,	140/256.0,	141/256.0,	142/256.0,	143/256.0,
-    144/256.0,	145/256.0,	146/256.0,	147/256.0,	148/256.0,	149/256.0,	150/256.0,	151/256.0,	152/256.0,	153/256.0,	154/256.0,	155/256.0,	156/256.0,	157/256.0,	158/256.0,	159/256.0,
-    160/256.0,	161/256.0,	162/256.0,	163/256.0,	164/256.0,	165/256.0,	166/256.0,	167/256.0,	168/256.0,	169/256.0,	170/256.0,	171/256.0,	172/256.0,	173/256.0,	174/256.0,	175/256.0,
-    176/256.0,	177/256.0,	178/256.0,	179/256.0,	180/256.0,	181/256.0,	182/256.0,	183/256.0,	184/256.0,	185/256.0,	186/256.0,	187/256.0,	188/256.0,	189/256.0,	190/256.0,	191/256.0,
-    192/256.0,	193/256.0,	194/256.0,	195/256.0,	196/256.0,	197/256.0,	198/256.0,	199/256.0,	200/256.0,	201/256.0,	202/256.0,	203/256.0,	204/256.0,	205/256.0,	206/256.0,	207/256.0,
-    208/256.0,	209/256.0,	210/256.0,	211/256.0,	212/256.0,	213/256.0,	214/256.0,	215/256.0,	216/256.0,	217/256.0,	218/256.0,	219/256.0,	220/256.0,	221/256.0,	222/256.0,	223/256.0,
-    224/256.0,	225/256.0,	226/256.0,	227/256.0,	228/256.0,	229/256.0,	230/256.0,	231/256.0,	232/256.0,	233/256.0,	234/256.0,	235/256.0,	236/256.0,	237/256.0,	238/256.0,	239/256.0,
-    240/256.0,	241/256.0,	242/256.0,	243/256.0,	244/256.0,	245/256.0,	246/256.0,	247/256.0,	248/256.0,	249/256.0,	250/256.0,	251/256.0,	252/256.0,	253/256.0,	254/256.0,	255/256.0,
+    0.  ,   1.  ,   2.  ,   3.  ,	4.,	    5.,	    6.,	    7.,	    8.,	    9.,	    10.,	11.,	12.,	13.,	14.,	15.,
+    16. ,   17. ,   18. ,   19. ,	20.,	21.,	22.,	23.,	24.,	25.,	26.,	27.,	28.,	29.,	30.,	31.,
+    32. ,   33. ,   34. ,   35. ,	36.,	37.,	38.,	39.,	40.,	41.,	42.,	43.,	44.,	45.,	46.,	47.,
+    48. ,   49. ,   50. ,   51. ,	52.,	53.,	54.,	55.,	56.,	57.,	58.,	59.,	60.,	61.,	62.,	63.,
+    64. ,   65. ,   66. ,   67. ,	68.,	69.,	70.,	71.,	72.,	73.,	74.,	75.,	76.,	77.,	78.,	79.,
+    80. ,   81. ,   82. ,   83. ,	84.,	85.,	86.,	87.,	88.,	89.,	90.,	91.,	92.,	93.,	94.,	95.,
+    96. ,   97. ,   98. ,   99. ,	100.,	101.,	102.,	103.,	104.,	105.,	106.,	107.,	108.,	109.,	110.,	111.,
+    112.,   113.,   114.,   115.,	116.,	117.,	118.,	119.,	120.,	121.,	122.,	123.,	124.,	125.,	126.,	127.,
+    128.,   129.,   130.,   131.,	132.,	133.,	134.,	135.,	136.,	137.,	138.,	139.,	140.,	141.,	142.,	143.,
+    144.,   145.,   146.,   147.,	148.,	149.,	150.,	151.,	152.,	153.,	154.,	155.,	156.,	157.,	158.,	159.,
+    160.,   161.,   162.,   163.,	164.,	165.,	166.,	167.,	168.,	169.,	170.,	171.,	172.,	173.,	174.,	175.,
+    176.,   177.,   178.,   179.,	180.,	181.,	182.,	183.,	184.,	185.,	186.,	187.,	188.,	189.,	190.,	191.,
+    192.,   193.,   194.,   195.,	196.,	197.,	198.,	199.,	200.,	201.,	202.,	203.,	204.,	205.,	206.,	207.,
+    208.,   209.,   210.,   211.,	212.,	213.,	214.,	215.,	216.,	217.,	218.,	219.,	220.,	221.,	222.,	223.,
+    224.,   225.,   226.,   227.,	228.,	229.,	230.,	231.,	232.,	233.,	234.,	235.,	236.,	237.,	238.,	239.,
+    240.,   241.,   242.,   243.,	244.,	245.,	246.,	247.,	248.,	249.,	250.,	251.,	252.,	253.,	254.,	255.,
+};
+
+constexpr const float uchar2float[]{
+    0.f  ,   1.f  ,   2.f,   3.f  ,	4.f,5.f,	  6.,	    7.f,	    8.f,	    9.f,	    10.f,	11.f,	12.f,	13.f,	14.f,	15.f,
+    16.f ,   17.f ,   18.f,   19.f ,	20.f,	21.f,	22.f,	23.f,	24.f,	25.f,	26.f,	27.f,	28.f,	29.f,	30.f,	31.f,
+    32.f ,   33.f ,   34.f,   35.f ,	36.f,	37.f,	38.f,	39.f,	40.f,	41.f,	42.f,	43.f,	44.f,	45.f,	46.f,	47.f,
+    48.f ,   49.f ,   50.f,   51.f ,	52.f,	53.f,	54.f,	55.f,	56.f,	57.f,	58.f,	59.f,	60.f,	61.f,	62.f,	63.f,
+    64.f ,   65.f ,   66.f,   67.f ,	68.f,	69.f,	70.f,	71.f,	72.f,	73.f,	74.f,	75.f,	76.f,	77.f,	78.f,	79.f,
+    80.f ,   81.f ,   82.f,   83.f ,	84.f,	85.f,	86.f,	87.f,	88.f,	89.f,	90.f,	91.f,	92.f,	93.f,	94.f,	95.f,
+    96.f ,   97.f ,   98.f,   99.f ,	100.f,	101.f,	102.f,	103.f,	104.f,	105.f,	106.f,	107.f,	108.f,	109.f,	110.f,	111.f,
+    112.f,   113.f,   114.f,   115.f,	116.f,	117.f,	118.f,	119.f,	120.f,	121.f,	122.f,	123.f,	124.f,	125.f,	126.f,	127.f,
+    128.f,   129.f,   130.f,   131.f,	132.f,	133.f,	134.f,	135.f,	136.f,	137.f,	138.f,	139.f,	140.f,	141.f,	142.f,	143.f,
+    144.f,   145.f,   146.f,   147.f,	148.f,	149.f,	150.f,	151.f,	152.f,	153.f,	154.f,	155.f,	156.f,	157.f,	158.f,	159.f,
+    160.f,   161.f,   162.f,   163.f,	164.f,	165.f,	166.f,	167.f,	168.f,	169.f,	170.f,	171.f,	172.f,	173.f,	174.f,	175.f,
+    176.f,   177.f,   178.f,   179.f,	180.f,	181.f,	182.f,	183.f,	184.f,	185.f,	186.f,	187.f,	188.f,	189.f,	190.f,	191.f,
+    192.f,   193.f,   194.f,   195.f,	196.f,	197.f,	198.f,	199.f,	200.f,	201.f,	202.f,	203.f,	204.f,	205.f,	206.f,	207.f,
+    208.f,   209.f,   210.f,   211.f,	212.f,	213.f,	214.f,	215.f,	216.f,	217.f,	218.f,	219.f,	220.f,	221.f,	222.f,	223.f,
+    224.f,   225.f,   226.f,   227.f,	228.f,	229.f,	230.f,	231.f,	232.f,	233.f,	234.f,	235.f,	236.f,	237.f,	238.f,	239.f,
+    240.f,   241.f,   242.f,   243.f,	244.f,	245.f,	246.f,	247.f,	248.f,	249.f,	250.f,	251.f,	252.f,	253.f,	254.f,	255.f,
 };
 
 template<typename T1,typename T>
 static inline void writeSome(const T1 & some,T * out) {
-    out->write((Byte *)(&some),sizeof(T1));
+    out->write((const Byte *)(&some),sizeof(T1));
 }
 
 template<typename T>
 static inline void writeSome(Integer some,T * out) {
-    out->write((Byte *)(&some),sizeof(Integer));
+    out->write((const Byte *)(&some),sizeof(Integer));
 }
 
 template<typename T>
@@ -81,17 +113,21 @@ namespace {
 //隐式数据共享
 typedef  QVector<Byte>  PixType;
 
+/*将rgb24位转为灰度图*/
 class QuantizationAlgorithm {
 public:
-    QuantizationAlgorithm() {}
+    QuantizationAlgorithm()=default;
     virtual void construct(const PixType & /*thepic*/,Integer /*len*/,Integer /*sample*/)=0;
-    virtual ~QuantizationAlgorithm() {}
+    virtual ~QuantizationAlgorithm()=default;
     virtual QVector<Byte> process()=0;
     virtual Integer map(Integer b,Integer g,Integer r)=0;
 };
 
 class Quantization :public QuantizationAlgorithm {
-
+public:
+    using const_uchar=const unsigned char/*定义类型const unsigned char*/;
+    using type_uchar=unsigned char/*定义类型unsigned char*/;
+private:
     static unsigned char int2unsignedchar(int i) {
         return (unsigned char)((i&0x00ff));
     }
@@ -99,19 +135,12 @@ class Quantization :public QuantizationAlgorithm {
 public:
 
     struct DataItem {
-        unsigned char a,b,c;
-        DataItem():a(0),b(0),c(0) {}
-        DataItem(
-                unsigned char _0,
-                unsigned char _1,
-                unsigned char _2):a(_0),b(_1),c(_2) {
-        }
-        template<typename T0,typename T1,typename T2>
-        DataItem(T0 _0,T1 _1,T2 _2):
-            a(int2unsignedchar(_0)),
-            b(int2unsignedchar(_1)),
-            c(int2unsignedchar(_2)) {
-        }
+        type_uchar a;
+        type_uchar b;
+        type_uchar c;
+
+        constexpr DataItem():a(0),b(0),c(0) {}
+        DataItem(type_uchar _0,type_uchar _1,type_uchar _2):a(_0),b(_1),c(_2) {}
         friend bool operator<(const DataItem & l,const DataItem & r) {
             if (l.a<r.a) { return true; }
             if (l.a>r.a) { return false; }
@@ -123,6 +152,7 @@ public:
 
     PixType pix;
     QVector<Byte> quantization;
+
     typedef boost::geometry::model::point<
         std::int32_t,3,
         boost::geometry::cs::cartesian> point_t/*笛卡尔坐标系点*/;
@@ -138,10 +168,13 @@ public:
     }
 
     QVector<Byte> process() {
+
+        /*清空数据*/
         QVector<Byte> & ans=quantization;
         ans.clear();
         rtree=std::make_shared<rtree_t>();
 
+        /**/
         evalQuantization();
 
         return quantization;
@@ -162,14 +195,112 @@ public:
     }
 
 private:
-    void evalQuantization() {
+    struct Data {
+        Double a,b,c;
+        std::int32_t count;
+    };
+    struct RGBFloat {
+        Float r,g,b;
+        RGBFloat()=default;
+        RGBFloat(Float a_,Float b_,Float c_)
+            :r(a_),g(b_),b(c_) {}
+        RGBFloat(Double a_,Double b_,Double c_)
+            :r(static_cast<Float>(a_)),
+            g(static_cast<Float>(b_)),
+            b(static_cast<Float>(c_)) {
+        }
+    };
+    using rgb_hist_map=std::map<DataItem,std::int32_t>;
+    using data_list=std::list<Data>;
+    using rgb_float_vector=std::vector<RGBFloat>;
+    using rgb_byte_vector=std::vector<DataItem>;
 
-        std::map<DataItem,std::int32_t>hist;
+    rgb_byte_vector rgb_float_vector_to_rgb_byte_vector(const rgb_float_vector & arg) {
+        rgb_byte_vector varAns;
+        varAns.resize(arg.size());
+        try {
+            cv::Mat matInputWrap(1,
+                static_cast<int>(arg.size()),
+                CV_32FC3,
+                const_cast<RGBFloat*>(arg.data())
+            );
+            cv::Mat matOutPutWrap(1,
+                static_cast<int>(varAns.size()),
+                CV_8UC3,
+                const_cast<DataItem*>(varAns.data())
+            );
+            cv::cvtColor(matInputWrap,matOutPutWrap,cv::COLOR_Lab2RGB,CV_8UC3);
+        }
+        catch (...) {
+            varAns.clear();
+            CPLUSPLUS_EXCEPTION(false);
+        }
+        return std::move(varAns);
+    }
+
+    data_list rgb_hist_map_to_data_list(const rgb_hist_map & hist) {
+        data_list varAns;
+
+        /*将rgb转为lab*/
+        try {
+            std::vector<RGBFloat> varTmpData;
+            std::vector<RGBFloat> varTmpDataAns;
+            varAns.resize(hist.size());
+            varTmpDataAns.resize(hist.size());
+            varTmpData.reserve(hist.size());
+
+            {
+                auto varI=varAns.begin();
+                for (const auto & i:hist) {
+                    varTmpData.emplace_back(
+                        uchar2float[i.first.a],
+                        uchar2float[i.first.b],
+                        uchar2float[i.first.c]
+                    );
+                    varI->count=i.second;
+                    ++varI;
+                }
+            }
+
+            cv::Mat matInputWrap(1,
+                static_cast<int>(varTmpData.size()),
+                CV_32FC3,
+                varTmpData.data()
+            );
+
+            cv::Mat matOutPutWrap(1,
+                static_cast<int>(varTmpDataAns.size()),
+                CV_32FC3,
+                varTmpDataAns.data());
+
+            cv::cvtColor(matInputWrap,matOutPutWrap,cv::COLOR_RGB2Lab);
+
+            {
+                auto varI=varAns.begin();
+                for (const auto & i:varTmpDataAns) {
+                    varI->a=i.r;
+                    varI->b=i.g;
+                    varI->c=i.b;
+                    ++varI;
+                }
+            }
+
+        }
+        catch (...) {
+            varAns.clear();
+            CPLUSPLUS_EXCEPTION(false);
+        }
+
+        return std::move(varAns);
+    }
+
+    rgb_hist_map genRGBHistMap() {
+        rgb_hist_map hist;
 
         {/*得到统计值*/
             auto begin_=(const DataItem *)(pix.cbegin());
             auto end_=(const DataItem*)(pix.cend());
-            for (auto pos=begin_; pos!=end_; ++pos) {
+            for (auto pos=begin_; pos<end_; ++pos) {
                 auto hpos=hist.find(*pos);
                 if (hpos!=hist.end()) {
                     ++(hpos->second);
@@ -180,6 +311,12 @@ private:
             }
 
         }
+        return std::move(hist);
+    }
+
+    void evalQuantization() {
+
+        auto hist=genRGBHistMap();
 
         /*颜色数小于等于256*/
         if (hist.size()<=256) {
@@ -188,19 +325,14 @@ private:
                 rtree->insert(std::make_pair(
                     point_t(i.first.a,i.first.b,i.first.c),index_++
                 ));
-                quantization.push_back(Byte(i.first.a&0x00ff));
-                quantization.push_back(Byte(i.first.b&0x00ff));
-                quantization.push_back(Byte(i.first.c&0x00ff));
+                quantization.push_back(reinterpret_cast<const Byte&>(i.first.a));
+                quantization.push_back(reinterpret_cast<const Byte&>(i.first.b));
+                quantization.push_back(reinterpret_cast<const Byte&>(i.first.c));
             }
             return;
         }
 
         /*降低颜色数目*/
-        struct Data {
-            double a,b,c;
-            std::int32_t count;
-        };
-
         struct Pack {
             std::list<Data>data;
             double mean_x,mean_y,mean_z;
@@ -228,9 +360,10 @@ private:
                     y=std::abs((i.b-mean_y));
                     x=std::abs((i.a-mean_x));
 
-                    if (x<0.5) { x/=2; }
-                    if (y<0.5) { y/=2; }
-                    if (z<0.5) { z/=2; }
+                    /*小误差快速收敛*/
+                    if (x<0.5) { x*=.5; }
+                    if (y<0.5) { y*=.5; }
+                    if (z<0.5) { z*=.5; }
 
                     std_x+=x*i.count;
                     std_y+=y*i.count;
@@ -303,24 +436,18 @@ private:
                 std::shared_ptr<Pack> &l,
                 std::shared_ptr<Pack> &r
                 ) {
-            auto std_l=(l->std_z+(l->std_x+l->std_y));
-            auto std_r=(r->std_x+(r->std_y+r->std_z));
+            const auto std_l=(l->std_z+(l->std_x+l->std_y));
+            const auto std_r=(r->std_x+(r->std_y+r->std_z));
             return std_l>std_r;
         };
 
         std::vector<std::shared_ptr<Pack>> packs;
         packs.reserve(256);
+
+        /*初始化迭代*/
         {
             auto pack_root=std::make_shared<Pack>();
-            for (const auto & i:hist) {
-                pack_root->data.push_back({
-                                              uchar2doule[i.first.a],
-                                              uchar2doule[i.first.b],
-                                              uchar2doule[i.first.c],
-                                              i.second
-                }
-                );
-            }
+            pack_root->data=rgb_hist_map_to_data_list(hist);
             pack_root->update();
             packs.push_back(std::move(pack_root));
         }
@@ -333,31 +460,35 @@ private:
             packs.push_back(next_.second);
         }
 
-        std::int32_t index=0;
+        rgb_float_vector varTmpAns;
+        varTmpAns.reserve(256);
         for (auto & p:packs) {
+            varTmpAns.emplace_back(
+                p->mean_x,
+                p->mean_y,
+                p->mean_z);
+            p.reset();
+        }
 
-            p->mean_x*=256.66;
-            p->mean_y*=256.66;
-            p->mean_z*=256.66;
+        auto varTmpAnsRGB=
+            rgb_float_vector_to_rgb_byte_vector(varTmpAns);
+        varTmpAns.clear();
 
-            std::int32_t a,b,c;
-            a=std::int32_t(std::round(p->mean_x));
-            b=std::int32_t(std::round(p->mean_y));
-            c=std::int32_t(std::round(p->mean_z));
+        std::int32_t index=0;
+        for (auto & p:varTmpAnsRGB) {
 
-            if (a>255) { a=255; }
-            if (b>255) { b=255; }
-            if (c>255) { c=255; }
+            const auto & x=p.a;
+            const auto & y=p.b;
+            const auto & z=p.c;
 
             rtree->insert(std::make_pair(
-                point_t(a,b,c),index++
+                point_t(x,y,z),index++
             ));
 
-            quantization.push_back(Byte(a&0x00ff));
-            quantization.push_back(Byte(b&0x00ff));
-            quantization.push_back(Byte(c&0x00ff));
+            quantization.push_back((const Byte&)(x));
+            quantization.push_back((const Byte&)(y));
+            quantization.push_back((const Byte&)(z));
 
-            p.reset();
         }
 
     }
@@ -478,7 +609,7 @@ private:
     inline void output(Integer code,type_iodevice * outs);
 private:
     CPLUSPLUS_OBJECT(LZWEncoder)
-};/*LZWEncoder*/
+    };/*LZWEncoder*/
 
 inline void LZWEncoder::char_out(type_uchar c,type_iodevice * outs) {
     accum[a_count++]=c;
