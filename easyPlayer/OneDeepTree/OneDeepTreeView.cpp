@@ -160,15 +160,69 @@ void OneDeepTreeView::gcEvent(){
 
 OneDeepTreeDelegate::OneDeepTreeDelegate(OneDeepTreeView * p): Super(p) {
     $m$thisp = new _PrivateOneDeepTreeDelegate;
+    $m$thisp->$m$view=p;
 }
 
 OneDeepTreeDelegate::~OneDeepTreeDelegate(){
     delete $m$thisp;
 }
 
+void OneDeepTreeDelegate::paint(QPainter *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+    {
+        const auto & varWidgets = $m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
+        auto varPos = varWidgets.find(c);
+        if( varPos == varWidgets.end() ){
+            $m$thisp->$m$view->openPersistentEditor(c);
+            return;
+        }else{
+            return;
+        }
+    }
+    return Super::paint(a,b,c);
+}
+
+QWidget *OneDeepTreeDelegate::createEditor(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+    {
+        auto ans = new OneDeepTreeItemWidget(a);
+        ans->setModelIndex(c);
+        auto & varWidgets = $m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
+        assert(varWidgets.count(ans)==0);
+        varWidgets.insert(ans);
+        return ans;
+    }
+    return Super::createEditor(a,b,c);
+}
+
+void OneDeepTreeDelegate::destroyEditor(QWidget *a, const QModelIndex &b) const {
+    return Super::destroyEditor(a,b);
+}
+
+void OneDeepTreeDelegate::updateEditorGeometry(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+    return Super::updateEditorGeometry(a,b,c);
+}
+
+void OneDeepTreeDelegate::setEditorData(QWidget *a,const QModelIndex &b) const {
+    {
+        auto v = qobject_cast<OneDeepTreeItemWidget*>(a);
+    }
+    return Super::setEditorData(a,b);
+}
+
 /*********************************************************************************/
 
 OneDeepTreeItemWidget::OneDeepTreeItemWidget(QWidget * p):Super(p){
+
+}
+
+void OneDeepTreeItemWidget::update(const QStyleOptionViewItem&a,const QModelIndex&b){
+    (void)b;
+}
+
+bool OneDeepTreeItemWidget::isOptionChanged(const QStyleOptionViewItem&a){
+
+}
+
+void OneDeepTreeItemWidget::setData(const QModelIndex &a){
 
 }
 
@@ -183,5 +237,6 @@ _PrivateOneDeepTreeView::~_PrivateOneDeepTreeView(){
 _PrivateOneDeepTreeDelegate::~_PrivateOneDeepTreeDelegate(){
 
 }
+
 
 /*********************************************************************************/
