@@ -103,7 +103,7 @@ void TreeView::gcEvent() {
     class Compare {
     public:
         class is_transparent {};
-        bool operator()(CT l,CT r)const { return l<r; }
+        bool operator()(CT l,CT r)const { return l->getModelIndex()<r->getModelIndex(); }
         bool operator()(U l,U r)const { return l<r; }
         bool operator()(CT l,U r)const { return l->getModelIndex()<r; }
         bool operator()(U l,CT r)const { return l<r->getModelIndex(); }
@@ -197,7 +197,7 @@ void TreeViewItemDelegate::paint(
                  qDebug()<<true;
                  return;
              }
-         
+
             w->update(styleOption,index);
         }
         return;
