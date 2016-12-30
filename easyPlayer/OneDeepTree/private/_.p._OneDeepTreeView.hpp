@@ -11,8 +11,11 @@
 class _PrivateOneDeepTreeView{
 public:
     ~_PrivateOneDeepTreeView();
-    std::uintmax_t $m$gc_tag=0;
-    OneDeepTreeView *super;
+
+    std::uintmax_t $m$gc_tag=0/*这里必须是unsigned*/;
+    std::uintmax_t $m$VerticalScrollbarValueChangeStamp=0/*这里必须是unsigned*/;
+
+    OneDeepTreeView *super=nullptr;
 
     template<typename $m$T>
     using vector=std::vector<$m$T,memory::Allocator<$m$T>>;

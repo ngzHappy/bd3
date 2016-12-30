@@ -22,6 +22,7 @@ $m$ONEDEEPTREEVIEW_PROTECTED:
     _PrivateOneDeepTreeView *$m$thisp=nullptr;
      QVector<QModelIndex> getAllVisibleItems()/*获得所有可见的item的index*/;
      void paintEvent(QPaintEvent *) override;
+     void verticalScrollbarValueChanged(int) override;
      void gcEvent();
 private:
      void _p_start_gcevent();

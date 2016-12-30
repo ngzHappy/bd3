@@ -55,7 +55,7 @@ QVector<QModelIndex> OneDeepTreeView::getAllVisibleItems(){
 
     for (firstVisibleItemOffset=firstVisibleItem;
          firstVisibleItemOffset<=lastVisibleItem;
-        ++firstVisibleItemOffset) {
+         ++firstVisibleItemOffset) {
         varAns.push_back(viewItems[firstVisibleItemOffset].index);
     }
 
@@ -73,24 +73,42 @@ void OneDeepTreeView::paintEvent(QPaintEvent *argEvent){
 
 /*进行滤波，消除过于频繁的gc调用*/
 void OneDeepTreeView::_p_start_gcevent(){
-    ++($m$thisp->$m$gc_tag);
-    QTimer::singleShot(10,this,[this,arg_tag=$m$thisp->$m$gc_tag](){
+    const auto arg_tag =++($m$thisp->$m$gc_tag);
+    QTimer::singleShot(10,this,[this,arg_tag](){
         if(arg_tag!=$m$thisp->$m$gc_tag){return;}
         this->gcEvent();
+    });
+}
+
+void OneDeepTreeView::verticalScrollbarValueChanged(int arg){
+    Super::verticalScrollbarValueChanged(arg);
+    const auto varCurrentStamp =++( $m$thisp->$m$VerticalScrollbarValueChangeStamp );
+    QTimer::singleShot(200,this,[this,varCurrentStamp]() {
+        /*200ms内没有再次调用此函数*/
+        if (varCurrentStamp==$m$thisp->$m$VerticalScrollbarValueChangeStamp) {
+            /*强制重绘*/
+            for (auto * varI:qAsConst($m$thisp->$m$OpendWidgets)) {
+                varI->update();
+            }
+        }
     });
 }
 
 /*删除看不到的元素*/
 void OneDeepTreeView::gcEvent(){
 
+    /*获得被管理的元素*/
     auto & varWidgets=$m$thisp->$m$OpendWidgets;
     if (varWidgets.empty()) {
         return;
     }
 
+    /*获得可见元素*/
     const auto varVisibleItems=getAllVisibleItems();
 
-    if(varVisibleItems.size()==varWidgets.size()){
+    auto varVS=varVisibleItems.size();
+    auto varWS=static_cast< DECLTYPE(varVS) >(varWidgets.size());
+    if(varVS==varWS){
         return;
     }
 
@@ -121,9 +139,16 @@ void OneDeepTreeView::gcEvent(){
 
     varWidgets=std::move(varAllOpenedWidgets);
 
-    /*可见元素数量应当与缓存数量一致*/
-    assert(varWidgets.size()==varVisibleItems.size());
+#ifndef NDEBUG
+    {
+        varVS=varVisibleItems.size();
+        varWS=static_cast< DECLTYPE(varVS) >(varWidgets.size());
+        /*可见元素数量应当与被管理元素数量一致*/
+        assert(varVS==varWS);
+    }
+#endif
 
+    /*关闭不可见元素*/
     for (auto * varI:varAboutToClosed) {
         varI->aboutToClosed();
         this->closePersistentEditor(varI->getModelIndex());
