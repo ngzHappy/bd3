@@ -23,7 +23,7 @@ public:
     void setModelIndex( const QModelIndex &arg ){ $m$ModelIndexWhenOpened=arg; }
     void setModelIndex(QModelIndex &&arg ){ $m$ModelIndexWhenOpened=std::move(arg); }
 $m$ONEDEEPTREEITEMWIDGET_PROTECTED:
-    virtual void close(){/*用于释放大对象*/}
+    virtual void aboutToClosed(){/*用于释放大对象*/}
 
 private:
     CPLUSPLUS_OBJECT(OneDeepTreeItemWidget)

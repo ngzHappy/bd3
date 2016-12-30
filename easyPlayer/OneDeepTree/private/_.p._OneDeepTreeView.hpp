@@ -12,6 +12,7 @@ class _PrivateOneDeepTreeView{
 public:
     ~_PrivateOneDeepTreeView();
     std::uintmax_t $m$gc_tag=0;
+    OneDeepTreeView *super;
 
     template<typename $m$T>
     using vector=std::vector<$m$T,memory::Allocator<$m$T>>;
@@ -32,6 +33,14 @@ public:
     };
 
     set<OneDeepTreeItemWidget *,TreeViewItemWidgetCompare> $m$OpendWidgets;
+
+    void closeAll() {
+        for (auto * varI:$m$OpendWidgets) {
+            varI->aboutToClosed();
+            super->closePersistentEditor(varI->getModelIndex());
+        }
+        $m$OpendWidgets.clear();
+    }
 
 private:
     CPLUSPLUS_OBJECT(_PrivateOneDeepTreeView)

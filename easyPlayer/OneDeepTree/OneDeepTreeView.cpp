@@ -22,6 +22,7 @@
 
 OneDeepTreeView::OneDeepTreeView(QWidget * p ):Super(p){
     $m$thisp=new _PrivateOneDeepTreeView;
+    $m$thisp->super=this;
 }
 
 OneDeepTreeView::~OneDeepTreeView(){
@@ -81,6 +82,52 @@ void OneDeepTreeView::_p_start_gcevent(){
 
 /*删除看不到的元素*/
 void OneDeepTreeView::gcEvent(){
+
+    auto & varWidgets=$m$thisp->$m$OpendWidgets;
+    if (varWidgets.empty()) {
+        return;
+    }
+
+    const auto varVisibleItems=getAllVisibleItems();
+
+    if(varVisibleItems.size()==varWidgets.size()){
+        return;
+    }
+
+    if (varVisibleItems.empty()) {
+        $m$thisp->closeAll();
+        return;
+    }
+
+    using Compare = _PrivateOneDeepTreeView::TreeViewItemWidgetCompare;
+    constexpr Compare varCompare;
+
+    _PrivateOneDeepTreeView::vector<OneDeepTreeItemWidget *> varAboutToClosed;
+    DECLTYPE(varWidgets) varAllOpenedWidgets;
+
+    for (auto * varI:varWidgets) {
+
+        if (std::binary_search(
+                    varVisibleItems.cbegin(),
+                    varVisibleItems.cend(),
+                    varI,varCompare)) {
+            varAllOpenedWidgets.insert(varI);
+        }
+        else {
+            varAboutToClosed.push_back(varI);
+        }
+
+    }
+
+    varWidgets=std::move(varAllOpenedWidgets);
+
+    /*可见元素数量应当与缓存数量一致*/
+    assert(varWidgets.size()==varVisibleItems.size());
+
+    for (auto * varI:varAboutToClosed) {
+        varI->aboutToClosed();
+        this->closePersistentEditor(varI->getModelIndex());
+    }
 
 }
 
