@@ -150,11 +150,6 @@ class Quantization :public QuantizationAlgorithm {
 public:
     using const_uchar=const unsigned char/*定义类型const unsigned char*/;
     using type_uchar=unsigned char/*定义类型unsigned char*/;
-private:
-    static unsigned char int2unsignedchar(int i) {
-        return (unsigned char)((i&0x00ff));
-    }
-
 public:
 
     struct DataItem {
@@ -235,120 +230,8 @@ private:
             b(arg1),c(arg2),count(arg3) {
         }
     };
-    struct RGBFloat {
-        Float r,g,b;
-        RGBFloat()=default;
-        RGBFloat(Float a_,Float b_,Float c_)
-            :r(a_),g(b_),b(c_) {}
-        RGBFloat(Double a_,Double b_,Double c_)
-            :r(static_cast<Float>(a_)),
-            g(static_cast<Float>(b_)),
-            b(static_cast<Float>(c_)) {
-        }
-    };
+
     using rgb_hist_map=std::map<DataItem,std::int32_t>;
-    using data_list=std::list<Data>;
-    using rgb_float_vector=std::vector<RGBFloat>;
-    using rgb_byte_vector=std::vector<DataItem>;
-
-    rgb_byte_vector rgb_float_vector_to_rgb_byte_vector(const rgb_float_vector & arg) {
-        rgb_byte_vector varAns;
-        rgb_float_vector varAnsTmp;
-
-        varAns.resize(arg.size());
-        varAnsTmp.resize(arg.size());
-
-        try {
-
-            cv::Mat matInputWrap(1,
-                static_cast<int>(arg.size()),
-                CV_32FC3,
-                const_cast<RGBFloat*>(arg.data())
-            );
-
-            cv::Mat matOutPutWrap(1,
-                static_cast<int>(varAnsTmp.size()),
-                CV_32FC3,
-                const_cast<RGBFloat*>(varAnsTmp.data())
-            );
-
-            cv::cvtColor(matInputWrap,matOutPutWrap,cv::COLOR_Lab2RGB);
-
-            matOutPutWrap*=255.0f;
-            matOutPutWrap+=0.505555f/*四舍五入*/;
-
-            matInputWrap=cv::Mat{ 1,
-                static_cast<int>(varAns.size()),
-                CV_8UC3,
-                const_cast<DataItem*>(varAns.data()) };
-
-            matOutPutWrap.convertTo(matInputWrap,CV_8UC3);
-
-        }
-        catch (...) {
-            varAns.clear();
-            CPLUSPLUS_EXCEPTION(false);
-        }
-        return std::move(varAns);
-    }
-
-    data_list rgb_hist_map_to_data_list(const rgb_hist_map & hist) {
-        data_list varAns;
-
-        /*将rgb转为lab*/
-        try {
-            std::vector<RGBFloat> varTmpData;
-            std::vector<RGBFloat> varTmpDataAns;
-            varAns.resize(hist.size());
-            varTmpDataAns.resize(hist.size());
-            varTmpData.reserve(hist.size());
-
-            {
-                auto varI=varAns.begin();
-                for (const auto & i:hist) {
-                    varTmpData.emplace_back(
-                        uchar2float_0_1[i.first.a],
-                        uchar2float_0_1[i.first.b],
-                        uchar2float_0_1[i.first.c]
-                    );
-                    varI->count=i.second;
-                    ++varI;
-                }
-            }
-
-            cv::Mat matInputWrap(1,
-                static_cast<int>(varTmpData.size()),
-                CV_32FC3,
-                varTmpData.data()
-            );
-
-            cv::Mat matOutPutWrap(1,
-                static_cast<int>(varTmpDataAns.size()),
-                CV_32FC3,
-                varTmpDataAns.data());
-
-            cv::cvtColor(matInputWrap,matOutPutWrap,cv::COLOR_RGB2Lab);
-
-            {
-                auto varI=varAns.begin();
-                for (const auto & i:varTmpDataAns) {
-                    varI->a=i.r;
-                    varI->b=i.g;
-                    varI->c=i.b;
-                    ++varI;
-                }
-            }
-
-        }
-        catch (...) {
-            varAns.clear();
-            CPLUSPLUS_EXCEPTION(false);
-            return std::move(varAns);
-        }
-
-        return std::move(varAns);
-    }
-
     rgb_hist_map genRGBHistMap() {
         rgb_hist_map hist;
 
@@ -372,289 +255,17 @@ private:
     void evalQuantization() {
 
         auto hist=genRGBHistMap();
-
-        /*颜色数小于等于256*/
-        if (hist.size()<=256) {
-            std::int32_t index_=0;
-            for (auto & i:hist) {
-                rtree->insert(std::make_pair(
-                    point_t(i.first.a,i.first.b,i.first.c),index_++
-                ));
-                quantization.push_back(i.first.a);
-                quantization.push_back(i.first.b);
-                quantization.push_back(i.first.c);
-            }
-            return;
-        }
-
-        /*降低颜色数目*/
-        struct Pack {
-            std::vector<Data>data;
-
-            Double length_x=0;
-            Double length_y=0;
-            Double length_z=0;
-            Double vSize=0;
-            std::int32_t count=0;
-
-            Double mean_x;
-            Double mean_y;
-            Double mean_z;
-
-            void eval_mean() {
-
-                count=0;
-                mean_x=0;
-                mean_y=0;
-                mean_z=0;
-
-                for (const auto &varI:data) {
-
-                    count+=varI.count;
-                    mean_x+=varI.a*varI.count;
-                    mean_y+=varI.b*varI.count;
-                    mean_z+=varI.c*varI.count;
-
-                }
-
-                mean_x/=count;
-                mean_y/=count;
-                mean_z/=count;
-
-            }
-
-            void update() {
-
-                Double min_x=std::numeric_limits<Double>::max();
-                Double max_x=std::numeric_limits<Double>::lowest();
-
-                Double min_y=std::numeric_limits<Double>::max();
-                Double max_y=std::numeric_limits<Double>::lowest();
-
-                Double min_z=std::numeric_limits<Double>::max();
-                Double max_z=std::numeric_limits<Double>::lowest();
-
-                count=0;
-
-                for (const auto &varI:data) {
-
-                    count+=varI.count;
-
-                    if (varI.a>max_x) { max_x=varI.a; }
-                    if (varI.a<min_x) { min_x=varI.a; }
-
-                    if (varI.b>max_y) { max_y=varI.b; }
-                    if (varI.b<min_y) { min_y=varI.b; }
-
-                    if (varI.c>max_z) { max_z=varI.c; }
-                    if (varI.c<min_z) { min_z=varI.c; }
-
-                }
-
-                length_x=max_x-min_x;
-                length_y=max_y-min_y;
-                length_z=max_z-min_z;
-
-                vSize= .001*length_x;
-                vSize*=.001*length_y;
-                vSize*=.001*length_z;
-
-            }
-
-            std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >next() {
-                if ((length_x>=length_y)&&(length_x>=length_z)) {
-                    return split_x();
-                }
-                if ((length_y>=length_x)&&(length_y>=length_z)) {
-                    return split_y();
-                }
-                return split_z();
-            }
-
-            std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >split_x() {
-                std::shared_ptr<Pack> l=std::make_shared<Pack>();
-                std::shared_ptr<Pack> r=std::make_shared<Pack>();
-
-                std::sort(data.begin(),data.end(),[](const auto &l,const auto &r) {
-                    return l.a<r.a;
-                });
-
-                auto half_count=count/2;
-
-                for (auto &varI:data) {
-                    auto old_half_count=half_count;
-                    half_count-=varI.count;
-                    if (half_count>=0) {
-                        l->data.push_back(varI);
-                    }
-                    else if (old_half_count<=0) {
-                        r->data.push_back(varI);
-                    }
-                    else {
-                        varI.count=old_half_count;
-                        l->data.push_back(varI);
-                        varI.count=-half_count;
-                        r->data.push_back(varI);
-                    }
-                }
-
-                l->update(); r->update();
-                return{ std::move(l),std::move(r) };
-            }
-            std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >split_y() {
-                std::shared_ptr<Pack> l=std::make_shared<Pack>();
-                std::shared_ptr<Pack> r=std::make_shared<Pack>();
-
-                std::sort(data.begin(),data.end(),[](const auto &l,const auto &r) {
-                    return l.b<r.b;
-                });
-
-                auto half_count=count/2;
-
-                for (auto &varI:data) {
-                    auto old_half_count=half_count;
-                    half_count-=varI.count;
-                    if (half_count>=0) {
-                        l->data.push_back(varI);
-                    }
-                    else if (old_half_count<=0) {
-                        r->data.push_back(varI);
-                    }
-                    else {
-                        varI.count=old_half_count;
-                        l->data.push_back(varI);
-                        varI.count=-half_count;
-                        r->data.push_back(varI);
-                    }
-                }
-
-                l->update(); r->update();
-                return{ std::move(l),std::move(r) };
-            }
-            std::pair<
-                std::shared_ptr<Pack>,
-                std::shared_ptr<Pack>
-            >split_z() {
-                std::shared_ptr<Pack> l=std::make_shared<Pack>();
-                std::shared_ptr<Pack> r=std::make_shared<Pack>();
-
-                std::sort(data.begin(),data.end(),[](const auto &l,const auto &r) {
-                    return l.c<r.c;
-                });
-
-                auto half_count=count/2;
-
-                for (auto &varI:data) {
-                    auto old_half_count=half_count;
-                    half_count-=varI.count;
-                    if (half_count>=0) {
-                        l->data.push_back(varI);
-                    }
-                    else if (old_half_count<=0) {
-                        r->data.push_back(varI);
-                    }
-                    else {
-                        varI.count=old_half_count;
-                        l->data.push_back(varI);
-                        varI.count=-half_count;
-                        r->data.push_back(varI);
-                    }
-                }
-
-                l->update(); r->update();
-                return{ std::move(l),std::move(r) };
-            }
-        };
-
-        auto comp_pack_function=[](
-                std::shared_ptr<Pack> &l,
-                std::shared_ptr<Pack> &r
-                ) {
-            return l->data.size()>r->data.size();
-        };
-
-        auto comp_pack_function_1=[](
-            std::shared_ptr<Pack> &l,
-            std::shared_ptr<Pack> &r
-            ) {
-            auto lvSize=l->vSize * l->data.size();
-            auto rvSize=r->vSize * r->data.size();
-            return lvSize>rvSize;
-        };
-
-        std::vector<std::shared_ptr<Pack>> packs;
-        packs.reserve(256);
-
-        std::int32_t allCount=1;
-        /*初始化迭代*/
-        {
-            auto pack_root=std::make_shared<Pack>();
-            auto tmp=rgb_hist_map_to_data_list(hist);
-            pack_root->data={ tmp.begin(),tmp.end() };
-            pack_root->update();
-            allCount=pack_root->count;
-            packs.push_back(std::move(pack_root));
-        }
-
-        hist.clear();
-        while (packs.size()<256) {
-
-            if (packs.size()>32) {
-                std::sort(packs.begin(),packs.end(),comp_pack_function_1);
-            }
-            else {
-                std::sort(packs.begin(),packs.end(),comp_pack_function);
-            }
-
-            auto * first=packs.begin()->get();
-            if (first->count<1) {
-                break;
-            }
-            auto next_=first->next();
-            packs[0]=std::move(next_.first);
-            packs.push_back(std::move(next_.second));
-        }
-
-        qDebug()<<packs.size();
-        rgb_float_vector varTmpAns;
-        varTmpAns.reserve(256);
-        for (auto & p:packs) {
-            p->eval_mean();
-            varTmpAns.emplace_back(
-                p->mean_x,
-                p->mean_y,
-                p->mean_z);
-        }
-
-        auto varTmpAnsRGB=
-            rgb_float_vector_to_rgb_byte_vector(varTmpAns);
-        varTmpAns.clear();
-
-        std::int32_t index=0;
-        for (auto & p:varTmpAnsRGB) {
-
-            const auto & x=p.a;
-            const auto & y=p.b;
-            const auto & z=p.c;
-
+        std::int32_t index_=0;
+        for (auto & i:hist) {
             rtree->insert(std::make_pair(
-                point_t(x,y,z),index++
+                point_t(i.first.a,i.first.b,i.first.c),index_++
             ));
-
-            quantization.push_back(x);
-            quantization.push_back(y);
-            quantization.push_back(z);
-
+            quantization.push_back(i.first.a);
+            quantization.push_back(i.first.b);
+            quantization.push_back(i.first.c);
         }
+        qDebug()<<hist.size();
+        return;
 
     }
 };
@@ -947,7 +558,7 @@ namespace mgui {
 class QAnimatedGifEncoder::ThisData {
 public:
     ThisData() {
-        for (auto & ii:usedEntry) { ii=false; }
+        usedEntry.assign(256,false);
     }
     ~ThisData() {}
 
@@ -965,7 +576,7 @@ public:
     QVector<type_uchar> indexedPixels; // converted frame indexed to palette
     Integer colorDepth=8; // number of bit planes
     QVector<type_uchar> colorTab; // RGB palette
-    Boolean usedEntry[256]; // active palette entries
+    std::vector<Boolean> usedEntry ; // active palette entries
     Integer palSize=7; // color table size (bits-1)
     Integer dispose=-1; // disposal code (-1 = use default)
     Boolean closeStream=false; // close stream when finished
@@ -1186,17 +797,6 @@ void QAnimatedGifEncoder::writeGraphicCtrlExt() {
     put_char(var_thisData->out,Byte(0)); // block terminator
 }
 
-void QAnimatedGifEncoder::writeLSD() {
-    ThisData * var_thisData=thisData.get();
-    // logical screen size
-    writeShort(var_thisData->width);
-    writeShort(var_thisData->height);
-    // packed fields
-    writeSome(Byte(0x80|0x70|0x00|var_thisData->palSize),var_thisData->out);
-    writeSome(Byte(0),var_thisData->out);
-    writeSome(Byte(0),var_thisData->out);
-}
-
 void QAnimatedGifEncoder::writeImageDesc() {
     ThisData * var_thisData=thisData.get();
     put_char(var_thisData->out,Byte(0x2c));
@@ -1248,6 +848,35 @@ static inline const Byte * gifHeader() {//6
     return data;
 }
 
+/* 'G', 'I', 'F', '8', '9', 'a' */
+Boolean QAnimatedGifEncoder::start(OutputStream & os) {
+    ThisData * var_thisData=thisData.get();
+    Boolean ok=true;
+    var_thisData->closeStream=false;
+    var_thisData->out=&os;
+
+    try {
+        writeString(gifHeader()); // header
+    }
+    catch (...) {
+        ok=false;
+    }
+
+    var_thisData->started=ok;
+    return ok;
+}
+
+void QAnimatedGifEncoder::writeLSD() {
+    ThisData * var_thisData=thisData.get();
+    // logical screen size
+    writeShort(var_thisData->width);
+    writeShort(var_thisData->height);
+    // packed fields
+    writeSome(Byte(0x80|0x70|0x00|var_thisData->palSize),var_thisData->out);
+    writeSome(Byte(0),var_thisData->out);
+    writeSome(Byte(0),var_thisData->out);
+}
+
 Boolean QAnimatedGifEncoder::finish() {
     ThisData * var_thisData=thisData.get();
     if (var_thisData->started==false) return false;
@@ -1296,24 +925,6 @@ void QAnimatedGifEncoder::setQuality(const Integer quality) {
     var_thisData->sample=quality;
 }
 
-/* 'G', 'I', 'F', '8', '9', 'a' */
-Boolean QAnimatedGifEncoder::start(OutputStream & os) {
-    ThisData * var_thisData=thisData.get();
-    Boolean ok=true;
-    var_thisData->closeStream=false;
-    var_thisData->out=&os;
-
-    try {
-        writeString(gifHeader()); // header
-    }
-    catch (...) {
-        ok=false;
-    }
-
-    var_thisData->started=ok;
-    return ok;
-}
-
 Integer QAnimatedGifEncoder::findClosest(Color c) {
     ThisData * var_thisData=thisData.get();
     if (var_thisData->colorTab.size()==null) return -1;
@@ -1350,48 +961,13 @@ void QAnimatedGifEncoder::analyzePixels() {
     std::unique_ptr<QuantizationAlgorithm> uptr_nq(nq);
     nq->construct(var_thisData->pixels,len,var_thisData->sample);
     var_thisData->colorTab=nq->process();
-//#define __FLOYD_STEINBERG 1
+    var_thisData->usedEntry.assign(var_thisData->colorTab.size()/3,false);
     const auto & pixels=var_thisData->pixels;
     /*map image pixels to new palette*/
     auto k=const_cast<type_uchar*>(pixels.constBegin());
-#if defined(__FLOYD_STEINBERG)
-    Integer px=0/*当前x*/;
-    Integer py=0/*当前y*/;
-    const Integer line_step=var_thisData->width*3;
-    constexpr Integer left_limit=0;
-    const Integer right_limit=var_thisData->width-1;
-    const Integer bottom_limit=var_thisData->height-1;
-    type_uchar * next_bottom_right_item=nullptr;
-    type_uchar * next_right_item=nullptr;
-    type_uchar * next_middle_item=nullptr;
-    const auto & colorTab=var_thisData->colorTab;
-#endif
+
     for (Integer i=0; i<nPix; ++i) {
-#if defined(__FLOYD_STEINBERG)
-        /*求下一行pix的坐标*/
-        if (py<bottom_limit) {
-            next_middle_item=k+line_step;
 
-            if (px<right_limit) {
-                next_bottom_right_item=next_middle_item+3;
-            }
-            else {
-                next_bottom_right_item=nullptr;
-            }
-
-        }
-        else {
-            next_bottom_right_item=nullptr;
-            next_middle_item=nullptr;
-        }
-
-        if (px<right_limit) {
-            next_right_item=k+3;
-        }
-        else {
-            next_right_item=nullptr;
-        }
-#endif
         const Integer r0=*k++/*原始r*/;
         const Integer g0=*k++/*原始g*/;
         const Integer b0=*k++/*原始b*/;
@@ -1401,105 +977,7 @@ void QAnimatedGifEncoder::analyzePixels() {
         var_thisData->usedEntry[index]=true;
         var_thisData->indexedPixels[i]=index;
 
-#if defined(__FLOYD_STEINBERG)
-        index*=3;
-        const Integer r1=colorTab[index++]/*新的r*/;
-        const Integer g1=colorTab[index++]/*新的g*/;
-        const Integer b1=colorTab[index]/*新的b*/;
-
-        const auto er=r1-r0/*r的误差*/;
-        const auto eg=g1-g0/*g的误差*/;
-        const auto eb=b1-b0/*b的误差*/;
-
-        /*3/8*/
-        if (next_middle_item) {
-            auto & or=*next_middle_item++;
-            auto & og=*next_middle_item++;
-            auto & ob=*next_middle_item;
-
-            Integer r=or;
-            Integer g=og;
-            Integer b=ob;
-
-            r+=(er*3)>>3;
-            g+=(eg*3)>>3;
-            b+=(eb*3)>>3;
-
-            if (r>255) { r=255; }
-            if (g>255) { g=255; }
-            if (b>255) { b=255; }
-
-            if (r<0) { r=0; }
-            if (g<0) { g=0; }
-            if (b<0) { b=0; }
-
-            or=r;
-            og=g;
-            ob=b;
-
-        }
-
-        /*1/4*/
-        if (next_bottom_right_item) {
-            auto & or=*next_bottom_right_item++;
-            auto & og=*next_bottom_right_item++;
-            auto & ob=*next_bottom_right_item;
-
-            Integer r=or;
-            Integer g=og;
-            Integer b=ob;
-
-            r+=(er)>>2;
-            g+=(eg)>>2;
-            b+=(eb)>>2;
-
-            if (r>255) { r=255; }
-            if (g>255) { g=255; }
-            if (b>255) { b=255; }
-
-            if (r<0) { r=0; }
-            if (g<0) { g=0; }
-            if (b<0) { b=0; }
-
-            or=r;
-            og=g;
-            ob=b;
-        }
-
-        /*3/8*/
-        if (next_right_item) {
-            auto & or=*next_right_item++;
-            auto & og=*next_right_item++;
-            auto & ob=*next_right_item;
-
-            Integer r=or;
-            Integer g=og;
-            Integer b=ob;
-
-            r+=(er*3)>>3;
-            g+=(eg*3)>>3;
-            b+=(eb*3)>>3;
-
-            if (r>255) { r=255; }
-            if (g>255) { g=255; }
-            if (b>255) { b=255; }
-
-            if (r<0) { r=0; }
-            if (g<0) { g=0; }
-            if (b<0) { b=0; }
-
-            or=r;
-            og=g;
-            ob=b;
-}
-
-        /*更新x y*/
-        ++px;
-        if (px>=var_thisData->width) {
-            px=0; ++py;
-        }
-#endif
-}
+    }
 
     var_thisData->pixels.clear();
     var_thisData->colorDepth=8;
