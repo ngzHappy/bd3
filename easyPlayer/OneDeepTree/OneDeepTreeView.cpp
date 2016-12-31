@@ -191,9 +191,16 @@ void OneDeepTreeDelegate::paint(QPainter *a, const QStyleOptionViewItem &b, cons
     return Super::paint(a,b,c);
 }
 
+/*用于创建不同类型的工厂*/
+OneDeepTreeItemWidget *OneDeepTreeDelegate::doCreateEditor(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+    auto ans = new OneDeepTreeItemWidget(a);
+    return ans;
+    (void)b;(void)c;
+}
+
 QWidget *OneDeepTreeDelegate::createEditor(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
     {
-        auto ans = new OneDeepTreeItemWidget(a);
+        auto ans = doCreateEditor(a,b,c);
         ans->setModelIndex(c);
         ans->setStyleOption(b);
         auto & varWidgets = $m$thisp->$m$view->$m$thisp->$m$OpendWidgets;

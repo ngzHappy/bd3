@@ -9,6 +9,7 @@
 #endif
 
 class OneDeepTreeView;
+class OneDeepTreeItemWidget;
 class _PrivateOneDeepTreeDelegate;
 class OneDeepTreeDelegate : public QStyledItemDelegate {
     Q_OBJECT
@@ -21,6 +22,7 @@ public:
     OneDeepTreeDelegate(OneDeepTreeView *);
     ~OneDeepTreeDelegate();
 protected:
+    virtual OneDeepTreeItemWidget *doCreateEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const ;
     void paint(QPainter *, const QStyleOptionViewItem &, const QModelIndex &) const override;
     QWidget *createEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const override;
     void destroyEditor(QWidget *, const QModelIndex &) const override;
