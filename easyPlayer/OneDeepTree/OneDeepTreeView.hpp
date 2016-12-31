@@ -17,7 +17,7 @@ private:
     friend class _PrivateOneDeepTreeView;
 public:
     OneDeepTreeView(QWidget * /**/=nullptr);
-    ~OneDeepTreeView();
+    virtual ~OneDeepTreeView();
 protected:
     OneDeepTreeView(_PrivateOneDeepTreeView*,QWidget*);
 $m$ONEDEEPTREEVIEW_PROTECTED:

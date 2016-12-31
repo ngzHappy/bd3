@@ -9,7 +9,7 @@
 #ifndef $m$ONEDEEPTREEITEMWIDGET_PROTECTED /*模拟java包组织权限*/
 #define $m$ONEDEEPTREEITEMWIDGET_PROTECTED protected
 #endif
-
+ 
 class OneDeepTreeItemWidget : public QWidget {
     Q_OBJECT
 private:
@@ -19,18 +19,19 @@ $m$ONEDEEPTREEITEMWIDGET_PROTECTED:
     QStyleOptionViewItem $m$QStyleOptionViewItem/*用于update*/;
 public:
     OneDeepTreeItemWidget(QWidget * /**/=nullptr);
+    virtual ~OneDeepTreeItemWidget()=default;
 
     const auto & getModelIndex() const { return $m$ModelIndexWhenOpened; }
-    void setModelIndex( const QModelIndex &arg ){ $m$ModelIndexWhenOpened=arg; }
-    void setModelIndex(QModelIndex &&arg ){ $m$ModelIndexWhenOpened=std::move(arg); }
+    void setModelIndex(const QModelIndex &arg) { $m$ModelIndexWhenOpened=arg; }
+    void setModelIndex(QModelIndex &&arg) { $m$ModelIndexWhenOpened=std::move(arg); }
 
     const auto & getStyleOption() const { return $m$QStyleOptionViewItem; }
-    void setStyleOption(const QStyleOptionViewItem & arg){$m$QStyleOptionViewItem=arg;}
-    void setStyleOption(QStyleOptionViewItem && arg){$m$QStyleOptionViewItem=std::move(arg);}
+    void setStyleOption(const QStyleOptionViewItem & arg) { $m$QStyleOptionViewItem=arg; }
+    void setStyleOption(QStyleOptionViewItem && arg) { $m$QStyleOptionViewItem=std::move(arg); }
 
     using Super::update;
-$m$ONEDEEPTREEITEMWIDGET_PROTECTED:
-    virtual void aboutToClosed(){/*用于释放大对象*/}
+public:
+    virtual void aboutToClosed() {/*用于释放大对象*/ }
     virtual void update(const QStyleOptionViewItem&,const QModelIndex&);
     virtual bool isOptionChanged(const QStyleOptionViewItem&);
     virtual void setData(const QModelIndex &);

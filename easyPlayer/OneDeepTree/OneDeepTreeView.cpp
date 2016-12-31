@@ -20,15 +20,15 @@
 
 /*********************************************************************************/
 
-OneDeepTreeView::OneDeepTreeView(_PrivateOneDeepTreeView*p,QWidget*s):Super(s){
+OneDeepTreeView::OneDeepTreeView(_PrivateOneDeepTreeView*p,QWidget*s):Super(s) {
     $m$thisp=p;
     $m$thisp->super=this;
 }
 
-OneDeepTreeView::OneDeepTreeView(QWidget * p):OneDeepTreeView(new _PrivateOneDeepTreeView,p){
+OneDeepTreeView::OneDeepTreeView(QWidget * p):OneDeepTreeView(new _PrivateOneDeepTreeView,p) {
 }
 
-OneDeepTreeView::~OneDeepTreeView(){
+OneDeepTreeView::~OneDeepTreeView() {
     delete $m$thisp;
 }
 
@@ -37,7 +37,7 @@ OneDeepTreeView::~OneDeepTreeView(){
  * 此函数返回所有可见项的index（QModelIndex）
  * 请保证返回是有序的并且没有重复（其实就是返回一个set）
 */
-QVector<QModelIndex> OneDeepTreeView::getAllVisibleItems(){
+QVector<QModelIndex> OneDeepTreeView::getAllVisibleItems() {
     QTreeViewPrivate *varPrivate=d_func();
     const QVector<QTreeViewItem> viewItems=varPrivate->viewItems;
 
@@ -51,10 +51,10 @@ QVector<QModelIndex> OneDeepTreeView::getAllVisibleItems(){
     const auto firstVisibleItem=varPrivate->firstVisibleItem(&firstVisibleItemOffset);
     if (firstVisibleItem<0) { /*all can not be see*/ return{}; }
     const auto lastVisibleItem=varPrivate->lastVisibleItem(firstVisibleItem,firstVisibleItemOffset);
-    if(lastVisibleItem<firstVisibleItem){ /*is threre a qt bug???*/ return{};}
+    if (lastVisibleItem<firstVisibleItem) { /*is threre a qt bug???*/ return{}; }
 
     QVector<QModelIndex> varAns;
-    varAns.reserve( lastVisibleItem-firstVisibleItem+1 );
+    varAns.reserve(lastVisibleItem-firstVisibleItem+1);
 
     for (firstVisibleItemOffset=firstVisibleItem;
          firstVisibleItemOffset<=lastVisibleItem;
@@ -62,30 +62,30 @@ QVector<QModelIndex> OneDeepTreeView::getAllVisibleItems(){
         varAns.push_back(viewItems[firstVisibleItemOffset].index);
     }
 
-    std::sort( varAns.begin(),varAns.end() );
-    assert( (std::unique(varAns.begin(),varAns.end())==varAns.end())
-            &&"is there a qt bug???" );
+    std::sort(varAns.begin(),varAns.end());
+    assert((std::unique(varAns.begin(),varAns.end())==varAns.end())
+            &&"is there a qt bug???");
 
     return std::move(varAns);
 }
 
-void OneDeepTreeView::paintEvent(QPaintEvent *argEvent){
+void OneDeepTreeView::paintEvent(QPaintEvent *argEvent) {
     Super::paintEvent(argEvent);
     _p_start_gcevent()/*启动gc，删除不可见元素*/;
 }
 
 /*进行滤波，消除过于频繁的gc调用*/
-void OneDeepTreeView::_p_start_gcevent(){
-    const auto arg_tag =++($m$thisp->$m$gc_tag);
-    QTimer::singleShot(10,this,[this,arg_tag](){
-        if(arg_tag!=$m$thisp->$m$gc_tag){return;}
+void OneDeepTreeView::_p_start_gcevent() {
+    const auto arg_tag=++($m$thisp->$m$gc_tag);
+    QTimer::singleShot(10,this,[this,arg_tag]() {
+        if (arg_tag!=$m$thisp->$m$gc_tag) { return; }
         this->gcEvent();
     });
 }
 
-void OneDeepTreeView::verticalScrollbarValueChanged(int arg){
+void OneDeepTreeView::verticalScrollbarValueChanged(int arg) {
     Super::verticalScrollbarValueChanged(arg);
-    const auto varCurrentStamp =++( $m$thisp->$m$VerticalScrollbarValueChangeStamp );
+    const auto varCurrentStamp=++($m$thisp->$m$VerticalScrollbarValueChangeStamp);
     QTimer::singleShot(200,this,[this,varCurrentStamp]() {
         /*200ms内没有再次调用此函数*/
         if (varCurrentStamp==$m$thisp->$m$VerticalScrollbarValueChangeStamp) {
@@ -98,7 +98,7 @@ void OneDeepTreeView::verticalScrollbarValueChanged(int arg){
 }
 
 /*删除看不到的元素*/
-void OneDeepTreeView::gcEvent(){
+void OneDeepTreeView::gcEvent() {
 
     /*获得被管理的元素*/
     auto & varWidgets=$m$thisp->$m$OpendWidgets;
@@ -109,18 +109,12 @@ void OneDeepTreeView::gcEvent(){
     /*获得可见元素*/
     const auto varVisibleItems=getAllVisibleItems();
 
-    auto varVS=varVisibleItems.size();
-    auto varWS=static_cast<DECLTYPE(varVS)>(varWidgets.size());
-    if(varVS==varWS){
-        return/*所有元素都可见*/;
-    }
-
     if (varVisibleItems.empty()) {
         $m$thisp->closeAll();
         return/*所有元素都不可见*/;
     }
 
-    using Compare = _PrivateOneDeepTreeView::TreeViewItemWidgetCompare;
+    using Compare=_PrivateOneDeepTreeView::TreeViewItemWidgetCompare;
     constexpr Compare varCompare;
 
     _PrivateOneDeepTreeView::vector<OneDeepTreeItemWidget *> varAboutToClosed;
@@ -129,9 +123,9 @@ void OneDeepTreeView::gcEvent(){
     for (auto * varI:qAsConst(varWidgets)) {
 
         if (std::binary_search(
-                    varVisibleItems.cbegin(),
-                    varVisibleItems.cend(),
-                    varI,varCompare)) {
+            varVisibleItems.cbegin(),
+            varVisibleItems.cend(),
+            varI,varCompare)) {
             varAllOpenedWidgets.insert(varI);
         }
         else {
@@ -144,10 +138,11 @@ void OneDeepTreeView::gcEvent(){
 
 #ifndef NDEBUG
     {
-        varVS=varVisibleItems.size();
-        varWS=static_cast< DECLTYPE(varVS) >(varWidgets.size());
-        /*可见元素数量应当与被管理元素数量一致*/
-        assert(varVS==varWS);
+        const auto varVS=varVisibleItems.size();
+        const auto varWS=static_cast<DECLTYPE(varVS)>(varWidgets.size());
+        /*可见元素数量应当多于被管理元素数量*/
+        /*因为调用是异步的，所以它们的数量可能不同*/
+        assert(varVS>=varWS);
     }
 #endif
 
@@ -171,19 +166,20 @@ OneDeepTreeDelegate::OneDeepTreeDelegate(_PrivateOneDeepTreeDelegate * p,
     $m$thisp->$m$view=s;
 }
 
-OneDeepTreeDelegate::~OneDeepTreeDelegate(){
+OneDeepTreeDelegate::~OneDeepTreeDelegate() {
     delete $m$thisp;
 }
 
-void OneDeepTreeDelegate::paint(QPainter *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+void OneDeepTreeDelegate::paint(QPainter *a,const QStyleOptionViewItem &b,const QModelIndex &c) const {
     {
-        const auto & varWidgets = $m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
-        auto varPos = varWidgets.find(c);
-        if( varPos == varWidgets.end() ){
+        const auto & varWidgets=$m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
+        auto varPos=varWidgets.find(c);
+        if (varPos==varWidgets.end()) {
             $m$thisp->$m$view->openPersistentEditor(c);
             return;
-        }else{
-            auto * v = *varPos;
+        }
+        else {
+            auto * v=*varPos;
             v->update(b,c);
             return;
         }
@@ -192,38 +188,38 @@ void OneDeepTreeDelegate::paint(QPainter *a, const QStyleOptionViewItem &b, cons
 }
 
 /*用于创建不同类型的工厂*/
-OneDeepTreeItemWidget *OneDeepTreeDelegate::doCreateEditor(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
-    auto ans = new OneDeepTreeItemWidget(a);
+OneDeepTreeItemWidget *OneDeepTreeDelegate::doCreateEditor(QWidget *a,const QStyleOptionViewItem &b,const QModelIndex &c) const {
+    auto ans=new OneDeepTreeItemWidget(a);
     return ans;
-    (void)b;(void)c;
+    (void)b; (void)c;
 }
 
-QWidget *OneDeepTreeDelegate::createEditor(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+QWidget *OneDeepTreeDelegate::createEditor(QWidget *a,const QStyleOptionViewItem &b,const QModelIndex &c) const {
     {
-        auto ans = doCreateEditor(a,b,c);
+        auto ans=doCreateEditor(a,b,c);
         ans->setModelIndex(c);
         ans->setStyleOption(b);
-        auto & varWidgets = $m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
+        auto & varWidgets=$m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
         assert(varWidgets.count(ans)==0);
         varWidgets.insert(ans);
         return ans;
     }
     return Super::createEditor(a,b,c);
-    (void)b;(void)c;
+    (void)b; (void)c;
 }
 
-void OneDeepTreeDelegate::destroyEditor(QWidget *a, const QModelIndex &b) const {
+void OneDeepTreeDelegate::destroyEditor(QWidget *a,const QModelIndex &b) const {
     return Super::destroyEditor(a,b);
 }
 
-void OneDeepTreeDelegate::updateEditorGeometry(QWidget *a, const QStyleOptionViewItem &b, const QModelIndex &c) const {
+void OneDeepTreeDelegate::updateEditorGeometry(QWidget *a,const QStyleOptionViewItem &b,const QModelIndex &c) const {
     return Super::updateEditorGeometry(a,b,c);
 }
 
 void OneDeepTreeDelegate::setEditorData(QWidget *a,const QModelIndex &b) const {
     {
-        auto v = qobject_cast<OneDeepTreeItemWidget*>(a);
-        if(v){
+        auto v=qobject_cast<OneDeepTreeItemWidget*>(a);
+        if (v) {
             v->setData(b);
             return;
         }
@@ -233,12 +229,12 @@ void OneDeepTreeDelegate::setEditorData(QWidget *a,const QModelIndex &b) const {
 
 /*********************************************************************************/
 
-OneDeepTreeItemWidget::OneDeepTreeItemWidget(QWidget * p):Super(p){
+OneDeepTreeItemWidget::OneDeepTreeItemWidget(QWidget * p):Super(p) {
 
 }
 
-void OneDeepTreeItemWidget::update(const QStyleOptionViewItem&a,const QModelIndex&b){
-    if(isOptionChanged(a)){
+void OneDeepTreeItemWidget::update(const QStyleOptionViewItem&a,const QModelIndex&b) {
+    if (isOptionChanged(a)) {
         this->update();
     }
     assert($m$ModelIndexWhenOpened==b);
@@ -246,11 +242,10 @@ void OneDeepTreeItemWidget::update(const QStyleOptionViewItem&a,const QModelInde
     (void)b;
 }
 
-bool OneDeepTreeItemWidget::isOptionChanged(const QStyleOptionViewItem&a){
-    auto & b = this->$m$QStyleOptionViewItem;
-    if(a.rect==b.rect){
-        if(a.state==b.state){
-             assert($m$ModelIndexWhenOpened==a.index);
+bool OneDeepTreeItemWidget::isOptionChanged(const QStyleOptionViewItem&a) {
+    auto & b=this->$m$QStyleOptionViewItem;
+    if (a.rect==b.rect) {
+        if (a.state==b.state) {
             return false;
         }
     }
@@ -258,25 +253,25 @@ bool OneDeepTreeItemWidget::isOptionChanged(const QStyleOptionViewItem&a){
     return true;
 }
 
-void OneDeepTreeItemWidget::setData(const QModelIndex &a){
+void OneDeepTreeItemWidget::setData(const QModelIndex &a) {
     assert($m$ModelIndexWhenOpened==a);
     this->update();
     (void)a;
 }
 
-void OneDeepTreeItemWidget::paintEvent(QPaintEvent *argEvent){
+void OneDeepTreeItemWidget::paintEvent(QPaintEvent *argEvent) {
     Super::paintEvent(argEvent);
 }
 
 /*********************************************************************************/
 
-_PrivateOneDeepTreeView::~_PrivateOneDeepTreeView(){
+_PrivateOneDeepTreeView::~_PrivateOneDeepTreeView() {
 
 }
 
 /*********************************************************************************/
 
-_PrivateOneDeepTreeDelegate::~_PrivateOneDeepTreeDelegate(){
+_PrivateOneDeepTreeDelegate::~_PrivateOneDeepTreeDelegate() {
 
 }
 

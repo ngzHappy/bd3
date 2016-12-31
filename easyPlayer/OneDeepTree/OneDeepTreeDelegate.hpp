@@ -20,7 +20,7 @@ protected:
     OneDeepTreeDelegate(_PrivateOneDeepTreeDelegate *,OneDeepTreeView *);
 public:
     OneDeepTreeDelegate(OneDeepTreeView *);
-    ~OneDeepTreeDelegate();
+    virtual ~OneDeepTreeDelegate();
 protected:
     virtual OneDeepTreeItemWidget *doCreateEditor(QWidget *, const QStyleOptionViewItem &, const QModelIndex &) const ;
     void paint(QPainter *, const QStyleOptionViewItem &, const QModelIndex &) const override;
