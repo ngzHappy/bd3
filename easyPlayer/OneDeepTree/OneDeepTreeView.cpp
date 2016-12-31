@@ -117,8 +117,8 @@ void OneDeepTreeView::gcEvent() {
     {/*查看可见序列与被管理序列是否相同，如果不同执行gc*/
         const auto varVS=varVisibleItems.size();
         const auto varWS=static_cast<DECLTYPE(varVS)>(varWidgets.size());
-        auto varPos=varVisibleItems.constBegin();
         if (varVS==varWS) {
+            auto varPos=varVisibleItems.constBegin();
             for (auto * w:varWidgets) {
                 if (w->getModelIndex()!=*varPos) { goto do_gc; }
                 ++varPos;
