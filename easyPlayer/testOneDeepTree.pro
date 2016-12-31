@@ -6,7 +6,7 @@ QT += gui_private
 QT += core_private
 QT += widgets_private
 
-TARGET = easyPlayer
+TARGET = easyPlayerTestOneDeepTree
 TEMPLATE = app
 
 DEFINES *= THIS_PROJECT_BUILD_DIR=\\\"$$PWD\\\"
