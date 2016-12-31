@@ -15,6 +15,8 @@ class OneDeepTreeDelegate : public QStyledItemDelegate {
 private:
     using Super=QStyledItemDelegate;
     friend class _PrivateOneDeepTreeDelegate;
+protected:
+    OneDeepTreeDelegate(_PrivateOneDeepTreeDelegate *,OneDeepTreeView *);
 public:
     OneDeepTreeDelegate(OneDeepTreeView *);
     ~OneDeepTreeDelegate();

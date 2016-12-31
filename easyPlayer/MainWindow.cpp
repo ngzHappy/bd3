@@ -1,11 +1,9 @@
 ﻿#include "MainWindow.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
+    : QMainWindow(parent){
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow(){
 
 }

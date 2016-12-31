@@ -10,7 +10,7 @@
 
 class _PrivateOneDeepTreeView{
 public:
-    ~_PrivateOneDeepTreeView();
+    virtual ~_PrivateOneDeepTreeView();
 
     std::uintmax_t $m$gc_tag=0/*这里必须是unsigned*/;
     std::uintmax_t $m$VerticalScrollbarValueChangeStamp=0/*这里必须是unsigned*/;

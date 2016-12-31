@@ -18,6 +18,8 @@ private:
 public:
     OneDeepTreeView(QWidget * /**/=nullptr);
     ~OneDeepTreeView();
+protected:
+    OneDeepTreeView(_PrivateOneDeepTreeView*,QWidget*);
 $m$ONEDEEPTREEVIEW_PROTECTED:
     _PrivateOneDeepTreeView *$m$thisp=nullptr;
      QVector<QModelIndex> getAllVisibleItems()/*获得所有可见的item的index*/;

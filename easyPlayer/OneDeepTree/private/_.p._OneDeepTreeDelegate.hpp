@@ -7,7 +7,7 @@
 
 class _PrivateOneDeepTreeDelegate {
 public:
-    ~_PrivateOneDeepTreeDelegate();
+    virtual ~_PrivateOneDeepTreeDelegate();
      OneDeepTreeView *$m$view=nullptr;
 private:
     CPLUSPLUS_OBJECT(_PrivateOneDeepTreeDelegate)

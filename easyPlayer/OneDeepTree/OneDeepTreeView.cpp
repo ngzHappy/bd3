@@ -20,9 +20,12 @@
 
 /*********************************************************************************/
 
-OneDeepTreeView::OneDeepTreeView(QWidget * p ):Super(p){
-    $m$thisp=new _PrivateOneDeepTreeView;
+OneDeepTreeView::OneDeepTreeView(_PrivateOneDeepTreeView*p,QWidget*s):Super(s){
+    $m$thisp=p;
     $m$thisp->super=this;
+}
+
+OneDeepTreeView::OneDeepTreeView(QWidget * p):OneDeepTreeView(new _PrivateOneDeepTreeView,p){
 }
 
 OneDeepTreeView::~OneDeepTreeView(){
@@ -68,7 +71,7 @@ QVector<QModelIndex> OneDeepTreeView::getAllVisibleItems(){
 
 void OneDeepTreeView::paintEvent(QPaintEvent *argEvent){
     Super::paintEvent(argEvent);
-    _p_start_gcevent();
+    _p_start_gcevent()/*启动gc，删除不可见元素*/;
 }
 
 /*进行滤波，消除过于频繁的gc调用*/
@@ -107,14 +110,14 @@ void OneDeepTreeView::gcEvent(){
     const auto varVisibleItems=getAllVisibleItems();
 
     auto varVS=varVisibleItems.size();
-    auto varWS=static_cast< DECLTYPE(varVS) >(varWidgets.size());
+    auto varWS=static_cast<DECLTYPE(varVS)>(varWidgets.size());
     if(varVS==varWS){
-        return;
+        return/*所有元素都可见*/;
     }
 
     if (varVisibleItems.empty()) {
         $m$thisp->closeAll();
-        return;
+        return/*所有元素都不可见*/;
     }
 
     using Compare = _PrivateOneDeepTreeView::TreeViewItemWidgetCompare;
@@ -123,7 +126,7 @@ void OneDeepTreeView::gcEvent(){
     _PrivateOneDeepTreeView::vector<OneDeepTreeItemWidget *> varAboutToClosed;
     DECLTYPE(varWidgets) varAllOpenedWidgets;
 
-    for (auto * varI:varWidgets) {
+    for (auto * varI:qAsConst(varWidgets)) {
 
         if (std::binary_search(
                     varVisibleItems.cbegin(),
@@ -149,18 +152,23 @@ void OneDeepTreeView::gcEvent(){
 #endif
 
     /*关闭不可见元素*/
-    for (auto * varI:varAboutToClosed) {
+    for (auto * varI:qAsConst(varAboutToClosed)) {
         varI->aboutToClosed();
         this->closePersistentEditor(varI->getModelIndex());
     }
 
+    return;
 }
 
 /*********************************************************************************/
 
-OneDeepTreeDelegate::OneDeepTreeDelegate(OneDeepTreeView * p): Super(p) {
-    $m$thisp = new _PrivateOneDeepTreeDelegate;
-    $m$thisp->$m$view=p;
+OneDeepTreeDelegate::OneDeepTreeDelegate(OneDeepTreeView * p):
+    OneDeepTreeDelegate(new _PrivateOneDeepTreeDelegate,p) {}
+
+OneDeepTreeDelegate::OneDeepTreeDelegate(_PrivateOneDeepTreeDelegate * p,
+                                         OneDeepTreeView *s):Super(s) {
+    $m$thisp=p;
+    $m$thisp->$m$view=s;
 }
 
 OneDeepTreeDelegate::~OneDeepTreeDelegate(){
@@ -175,6 +183,8 @@ void OneDeepTreeDelegate::paint(QPainter *a, const QStyleOptionViewItem &b, cons
             $m$thisp->$m$view->openPersistentEditor(c);
             return;
         }else{
+            auto * v = *varPos;
+            v->update(b,c);
             return;
         }
     }
@@ -185,12 +195,14 @@ QWidget *OneDeepTreeDelegate::createEditor(QWidget *a, const QStyleOptionViewIte
     {
         auto ans = new OneDeepTreeItemWidget(a);
         ans->setModelIndex(c);
+        ans->setStyleOption(b);
         auto & varWidgets = $m$thisp->$m$view->$m$thisp->$m$OpendWidgets;
         assert(varWidgets.count(ans)==0);
         varWidgets.insert(ans);
         return ans;
     }
     return Super::createEditor(a,b,c);
+    (void)b;(void)c;
 }
 
 void OneDeepTreeDelegate::destroyEditor(QWidget *a, const QModelIndex &b) const {
@@ -204,6 +216,10 @@ void OneDeepTreeDelegate::updateEditorGeometry(QWidget *a, const QStyleOptionVie
 void OneDeepTreeDelegate::setEditorData(QWidget *a,const QModelIndex &b) const {
     {
         auto v = qobject_cast<OneDeepTreeItemWidget*>(a);
+        if(v){
+            v->setData(b);
+            return;
+        }
     }
     return Super::setEditorData(a,b);
 }
@@ -215,15 +231,34 @@ OneDeepTreeItemWidget::OneDeepTreeItemWidget(QWidget * p):Super(p){
 }
 
 void OneDeepTreeItemWidget::update(const QStyleOptionViewItem&a,const QModelIndex&b){
+    if(isOptionChanged(a)){
+        this->update();
+    }
+    assert($m$ModelIndexWhenOpened==b);
+    return;
     (void)b;
 }
 
 bool OneDeepTreeItemWidget::isOptionChanged(const QStyleOptionViewItem&a){
-
+    auto & b = this->$m$QStyleOptionViewItem;
+    if(a.rect==b.rect){
+        if(a.state==b.state){
+             assert($m$ModelIndexWhenOpened==a.index);
+            return false;
+        }
+    }
+    b=a;
+    return true;
 }
 
 void OneDeepTreeItemWidget::setData(const QModelIndex &a){
+    assert($m$ModelIndexWhenOpened==a);
+    this->update();
+    (void)a;
+}
 
+void OneDeepTreeItemWidget::paintEvent(QPaintEvent *argEvent){
+    Super::paintEvent(argEvent);
 }
 
 /*********************************************************************************/
