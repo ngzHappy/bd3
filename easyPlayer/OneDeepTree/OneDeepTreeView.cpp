@@ -114,6 +114,21 @@ void OneDeepTreeView::gcEvent() {
         return/*所有元素都不可见*/;
     }
 
+    {/*查看可见序列与被管理序列是否相同，如果不同执行gc*/
+        const auto varVS=varVisibleItems.size();
+        const auto varWS=static_cast<DECLTYPE(varVS)>(varWidgets.size());
+        auto varPos=varVisibleItems.constBegin();
+        if (varVS==varWS) {
+            for (auto * w:varWidgets) {
+                if (w->getModelIndex()!=*varPos) { goto do_gc; }
+                ++varPos;
+            }
+            return/*两个序列完全相同，放弃gc*/;
+        }
+    }
+
+    do_gc:
+
     using Compare=_PrivateOneDeepTreeView::TreeViewItemWidgetCompare;
     constexpr Compare varCompare;
 
