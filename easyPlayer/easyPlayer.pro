@@ -27,5 +27,5 @@ LIBS+=-L$$THIS_PROJECT_DESTDIR -lqt_basic_library
 
 include($$PWD/OneDeepTree/onedeeptree.pri)
 include($$PWD/EasyPlayerGlobal/easyPlayerGlobal.pri)
-
+include($$PWD/DataModel/datamodel.pri)
 
