@@ -26,6 +26,6 @@ include($$PWD/../qt_basic/qt_basic.pri)
 LIBS+=-L$$THIS_PROJECT_DESTDIR -lqt_basic_library
 
 include($$PWD/OneDeepTree/onedeeptree.pri)
-
+include($$PWD/EasyPlayerGlobal/easyPlayerGlobal.pri)
 
 

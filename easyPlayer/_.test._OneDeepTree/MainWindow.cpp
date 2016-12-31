@@ -1,5 +1,6 @@
 ﻿#include "MainWindow.hpp"
 
+#include <easyplayerconfig.hpp>
 #include "../OneDeepTree/OneDeepTreeView.hpp"
 #include "../OneDeepTree/OneDeepTreeDelegate.hpp"
 #include "../OneDeepTree/OneDeepTreeItemWidget.hpp"
@@ -18,11 +19,7 @@ public:
         Super::paintEvent(argEvent);
 
         QPainter painter(this);
-        painter.setRenderHints(QPainter::Antialiasing|
-            QPainter::TextAntialiasing|
-            QPainter::SmoothPixmapTransform|
-            QPainter::HighQualityAntialiasing
-        );
+        painter.setRenderHints(defaultQPainterRenderHints());
 
         painter.setBrush(QColor(222,std::rand()&127,std::rand()&127));
         painter.setPen(QPen(QColor(123,222,123),2));
