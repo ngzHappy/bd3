@@ -662,7 +662,7 @@ public:
         if (arg==nullptr) { return; }
         auto var=reinterpret_cast<Item *>(arg);
         --var;
-        if(isRightPointer(var->data)){
+        if(isRightPointer(var)){
             var->data->free(var);
         }else{
             std::free(arg);
