@@ -1,6 +1,6 @@
 ﻿/*MainWindow.cpp*/
 #include "MainWindow.hpp"
-#include "ui_MainWindow.h"
+//#include "ui_MainWindow.h"
 
 class MainWindow::_PrivateMainWindow{
 public:
