@@ -5,32 +5,45 @@
 
 #include <cplusplus_basic.hpp>
 
-/*0*/
+/*new*/
 void * operator new(std::size_t arg){
     return memory::malloc(arg);
 }
 
-/*1*/
+/*new*/
+void* operator new(std::size_t arg, const std::nothrow_t&){
+    return memory::malloc(arg);
+}
+
+/*delete*/
 void operator delete(void * arg){
     return memory::free(arg);
 }
 
-/*2*/
+/*delete*/
 void operator delete(void * arg,std::size_t){
     return memory::free(arg);
 }
 
-/*3*/
+/*new[]*/
 void * operator new[](std::size_t arg){
     return memory::malloc(arg);
 }
 
-/*4*/
+/*new[]*/
+void* operator new[] (std::size_t arg, const std::nothrow_t&){
+    return memory::malloc(arg);
+}
+
+/*delete[]*/
 void operator delete[](void * arg){
     return memory::free(arg);
 }
 
-/*5*/
+/*delete[]*/
 void operator delete[](void * arg,std::size_t){
     return memory::free(arg);
 }
+
+
+
