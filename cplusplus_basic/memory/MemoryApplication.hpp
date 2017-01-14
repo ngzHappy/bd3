@@ -3,6 +3,8 @@
  * 最好被写在main或者Application定义的文件里
 */
 
+#if defined(OPERATOR_NEW_DELETE)
+
 #include <cplusplus_basic.hpp>
 
 /*new*/
@@ -45,5 +47,5 @@ void operator delete[](void * arg,std::size_t){
     return memory::free(arg);
 }
 
-
+#endif
 
