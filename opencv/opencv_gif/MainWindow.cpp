@@ -26,5 +26,7 @@ void MainWindow::openLua(){
     return _Super::openLua();
 }
 
+#include <memory/MemoryApplication.hpp>
+
 /*End of the file.*/
 

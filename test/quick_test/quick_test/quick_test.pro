@@ -12,7 +12,8 @@ SOURCES += main.cpp\
     TestMemory.cpp \
     TestException.cpp \
     TestLua.cpp \
-    ContainersTest.cpp
+    ContainersTest.cpp \
+    operator_new_delete.cpp
 
 HEADERS  += MainWindow.hpp \
     TestMemory.hpp \

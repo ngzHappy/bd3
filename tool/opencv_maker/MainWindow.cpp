@@ -87,6 +87,8 @@ Application::~Application(){
     delete _thisp;
 }
 
+#include <memory/MemoryApplication.hpp>
+
 /*End of the file.*/
 
 )_!_"_qu8;

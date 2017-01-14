@@ -18,5 +18,7 @@ Application::~Application() {
     delete _thisp;
 }
 
+#include <memory/MemoryApplication.hpp>
+
 /*End of the file.*/
 
