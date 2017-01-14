@@ -227,14 +227,14 @@ Memory&operator=(Memory&&)=delete;
 
     {
         ofs<<u8R"(
-
+#if defined(CHECK_POINTER)
 bool isRightPointer(const void * arg)const{
         static const char * const varBegin=(const char *)(this);
         static const char * const varEnd=(const char *)(this)+sizeof(*this);
         const char * const var=(const char *)(arg);
         return (var>=varBegin)&&(var<=varEnd);
     }
-
+#endif
 /*+++*/
 void * malloc(uint_t n){
         constexpr static int_t var_size_of_Item=sizeof(Item);
@@ -257,14 +257,18 @@ void * malloc(uint_t n){
         auto var=reinterpret_cast<Item *>(arg);
         --var;
         /*
-        有些库实现不佳将new的内容用free释放
+        有些库实现不佳将malloc的数据用delete释放
         这里不得不进行特殊处理
         */
+#if defined(CHECK_POINTER)
         if(isRightPointer(var->data)){
+#endif
             var->data->free(var);
+#if defined(CHECK_POINTER)
         }else{
             std::free(arg);
         }
+#endif
     }
 
     uint_t size(void * arg)const{
