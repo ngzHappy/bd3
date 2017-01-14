@@ -1,5 +1,6 @@
 ﻿/*
  * 此文件只能在一个项目中被编译一次
+ * 最好被写在main或者Application定义的文件里
 */
 
 #include <cplusplus_basic.hpp>
