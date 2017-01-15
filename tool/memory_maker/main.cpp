@@ -277,10 +277,11 @@ void * malloc(uint_t n){
         --var;
         /*
         有些库实现不佳将malloc的数据用delete释放
+        重载全局operator new/delete有时候不好使
         这里不得不进行特殊处理
         */
 #if defined(CHECK_POINTER)
-        if(isRightPointer(var->data)){
+        if(isRightPointer(var)){
 #endif
             var->data->free(var);
 #if defined(CHECK_POINTER)
