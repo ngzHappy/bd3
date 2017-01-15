@@ -3,6 +3,7 @@
  * 最好被写在main或者Application定义的文件里
 */
 
+#define OPERATOR_NEW_DELETE
 #if defined(OPERATOR_NEW_DELETE)
 
 #include <cplusplus_basic.hpp>

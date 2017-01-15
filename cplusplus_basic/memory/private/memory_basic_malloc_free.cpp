@@ -48,7 +48,14 @@ public:
 
     class Item {
     public:
+        constexpr static const char * get_code_0() { return"0"; }
+        constexpr static const char * get_code_1() { return"1"; }
+        constexpr static const char * get_code_2() { return"2"; }
+   
+        const char * code_0;
         MFItem * data;
+        const char * code_1;
+        const char * code_2;
     };
 
     class Item_default final :public MFItem {
@@ -66,7 +73,10 @@ public:
         void * malloc(uint_t arg) {
             auto var=reinterpret_cast<Item *>(std::malloc(arg));
             if (var) {
+                var->code_0=Item::get_code_0();
                 var->data=this;
+                var->code_1=Item::get_code_1();
+                var->code_2=Item::get_code_2();
                 return ++var;
             }
             return nullptr;
@@ -84,7 +94,10 @@ public:
         void * malloc() {
             auto var=reinterpret_cast<Item *>(_pm_pool.malloc());
             if (var) {
+                var->code_0=Item::get_code_0();
                 var->data=this;
+                var->code_1=Item::get_code_1();
+                var->code_2=Item::get_code_2();
                 return ++var;
             }
             return nullptr;
@@ -643,12 +656,18 @@ public:
     Memory(Memory&&)=delete;
     Memory&operator=(Memory&&)=delete;
 
+#define CHECK_POINTER
 #if defined(CHECK_POINTER)
-    bool isRightPointer(const void * arg)const{
-        static const char * const varBegin=(const char *)(this);
-        static const char * const varEnd=(const char *)(this)+sizeof(*this);
-        const char * const var=(const char *)(arg);
-        return (var>=varBegin)&&(var<=varEnd);
+    bool isRightPointer(const Item * arg)const{
+        {
+            static const char * const varBegin=(const char *)(this);
+            static const char * const varEnd=(const char *)(this)+sizeof(*this);
+            const char * const var=(const char *)(arg->data);
+            if (!((var>=varBegin)&&(var<=varEnd))) { return false; }
+        }
+        return ((arg->code_2==Item::get_code_2())&&
+        (arg->code_0==Item::get_code_0())&&
+        (arg->code_1==Item::get_code_1()));
     }
 #endif
 
@@ -665,7 +684,7 @@ public:
         auto var=reinterpret_cast<Item *>(arg);
         --var;
 #if defined(CHECK_POINTER)
-        if(isRightPointer(var->data)){
+        if(isRightPointer(var)){
 #endif
             var->data->free(var);
 #if defined(CHECK_POINTER)

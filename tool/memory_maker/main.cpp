@@ -118,10 +118,17 @@ extern void __memory_clean_thread_function(void(*)(void *),void *);
              virtual uint_t size(void *) const =0;
          };
 
-         class Item{
-         public:
-             MFItem * data;
-         };
+         class Item {
+    public:
+        constexpr static const char * get_code_0() { return"0"; }
+        constexpr static const char * get_code_1() { return"1"; }
+        constexpr static const char * get_code_2() { return"2"; }
+   
+        const char * code_0;
+        MFItem * data;
+        const char * code_1;
+        const char * code_2;
+    };
 
          class Item_default final:public MFItem{
          public:
@@ -138,8 +145,11 @@ extern void __memory_clean_thread_function(void(*)(void *),void *);
              void * malloc(uint_t arg){
                 auto var=reinterpret_cast<Item *>(std::malloc(arg));
                 if (var) {
-                 var->data=this;
-                  return ++var;
+                  var->code_0=Item::get_code_0();
+                var->data=this;
+                var->code_1=Item::get_code_1();
+                var->code_2=Item::get_code_2();
+                return ++var;
              }
              return nullptr;
              }/*malloc(uint_t arg)*/
@@ -156,7 +166,10 @@ extern void __memory_clean_thread_function(void(*)(void *),void *);
              void * malloc(){
                  auto var=reinterpret_cast<Item *>(_pm_pool.malloc());
                 if(var){
+                var->code_0=Item::get_code_0();
                 var->data=this;
+                var->code_1=Item::get_code_1();
+                var->code_2=Item::get_code_2();
                 return ++var;
             }
             return nullptr;
@@ -227,12 +240,18 @@ Memory&operator=(Memory&&)=delete;
 
     {
         ofs<<u8R"(
+#define CHECK_POINTER
 #if defined(CHECK_POINTER)
 bool isRightPointer(const void * arg)const{
-        static const char * const varBegin=(const char *)(this);
-        static const char * const varEnd=(const char *)(this)+sizeof(*this);
-        const char * const var=(const char *)(arg);
-        return (var>=varBegin)&&(var<=varEnd);
+          {
+            static const char * const varBegin=(const char *)(this);
+            static const char * const varEnd=(const char *)(this)+sizeof(*this);
+            const char * const var=(const char *)(arg->data);
+            if (!((var>=varBegin)&&(var<=varEnd))) { return false; }
+        }
+        return ((arg->code_2==Item::get_code_2())&&
+        (arg->code_0==Item::get_code_0())&&
+        (arg->code_1==Item::get_code_1()));
     }
 #endif
 /*+++*/
