@@ -111,9 +111,6 @@ QWidget* MainWindow::addImage(const QImage &arg) {
     return ans;
 }
 
-
-
-
 void MainWindow::openLua() {
     return _Super::openLua();
 }

@@ -48,14 +48,20 @@ public:
 
     class Item {
     public:
+#if defined(CHECK_POINTER)
         constexpr static const char * get_code_0() { return"0"; }
         constexpr static const char * get_code_1() { return"1"; }
         constexpr static const char * get_code_2() { return"2"; }
-   
+#endif
+
+#if defined(CHECK_POINTER)
         const char * code_0;
+#endif
         MFItem * data;
+#if defined(CHECK_POINTER)
         const char * code_1;
         const char * code_2;
+#endif
     };
 
     class Item_default final :public MFItem {
@@ -73,10 +79,14 @@ public:
         void * malloc(uint_t arg) {
             auto var=reinterpret_cast<Item *>(std::malloc(arg));
             if (var) {
+#if defined(CHECK_POINTER)
                 var->code_0=Item::get_code_0();
+#endif
                 var->data=this;
+#if defined(CHECK_POINTER)
                 var->code_1=Item::get_code_1();
                 var->code_2=Item::get_code_2();
+#endif
                 return ++var;
             }
             return nullptr;
@@ -94,10 +104,14 @@ public:
         void * malloc() {
             auto var=reinterpret_cast<Item *>(_pm_pool.malloc());
             if (var) {
+#if defined(CHECK_POINTER)
                 var->code_0=Item::get_code_0();
+#endif
                 var->data=this;
+#if defined(CHECK_POINTER)
                 var->code_1=Item::get_code_1();
                 var->code_2=Item::get_code_2();
+#endif
                 return ++var;
             }
             return nullptr;
@@ -656,7 +670,6 @@ public:
     Memory(Memory&&)=delete;
     Memory&operator=(Memory&&)=delete;
 
-#define CHECK_POINTER
 #if defined(CHECK_POINTER)
     bool isRightPointer(const Item * arg)const{
         {
