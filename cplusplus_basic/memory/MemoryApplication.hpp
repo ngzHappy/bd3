@@ -2,6 +2,28 @@
  * 此文件只能在一个项目中被编译一次
  * 最好被写在main或者Application定义的文件里
 */
+#include <Qt/boost/config.hpp>
+
+#if defined(HAS_TCMALLOC_CONCEPT)
+
+extern "C" {/*extern "C"*/
+
+BOOST_SYMBOL_IMPORT void __tcmalloc();
+
+}/*extern "C"*/
+
+namespace  {
+
+class ___init_tcmalloc{
+public:
+    ___init_tcmalloc(){
+    __tcmalloc();
+    }
+}___;
+
+}/*namespace*/
+
+#endif
 
 //#define OPERATOR_NEW_DELETE
 #if defined(OPERATOR_NEW_DELETE)

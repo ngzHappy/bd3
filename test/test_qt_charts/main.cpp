@@ -39,3 +39,4 @@ int main(int argc, char *argv[])try{
     return -1;
 }
 
+#include <memory/MemoryApplication.hpp>
