@@ -8,3 +8,5 @@ QtBasicLibrary::~QtBasicLibrary(){
 
 }
 
+#include <memory/MemoryApplication.hpp>
+
